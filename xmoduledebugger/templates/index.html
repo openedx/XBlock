@@ -2,6 +2,8 @@
     <head>
     </head>
     <body>
-        {{xmodules}}
+        {% for module_name, module_class in xmodules %}
+        <a href="{{module_name}}">{{module_name}}</a>
+        {% endfor %}
     </body>
 </body>

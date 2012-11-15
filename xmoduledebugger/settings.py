@@ -3,6 +3,9 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# The variable doesn't seem to actually get interpolated in
+TEMPLATE_STRING_IF_INVALID = "<MISSING VARAIBLE '%s'>"
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )

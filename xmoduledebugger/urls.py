@@ -5,7 +5,8 @@ from django.conf.urls import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = patterns('xmoduledebugger.views',
-    url(r'^$', 'index', name='index')
+    url(r'^$', 'index', name='index'),
+    url(r'^(?P<module_name>.*)$', 'module', name='module'),
     # Examples:
     # url(r'^$', 'xmoduledebugger.views.home', name='home'),
     # url(r'^xmoduledebugger/', include('xmoduledebugger.foo.urls')),
