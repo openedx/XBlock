@@ -15,6 +15,9 @@ def module(request, module_name):
     content = course_settings = student_state = user_preferences = {}
     runtime = None
 
+    module = module(runtime, content, course_settings, user_preferences, student_state)
+
     return render_to_response('module.html', {
-        'module': module(runtime, content, course_settings, user_preferences, student_state)
+        'module': module,
+        'student_view': module.render('student_view'),
     })
