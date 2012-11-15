@@ -2,6 +2,8 @@ from django.shortcuts import render_to_response
 
 from xmodule.xmodule import XModule
 
+class DebuggerRuntime(object):
+    children = []
 
 def index(request):
     xmodules = XModule.load_classes()
@@ -9,11 +11,10 @@ def index(request):
         'xmodules': xmodules
     })
 
-
 def module(request, module_name):
     module = XModule.load_class(module_name)
     content = course_settings = student_state = user_preferences = {}
-    runtime = None
+    runtime = DebuggerRuntime()
 
     module = module(runtime, content, course_settings, user_preferences, student_state)
 
