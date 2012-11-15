@@ -1,9 +1,19 @@
 from django.shortcuts import render_to_response
 
-from xmodule.xmodule import XModule
+from xmodule.xmodule import XModule, register_view
+
+class DebuggingChildModule(XModule):
+    @register_view('student_view')
+    def student_view(self):
+        return "<div class='debug_child'></div>"
+
+def debug_child():
+    return DebuggingChildModule(DebuggerRuntime(), {}, {}, {}, {})
 
 class DebuggerRuntime(object):
-    children = []
+    @property
+    def children(self):
+        return [debug_child(), debug_child()]
 
 def index(request):
     xmodules = XModule.load_classes()
@@ -20,5 +30,5 @@ def module(request, module_name):
 
     return render_to_response('module.html', {
         'module': module,
-        'student_view': module.render('student_view'),
+        'student_view': XModule.render(module, 'student_view'),
     })
