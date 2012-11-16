@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
 
-from xmodule.xmodule import XModule, register_view
+from xmodule.xmodule import XModule, register_view, MissingXModuleView
 from xmodule.structure_module import Usage
 
 class DebuggingChildModule(XModule):
@@ -37,15 +37,20 @@ def index(request):
     })
 
 def module(request, module_name):
-    module = XModule.load_class(module_name)
+    module_cls = XModule.load_class(module_name)
     content = course_settings = student_state = user_preferences = {}
     runtime = DebuggerRuntime()
 
-    module = module(runtime, content, course_settings, user_preferences, student_state)
+    module = module_cls(runtime, content, course_settings, user_preferences, student_state)
+
+    try:
+        student_view = XModule.render(module, 'student_view')
+    except MissingXModuleView:
+        student_view = "No View Found"
 
     return render_to_response('module.html', {
         'module': module,
-        'student_view': XModule.render(module, 'student_view'),
+        'student_view': student_view
     })
 
 def settings(request):
