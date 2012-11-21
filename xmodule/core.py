@@ -52,8 +52,8 @@ class ThumbsModule(XModule):
     @votes_scope
     def render_student(self, context):
         return Widget(render_template("upvotes.html",
-            upvotes=context.votes['up'],
-            downvotes=context.votes['down'],
+            upvotes=context.votes.get('up', 0),
+            downvotes=context.votes.get('down', 0),
         ))
 
     @register_handler('vote')
@@ -63,5 +63,5 @@ class ThumbsModule(XModule):
             log.error('error!')
             return
 
-        context.votes[data['vote_type']] += 1
+        context.votes.setdefault(data['vote_type'], 0) += 1
 
