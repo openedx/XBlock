@@ -11,7 +11,11 @@ def scope(name, by_student=True, by_course=True, by_module=ModuleScope.id, attr=
     return wrapper
 
 
-def requires_children(fn):
+def needs_children(fn):
+    return fn
+
+
+def needs_settings(fn):
     return fn
 
 
@@ -34,7 +38,7 @@ class XModule(object):
 class VerticalModule(XModule):
 
     @register_view('student')
-    @requires_children
+    @needs_children
     def render_student(self, context):
         result = Widget()
         child_widgets = [self.render_child(child) for child in context.children]
