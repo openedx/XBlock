@@ -3,8 +3,8 @@ import json
 from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
 
-from xmodule.xmodule import XModule, register_view, MissingXModuleView
-from xmodule.structure_module import Usage
+from xmodule.core import XModule, register_view, MissingXModuleView
+#from xmodule.structure_module import Usage
 
 class DebuggingChildModule(XModule):
     @register_view('student_view')
@@ -29,6 +29,15 @@ class User(object):
     id = None
     groups = []
 
+class Placeholder(object):
+    def __init__(self, name='generic'):
+        self.name = name
+
+    def __getattr__(self, name):
+        raise Exception("Tried to use %s on %r %s instance" % (name, self.name, self.__class__.__name__))
+
+class Database(Placeholder):
+    pass
 
 def index(request):
     xmodules = XModule.load_classes()
@@ -38,10 +47,10 @@ def index(request):
 
 def module(request, module_name):
     module_cls = XModule.load_class(module_name)
-    content = course_settings = student_state = user_preferences = {}
     runtime = DebuggerRuntime()
+    db = Database()
 
-    module = module_cls(runtime, content, course_settings, user_preferences, student_state)
+    module = module_cls(runtime, db)
 
     try:
         student_view = XModule.render(module, 'student_view')
