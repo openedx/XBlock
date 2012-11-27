@@ -2,17 +2,19 @@ import json
 
 from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
+from django.template import loader as django_template_loader, Context as DjangoContext
 
 from xmodule.core import XModule, register_view, MissingXModuleView
+from xmodule.widget import Widget
 #from xmodule.structure_module import Usage
 
 class DebuggingChildModule(XModule):
     @register_view('student_view')
-    def student_view(self):
-        return "<div class='debug_child'></div>"
+    def student_view(self, context):
+        return Widget("<div class='debug_child'></div>")
 
 def debug_child():
-    return DebuggingChildModule(DebuggerRuntime(), {}, {}, {}, {})
+    return DebuggingChildModule(DebuggerRuntime(), Database())
 
 class DebuggerRuntime(object):
     @property
@@ -24,6 +26,9 @@ class DebuggerRuntime(object):
             return get_cache(cache_name)
         except:
             return cache
+
+    def render_template(self, template_name, **kwargs):
+        return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
 
 class User(object):
     id = None
@@ -39,6 +44,12 @@ class Placeholder(object):
 class Database(Placeholder):
     pass
 
+class Context(object):
+    def __init__(self):
+        self._current_view = None
+
+#---- Views -----
+
 def index(request):
     xmodules = XModule.load_classes()
     return render_to_response('index.html', {
@@ -51,11 +62,14 @@ def module(request, module_name):
     db = Database()
 
     module = module_cls(runtime, db)
+    context = Context()
 
     try:
-        student_view = XModule.render(module, 'student_view')
+        widget = module.render('student_view', context)
     except MissingXModuleView:
         student_view = "No View Found"
+    else:
+        student_view = widget.html()
 
     return render_to_response('module.html', {
         'module': module,

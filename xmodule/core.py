@@ -1,18 +1,16 @@
+import inspect
 from .widget import Widget
 
-
-
-
 def needs_children(fn):
+    fn.needs_children = True
     return fn
-
 
 def needs_settings(fn):
     return fn
 
-
 def register_view(name):
     def wrapper(fn):
+        fn.view_name = name
         return fn
     return wrapper
 
@@ -43,23 +41,41 @@ class XModule(Plugin):
         self.db = db
 
     def find_view(self, view_name):
-        for method_name, method_fn in inspect.getmembers(self, inspect.ismethod):
-            if getattr(method_fn, 'view_name', None) == view_name:
-                return method_fn
+        for name, fn in inspect.getmembers(self, inspect.ismethod):
+            fn_view_name = getattr(fn, 'view_name', None)
+            if fn_view_name == view_name:
+                return fn
         raise MissingXModuleView(self.__class__, view_name)
 
+    def render(self, view_name, context):
+        context._view_name = view_name
+        widget = self.find_view(view_name)(context)
+        context._view_name = None
+        return widget
+
+    def render_child(self, child, context, view_name=None):
+        view_name = view_name or context._view_name
+        widget = child.find_view(view_name)(context)
+        return widget
+
+class HelloWorldModule(XModule):
+    @register_view('student_view')
+    def student_view(self, context):
+        return Widget("Hello, world!")
 
 class VerticalModule(XModule):
 
-    @register_view('student')
+    @register_view('student_view')
     @needs_children
     def render_student(self, context):
         result = Widget()
-        child_widgets = [self.render_child(child) for child in context.children]
+        # TODO: self.runtime.children is actual children here, not ids...
+        child_widgets = [self.render_child(child, context) for child in self.runtime.children]
         result.add_widget_resources(child_widgets)
-        result.add_content(render_template("vertical.html",
-            children=[w.content for w in child_widgets]
+        result.add_content(self.runtime.render_template("vertical.html",
+            children=child_widgets
         ))
+        return result
 
 
 class ModuleScope(object):
@@ -125,19 +141,13 @@ if 0:
 
 class ThumbsModule(XModule):
 
-    @register_view('student')
+    @register_view('student_view')
     @cache_for_all_students # @depends_on(student=False)
     def render_student(self, context):
         # With named scopes:
-        return Widget(render_template("upvotes.html",
+        return Widget(self.runtime.render_template("upvotes.html",
             upvotes=self.content.votes.get('up', 0),
             downvotes=self.content.votes.get('down', 0),
-        ))
-        # Pyotr's way:
-        content = self.db.query(module_id=True, module_type=False, student=False, keys=['votes'])
-        return Widget(render_template("upvotes.html",
-            upvotes=content.votes.get('up', 0),
-            downvotes=content.votes.get('down', 0),
         ))
 
     @register_handler('vote')
