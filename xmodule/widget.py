@@ -41,8 +41,9 @@ class Widget(object):
     def cache_for(self, seconds):
         self.cache_seconds = seconds
 
-    def js_initialize(self, js_func):
-        self.js_init = js_func
+    def initialize_js(self, js_func, runtime_version=1):
+        """Register a Javascript function to initialize the Widget's browser code."""
+        self.js_init = (js_func, runtime_version)
 
     # Implementation methods: don't override
 
