@@ -139,10 +139,8 @@ class VerticalModule(XModule):
         result = Widget()
         # TODO: self.runtime.children is actual children here, not ids...
         child_widgets = [self.render_child(child, context) for child in self.runtime.children]
-        result.add_widget_resources(child_widgets)
-        result.add_content(self.runtime.render_template("vertical.html",
-            children=child_widgets
-        ))
+        result.add_widgets_resources(child_widgets)
+        result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
         return result
 
 

@@ -1,18 +1,13 @@
 <html>
     <head>
         <style type="text/css">
-        .debug_child {
-            background-color: grey;
-            width: 200px;
-            height: 100px;
-            margin: 10px;
-        }
         .data_label {
             width: 8em;
             display: block;
             float: left;
         }
         </style>
+        {{head_html|safe}}
     </head>
     <body>
         <!--
@@ -38,7 +33,7 @@
         </div>
         <hr />
         <div class="student_view">
-            {{student_view|safe}}
+            {{body|safe}}
         </div>
     </body>
 </html>

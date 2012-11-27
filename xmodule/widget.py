@@ -32,6 +32,11 @@ class Widget(object):
 
     def add_widget_resources(self, widget):
         """Add all the resources from `widget` to my resources."""
+        self.resources.extend(widget.resources)
+
+    def add_widgets_resources(self, widgets):
+        for w in widgets:
+            self.add_widget_resources(w)
 
     def cache_for(self, seconds):
         self.cache_seconds = seconds
@@ -39,8 +44,36 @@ class Widget(object):
     def js_initialize(self, js_func):
         self.js_init = js_func
 
+    # Implementation methods: don't override
+
     def html(self):
         if self.mimetype == 'text/html':
             return self.content
     
         return "[[No HTML from %s]]" % self.content_type
+
+    def head_html(self):
+        # The list of head fragments
+        hh = []
+        # The set of all data we've already seen, so no dups.
+        seen = set()
+        for kind, data, mimetype in self.resources:
+            # De-dup the data.
+            if data in seen:
+                continue
+            seen.add(data)
+            # Different things get different tags.
+            if mimetype == "text/css":
+                if kind == "text":
+                    hh.append("<style type='text/css'>\n%s\n</style>" % data)
+                elif kind == "url":
+                    hh.append("<link rel='stylesheet' href='%s' type='text/css'>" % data)
+            elif mimetype == "application/javascript":
+                if kind == "text":
+                    hh.append("<script>\n%s\n</script>" % data)
+                elif kind == "url":
+                    hh.append("<script src='%s'>" % data)
+            else:
+                raise Exception("Never heard of mimetype %r" % mimetype)
+
+        return "\n".join(hh)

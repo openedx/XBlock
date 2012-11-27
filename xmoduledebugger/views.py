@@ -8,18 +8,35 @@ from xmodule.core import XModule, register_view, MissingXModuleView, ModuleScope
 from xmodule.widget import Widget
 #from xmodule.structure_module import Usage
 
+from .util import call_once_property
+
 class DebuggingChildModule(XModule):
     @register_view('student_view')
     def student_view(self, context):
-        return Widget("<div class='debug_child'></div>")
+        widget = Widget("<div class='debug_child'></div>")
+        widget.add_css("""
+            .debug_child {
+                background-color: grey;
+                width: 200px;
+                height: 100px;
+                margin: 10px;
+            }
+            """)
+        return widget
 
-def debug_child():
-    return DebuggingChildModule(DebuggerRuntime(), Database())
+def create_xmodule(module_name):
+    module_cls = XModule.load_class(module_name)
+    runtime = DebuggerRuntime()
+    db = DbView(module_cls, "student1234", "usage5678")
+    module = module_cls(runtime, db)
+    return module
 
 class DebuggerRuntime(object):
-    @property
+    @call_once_property
     def children(self):
-        return [debug_child(), debug_child()]
+        child_class = 'DebuggingChildModule'
+        num_children = 3
+        return [create_xmodule(child_class) for _ in range(num_children)]
 
     def cache(self, cache_name):
         try:
@@ -79,23 +96,18 @@ def index(request):
     })
 
 def module(request, module_name):
-    module_cls = XModule.load_class(module_name)
-    runtime = DebuggerRuntime()
-    db = DbView(module_cls, "student1234", "usage5678")
-
-    module = module_cls(runtime, db)
+    module = create_xmodule(module_name)
     context = Context()
 
     try:
         widget = module.render('student_view', context)
     except MissingXModuleView:
-        student_view = "No View Found"
-    else:
-        student_view = widget.html()
+        widget = Widget("No View Found")
 
     return render_to_response('module.html', {
         'module': module,
-        'student_view': student_view
+        'body': widget.html(),
+        'head_html': widget.head_html(),
     })
 
 def settings(request):
