@@ -76,26 +76,6 @@ class XModule(Plugin):
 
     #self.settings is different
 
-class HelloWorldModule(XModule):
-    @register_view('student_view')
-    def student_view(self, context):
-        return Widget("Hello, world!")
-
-class VerticalModule(XModule):
-
-    @register_view('student_view')
-    @needs_children
-    def render_student(self, context):
-        result = Widget()
-        # TODO: self.runtime.children is actual children here, not ids...
-        child_widgets = [self.render_child(child, context) for child in self.runtime.children]
-        result.add_widget_resources(child_widgets)
-        result.add_content(self.runtime.render_template("vertical.html",
-            children=child_widgets
-        ))
-        return result
-
-
 class ModuleScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
@@ -144,6 +124,27 @@ def expires(seconds):
     return noop_decorator
 
 
+#-- specific modules --------
+
+class HelloWorldModule(XModule):
+    @register_view('student_view')
+    def student_view(self, context):
+        return Widget("Hello, world!")
+
+class VerticalModule(XModule):
+
+    @register_view('student_view')
+    @needs_children
+    def render_student(self, context):
+        result = Widget()
+        # TODO: self.runtime.children is actual children here, not ids...
+        child_widgets = [self.render_child(child, context) for child in self.runtime.children]
+        result.add_widget_resources(child_widgets)
+        result.add_content(self.runtime.render_template("vertical.html",
+            children=child_widgets
+        ))
+        return result
+
 
 class ThumbsModule(XModule):
 
@@ -151,10 +152,15 @@ class ThumbsModule(XModule):
     @cache_for_all_students # @depends_on(student=False)
     def render_student(self, context):
         self.content.setdefault('votes', {})
-        return Widget(self.runtime.render_template("upvotes.html",
+        widget = Widget(self.runtime.render_template("upvotes.html",
             upvotes=self.content['votes'].get('up', 0),
             downvotes=self.content['votes'].get('down', 0),
         ))
+        widget.add_css("""
+            .upvote { color: green }
+            .downvote { color: red }
+            """)
+        return widget
 
     @register_handler('vote')
     def handle_vote(self, context, data):
