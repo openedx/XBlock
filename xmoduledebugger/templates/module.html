@@ -2,29 +2,41 @@
     <head>
         <style type="text/css">
         .debug_child {
-            background-color:grey;
+            background-color: grey;
             width: 200px;
             height: 100px;
             margin: 10px;
         }
+        .data_label {
+            width: 8em;
+            display: block;
+            float: left;
+        }
         </style>
     </head>
     <body>
-        <div class="content">
-            {{module.content}}
-        </div>
+        <!--
         <div class="runtime">
             {{module.runtime}}
         </div>
-        <div class="course_settings">
-            {{module.course_settings}}
+        -->
+        <div class="content">
+            <span class="data_label">Content</span>
+            {{module.content}}
         </div>
-        <div class="user_preferences">
-            {{module.user_preferences}}
+        <div class="student_preferences">
+            <span class="data_label">Preferences</span>
+            {{module.student_preferences}}
+        </div>
+        <div class="student_info">
+            <span class="data_label">Student Info</span>
+            {{module.student_info}}
         </div>
         <div class="student_state">
+            <span class="data_label">Student State</span>
             {{module.student_state}}
         </div>
+        <hr />
         <div class="student_view">
             {{student_view|safe}}
         </div>

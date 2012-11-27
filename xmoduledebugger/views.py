@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
 from django.template import loader as django_template_loader, Context as DjangoContext
 
-from xmodule.core import XModule, register_view, MissingXModuleView
+from xmodule.core import XModule, register_view, MissingXModuleView, ModuleScope
 from xmodule.widget import Widget
 #from xmodule.structure_module import Usage
 
@@ -41,8 +41,30 @@ class Placeholder(object):
     def __getattr__(self, name):
         raise Exception("Tried to use %s on %r %s instance" % (name, self.name, self.__class__.__name__))
 
-class Database(Placeholder):
-    pass
+
+DATABASE = {}
+
+class DbView(Placeholder):
+    def __init__(self, module_type, student_id, usage_id):
+        self.module_type = module_type
+        self.student_id = student_id
+        self.usage_id = usage_id
+
+    def query(self, student=False, module=ModuleScope.ALL):
+        key = []
+        if module == ModuleScope.ALL:
+            pass
+        elif module == ModuleScope.USAGE:
+            key.append(self.usage_id)
+        elif module == ModuleScope.DEFINITION:
+            key.append("DEFINITION?")
+        elif module == ModuleScope.TYPE:
+            key.append(self.module_type.__name__)
+        if student:
+            key.append(self.student_id)
+        key = ".".join(key)
+        return DATABASE.setdefault(key, {})
+
 
 class Context(object):
     def __init__(self):
@@ -59,7 +81,7 @@ def index(request):
 def module(request, module_name):
     module_cls = XModule.load_class(module_name)
     runtime = DebuggerRuntime()
-    db = Database()
+    db = DbView(module_cls, "student1234", "usage5678")
 
     module = module_cls(runtime, db)
     context = Context()

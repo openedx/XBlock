@@ -58,6 +58,24 @@ class XModule(Plugin):
         widget = child.find_view(view_name)(context)
         return widget
 
+    @property
+    def content(self):
+        return self.db.query(student=False, module=ModuleScope.DEFINITION)
+
+    @property
+    def student_state(self):
+        return self.db.query(student=True, module=ModuleScope.USAGE)
+
+    @property
+    def student_preferences(self):
+        return self.db.query(student=True, module=ModuleScope.TYPE)
+
+    @property
+    def student_info(self):
+        return self.db.query(student=True, module=ModuleScope.ALL)
+
+    #self.settings is different
+
 class HelloWorldModule(XModule):
     @register_view('student_view')
     def student_view(self, context):
@@ -80,11 +98,6 @@ class VerticalModule(XModule):
 
 class ModuleScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
-
-class Database(object):
-    def query(self, student=True, module=ModuleScope.USAGE, keys=None):
-        """Get a data object optionally scoped by `student`, `course`, and `module`."""
-        return SOMETHING
 
 def depends_on(student=True, module=ModuleScope.USAGE, keys=None):
     """A caching decorator."""
@@ -131,34 +144,28 @@ def expires(seconds):
     return noop_decorator
 
 
-# In the runtime, to set up the XModule:
-if 0:
-    self.content = self.db.query(student=False, module=ModuleScope.DEFINITION)
-    self.student = self.db.query(student=True, module=ModuleScope.USAGE)
-    self.preferences = self.db.query(student=True, module=ModuleScope.TYPE)
-    self.student_info = self.db.query(student=True, module=ModuleScope.ALL)
-    #self.settings is different
 
 class ThumbsModule(XModule):
 
     @register_view('student_view')
     @cache_for_all_students # @depends_on(student=False)
     def render_student(self, context):
-        # With named scopes:
+        self.content.setdefault('votes', {})
         return Widget(self.runtime.render_template("upvotes.html",
-            upvotes=self.content.votes.get('up', 0),
-            downvotes=self.content.votes.get('down', 0),
+            upvotes=self.content['votes'].get('up', 0),
+            downvotes=self.content['votes'].get('down', 0),
         ))
 
     @register_handler('vote')
     def handle_vote(self, context, data):
-        if self.student.voted:
-            log.error("cheater!")
-            return
+        #if self.student.voted:
+        #    log.error("cheater!")
+        #    return
         if data['vote_type'] not in ('up', 'down'):
             log.error('error!')
             return
 
-        self.content.votes.setdefault(data['vote_type'], 0)
-        self.content.votes[data['vote_type']] += 1
-        self.student.voted = True
+        self.content.setdefault('votes', {})
+        self.content['votes'].setdefault(data['vote_type'], 0)
+        self.content['votes'][data['vote_type']] += 1
+        self.student['voted'] = True
