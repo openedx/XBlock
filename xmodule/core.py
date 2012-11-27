@@ -9,12 +9,16 @@ def needs_settings(fn):
     return fn
 
 def register_view(name):
+    return _register_method('view', name)
+
+def register_handler(name):
+    return _register_method('handler', name)
+
+def _register_method(registration_type, name):
     def wrapper(fn):
-        fn.view_name = name
+        setattr(fn, '_' + registration_type, name)
         return fn
     return wrapper
-
-register_handler = register_view
 
 
 class Plugin(object):
@@ -32,7 +36,7 @@ class Plugin(object):
                 return c
 
 
-class MissingXModuleView(Exception):
+class MissingXModuleRegistration(Exception):
     pass
 
 class XModule(Plugin):
@@ -40,16 +44,19 @@ class XModule(Plugin):
         self.runtime = runtime
         self.db = db
 
-    def find_view(self, view_name):
-        for name, fn in inspect.getmembers(self, inspect.ismethod):
-            fn_view_name = getattr(fn, 'view_name', None)
-            if fn_view_name == view_name:
+    def _find_registered_method(self, registration_type, name):
+        for _, fn in inspect.getmembers(self, inspect.ismethod):
+            fn_name = getattr(fn, '_' + registration_type, None)
+            if fn_name == name:
                 return fn
-        raise MissingXModuleView(self.__class__, view_name)
+        raise MissingXModuleRegistration(self.__class__, registration_type, name)
+
+    def handle(self, handler_name, data):
+        return self._find_registered_method('handler', handler_name)(data)
 
     def render(self, view_name, context):
         context._view_name = view_name
-        widget = self.find_view(view_name)(context)
+        widget = self._find_registered_method('view', view_name)(context)
         context._view_name = None
         return widget
 
@@ -161,7 +168,7 @@ class ThumbsModule(XModule):
         return widget
 
     @register_handler('vote')
-    def handle_vote(self, context, data):
+    def handle_vote(self, data):
         #if self.student.voted:
         #    log.error("cheater!")
         #    return
@@ -172,4 +179,4 @@ class ThumbsModule(XModule):
         self.content.setdefault('votes', {})
         self.content['votes'].setdefault(data['vote_type'], 0)
         self.content['votes'][data['vote_type']] += 1
-        self.student['voted'] = True
+        self.student_state['voted'] = True

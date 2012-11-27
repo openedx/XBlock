@@ -1,10 +1,12 @@
 import json
 
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
+from django.http import HttpResponse
 from django.template import loader as django_template_loader, Context as DjangoContext
 
-from xmodule.core import XModule, register_view, MissingXModuleView, ModuleScope
+from xmodule.core import XModule, register_view, MissingXModuleRegistration, ModuleScope
 from xmodule.widget import Widget
 #from xmodule.structure_module import Usage
 
@@ -95,13 +97,14 @@ def index(request):
         'xmodules': xmodules
     })
 
+
 def module(request, module_name):
     module = create_xmodule(module_name)
     context = Context()
 
     try:
         widget = module.render('student_view', context)
-    except MissingXModuleView:
+    except MissingXModuleRegistration:
         widget = Widget("No View Found")
 
     return render_to_response('module.html', {
@@ -135,3 +138,11 @@ def settings(request):
         'applied_tree': json.dumps(course.apply_policies(User()).as_json(), indent=4),
     })
 
+def handler(request, module_name, handler):
+    module_cls = XModule.load_class(module_name)
+    runtime = DebuggerRuntime()
+    db = DbView(module_cls, "student1234", "usage5678")
+
+    module = module_cls(runtime, db)
+    result = module.handle(handler, json.loads(request.body))
+    return HttpResponse(result)
