@@ -24,6 +24,7 @@ class DebuggingChildModule(XModule):
                 margin: 10px;
             }
             """)
+        widget.initialize_js("foo")
         return widget
 
 def create_xmodule(module_name):
@@ -33,7 +34,14 @@ def create_xmodule(module_name):
     module = module_cls(runtime, db)
     return module
 
-class DebuggerRuntime(object):
+class RuntimeBase(object):
+    def wrap_child(self, widget, context):
+        return widget
+
+class DebuggerRuntime(RuntimeBase):
+    def __init__(self):
+        self.widget_id = 0
+
     @call_once_property
     def children(self):
         child_class = 'DebuggingChildModule'
@@ -48,6 +56,21 @@ class DebuggerRuntime(object):
 
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
+
+    def wrap_child(self, widget, context):
+        wrapped = Widget()
+        attrs = ""
+        if widget.js_init:
+            fn, version = widget.js_init
+            wrapped.add_javascript_url("/js/runtime/%s" % version)
+            attrs += " data-init='%s'" % fn
+        html = "<div id='widget_%d' class='wrapper'%s>%s</div>" % (
+            self.widget_id, attrs, widget.html() 
+            )
+        self.widget_id += 1
+        wrapped.add_content(html)
+        wrapped.add_widget_resources(widget)
+        return wrapped
 
 class User(object):
     id = None
@@ -87,7 +110,7 @@ class DbView(Placeholder):
 
 class Context(object):
     def __init__(self):
-        self._current_view = None
+        self._view_name = None
 
 #---- Views -----
 
@@ -103,9 +126,9 @@ def module(request, module_name):
     context = Context()
 
     try:
-        widget = module.render('student_view', context)
-    except MissingXModuleRegistration:
-        widget = Widget("No View Found")
+        widget = module.render(context, 'student_view')
+    except MissingXModuleRegistration as e:
+        widget = Widget("No View Found: %s" % (e.args,))
 
     return render_to_response('module.html', {
         'module': module,

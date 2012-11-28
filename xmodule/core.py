@@ -54,16 +54,14 @@ class XModule(Plugin):
     def handle(self, handler_name, data):
         return self._find_registered_method('handler', handler_name)(data)
 
-    def render(self, view_name, context):
-        context._view_name = view_name
+    def render(self, context, view_name=None):
+        if context._view_name is None:
+            assert view_name, "You must provide a view name to render a tree of XModules"
+            context._view_name = view_name
+        else:
+            view_name = context._view_name
         widget = self._find_registered_method('view', view_name)(context)
-        context._view_name = None
-        return widget
-
-    def render_child(self, child, context, view_name=None):
-        view_name = view_name or context._view_name
-        widget = child.find_view(view_name)(context)
-        return widget
+        return self.runtime.wrap_child(widget, context)
 
     @property
     def content(self):
@@ -145,7 +143,7 @@ class VerticalModule(XModule):
     def render_student(self, context):
         result = Widget()
         # TODO: self.runtime.children is actual children here, not ids...
-        child_widgets = [self.render_child(child, context) for child in self.runtime.children]
+        child_widgets = [child.render(context) for child in self.runtime.children]
         result.add_widgets_resources(child_widgets)
         result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
         return result

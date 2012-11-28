@@ -24,8 +24,14 @@ class Widget(object):
     def add_css(self, bytes):
         self.add_resource(bytes, 'text/css')
 
+    def add_css_url(self, url):
+        self.add_resource_url(url, 'text/css')
+
     def add_javascript(self, bytes):
         self.add_resource(bytes, 'application/javascript')
+
+    def add_javascript_url(self, url):
+        self.add_resource_url(url, 'application/javascript')
 
     def add_resource_url(self, url, mimetype):
         self.resources.append(('url', url, mimetype))
@@ -73,7 +79,7 @@ class Widget(object):
                 if kind == "text":
                     hh.append("<script>\n%s\n</script>" % data)
                 elif kind == "url":
-                    hh.append("<script src='%s'>" % data)
+                    hh.append("<script src='%s' type='application/javascript'></script>" % data)
             else:
                 raise Exception("Never heard of mimetype %r" % mimetype)
 
