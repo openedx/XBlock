@@ -57,16 +57,32 @@ class DebuggerRuntime(RuntimeBase):
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
 
-    def wrap_child(self, widget, context):
+    def wrap_child(self, module, widget, context):
         wrapped = Widget()
-        attrs = ""
+        data = {}
         if widget.js_init:
             fn, version = widget.js_init
-            wrapped.add_javascript_url("/js/runtime/%s" % version)
-            attrs += " data-init='%s'" % fn
+            wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
+            data['init'] = fn
+            data['runtime-version'] = version
+            data['module-type'] = module.__class__.__name__
         html = "<div id='widget_%d' class='wrapper'%s>%s</div>" % (
-            self.widget_id, attrs, widget.html() 
-            )
+            self.widget_id,
+            " ".join("data-%s='%s'" % item for item in data.items()),
+            widget.html(),
+        )
+        wrapped.add_javascript_url("//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js")
+        wrapped.add_javascript_url("//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.2/jquery.cookie.js")
+        wrapped.add_javascript("""
+            $(function() {
+                $('.wrapper').each(function(idx, elm) {
+                    var version = $(elm).data('runtime-version');
+                    var runtime = window['runtime_' + version](elm);
+                    var init_fn = window[$(elm).data('init')];
+                    init_fn(runtime, elm);
+                })
+            });
+            """)
         self.widget_id += 1
         wrapped.add_content(html)
         wrapped.add_widget_resources(widget)
@@ -168,4 +184,14 @@ def handler(request, module_name, handler):
 
     module = module_cls(runtime, db)
     result = module.handle(handler, json.loads(request.body))
-    return HttpResponse(result)
+    return webob_to_django_response(result)
+
+
+def webob_to_django_response(webob_response):
+    django_response = HttpResponse(
+        webob_response.app_iter,
+        content_type=webob_response.content_type
+    )
+    for name, value in webob_response.headerlist:
+        django_response[name] = value
+    return django_response

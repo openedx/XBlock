@@ -1,4 +1,6 @@
 import inspect
+import json
+from webob import Response
 from .widget import Widget
 
 def needs_children(fn):
@@ -61,7 +63,7 @@ class XModule(Plugin):
         else:
             view_name = context._view_name
         widget = self._find_registered_method('view', view_name)(context)
-        return self.runtime.wrap_child(widget, context)
+        return self.runtime.wrap_child(self, widget, context)
 
     @property
     def content(self):
@@ -163,6 +165,28 @@ class ThumbsModule(XModule):
             .upvote { color: green }
             .downvote { color: red }
             """)
+        widget.add_javascript("""
+            function ThumbsModule(runtime, element) {
+                function update_votes(votes) {
+                    $('.upvote .count', element).text(votes.up);
+                    $('.downvote .count', element).text(votes.down);
+                }
+
+                var handler_url = runtime.handler('vote')
+                $(element).bind('ajaxSend', function(elm, xhr, s) {
+                    runtime.prep_xml_http_request(xhr);
+                });
+
+                $('.upvote', element).bind('click.ThumbsModule.up', function() {
+                    $.post(handler_url, JSON.stringify({vote_type: 'up'})).success(update_votes);
+                });
+
+                $('.downvote', element).bind('click.ThumbsModule.up', function() {
+                    $.post(handler_url, JSON.stringify({vote_type: 'down'})).success(update_votes);
+                });
+            };
+            """)
+        widget.initialize_js('ThumbsModule')
         return widget
 
     @register_handler('vote')
@@ -178,3 +202,5 @@ class ThumbsModule(XModule):
         self.content['votes'].setdefault(data['vote_type'], 0)
         self.content['votes'][data['vote_type']] += 1
         self.student_state['voted'] = True
+
+        return Response(body=json.dumps(self.content['votes']), content_type='application/json')
