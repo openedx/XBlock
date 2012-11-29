@@ -3,13 +3,6 @@ import json
 from webob import Response
 from .widget import Widget
 
-def needs_children(fn):
-    fn.needs_children = True
-    return fn
-
-def needs_settings(fn):
-    return fn
-
 def register_view(name):
     return _register_method('view', name)
 
