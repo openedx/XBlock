@@ -1,5 +1,10 @@
 import json
 
+from StringIO import StringIO
+
+from webob import Request
+from webob.multidict import MultiDict
+
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
@@ -29,24 +34,25 @@ class DebuggingChildModule(XModule):
 
 def create_xmodule(module_name):
     module_cls = XModule.load_class(module_name)
-    runtime = DebuggerRuntime()
+    runtime = DebuggerRuntime(module_cls, "student1234", "usage5678")
     db = DbView(module_cls, "student1234", "usage5678")
-    module = module_cls(runtime, db)
-    return module
+    return module_cls(runtime, db)
 
 class RuntimeBase(object):
     def wrap_child(self, widget, context):
         return widget
 
 class DebuggerRuntime(RuntimeBase):
-    def __init__(self):
+    def __init__(self, module_cls, student_id, usage_id):
         self.widget_id = 0
+        self.module_cls = module_cls
+        self.student_id = student_id
+        self.usage_id = usage_id
 
     @call_once_property
     def children(self):
-        child_class = 'DebuggingChildModule'
         num_children = 3
-        return [create_xmodule(child_class) for _ in range(num_children)]
+        return [create_xmodule('debugchild') for _ in range(num_children)]
 
     def cache(self, cache_name):
         try:
@@ -57,7 +63,7 @@ class DebuggerRuntime(RuntimeBase):
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
 
-    def wrap_child(self, module, widget, context):
+    def wrap_child(self, widget, context):
         wrapped = Widget()
         data = {}
         if widget.js_init:
@@ -65,21 +71,23 @@ class DebuggerRuntime(RuntimeBase):
             wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
             data['init'] = fn
             data['runtime-version'] = version
-            data['module-type'] = module.__class__.__name__
+            data['module-type'] = self.module_cls.plugin_name
         html = "<div id='widget_%d' class='wrapper'%s>%s</div>" % (
             self.widget_id,
             "".join(" data-%s='%s'" % item for item in data.items()),
             widget.html(),
         )
-        wrapped.add_javascript_url("//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js")
-        wrapped.add_javascript_url("//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.2/jquery.cookie.js")
+        wrapped.add_javascript_url("/static/js/vendor/jquery.min.js")
+        wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")
         wrapped.add_javascript("""
             $(function() {
                 $('.wrapper').each(function(idx, elm) {
                     var version = $(elm).data('runtime-version');
-                    var runtime = window['runtime_' + version](elm);
-                    var init_fn = window[$(elm).data('init')];
-                    init_fn(runtime, elm);
+                    if (version !== undefined) {
+                        var runtime = window['runtime_' + version](elm);
+                        var init_fn = window[$(elm).data('init')];
+                        init_fn(runtime, elm);
+                    }
                 })
             });
             """)
@@ -87,6 +95,9 @@ class DebuggerRuntime(RuntimeBase):
         wrapped.add_content(html)
         wrapped.add_widget_resources(widget)
         return wrapped
+
+    def handler_url(self, url):
+        return "/%s/%s" % (self.module_cls.plugin_name, url)
 
 class User(object):
     id = None
@@ -177,13 +188,13 @@ def settings(request):
         'applied_tree': json.dumps(course.apply_policies(User()).as_json(), indent=4),
     })
 
-def handler(request, module_name, handler):
-    module_cls = XModule.load_class(module_name)
-    runtime = DebuggerRuntime()
-    db = DbView(module_cls, "student1234", "usage5678")
 
-    module = module_cls(runtime, db)
-    result = module.handle(handler, json.loads(request.body))
+def handler(request, module_name, handler):
+    module = create_xmodule(module_name)
+    request = django_to_webob_request(request)
+    request.path_info_pop()
+    request.path_info_pop()
+    result = module.handle(handler, request)
     return webob_to_django_response(result)
 
 
@@ -195,3 +206,12 @@ def webob_to_django_response(webob_response):
     for name, value in webob_response.headerlist:
         django_response[name] = value
     return django_response
+
+
+def django_to_webob_request(django_request):
+    environ = {}
+    environ.update(django_request.META)
+
+    webob_request = Request(django_request.META)
+    webob_request.body = django_request.body
+    return webob_request

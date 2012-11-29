@@ -1,7 +1,10 @@
 import inspect
 import json
+from pkg_resources import resource_string
 from webob import Response
 from .widget import Widget
+from .plugin import Plugin
+from .util import call_once_property
 
 def register_view(name):
     return _register_method('view', name)
@@ -16,25 +19,12 @@ def _register_method(registration_type, name):
     return wrapper
 
 
-class Plugin(object):
-    @classmethod
-    def load_classes(cls):
-        # This should be Plugin.load_classes
-        for c in cls.__subclasses__():
-            yield c.__name__, c
-
-    @classmethod
-    def load_class(cls, name):
-        # This should be Plugin.load_class
-        for c in cls.__subclasses__():
-            if c.__name__ == name:
-                return c
-
-
 class MissingXModuleRegistration(Exception):
     pass
 
 class XModule(Plugin):
+    entry_point = 'xmodule.v2'
+
     def __init__(self, runtime, db):
         self.runtime = runtime
         self.db = db
@@ -56,7 +46,7 @@ class XModule(Plugin):
         else:
             view_name = context._view_name
         widget = self._find_registered_method('view', view_name)(context)
-        return self.runtime.wrap_child(self, widget, context)
+        return self.runtime.wrap_child(widget, context)
 
     @property
     def content(self):
@@ -134,7 +124,6 @@ class HelloWorldModule(XModule):
 class VerticalModule(XModule):
 
     @register_view('student_view')
-    @needs_children
     def render_student(self, context):
         result = Widget()
         # TODO: self.runtime.children is actual children here, not ids...
@@ -183,10 +172,11 @@ class ThumbsModule(XModule):
         return widget
 
     @register_handler('vote')
-    def handle_vote(self, data):
+    def handle_vote(self, request):
         #if self.student.voted:
         #    log.error("cheater!")
         #    return
+        data = json.loads(request.body)
         if data['vote_type'] not in ('up', 'down'):
             log.error('error!')
             return
@@ -197,3 +187,46 @@ class ThumbsModule(XModule):
         self.student_state['voted'] = True
 
         return Response(body=json.dumps(self.content['votes']), content_type='application/json')
+
+
+class StaticXModuleMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+
+        if 'content' in attrs and 'view_names' in attrs and attrs['view_names']:
+            @call_once_property
+            def _content(self):
+                return resource_string(self.__class__.__module__, 'content/' + attrs['content'])
+
+            attrs['_content'] = _content
+
+            def view(self, context):
+                widget = Widget(self._content)
+
+                for url, mime_type in attrs.get('urls', []):
+                    widget.add_resource_url(self.runtime.handler_url('static') + '/' + url, mime_type)
+
+                if hasattr(self, 'initialize_js'):
+                    widget.initialize_js(self.initialize_js)
+
+                return widget
+
+            for view_name in attrs['view_names']:
+                view = register_view(view_name)(view)
+
+            attrs['_view'] = view
+
+        attrs['_mime_types_map'] = dict(attrs.get('urls', []))
+
+        @register_handler('static')
+        def static_handler(self, request):
+            path = request.path_info[1:]
+            mime_type = self._mime_types_map[path]
+            return Response(body=resource_string(self.__class__.__module__, 'content/' + path), content_type=mime_type)
+
+        attrs['static_handler'] = static_handler
+
+        return super(StaticXModuleMetaclass, cls).__new__(cls, name, bases, attrs)
+
+
+class StaticXModule(XModule):
+    __metaclass__ = StaticXModuleMetaclass
