@@ -1,12 +1,13 @@
 import json
 
+from collections import defaultdict, MutableMapping
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
 from django.http import HttpResponse
 from django.template import loader as django_template_loader, Context as DjangoContext
 
-from xmodule.core import XModule, register_view, MissingXModuleRegistration, ModuleScope
+from xmodule.core import XModule, register_view, MissingXModuleRegistration, ModuleScope, Scope
 from xmodule.widget import Widget
 #from xmodule.structure_module import Usage
 
@@ -31,8 +32,57 @@ def create_xmodule(module_name):
     module_cls = XModule.load_class(module_name)
     runtime = DebuggerRuntime()
     db = DbView(module_cls, "student1234", "usage5678")
-    module = module_cls(runtime, db)
+    module = module_cls(runtime, DbModel(module_cls.Model, db))
     return module
+
+class DbModel(MutableMapping):
+    def __init__(self, model, db):
+        self._model = model
+        self._db = db
+
+    @call_once_property
+    def _children(self):
+        child_class = 'DebuggingChildModule'
+        num_children = 3
+        return [create_xmodule(child_class) for _ in range(num_children)]
+
+    def _getfield(self, name):
+        if not hasattr(self._model, name):
+            raise KeyError(name)
+
+        return getattr(self._model, name)
+
+    def _getview(self, name):
+        field = self._getfield(name)
+        return self._db.query(student=field.scope.student, module=field.scope.module)
+
+    def __getitem__(self, name):
+        field = self._getfield(name)
+        if field.scope is Scope.children:
+            return self._children
+            
+        return self._getview(name).get(name, field.default)
+
+    def __setitem__(self, name, value):
+        self._getview(name)[name] = value
+
+    def __delitem__(self, name):
+        del self._getview(name)[name]
+
+    def __iter__(self):
+        return iter(self.keys())
+
+    def __len__(self):
+        return len(self.keys())
+
+    def keys(self):
+        return [field.name for field in self._model.fields]
+
+    def __repr__(self):
+        return 'DbModel(%r, %r)' % (self._model, self._db)
+
+    def __str__(self):
+        return str(dict(self.iteritems()))
 
 class RuntimeBase(object):
     def wrap_child(self, widget, context):
@@ -42,11 +92,6 @@ class DebuggerRuntime(RuntimeBase):
     def __init__(self):
         self.widget_id = 0
 
-    @call_once_property
-    def children(self):
-        child_class = 'DebuggingChildModule'
-        num_children = 3
-        return [create_xmodule(child_class) for _ in range(num_children)]
 
     def cache(self, cache_name):
         try:
@@ -104,6 +149,7 @@ DATABASE = {}
 
 class DbView(Placeholder):
     def __init__(self, module_type, student_id, usage_id):
+        super(DbView, self).__init__()
         self.module_type = module_type
         self.student_id = student_id
         self.usage_id = usage_id
@@ -178,11 +224,7 @@ def settings(request):
     })
 
 def handler(request, module_name, handler):
-    module_cls = XModule.load_class(module_name)
-    runtime = DebuggerRuntime()
-    db = DbView(module_cls, "student1234", "usage5678")
-
-    module = module_cls(runtime, db)
+    module = create_xmodule(module_name)
     result = module.handle(handler, json.loads(request.body))
     return webob_to_django_response(result)
 
