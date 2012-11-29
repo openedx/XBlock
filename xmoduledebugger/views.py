@@ -267,7 +267,6 @@ def settings(request):
     })
 
 def handler(request, usage_id, handler):
-    import pudb;pudb.set_trace() # -={XX}=-={XX}=-={XX}=- 
     usage = Usage.find_usage(usage_id)
     module = create_xmodule_from_usage(usage, "student99")
     result = module.handle(handler, json.loads(request.body))
