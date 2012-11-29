@@ -193,6 +193,7 @@ def module(request, module_name):
         widget = Widget("No View Found: %s" % (e.args,))
 
     return render_to_response('module.html', {
+        'database': DATABASE,
         'module': module,
         'body': widget.html(),
         'head_html': widget.head_html(),
