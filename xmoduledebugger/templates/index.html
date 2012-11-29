@@ -3,8 +3,8 @@
     </head>
     <body>
         <h3>XModule classes</h3>
-        {% for module_name, module_class in xmodules %}
-            <p><a href="{{module_name}}">{{module_name}}</a></p>
+        {% for i, desc in scenarios %}
+            <p><a href="/scenario/{{i}}">{{desc}}</a></p>
         {% endfor %}
     </body>
 </body>

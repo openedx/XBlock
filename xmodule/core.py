@@ -146,8 +146,9 @@ class XModule(Plugin):
     class Model(ModelBase):
         pass
 
-    def __init__(self, runtime, model):
+    def __init__(self, runtime, usage_id, model):
         self.runtime = runtime
+        self.usage_id = usage_id
         self.model = model
 
     def _find_registered_method(self, registration_type, name):

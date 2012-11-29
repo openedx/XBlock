@@ -8,9 +8,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = patterns('xmoduledebugger.views',
     url(r'^$', 'index', name='index'),
     url(r'^settings$', 'settings', name='settings'),
-    url(r'^(?P<module_name>[^/]+)$', 'module', name='module'),
+    url(r'^scenario/(?P<scenario_id>[^/]+)$', 'show_scenario', name='scenario'),
 
-    url(r'^(?P<module_name>[^/]+)/(?P<handler>[^/]*)', 'handler', name='handler'),
+    url(r'^(?P<usage_id>[^/]+)/(?P<handler>[^/]*)', 'handler', name='handler'),
     # Examples:
     # url(r'^$', 'xmoduledebugger.views.home', name='home'),
     # url(r'^xmoduledebugger/', include('xmoduledebugger.foo.urls')),
