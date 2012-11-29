@@ -68,7 +68,7 @@ class DebuggerRuntime(RuntimeBase):
             data['module-type'] = module.__class__.__name__
         html = "<div id='widget_%d' class='wrapper'%s>%s</div>" % (
             self.widget_id,
-            " ".join("data-%s='%s'" % item for item in data.items()),
+            "".join(" data-%s='%s'" % item for item in data.items()),
             widget.html(),
         )
         wrapped.add_javascript_url("//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js")
