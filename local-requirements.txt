@@ -1,3 +1,3 @@
 -e jdmodule
--e xmodule
+-e xblock
 -e debugger

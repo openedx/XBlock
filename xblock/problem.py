@@ -1,10 +1,10 @@
-"""Problem XModule, and friends."""
+"""Problem XBlock, and friends."""
 
-from .core import XModule, register_view, register_handler
+from .core import XBlock, register_view, register_handler
 from .widget import Widget
 
 
-class ProblemModule(XModule):
+class ProblemBlock(XBlock):
 
     has_children = True
 
@@ -18,10 +18,10 @@ class ProblemModule(XModule):
         return result
 
 
-class InputModule(XModule):
+class InputBlock(XBlock):
     pass
 
-class TextInputModule(InputModule):
+class TextInputBlock(InputBlock):
     # Maybe name this differently, so that Problems draw their inputs specially?
     @register_view("student_view")
     def student_view(self, context):

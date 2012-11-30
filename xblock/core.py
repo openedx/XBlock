@@ -23,22 +23,22 @@ def _register_method(registration_type, name):
     return wrapper
 
 
-class MissingXModuleRegistration(Exception):
+class MissingXBlockRegistration(Exception):
     pass
 
 
-class ModuleScope(object):
+class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
 
-class Scope(namedtuple('ScopeBase', 'student module')):
+class Scope(namedtuple('ScopeBase', 'student block')):
     pass
 
-Scope.content = Scope(student=False, module=ModuleScope.DEFINITION)
-Scope.student_state = Scope(student=True, module=ModuleScope.USAGE)
-Scope.settings = Scope(student=True, module=ModuleScope.USAGE)
-Scope.student_preferences = Scope(student=True, module=ModuleScope.TYPE)
-Scope.student_info = Scope(student=True, module=ModuleScope.ALL)
+Scope.content = Scope(student=False, block=BlockScope.DEFINITION)
+Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
+Scope.settings = Scope(student=True, block=BlockScope.USAGE)
+Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
+Scope.student_info = Scope(student=True, block=BlockScope.ALL)
 
 
 class ModelType(object):
@@ -78,7 +78,7 @@ class ModelType(object):
 class ModelMetaclass(type):
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = ModelType(help='The children of this xmodule', default=[], scope=None)
+            attrs['children'] = ModelType(help='The children of this xblock', default=[], scope=None)
 
         fields = []
         for n, v in attrs.items():
@@ -94,12 +94,12 @@ class ModelMetaclass(type):
 Int = Float = Boolean = ModelType
 
 
-def depends_on(student=True, module=ModuleScope.USAGE, keys=None):
+def depends_on(student=True, block=BlockScope.USAGE, keys=None):
     """A caching decorator."""
     def _dec(f):
         cache_key = f.__name__+f.__class__.__name__
         if keys:
-            val = db.query(student=student, module=module, keys=keys)
+            val = db.query(student=student, block=block, keys=keys)
             for k in keys:
                 cache_key += val[k]
         if student and not keys:
@@ -110,15 +110,15 @@ def depends_on(student=True, module=ModuleScope.USAGE, keys=None):
 
 
 def cache_for_student_demographics(name):
-    return depends_on(student=True, module=ALL, keys=[name])
+    return depends_on(student=True, block=ALL, keys=[name])
 
 cache_for_all_students = depends_on(student=False)
-# What other caching scopes do we need?  ModuleScope.TYPE is implied.
+# What other caching scopes do we need?  BlockScope.TYPE is implied.
 
 def noop_decorator(f):
     return f
 
-def varies_on_id(module):
+def varies_on_id(block):
     # key = $def_id or $usage_id
     return noop_decorator
 
@@ -130,11 +130,11 @@ def expires(seconds):
     # cache expiration
     return noop_decorator
 
-# -- Base Module
-class XModule(Plugin):
+# -- Base Block
+class XBlock(Plugin):
     __metaclass__ = ModelMetaclass
 
-    entry_point = 'xmodule.v2'
+    entry_point = 'xblock.v1'
 
     def __init__(self, runtime, usage_id, model_data):
         self.runtime = runtime
@@ -146,14 +146,14 @@ class XModule(Plugin):
             fn_name = getattr(fn, '_' + registration_type, None)
             if fn_name == name:
                 return fn
-        raise MissingXModuleRegistration(self.__class__, registration_type, name)
+        raise MissingXBlockRegistration(self.__class__, registration_type, name)
 
     def handle(self, handler_name, data):
         return self._find_registered_method('handler', handler_name)(data)
 
     def render(self, context, view_name=None):
         if context._view_name is None:
-            assert view_name, "You must provide a view name to render a tree of XModules"
+            assert view_name, "You must provide a view name to render a tree of XBlocks"
             context._view_name = view_name
         else:
             view_name = context._view_name
@@ -167,15 +167,15 @@ class XModule(Plugin):
         )
 
 
-#-- specific modules --------
+#-- specific blocks --------
 
-class HelloWorldModule(XModule):
+class HelloWorldBlock(XBlock):
     @register_view('student_view')
     def student_view(self, context):
         return Widget("Hello, world!")
 
 
-class VerticalModule(XModule):
+class VerticalBlock(XBlock):
 
     has_children = True
 
@@ -189,7 +189,7 @@ class VerticalModule(XModule):
         return result
 
 
-class ThumbsModule(XModule):
+class ThumbsBlock(XBlock):
 
     upvotes = Int(help="Number of up votes made on this thumb", default=0, scope=Scope.content)
     downvotes = Int(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
@@ -207,7 +207,7 @@ class ThumbsModule(XModule):
             .downvote { color: red }
             """)
         widget.add_javascript("""
-            function ThumbsModule(runtime, element) {
+            function ThumbsBlock(runtime, element) {
                 function update_votes(votes) {
                     $('.upvote .count', element).text(votes.up);
                     $('.downvote .count', element).text(votes.down);
@@ -218,16 +218,16 @@ class ThumbsModule(XModule):
                     runtime.prep_xml_http_request(xhr);
                 });
 
-                $('.upvote', element).bind('click.ThumbsModule.up', function() {
+                $('.upvote', element).bind('click.ThumbsBlock.up', function() {
                     $.post(handler_url, JSON.stringify({vote_type: 'up'})).success(update_votes);
                 });
 
-                $('.downvote', element).bind('click.ThumbsModule.up', function() {
+                $('.downvote', element).bind('click.ThumbsBlock.up', function() {
                     $.post(handler_url, JSON.stringify({vote_type: 'down'})).success(update_votes);
                 });
             };
             """)
-        widget.initialize_js('ThumbsModule')
+        widget.initialize_js('ThumbsBlock')
         return widget
 
     @register_handler('vote')
@@ -253,7 +253,7 @@ class ThumbsModule(XModule):
         )
 
 
-class StaticXModuleMetaclass(ModelMetaclass):
+class StaticXBlockMetaclass(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
         if 'content' in attrs and 'view_names' in attrs and attrs['view_names']:
             @call_once_property
@@ -288,8 +288,8 @@ class StaticXModuleMetaclass(ModelMetaclass):
 
         attrs['static_handler'] = static_handler
 
-        return super(StaticXModuleMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super(StaticXBlockMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class StaticXModule(XModule):
-    __metaclass__ = StaticXModuleMetaclass
+class StaticXBlock(XBlock):
+    __metaclass__ = StaticXBlockMetaclass

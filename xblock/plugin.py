@@ -4,7 +4,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class ModuleMissingError(Exception):
+class PluginMissingError(Exception):
     pass
 
 
@@ -34,7 +34,7 @@ class Plugin(object):
         first class identified.
 
         If default is not None, will return default if no entry_point matching
-        identifier is found. Otherwise, will raise a ModuleMissingError
+        identifier is found. Otherwise, will raise a PluginMissingError
         """
         if cls._plugin_cache is None:
             cls._plugin_cache = {}
@@ -51,12 +51,12 @@ class Plugin(object):
                     entry_point=cls.entry_point,
                     id=identifier,
                     classes=", ".join(
-                            class_.module_name for class_ in classes)))
+                            class_.module_name for class_ in classes)))  # TODO: .module_name doesn't exist.
 
             if len(classes) == 0:
                 if default is not None:
                     return default
-                raise ModuleMissingError(identifier)
+                raise PluginMissingError(identifier)
 
             cls._plugin_cache[identifier] = cls._load_class_entry_point(classes[0])
         return cls._plugin_cache[identifier]

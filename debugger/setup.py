@@ -1,14 +1,14 @@
 from distutils.core import setup
 
 setup(
-    name='XModuleDebugger',
+    name='XBlockDebugger',
     version='0.1',
-    description='XModule Debugger',
+    description='XBlock Debugger',
     package_dir={'debugger': ''},
     packages=['debugger'],
     entry_points={
-        'xmodule.v2': [
-            'debugchild = debugger.views:DebuggingChildModule',
+        'xblock.v1': [
+            'debugchild = debugger.views:DebuggingChildBlock',
         ]
     }
 )

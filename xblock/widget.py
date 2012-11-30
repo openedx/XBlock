@@ -1,4 +1,4 @@
-"""Widgets for XModules."""
+"""Widgets for XBlocks."""
 
 class Widget(object):
     def __init__(self, content=None, mimetype='text/html'):
