@@ -15,26 +15,9 @@ from django.template import loader as django_template_loader, Context as DjangoC
 
 from xblock.core import XBlock, register_view, MissingXBlockRegistration, BlockScope, Scope, ModelType
 from xblock.widget import Widget
-from xblock.problem import ProblemBlock
 
 from .util import call_once_property
 
-
-class DebuggingChildBlock(XBlock):
-    """A simple gray box, to use as a child placeholder."""
-    @register_view('student_view')
-    def student_view(self, context):
-        widget = Widget("<div class='debug_child'></div>")
-        widget.add_css("""
-            .debug_child {
-                background-color: grey;
-                width: 200px;
-                height: 100px;
-                margin: 10px;
-            }
-            """)
-        widget.initialize_js("foo")
-        return widget
 
 class Usage(object):
     # Not the real way we'll store usages!

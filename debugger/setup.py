@@ -8,7 +8,7 @@ setup(
     packages=['debugger'],
     entry_points={
         'xblock.v1': [
-            'debugchild = debugger.views:DebuggingChildBlock',
+            'debugchild = debugger.blocks:DebuggingChildBlock',
         ]
     }
 )
