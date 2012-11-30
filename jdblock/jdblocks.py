@@ -1,7 +1,7 @@
-from xmodule.core import StaticXModule
-print StaticXModule
+from xblock.core import StaticXBlock
+print StaticXBlock
 
-class RandomArboretum(StaticXModule):
+class RandomArboretum(StaticXBlock):
     view_names = ["student_view"]
     content = "random-arboretum.html"
     urls = [
