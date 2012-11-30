@@ -215,6 +215,13 @@ default_children = [Usage("DebuggingChildModule", "dbgdefn", []) for _ in xrange
 for name, cls in XModule.load_classes():
     SCENARIOS.append(Scenario("class "+name, Usage(name, "defn999", default_children)))
 
+SCENARIOS.append(Scenario("Problem with an input",
+    Usage("ProblemModule", "x", [
+        Usage("TextInputModule", "x", []),
+        Usage("TextInputModule", "x", []),
+    ])
+))
+
 #---- Views -----
 
 def index(request):
