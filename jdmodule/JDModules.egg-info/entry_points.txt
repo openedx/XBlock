@@ -1,3 +1,0 @@
-[xmodule.v2]
-random-arboretum = jdmodules:RandomArboretum
-

@@ -1,6 +1,0 @@
-jdmodules.py
-JDModules.egg-info/PKG-INFO
-JDModules.egg-info/SOURCES.txt
-JDModules.egg-info/dependency_links.txt
-JDModules.egg-info/entry_points.txt
-JDModules.egg-info/top_level.txt
