@@ -1,5 +1,7 @@
+import itertools
 import json
 
+from collections import defaultdict, MutableMapping, namedtuple
 from StringIO import StringIO
 
 from webob import Request
@@ -11,13 +13,16 @@ from django.core.cache import get_cache, cache
 from django.http import HttpResponse
 from django.template import loader as django_template_loader, Context as DjangoContext
 
-from xmodule.core import XModule, register_view, MissingXModuleRegistration, ModuleScope
+from xmodule.core import XModule, register_view, MissingXModuleRegistration, ModuleScope, Scope
 from xmodule.widget import Widget
 #from xmodule.structure_module import Usage
+from xmodule.problem import ProblemModule
 
 from .util import call_once_property
 
+
 class DebuggingChildModule(XModule):
+    """A simple gray box, to use as a child placeholder."""
     @register_view('student_view')
     def student_view(self, context):
         widget = Widget("<div class='debug_child'></div>")
@@ -32,11 +37,85 @@ class DebuggingChildModule(XModule):
         widget.initialize_js("foo")
         return widget
 
-def create_xmodule(module_name):
+class Usage(object):
+    # Not the real way we'll store usages!
+    ids = itertools.count()
+    usage_index = {}
+
+    def __init__(self, module_name, def_id, child_specs):
+        self.id = "usage_%d" % next(self.ids)
+        self.module_name = module_name
+        self.def_id = def_id
+        self.child_specs = child_specs
+        self.usage_index[self.id] = self
+
+    @classmethod
+    def find_usage(cls, usage_id):
+        return cls.usage_index[usage_id]
+
+
+def create_xmodule_from_usage(usage, student_id):
+    return create_xmodule(usage.module_name, student_id, usage.id, usage.def_id, usage.child_specs)
+
+def create_xmodule(module_name, student_id, usage_id, def_id, child_specs):
     module_cls = XModule.load_class(module_name)
-    runtime = DebuggerRuntime(module_cls, "student1234", "usage5678")
-    db = DbView(module_cls, "student1234", "usage5678")
-    return module_cls(runtime, db)
+    runtime = DebuggerRuntime(module_cls, student_id, usage_id)
+    dbview = DbView(module_cls, student_id, usage_id, def_id)
+    module = module_cls(runtime, usage_id, DbModel(module_cls.Model, student_id, child_specs, dbview))
+    return module
+
+class DbModel(MutableMapping):
+    def __init__(self, model, student_id, child_specs, dbview):
+        self._student_id = student_id
+        self._model = model
+        self._child_specs = child_specs
+        self._db = dbview
+
+    @call_once_property
+    def _children(self):
+        """Instantiate the children."""
+        return [
+            create_xmodule_from_usage(cs, self._student_id) 
+            for cs in self._child_specs
+            ]
+
+    def _getfield(self, name):
+        if not hasattr(self._model, name):
+            raise KeyError(name)
+
+        return getattr(self._model, name)
+
+    def _getview(self, name):
+        field = self._getfield(name)
+        return self._db.query(student=field.scope.student, module=field.scope.module)
+
+    def __getitem__(self, name):
+        field = self._getfield(name)
+        if field.scope is Scope.children:
+            return self._children
+            
+        return self._getview(name).get(name, field.default)
+
+    def __setitem__(self, name, value):
+        self._getview(name)[name] = value
+
+    def __delitem__(self, name):
+        del self._getview(name)[name]
+
+    def __iter__(self):
+        return iter(self.keys())
+
+    def __len__(self):
+        return len(self.keys())
+
+    def keys(self):
+        return [field.name for field in self._model.fields]
+
+    def __repr__(self):
+        return 'DbModel(%r, %r)' % (self._model, self._db)
+
+    def __str__(self):
+        return str(dict(self.iteritems()))
 
 class RuntimeBase(object):
     def wrap_child(self, widget, context):
@@ -48,11 +127,6 @@ class DebuggerRuntime(RuntimeBase):
         self.module_cls = module_cls
         self.student_id = student_id
         self.usage_id = usage_id
-
-    @call_once_property
-    def children(self):
-        num_children = 3
-        return [create_xmodule('debugchild') for _ in range(num_children)]
 
     def cache(self, cache_name):
         try:
@@ -71,6 +145,7 @@ class DebuggerRuntime(RuntimeBase):
             wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
             data['init'] = fn
             data['runtime-version'] = version
+            data['usage'] = self.usage_id
             data['module-type'] = self.module_cls.plugin_name
         html = "<div id='widget_%d' class='wrapper'%s>%s</div>" % (
             self.widget_id,
@@ -97,7 +172,7 @@ class DebuggerRuntime(RuntimeBase):
         return wrapped
 
     def handler_url(self, url):
-        return "/%s/%s" % (self.module_cls.plugin_name, url)
+        return "/%s/%s" % (self.usage_id, url)
 
 class User(object):
     id = None
@@ -114,9 +189,11 @@ class Placeholder(object):
 DATABASE = {}
 
 class DbView(Placeholder):
-    def __init__(self, module_type, student_id, usage_id):
+    def __init__(self, module_type, student_id, usage_id, definition_id):
+        super(DbView, self).__init__()
         self.module_type = module_type
         self.student_id = student_id
+        self.definition_id = definition_id
         self.usage_id = usage_id
 
     def query(self, student=False, module=ModuleScope.ALL):
@@ -126,7 +203,7 @@ class DbView(Placeholder):
         elif module == ModuleScope.USAGE:
             key.append(self.usage_id)
         elif module == ModuleScope.DEFINITION:
-            key.append("DEFINITION?")
+            key.append(self.definition_id)
         elif module == ModuleScope.TYPE:
             key.append(self.module_type.__name__)
         if student:
@@ -139,17 +216,37 @@ class Context(object):
     def __init__(self):
         self._view_name = None
 
+#---- Data -----
+
+# Build the scenarios, which are named trees of usages.
+
+Scenario = namedtuple("Scenario", "description usage")
+
+SCENARIOS = []
+default_children = [Usage("debugchild", "dbgdefn", []) for _ in xrange(3)]
+
+for name, cls in XModule.load_classes():
+    SCENARIOS.append(Scenario("class "+name, Usage(name, "defn999", default_children)))
+
+SCENARIOS.append(Scenario("Problem with an input",
+    Usage("problem", "x", [
+        Usage("textinput", "x", []),
+        Usage("textinput", "x", []),
+    ])
+))
+
 #---- Views -----
 
 def index(request):
-    xmodules = XModule.load_classes()
     return render_to_response('index.html', {
-        'xmodules': xmodules
+        'scenarios': [(i, scenario.description) for i, scenario in enumerate(SCENARIOS)]
     })
 
 
-def module(request, module_name):
-    module = create_xmodule(module_name)
+def show_scenario(request, scenario_id):
+    scenario = SCENARIOS[int(scenario_id)]
+    usage = scenario.usage
+    module = create_xmodule_from_usage(usage, "student99")
     context = Context()
 
     try:
@@ -158,10 +255,12 @@ def module(request, module_name):
         widget = Widget("No View Found: %s" % (e.args,))
 
     return render_to_response('module.html', {
+        'database': DATABASE,
         'module': module,
         'body': widget.html(),
         'head_html': widget.head_html(),
     })
+
 
 def settings(request):
 
@@ -189,8 +288,9 @@ def settings(request):
     })
 
 
-def handler(request, module_name, handler):
-    module = create_xmodule(module_name)
+def handler(request, usage_id, handler):
+    usage = Usage.find_usage(usage_id)
+    module = create_xmodule_from_usage(usage, "student99")
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()

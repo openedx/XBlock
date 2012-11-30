@@ -11,6 +11,8 @@ setup(
             'thumbs = xmodule.core:ThumbsModule',
             'helloworld = xmodule.core:HelloWorldModule',
             'vertical = xmodule.core:VerticalModule',
+            'problem = xmodule.problem:ProblemModule',
+            'textinput = xmodule.problem:TextInputModule',
         ]
     }
 )
