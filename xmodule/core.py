@@ -34,12 +34,11 @@ class ModuleScope(object):
 class Scope(namedtuple('ScopeBase', 'student module')):
     pass
 
-Scope.content = Scope(student=True, module=ModuleScope.DEFINITION)
+Scope.content = Scope(student=False, module=ModuleScope.DEFINITION)
 Scope.student_state = Scope(student=True, module=ModuleScope.USAGE)
-Scope.student_preferencs = Scope(student=True, module=ModuleScope.TYPE)
+Scope.settings = Scope(student=True, module=ModuleScope.USAGE)
+Scope.student_preferences = Scope(student=True, module=ModuleScope.TYPE)
 Scope.student_info = Scope(student=True, module=ModuleScope.ALL)
-Scope.settings = object()
-Scope.children = object()
 
 
 class ModelType(object):
@@ -57,6 +56,18 @@ class ModelType(object):
     def name(self):
         return self._name
 
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        return instance.model_data.get(self.name, self.default)
+
+    def __set__(self, instance, value):
+        instance.model_data[self.name] = value
+
+    def __delete__(self, instance):
+        del instance.model_data[self.name]
+
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self._name)
 
@@ -66,6 +77,9 @@ class ModelType(object):
 
 class ModelMetaclass(type):
     def __new__(cls, name, bases, attrs):
+        if attrs.get('has_children', False):
+            attrs['children'] = ModelType(help='The children of this xmodule', default=[], scope=None)
+
         fields = []
         for n, v in attrs.items():
             if isinstance(v, ModelType):
@@ -73,19 +87,11 @@ class ModelMetaclass(type):
                 fields.append(v)
         fields.sort()
         attrs['fields'] = fields
+
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class ModelBase(object):
-    __metaclass__ = ModelMetaclass
-
-
 Int = Float = Boolean = ModelType
-
-
-class Children(ModelType):
-    def __init__(self, help="A list of all XModule children of this module"):
-        super(Children, self).__init__(help=help, default=[], scope=Scope.children)
 
 
 def depends_on(student=True, module=ModuleScope.USAGE, keys=None):
@@ -126,15 +132,14 @@ def expires(seconds):
 
 # -- Base Module
 class XModule(Plugin):
+    __metaclass__ = ModelMetaclass
+
     entry_point = 'xmodule.v2'
 
-    class Model(ModelBase):
-        pass
-
-    def __init__(self, runtime, usage_id, model):
+    def __init__(self, runtime, usage_id, model_data):
         self.runtime = runtime
         self.usage_id = usage_id
-        self.model = model
+        self.model_data = model_data
 
     def _find_registered_method(self, registration_type, name):
         for _, fn in inspect.getmembers(self, inspect.ismethod):
@@ -155,17 +160,11 @@ class XModule(Plugin):
         widget = self._find_registered_method('view', view_name)(context)
         return self.runtime.wrap_child(widget, context)
 
-    def __getattr__(self, name):
-        if name in self.__dict__.setdefault('model', {}):
-            return self.__dict__['model'][name]
-
-        raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, name))
-
-    def __setattr__(self, name, value):
-        if name in self.__dict__.setdefault('model', {}):
-            self.__dict__['model'][name] = value
-
-        self.__dict__[name] = value
+    def __str__(self):
+        return "%s<%s>" % (
+            self.__class__.__name__,
+            ', '.join("%s=%s" % (field.name, getattr(self, field.name)) for field in self.fields)
+        )
 
 
 #-- specific modules --------
@@ -178,8 +177,7 @@ class HelloWorldModule(XModule):
 
 class VerticalModule(XModule):
 
-    class Model(ModelBase):
-        children = Children()
+    has_children = True
 
     @register_view('student_view')
     def render_student(self, context):
@@ -193,10 +191,9 @@ class VerticalModule(XModule):
 
 class ThumbsModule(XModule):
 
-    class Model(ModelBase):
-        upvotes = Int(help="Number of up votes made on this thumb", default=0, scope=Scope.content)
-        downvotes = Int(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
-        voted = Boolean(help="Whether a student has already voted on a thumb", default=False, scope=Scope.student_state)
+    upvotes = Int(help="Number of up votes made on this thumb", default=0, scope=Scope.content)
+    downvotes = Int(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
+    voted = Boolean(help="Whether a student has already voted on a thumb", default=False, scope=Scope.student_state)
 
     @register_view('student_view')
     @cache_for_all_students # @depends_on(student=False)
@@ -256,9 +253,8 @@ class ThumbsModule(XModule):
         )
 
 
-class StaticXModuleMetaclass(type):
+class StaticXModuleMetaclass(ModelMetaclass):
     def __new__(cls, name, bases, attrs):
-
         if 'content' in attrs and 'view_names' in attrs and attrs['view_names']:
             @call_once_property
             def _content(self):

@@ -1,12 +1,12 @@
 """Problem XModule, and friends."""
 
-from .core import XModule, ModelBase, Children, register_view, register_handler
+from .core import XModule, register_view, register_handler
 from .widget import Widget
 
 
 class ProblemModule(XModule):
-    class Model(ModelBase):
-        children = Children()
+
+    has_children = True
 
     # The content controls how the Inputs attach to Graders
     @register_view("student_view")

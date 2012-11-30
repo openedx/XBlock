@@ -13,7 +13,7 @@ from django.core.cache import get_cache, cache
 from django.http import HttpResponse
 from django.template import loader as django_template_loader, Context as DjangoContext
 
-from xmodule.core import XModule, register_view, MissingXModuleRegistration, ModuleScope, Scope
+from xmodule.core import XModule, register_view, MissingXModuleRegistration, ModuleScope, Scope, ModelType
 from xmodule.widget import Widget
 #from xmodule.structure_module import Usage
 from xmodule.problem import ProblemModule
@@ -61,13 +61,13 @@ def create_xmodule(module_name, student_id, usage_id, def_id, child_specs):
     module_cls = XModule.load_class(module_name)
     runtime = DebuggerRuntime(module_cls, student_id, usage_id)
     dbview = DbView(module_cls, student_id, usage_id, def_id)
-    module = module_cls(runtime, usage_id, DbModel(module_cls.Model, student_id, child_specs, dbview))
+    module = module_cls(runtime, usage_id, DbModel(module_cls, student_id, child_specs, dbview))
     return module
 
 class DbModel(MutableMapping):
-    def __init__(self, model, student_id, child_specs, dbview):
+    def __init__(self, module_cls, student_id, child_specs, dbview):
         self._student_id = student_id
-        self._model = model
+        self._module_cls = module_cls
         self._child_specs = child_specs
         self._db = dbview
 
@@ -80,21 +80,21 @@ class DbModel(MutableMapping):
             ]
 
     def _getfield(self, name):
-        if not hasattr(self._model, name):
+        if not hasattr(self._module_cls, name) or not isinstance(getattr(self._module_cls, name), ModelType):
             raise KeyError(name)
 
-        return getattr(self._model, name)
+        return getattr(self._module_cls, name)
 
     def _getview(self, name):
         field = self._getfield(name)
         return self._db.query(student=field.scope.student, module=field.scope.module)
 
     def __getitem__(self, name):
-        field = self._getfield(name)
-        if field.scope is Scope.children:
+        if name == 'children':
             return self._children
-            
-        return self._getview(name).get(name, field.default)
+
+        field = self._getfield(name)
+        return self._getview(name)[name]
 
     def __setitem__(self, name, value):
         self._getview(name)[name] = value
@@ -109,10 +109,10 @@ class DbModel(MutableMapping):
         return len(self.keys())
 
     def keys(self):
-        return [field.name for field in self._model.fields]
+        return [field.name for field in self._module_cls.fields]
 
     def __repr__(self):
-        return 'DbModel(%r, %r)' % (self._model, self._db)
+        return 'DbModel(%r, %r)' % (self._module_cls, self._db)
 
     def __str__(self):
         return str(dict(self.iteritems()))
