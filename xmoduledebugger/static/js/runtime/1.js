@@ -1,6 +1,6 @@
 function runtime_1(element) {
     return {
-        handler: function(handler_name) {
+        handler_url: function(handler_name) {
             var usage = $(element).data('usage');
             return "/" + usage + "/" + handler_name;
         },
