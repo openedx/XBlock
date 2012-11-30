@@ -12,7 +12,6 @@ setup(
             'vertical = xblock.core:VerticalBlock',
             'problem = xblock.problem:ProblemBlock',
             'textinput = xblock.problem:TextInputBlock',
-
             'thumbs = xblock.thumbs:ThumbsBlock',
         ]
     }

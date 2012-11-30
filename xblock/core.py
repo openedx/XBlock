@@ -1,5 +1,4 @@
 import inspect
-import json
 from pkg_resources import resource_string
 from collections import namedtuple
 from webob import Response
@@ -74,11 +73,13 @@ class ModelType(object):
     def __lt__(self, other):
         return self._seq < other._seq
 
+Int = Float = Boolean = ModelType
+
 
 class ModelMetaclass(type):
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = ModelType(help='The children of this xblock', default=[], scope=None)
+            attrs['children'] = ModelType(help='The children of this XBlock', default=[], scope=None)
 
         fields = []
         for n, v in attrs.items():
@@ -91,7 +92,6 @@ class ModelMetaclass(type):
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-Int = Float = Boolean = ModelType
 
 
 def depends_on(student=True, block=BlockScope.USAGE, keys=None):
