@@ -28,9 +28,9 @@ SCENARIOS = []
 default_children = [Usage("debugchild", "dbgdefn", []) for _ in xrange(3)]
 
 for name, cls in XBlock.load_classes():
-    SCENARIOS.append(Scenario("class "+name, Usage(name, "defn999", default_children)))
+    SCENARIOS.append(Scenario(name, Usage(name, "defn999", default_children)))
 
-SCENARIOS.append(Scenario("Problem with an input",
+SCENARIOS.append(Scenario("problem with two inputs",
     Usage("problem", "x", [
         Usage("textinput", "x", []),
         Usage("textinput", "x", []),

@@ -160,10 +160,11 @@ class XBlock(Plugin):
         widget = self._find_registered_method('view', view_name)(context)
         return self.runtime.wrap_child(widget, context)
 
-    def __str__(self):
-        return "%s<%s>" % (
+    def __repr__(self):
+        return "<%s @%04X%s>" % (
             self.__class__.__name__,
-            ', '.join("%s=%s" % (field.name, getattr(self, field.name)) for field in self.fields)
+            id(self) % 0xFFFF,
+            ','.join(" %s=%s" % (field.name, getattr(self, field.name)) for field in self.fields)
         )
 
 
