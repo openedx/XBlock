@@ -91,7 +91,6 @@ class RuntimeBase(object):
 
 class DebuggerRuntime(RuntimeBase):
     def __init__(self, block_cls, student_id, usage_id):
-        self.widget_id = 0
         self.block_cls = block_cls
         self.student_id = student_id
         self.usage_id = usage_id
@@ -115,8 +114,8 @@ class DebuggerRuntime(RuntimeBase):
             data['runtime-version'] = version
             data['usage'] = self.usage_id
             data['block-type'] = self.block_cls.plugin_name
-        html = "<div id='widget_%d' class='wrapper'%s>%s</div>" % (
-            self.widget_id,
+
+        html = "<div class='wrapper'%s>%s</div>" % (
             "".join(" data-%s='%s'" % item for item in data.items()),
             widget.html(),
         )
@@ -134,7 +133,6 @@ class DebuggerRuntime(RuntimeBase):
                 })
             });
             """)
-        self.widget_id += 1
         wrapped.add_content(html)
         wrapped.add_widget_resources(widget)
         return wrapped

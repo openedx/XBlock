@@ -18,8 +18,13 @@ class ThumbsBlock(XBlock):
             downvotes=self.downvotes,
         ))
         widget.add_css("""
-            .upvote { color: green }
-            .downvote { color: red }
+            .upvote, .downvote {
+                cursor: pointer;
+                border: 1px solid #888;
+                padding: 0 .5em;
+            }
+            .upvote { color: green; }
+            .downvote { color: red; }
             """)
         widget.add_javascript("""
             function ThumbsBlock(runtime, element) {
