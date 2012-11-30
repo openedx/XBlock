@@ -4,11 +4,11 @@ setup(
     name='XModuleDebugger',
     version='0.1',
     description='XModule Debugger',
-    package_dir={'xmoduledebugger': ''},
-    packages=['xmoduledebugger'],
+    package_dir={'debugger': ''},
+    packages=['debugger'],
     entry_points={
         'xmodule.v2': [
-            'debugchild = xmoduledebugger.views:DebuggingChildModule',
+            'debugchild = debugger.views:DebuggingChildModule',
         ]
     }
 )

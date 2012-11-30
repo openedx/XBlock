@@ -1,4 +1,4 @@
-# Django settings for xmoduledebugger project.
+# Django settings for debugger project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -100,13 +100,13 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'xmoduledebugger.urls'
+ROOT_URLCONF = 'debugger.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'xmoduledebugger.wsgi.application'
+WSGI_APPLICATION = 'debugger.wsgi.application'
 
 TEMPLATE_DIRS = (
-    'xmoduledebugger/templates'
+    'debugger/templates'
 )
 
 INSTALLED_APPS = (
@@ -116,7 +116,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'xmoduledebugger'
+    'debugger',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

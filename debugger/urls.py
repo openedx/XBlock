@@ -5,15 +5,15 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('xmoduledebugger.views',
+urlpatterns = patterns('debugger.views',
     url(r'^$', 'index', name='index'),
     url(r'^settings$', 'settings', name='settings'),
     url(r'^scenario/(?P<scenario_id>[^/]+)$', 'show_scenario', name='scenario'),
 
     url(r'^(?P<usage_id>[^/]+)/(?P<handler>[^/]*)', 'handler', name='handler'),
     # Examples:
-    # url(r'^$', 'xmoduledebugger.views.home', name='home'),
-    # url(r'^xmoduledebugger/', include('xmoduledebugger.foo.urls')),
+    # url(r'^$', 'debugger.views.home', name='home'),
+    # url(r'^debugger/', include('debugger.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
