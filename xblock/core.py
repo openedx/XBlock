@@ -67,7 +67,7 @@ class ModelType(object):
         del instance.model_data[self.name]
 
     def __repr__(self):
-        return "<%s %s>" % (self.__class__.__name__, self._name)
+        return "<{0.__class__.__name} {0.__name__}>".format(self)
 
     def __lt__(self, other):
         return self._seq < other._seq

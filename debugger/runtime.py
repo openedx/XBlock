@@ -22,9 +22,7 @@ class Usage(object):
         self.usage_index[self.id] = self
 
     def __repr__(self):
-        return "<%s %s %s %s %r>" % (
-            self.__class__.__name__, self.id, self.block_name, self.def_id, self.child_specs
-        )
+        return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.child_specs!r}>".format(self)
 
     @classmethod
     def find_usage(cls, usage_id):
@@ -85,7 +83,7 @@ class DbModel(MutableMapping):
         return [field.name for field in self._block_cls.fields]
 
     def __repr__(self):
-        return 'DbModel(%r, %r)' % (self._block_cls, self._db)
+        return "<{0.__class__.__name__} {0._block_cls!r} {0._db!r}>".format(self)
 
     def __str__(self):
         return str(dict(self.iteritems()))
