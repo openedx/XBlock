@@ -12,7 +12,7 @@ class ProblemBlock(XBlock):
     @register_view("student_view")
     def student_view(self, context):
         result = Widget("<p>A Problem:</p>")
-        child_widgets = [self.runtime.render_child(child, context) for child in self.children]
+        child_widgets = [self.runtime.render_child(child, context, "problem_view") for child in self.children]
         result.add_widgets_resources(child_widgets)
         result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
         return result
@@ -22,8 +22,11 @@ class InputBlock(XBlock):
     pass
 
 class TextInputBlock(InputBlock):
-    # Maybe name this differently, so that Problems draw their inputs specially?
     @register_view("student_view")
     def student_view(self, context):
+        return Widget("<p>I can only appear inside problems.</p>")
+
+    @register_view("problem_view")
+    def problem_view(self, context):
         result = Widget("<input val='Type here'></input>")
         return result
