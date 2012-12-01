@@ -1,3 +1,4 @@
+import inspect
 import itertools
 from collections import defaultdict, MutableMapping
 
@@ -20,10 +21,14 @@ class Usage(object):
         self.child_specs = child_specs
         self.usage_index[self.id] = self
 
+    def __repr__(self):
+        return "<%s %s %s %s %r>" % (
+            self.__class__.__name__, self.id, self.block_name, self.def_id, self.child_specs
+        )
+
     @classmethod
     def find_usage(cls, usage_id):
         return cls.usage_index[usage_id]
-
 
 def create_xblock_from_usage(usage, student_id):
     block_cls = XBlock.load_class(usage.block_name)
@@ -86,11 +91,38 @@ class DbModel(MutableMapping):
         return str(dict(self.iteritems()))
 
 class RuntimeBase(object):
+    """Methods all runtimes need."""
+    def __init__(self):
+        self._view_name = None
+
+    def find_xblock_method(self, block, registration_type, name):
+        for _, fn in inspect.getmembers(block, inspect.ismethod):
+            fn_name = getattr(fn, '_' + registration_type, None)
+            if fn_name == name:
+                return fn
+        raise MissingXBlockRegistration(block.__class__, registration_type, name)
+
+    def render(self, block, context, view_name=None):
+        if self._view_name is None:
+            assert view_name, "You must provide a view name to render a tree of XBlocks"
+            self._view_name = view_name
+        else:
+            view_name = self._view_name
+        widget = self.find_xblock_method(block, 'view', view_name)(context)
+        return self.wrap_child(widget, context)
+
+    def render_child(self, block, context, view_name=None):
+        return block.runtime.render(block, context, view_name or self._view_name)
+
     def wrap_child(self, widget, context):
         return widget
 
+    def handle(self, block, handler_name, data):
+        return self.find_xblock_method(block, 'handler', handler_name)(data)
+
 class DebuggerRuntime(RuntimeBase):
     def __init__(self, block_cls, student_id, usage_id):
+        super(DebuggerRuntime, self).__init__()
         self.block_cls = block_cls
         self.student_id = student_id
         self.usage_id = usage_id
@@ -169,9 +201,3 @@ class DbView(object):
             key.append(self.student_id)
         key = ".".join(key)
         return DATABASE.setdefault(key, {})
-
-
-class Context(object):
-    def __init__(self):
-        self._view_name = None
-

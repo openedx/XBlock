@@ -1,4 +1,3 @@
-import inspect
 from pkg_resources import resource_string
 from collections import namedtuple
 from webob import Response
@@ -141,25 +140,6 @@ class XBlock(Plugin):
         self.usage_id = usage_id
         self.model_data = model_data
 
-    def _find_registered_method(self, registration_type, name):
-        for _, fn in inspect.getmembers(self, inspect.ismethod):
-            fn_name = getattr(fn, '_' + registration_type, None)
-            if fn_name == name:
-                return fn
-        raise MissingXBlockRegistration(self.__class__, registration_type, name)
-
-    def handle(self, handler_name, data):
-        return self._find_registered_method('handler', handler_name)(data)
-
-    def render(self, context, view_name=None):
-        if context._view_name is None:
-            assert view_name, "You must provide a view name to render a tree of XBlocks"
-            context._view_name = view_name
-        else:
-            view_name = context._view_name
-        widget = self._find_registered_method('view', view_name)(context)
-        return self.runtime.wrap_child(widget, context)
-
     def __repr__(self):
         return "<%s @%04X%s>" % (
             self.__class__.__name__,
@@ -184,7 +164,7 @@ class VerticalBlock(XBlock):
     def render_student(self, context):
         result = Widget()
         # TODO: self.runtime.children is actual children here, not ids...
-        child_widgets = [child.render(context) for child in self.children]
+        child_widgets = [self.runtime.render_child(child, context) for child in self.children]
         result.add_widgets_resources(child_widgets)
         result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
         return result

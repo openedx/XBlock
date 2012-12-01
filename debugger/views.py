@@ -16,7 +16,7 @@ from xblock.core import XBlock, MissingXBlockRegistration
 from xblock.widget import Widget
 
 
-from .runtime import Usage, create_xblock_from_usage, Context, DATABASE
+from .runtime import Usage, create_xblock_from_usage, DATABASE
 
 #---- Data -----
 
@@ -58,10 +58,9 @@ def show_scenario(request, scenario_id):
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     block = create_xblock_from_usage(usage, "student99")
-    context = Context()
 
     try:
-        widget = block.render(context, 'student_view')
+        widget = block.runtime.render(block, {}, 'student_view')
     except MissingXBlockRegistration as e:
         widget = Widget("No View Found: %s" % (e.args,))
 
@@ -70,6 +69,7 @@ def show_scenario(request, scenario_id):
         'block': block,
         'body': widget.html(),
         'head_html': widget.head_html(),
+        'usage': usage,
     })
 
 
@@ -105,7 +105,7 @@ def handler(request, usage_id, handler):
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()
-    result = block.handle(handler, request)
+    result = block.runtime.handle(block, handler, request)
     return webob_to_django_response(result)
 
 
