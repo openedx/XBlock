@@ -106,7 +106,8 @@ ROOT_URLCONF = 'debugger.urls'
 WSGI_APPLICATION = 'debugger.wsgi.application'
 
 TEMPLATE_DIRS = (
-    'debugger/templates'
+    'debugger/templates',
+    'xblock/templates',
 )
 
 INSTALLED_APPS = (

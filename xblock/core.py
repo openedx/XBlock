@@ -151,13 +151,14 @@ class XBlock(Plugin):
 #-- specific blocks --------
 
 class HelloWorldBlock(XBlock):
+    """A simple block: just show some fixed content."""
     @register_view('student_view')
     def student_view(self, context):
         return Widget("Hello, world!")
 
 
 class VerticalBlock(XBlock):
-
+    """A simple container."""
     has_children = True
 
     @register_view('student_view')
