@@ -100,8 +100,7 @@ class RuntimeBase(object):
                 return fn
         raise MissingXBlockRegistration(block.__class__, registration_type, name)
 
-    def render(self, block, context, view_name=None):
-        assert view_name, "You must provide a view name to render a tree of XBlocks"
+    def render(self, block, context, view_name):
         self._view_name = view_name
         widget = self.find_xblock_method(block, 'view', view_name)(context)
         self._view_name = None
