@@ -1,8 +1,9 @@
 import inspect
 import itertools
-from collections import defaultdict, MutableMapping
+from collections import MutableMapping
 
 from django.template import loader as django_template_loader, Context as DjangoContext
+from django.core.cache import cache
 
 from xblock.core import XBlock, register_view, MissingXBlockRegistration, BlockScope, Scope, ModelType
 from xblock.widget import Widget
@@ -28,11 +29,11 @@ class Usage(object):
     def find_usage(cls, usage_id):
         return cls.usage_index[usage_id]
 
-def create_xblock_from_usage(usage, student_id):
+def create_xblock(usage, student_id):
     block_cls = XBlock.load_class(usage.block_name)
-    runtime = DebuggerRuntime(block_cls, student_id, usage.id)
+    runtime = DebuggerRuntime(block_cls, student_id, usage)
     dbview = DbView(block_cls, student_id, usage.id, usage.def_id)
-    block = block_cls(runtime, usage.id, DbModel(block_cls, student_id, usage.child_specs, dbview))
+    block = block_cls(runtime, usage, DbModel(block_cls, student_id, usage.child_specs, dbview))
     return block
 
 class DbModel(MutableMapping):
@@ -46,7 +47,7 @@ class DbModel(MutableMapping):
     def _children(self):
         """Instantiate the children."""
         return [
-            create_xblock_from_usage(cs, self._student_id) 
+            create_xblock(cs, self._student_id) 
             for cs in self._child_specs
             ]
 
@@ -102,7 +103,23 @@ class RuntimeBase(object):
 
     def render(self, block, context, view_name):
         self._view_name = view_name
-        widget = self.find_xblock_method(block, 'view', view_name)(context)
+        view_fn = self.find_xblock_method(block, 'view', view_name)
+
+        cache_info = getattr(view_fn, "_cache", {})
+        key = "view.%s.%s" % (block.__class__.__name__, view_name)
+        id_type = cache_info.get('id', 'definition')
+        if id_type == 'usage':
+            key += ".%s" % block.usage.id
+        elif id_type == 'definition':
+            key += ".%s" % block.usage.def_id
+        for name in cache_info.get('model', ()):
+            key += ".%s=%r" % (name, getattr(block, name))
+        widget = cache.get(key)
+        if widget is None:
+            widget = view_fn(context)
+            seconds = cache_info.get('seconds', 0)
+            if seconds:
+                cache.set(key, widget, seconds)
         self._view_name = None
         return self.wrap_child(widget, context)
 
@@ -116,17 +133,11 @@ class RuntimeBase(object):
         return self.find_xblock_method(block, 'handler', handler_name)(data)
 
 class DebuggerRuntime(RuntimeBase):
-    def __init__(self, block_cls, student_id, usage_id):
+    def __init__(self, block_cls, student_id, usage):
         super(DebuggerRuntime, self).__init__()
         self.block_cls = block_cls
         self.student_id = student_id
-        self.usage_id = usage_id
-
-    def cache(self, cache_name):
-        try:
-            return get_cache(cache_name)
-        except:
-            return cache
+        self.usage = usage
 
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
@@ -139,7 +150,7 @@ class DebuggerRuntime(RuntimeBase):
             wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
             data['init'] = fn
             data['runtime-version'] = version
-            data['usage'] = self.usage_id
+            data['usage'] = self.usage.id
             data['block-type'] = self.block_cls.plugin_name
 
         html = "<div class='wrapper'%s>%s</div>" % (
@@ -165,7 +176,7 @@ class DebuggerRuntime(RuntimeBase):
         return wrapped
 
     def handler_url(self, url):
-        return "/%s/%s" % (self.usage_id, url)
+        return "/%s/%s" % (self.usage.id, url)
 
 class User(object):
     id = None

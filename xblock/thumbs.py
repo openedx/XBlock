@@ -1,7 +1,7 @@
 import json
 from webob import Response
 
-from .core import XBlock, Scope, Int, Boolean, register_view, register_handler, cache_for_all_students
+from .core import XBlock, Scope, Int, Boolean, register_view, register_handler, expires, varies_on_block
 from .widget import Widget
 
 class ThumbsBlock(XBlock):
@@ -11,7 +11,8 @@ class ThumbsBlock(XBlock):
     voted = Boolean(help="Whether a student has already voted on a thumb", default=False, scope=Scope.student_state)
 
     @register_view('student_view')
-    @cache_for_all_students # @depends_on(student=False)
+    @varies_on_block('definition')
+    @expires(seconds=5)
     def render_student(self, context):
         widget = Widget(self.runtime.render_template("upvotes.html",
             upvotes=self.upvotes,

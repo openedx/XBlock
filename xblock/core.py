@@ -58,13 +58,13 @@ class ModelType(object):
         if instance is None:
             return self
 
-        return instance.model_data.get(self.name, self.default)
+        return instance._model_data.get(self.name, self.default)
 
     def __set__(self, instance, value):
-        instance.model_data[self.name] = value
+        instance._model_data[self.name] = value
 
     def __delete__(self, instance):
-        del instance.model_data[self.name]
+        del instance._model_data[self.name]
 
     def __repr__(self):
         return "<{0.__class__.__name} {0.__name__}>".format(self)
@@ -75,7 +75,7 @@ class ModelType(object):
 Int = Float = Boolean = ModelType
 
 
-class ModelMetaclass(type):
+class XBlockMetaclass(type):
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
             attrs['children'] = ModelType(help='The children of this XBlock', default=[], scope=None)
@@ -88,57 +88,51 @@ class ModelMetaclass(type):
         fields.sort()
         attrs['fields'] = fields
 
-        return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super(XBlockMetaclass, cls).__new__(cls, name, bases, attrs)
 
+# -- Caching tools
 
+def _set_cache_info(f, **kwargs):
+    if not hasattr(f, '_cache'):
+        f._cache = {}
+    f._cache.update(kwargs)
 
-
-def depends_on(student=True, block=BlockScope.USAGE, keys=None):
-    """A caching decorator."""
+def varies_on_model(*attrs):
+    # key = (getattr(self, attr) for attr in attrs)
     def _dec(f):
-        cache_key = f.__name__+f.__class__.__name__
-        if keys:
-            val = db.query(student=student, block=block, keys=keys)
-            for k in keys:
-                cache_key += val[k]
-        if student and not keys:
-            # Student=True, no keys
-            cache_key += student_id
+        _set_cache_info(f, model=attrs)
         return f
     return _dec
 
-
-def cache_for_student_demographics(name):
-    return depends_on(student=True, block=ALL, keys=[name])
-
-cache_for_all_students = depends_on(student=False)
-# What other caching scopes do we need?  BlockScope.TYPE is implied.
-
-def noop_decorator(f):
+def varies_on_children(f):
+    # not sure how to do this yet...
+    # _set_cache_info(f, children=True)
     return f
 
-def varies_on_id(block):
-    # key = $def_id or $usage_id
-    return noop_decorator
+def varies_on_block(type):
+    """Use 'usage', 'definition', or 'none'."""
+    def _dec(f):
+        _set_cache_info(f, id=type)
+        return f
+    return _dec
 
-def varies_on_model(attrs):
-    # key = (getattr(self, attr) for attr in attrs)
-    return noop_decorator
-
-def expires(seconds):
+def expires(hours=0, minutes=0, seconds=0):
     # cache expiration
-    return noop_decorator
+    def _dec(f):
+        _set_cache_info(f, seconds=hours*3600+minutes*60+seconds)
+        return f
+    return _dec
 
 # -- Base Block
 class XBlock(Plugin):
-    __metaclass__ = ModelMetaclass
+    __metaclass__ = XBlockMetaclass
 
     entry_point = 'xblock.v1'
 
-    def __init__(self, runtime, usage_id, model_data):
+    def __init__(self, runtime, usage, model_data):
         self.runtime = runtime
-        self.usage_id = usage_id
-        self.model_data = model_data
+        self.usage = usage
+        self._model_data = model_data
 
     def __repr__(self):
         return "<%s @%04X%s>" % (
@@ -171,7 +165,7 @@ class VerticalBlock(XBlock):
         return result
 
 
-class StaticXBlockMetaclass(ModelMetaclass):
+class StaticXBlockMetaclass(XBlockMetaclass):
     def __new__(cls, name, bases, attrs):
         if 'content' in attrs and 'view_names' in attrs and attrs['view_names']:
             @call_once_property

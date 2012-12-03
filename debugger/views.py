@@ -16,7 +16,7 @@ from xblock.core import XBlock, MissingXBlockRegistration
 from xblock.widget import Widget
 
 
-from .runtime import Usage, create_xblock_from_usage, DATABASE
+from .runtime import Usage, create_xblock, DATABASE
 
 #---- Data -----
 
@@ -57,7 +57,7 @@ def index(request):
 def show_scenario(request, scenario_id):
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
-    block = create_xblock_from_usage(usage, "student99")
+    block = create_xblock(usage, "student99")
 
     try:
         widget = block.runtime.render(block, {}, 'student_view')
@@ -101,7 +101,7 @@ def settings(request):
 
 def handler(request, usage_id, handler):
     usage = Usage.find_usage(usage_id)
-    block = create_xblock_from_usage(usage, "student99")
+    block = create_xblock(usage, "student99")
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()
