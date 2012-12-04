@@ -124,10 +124,12 @@ class TextInputBlock(InputBlock):
         return result
 
     def submit(self, submission):
+        self.student_input = submission[0]['value']
         if self.input_type == 'int':
-            self.student_input = int(submission[0]['value'])
-        else:
-            self.student_input = submission[0]['value']
+            try:
+                self.student_input = int(submission[0]['value'])
+            except ValueError:
+                pass
 
 class EqualityCheckerBlock(CheckerBlock):
 
