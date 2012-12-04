@@ -16,7 +16,9 @@ def register_handler(name):
 
 def _register_method(registration_type, name):
     def wrapper(fn):
-        setattr(fn, '_' + registration_type, name)
+        if not hasattr(fn, '_method_registrations'):
+            setattr(fn, '_method_registrations', {})
+        fn._method_registrations.setdefault(registration_type, []).append(name)
         return fn
     return wrapper
 
@@ -72,7 +74,7 @@ class ModelType(object):
     def __lt__(self, other):
         return self._seq < other._seq
 
-Int = Float = Boolean = ModelType
+Int = Float = Boolean = Object = List = String = ModelType
 
 
 class XBlockMetaclass(type):

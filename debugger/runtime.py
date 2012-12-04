@@ -15,12 +15,13 @@ class Usage(object):
     ids = itertools.count()
     usage_index = {}
 
-    def __init__(self, block_name, def_id, child_specs):
+    def __init__(self, block_name, def_id, child_specs, initial_state={}):
         self.id = "usage_%d" % next(self.ids)
         self.block_name = block_name
         self.def_id = def_id
         self.child_specs = child_specs
         self.usage_index[self.id] = self
+        self.initial_state = initial_state
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.child_specs!r}>".format(self)
@@ -69,6 +70,8 @@ def create_xblock(usage, student_id):
     block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
     block = block_cls(runtime, usage, DbModel(MEMORY_KVS, block_cls, student_id, usage))
+    for name, value in usage.initial_state.items():
+        setattr(block, name, value)
     return block
 
 
@@ -144,8 +147,9 @@ class RuntimeBase(object):
 
     def find_xblock_method(self, block, registration_type, name):
         for _, fn in inspect.getmembers(block, inspect.ismethod):
-            fn_name = getattr(fn, '_' + registration_type, None)
-            if fn_name == name:
+            registered_as = getattr(fn, '_method_registrations', {}).get(registration_type, [])
+
+            if name in registered_as:
                 return fn
         raise MissingXBlockRegistration(block.__class__, registration_type, name)
 
@@ -209,14 +213,32 @@ class DebuggerRuntime(RuntimeBase):
         wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")
         wrapped.add_javascript("""
             $(function() {
-                $('.wrapper').each(function(idx, elm) {
-                    var version = $(elm).data('runtime-version');
-                    if (version !== undefined) {
-                        var runtime = window['runtime_' + version](elm);
+                $.fn.immediateDescendents = function(selector) {
+                    return this.children().map(function(idx, elm) {
+                        if ($(elm).is(selector)) {
+                            return elm;
+                        } else {
+                            return $(elm).immediateDescendents(selector).toArray();
+                        }
+                    });
+                };
+
+                function initializeBlocks(element) {
+                    return $(element).immediateDescendents('.wrapper').map(function(idx, elm) {
+                        var version = $(elm).data('runtime-version');
+                        if (version === undefined) {
+                            return null;
+                        }
+                        var children = initializeBlocks($(elm));
+                        var runtime = window['runtime_' + version](elm, children);
                         var init_fn = window[$(elm).data('init')];
-                        init_fn(runtime, elm);
-                    }
-                })
+                        var js_block = init_fn(runtime, elm) || {};
+                        js_block.element = elm;
+                        return js_block;
+                    }).toArray();
+                }
+
+                initializeBlocks($('body'))
             });
             """)
         wrapped.add_content(html)

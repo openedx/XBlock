@@ -12,7 +12,7 @@ from django.shortcuts import render_to_response
 from django.core.cache import get_cache, cache
 from django.http import HttpResponse
 
-from xblock.core import XBlock, MissingXBlockRegistration
+from xblock.core import XBlock, MissingXBlockRegistration, Scope
 from xblock.widget import Widget
 
 
@@ -42,7 +42,13 @@ SCENARIOS.extend([
             Usage("thumbs", "def1", []),
             Usage("thumbs", "def2", []),
             Usage("thumbs", "def3", []),
-        ]),
+        ])
+    ),
+    Scenario("problem with thumbs and textbox",
+        Usage("problem", "p1", [
+            Usage("thumbs", "x", []),
+            Usage("textinput", "x", []),
+        ], {'children_names': ['thumb', 'votecount']}),
     ),
 ])
 
@@ -58,7 +64,7 @@ def show_scenario(request, scenario_id):
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     block = create_xblock(usage, "student99")
-
+    
     try:
         widget = block.runtime.render(block, {}, 'student_view')
     except MissingXBlockRegistration as e:
