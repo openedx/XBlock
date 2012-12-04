@@ -1,4 +1,5 @@
 import itertools
+import json
 import logging
 import new
 from collections import MutableMapping
@@ -62,11 +63,12 @@ class MemoryKeyValueStore(KeyValueStore):
 
     def as_html(self):
         """Just for our Debugger!"""
-        keys = sorted(self.d.keys())
-        html = []
-        for k in keys:
-            html.append("<p>%r: %r</p>" % (k, self.d[k]))
-        return "".join(html)
+        html = json.dumps(self.d, sort_keys=True, indent=4)
+        html = html.replace("&", "&amp;")
+        html = html.replace(" ", "&nbsp;")
+        html = html.replace("<", "&lt;")
+        html = html.replace("\n", "<br>")
+        return html
 
 MEMORY_KVS = MemoryKeyValueStore({})
 
