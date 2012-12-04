@@ -78,7 +78,7 @@ def index(request):
 
 
 def show_scenario(request, scenario_id):
-    log.info("Start show_scenario")
+    log.info("Start show_scenario %s", scenario_id)
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     block = create_xblock(usage, "student99")
@@ -88,7 +88,7 @@ def show_scenario(request, scenario_id):
     except MissingXBlockRegistration as e:
         widget = Widget("No View Found: %s" % (e.args,))
 
-    log.info("End show_scenario")
+    log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
         'database': MEMORY_KVS,
         'block': block,
@@ -126,12 +126,14 @@ def settings(request):
 
 
 def handler(request, usage_id, handler):
+    log.info("Start handler %s/%s", usage_id, handler)
     usage = Usage.find_usage(usage_id)
     block = create_xblock(usage, "student99")
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()
     result = block.runtime.handle(block, handler, request)
+    log.info("End handler %s/%s", usage_id, handler)
     return webob_to_django_response(result)
 
 

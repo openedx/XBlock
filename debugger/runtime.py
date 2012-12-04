@@ -1,5 +1,6 @@
 import inspect
 import itertools
+import logging
 from collections import MutableMapping
 
 from django.template import loader as django_template_loader, Context as DjangoContext
@@ -9,6 +10,9 @@ from xblock.core import XBlock, register_view, MissingXBlockRegistration, BlockS
 from xblock.widget import Widget
 
 from .util import call_once_property
+
+log = logging.getLogger(__name__)
+
 
 class Usage(object):
     # Not the real way we'll store usages!
@@ -172,6 +176,8 @@ class RuntimeBase(object):
             seconds = cache_info.get('seconds', 0)
             if seconds:
                 cache.set(key, widget, seconds)
+        else:
+            log.debug("Cache hit: %s", key)
         self._view_name = None
         return self.wrap_child(widget, context)
 
