@@ -64,8 +64,27 @@ SCENARIOS.extend([
     Scenario("problem with thumbs and textbox",
         Usage("problem", "p1", [
             Usage("thumbs", "x", []),
-            Usage("textinput", "x", []),
-        ], {'children_names': ['thumb', 'votecount']}),
+            Usage("textinput", "textin", [], {'input_type': 'int'}),
+            Usage("equality", "e1", [], {'message': 'Upvotes match downvotes'}),
+            Usage("equality", "e2", [], {'message': 'Number of upvotes matches entered string'}),
+            Usage("equality", "e3", [], {'message': 'Number of upvotes is 3'}),
+        ], {
+            'children_names': ['thumb', 'votecount', 'votes_equal', 'votes_named', 'votes_specified'],
+            'checker_arguments': {
+                'votes_equal': {
+                    'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
+                    'right': {'_type': 'reference', 'ref_name': 'thumb.downvotes'},
+                },
+                'votes_named': {
+                    'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
+                    'right': {'_type': 'reference', 'ref_name': 'votecount.student_input'},
+                },
+                'votes_specified': {
+                    'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
+                    'right': 3,
+                }
+            }
+        }),
     ),
 ])
 
@@ -82,7 +101,7 @@ def show_scenario(request, scenario_id):
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     block = create_xblock(usage, "student99")
-    
+
     try:
         widget = block.runtime.render(block, {}, 'student_view')
     except MissingXBlockRegistration as e:

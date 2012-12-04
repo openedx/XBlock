@@ -57,7 +57,7 @@ class ModelType(object):
     def __lt__(self, other):
         return self._seq < other._seq
 
-Int = Float = Boolean = Object = List = String = ModelType
+Int = Float = Boolean = Object = List = String = Any = ModelType
 
 
 class XBlockMetaclass(type):

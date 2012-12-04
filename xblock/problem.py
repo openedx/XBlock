@@ -2,7 +2,7 @@
 
 import json
 
-from .core import XBlock, Object, Scope, List, String
+from .core import XBlock, Object, Scope, List, String, Any
 from .util import call_once_property
 from .widget import Widget
 from webob import Response
@@ -11,7 +11,7 @@ from webob import Response
 class ProblemBlock(XBlock):
 
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
-    children_names = List(help="List of names for child elements", scope=Scope.content, default=None)
+    children_names = List(help="List of names for child elements", scope=Scope.content, default=[])
     has_children = True
 
     # The content controls how the Inputs attach to Graders
@@ -26,7 +26,6 @@ class ProblemBlock(XBlock):
             in self.named_children
         ]
         result.add_widgets_resources(widget for _, widget in named_child_widgets)
-        print named_child_widgets
         result.add_content(self.runtime.render_template("problem.html",
             named_children=named_child_widgets
         ))
@@ -60,10 +59,7 @@ class ProblemBlock(XBlock):
 
     @call_once_property
     def named_children(self):
-        if self.children_names is None:
-            names = ["unnamed_child_%d" % idx for idx in range(len(self.children))]
-        else:
-            names = self.children_names
+        names = self.children_names + ["unnamed_child_%d" % idx for idx in range(len(self.children) - len(self.children_names))]
 
         return zip(names, self.children)
 
@@ -79,12 +75,14 @@ class ProblemBlock(XBlock):
             self.child_name_map[input_name].submit(submission)
 
         results = {}
-        for checker, arguments in self.checker_arguments:
+        for checker, arguments in self.checker_arguments.items():
+            kwargs = {}
+            kwargs.update(arguments)
             for arg_name, arg_value in arguments.items():
                 if isinstance(arg_value, dict) and arg_value.get('_type') == 'reference':
                     child, _, attribute = arg_value['ref_name'].partition('.')
-                    arguments[arg_name] = getattr(self.child_name_map[child], attribute)
-            results[checker] = self.child_name_map[checker].check(**arguments)
+                    kwargs[arg_name] = getattr(self.child_name_map[child], attribute)
+            results[checker] = self.child_name_map[checker].check(**kwargs)
 
         return Response(json.dumps(results))
 
@@ -103,6 +101,7 @@ class CheckerBlock(XBlock):
 
 class TextInputBlock(InputBlock):
 
+    input_type = String(help="Type of input string")
     student_input = String(help="Last input submitted by the student", default="", scope=Scope.student_state)
 
     @XBlock.view("student_view")
@@ -125,4 +124,30 @@ class TextInputBlock(InputBlock):
         return result
 
     def submit(self, submission):
-        self.student_input = submission[0]['value']
+        if self.input_type == 'int':
+            self.student_input = int(submission[0]['value'])
+        else:
+            self.student_input = submission[0]['value']
+
+class EqualityCheckerBlock(CheckerBlock):
+
+    left = Any(scope=Scope.student_state)
+    right = Any(scope=Scope.student_state)
+    attempted = Any(scope=Scope.student_state)
+    message = String(help="Message describing the equality test", scope=Scope.content, default="Equality test")
+
+    @XBlock.view('problem_view')
+    def problem(self, context):
+        if not self.attempted:
+            correct = "Not attempted"
+        else:
+            correct = self.left == self.right
+
+        return Widget("<span>%s: %s</span>" % (self.message, correct))
+
+
+    def check(self, left, right):
+        self.attempted = True
+        self.left = left
+        self.right = right
+        return left == right

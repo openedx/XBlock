@@ -13,6 +13,7 @@ setup(
             'problem = xblock.problem:ProblemBlock',
             'textinput = xblock.problem:TextInputBlock',
             'thumbs = xblock.thumbs:ThumbsBlock',
+            'equality = xblock.problem:EqualityCheckerBlock',
         ]
     }
 )
