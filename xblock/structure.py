@@ -3,6 +3,29 @@
 from .core import XBlock
 from .widget import Widget
 
+
+class Sequence(XBlock):
+    has_children = True
+
+    @XBlock.view('student_view')
+    def render_student(self, context):
+        widget = Widget()
+        child_widgets = [self.runtime.render_child(child, context) for child in self.children]
+        widget.add_widgets_resources(child_widgets)
+        widget.add_content(self.runtime.render_template("sequence.html", children=child_widgets))
+        widget.add_css_url('http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css')
+        widget.add_javascript_url('http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js')
+
+        # mess things up
+        widget.add_javascript("""
+            function Sequence(runtime, element) {
+              $(element).children('.tabs').tabs();
+            };
+            """)
+        widget.initialize_js('Sequence')
+        return widget
+
+
 class VerticalBlock(XBlock):
     """A simple container."""
     has_children = True

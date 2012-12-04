@@ -25,7 +25,7 @@ SCENARIOS.extend([
 
                                         <li><p>Click on the Download Button.</p></li>
 
-                                        <li><p>On the subsequent page, select the download file for Windows. Do NOT 
+                                        <li><p>On the subsequent page, select the download file for Windows. Do NOT
                                         download the 64 bit version, even if your operating system is 64-bit.</p></li>
 
                                         <li><p>Once the file has downloaded to your system, complete the
@@ -38,7 +38,7 @@ SCENARIOS.extend([
                                     the Python environment. To do this, follow these steps:</p>
 
                                     <ul><li><p>Find the Enthought system on your machine and open the Idle program.
-                                        </p><p>Click on the Start menu, then click on All Programs. Find 
+                                        </p><p>Click on the Start menu, then click on All Programs. Find
                                         the Enthought folder in the list. Open the folder and click on Idle.</p>
                                     </li>
                                     </ul>
@@ -88,5 +88,23 @@ SCENARIOS.extend([
                 }
             }
         }),
+    ),
+    Scenario("sequence with progress_sliders",
+        Usage("sequence", "s-a", [
+            Usage("vertical", "v-a", [
+                Usage("slider", "s-aa", []),
+                Usage("progress_slider", "ps-ab", []),
+            ]),
+            Usage("vertical", "v-b", [
+                Usage("thumbs", "t-ba", []),
+                Usage("slider", "ps-bb", []),
+                Usage("progress_slider", "ps-bc", []),
+            ]),
+            Usage("vertical", "v-c", [
+                Usage("progress_slider", "ps-ca", []),
+                Usage("progress_slider", "ps-cb", []),
+                Usage("progress_slider", "ps-cc", []),
+            ]),
+        ]),
     ),
 ])

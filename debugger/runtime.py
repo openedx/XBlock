@@ -101,7 +101,7 @@ class DbModel(MutableMapping):
     def _children(self):
         """Instantiate the children."""
         return [
-            create_xblock(cs, self._student_id) 
+            create_xblock(cs, self._student_id)
             for cs in self._usage.child_specs
             ]
 
@@ -207,6 +207,8 @@ class DebuggerRuntime(RuntimeBase):
         self.student_id = student_id
         self.usage = usage
 
+    # TODO: [rocha] runtime should not provide this, each xblock
+    # should use whatever they want
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
 
@@ -272,6 +274,15 @@ class DebuggerRuntime(RuntimeBase):
 
     def handler_url(self, url):
         return "/%s/%s" % (self.usage.id, url)
+
+
+    # TODO: [rocha] other name options: gather
+    def collect(self, key):
+        return []
+
+    # TODO: [rocha] other name options: scatter, share
+    def publish(self, key, value):
+        pass
 
 class User(object):
     id = None
