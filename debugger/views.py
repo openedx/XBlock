@@ -1,5 +1,6 @@
 import itertools
 import json
+import logging
 
 from collections import defaultdict, MutableMapping, namedtuple
 from StringIO import StringIO
@@ -17,6 +18,22 @@ from xblock.widget import Widget
 
 
 from .runtime import Usage, create_xblock, MEMORY_KVS
+
+# --- Set up an in-memory logger
+
+def setup_logging():
+    global LOG_STREAM
+    LOG_STREAM = StringIO()
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(LOG_STREAM)
+    handler.setFormatter(logging.Formatter("<p>%(asctime)s %(name)s %(levelname)s: %(message)s</p>"))
+    root_logger.addHandler(handler)
+
+setup_logging()
+
+log = logging.getLogger(__name__)
 
 #---- Data -----
 
@@ -61,6 +78,7 @@ def index(request):
 
 
 def show_scenario(request, scenario_id):
+    log.info("Start show_scenario")
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     block = create_xblock(usage, "student99")
@@ -70,12 +88,14 @@ def show_scenario(request, scenario_id):
     except MissingXBlockRegistration as e:
         widget = Widget("No View Found: %s" % (e.args,))
 
+    log.info("End show_scenario")
     return render_to_response('block.html', {
         'database': MEMORY_KVS,
         'block': block,
         'body': widget.html(),
         'head_html': widget.head_html(),
         'usage': usage,
+        'log': LOG_STREAM.getvalue(),
     })
 
 
