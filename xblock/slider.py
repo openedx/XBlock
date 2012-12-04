@@ -45,7 +45,7 @@ class ProgressSlider(Slider):
     @XBlock.handler('update')
     def handle_progress(self, request):
         response = super(ProgressSlider, self).handle_update(request)
-        self.runtime.publish('progress', self.value)
+        self.runtime.publish('progress', (self.value, self.max_value))
         return response
 
 SLIDER_TEMPLATE = """

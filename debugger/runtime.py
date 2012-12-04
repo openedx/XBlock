@@ -275,15 +275,77 @@ class DebuggerRuntime(RuntimeBase):
     def handler_url(self, url):
         return "/%s/%s" % (self.usage.id, url)
 
-
     # TODO: [rocha] other name options: gather
-    def collect(self, key):
-        return []
+    def collect(self, key, block=None):
+        block_cls = (block and block.__class__) or self.block_cls
+        usage = (block and block.usage) or self.usage
+
+        data_model = AnalyticsDbModel(MEMORY_KVS, block_cls, self.student_id, usage)
+        value = data_model.get(key)
+        children = data_model.get('children', [])
+
+        result = {
+            'class': block_cls.__name__,
+            'value': value,
+            'children': [self.collect(key, b) for b in children]
+        }
+
+        return result
 
     # TODO: [rocha] other name options: scatter, share
     def publish(self, key, value):
-        pass
+        data = AnalyticsDbModel(MEMORY_KVS, self.block_cls, self.student_id, self.usage)
+        data[key] = value
+
 
 class User(object):
     id = None
     groups = []
+
+
+class AnalyticsDbModel(DbModel):
+    def _key(self, name):
+        key = "analytics.{0}".format(super(AnalyticsDbModel, self)._key(name))
+        return key
+
+    def _getfield(self, name):
+        return ModelType(scope=Scope.student_state)
+
+
+RUNTIME_JS = """
+$(function() {
+    $.fn.immediateDescendents = function(selector) {
+        return this.children().map(function(idx, element) {
+            if ($(element).is(selector)) {
+                return element;
+            } else {
+                return $(element).immediateDescendents(selector).toArray();
+            }
+        });
+    };
+
+    function initializeBlock(element) {
+            var children = initializeBlocks($(element));
+
+            var version = $(element).data('runtime-version');
+            if (version === undefined) {
+                return null;
+            }
+
+            var runtime = window['runtime_' + version](element, children);
+            var init_fn = window[$(element).data('init')];
+            var js_block = init_fn(runtime, element) || {};
+            js_block.element = element;
+            js_block.name = $(element).data('name');
+            return js_block;
+    }
+
+    function initializeBlocks(element) {
+        return $(element).immediateDescendents('.xblock').map(function(idx, elem) {
+            return initializeBlock(elem);
+        }).toArray();
+    }
+
+    initializeBlocks($('body'));
+});
+"""

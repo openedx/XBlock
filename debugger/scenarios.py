@@ -101,9 +101,11 @@ SCENARIOS.extend([
                 Usage("progress_slider", "ps-bc", []),
             ]),
             Usage("vertical", "v-c", [
-                Usage("progress_slider", "ps-ca", []),
-                Usage("progress_slider", "ps-cb", []),
+                Usage("thumbs", "t-ca", []),
+                Usage("slider", "ps-cb", []),
                 Usage("progress_slider", "ps-cc", []),
+                Usage("progress_slider", "ps-cd", []),
+                Usage("progress_slider", "ps-ce", []),
             ]),
         ]),
     ),
