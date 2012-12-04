@@ -11,18 +11,25 @@ from webob import Response
 class ProblemBlock(XBlock):
 
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
-    children_names = List(help="List of names for child elements", scope=Scope.content, default=[])
+    children_names = List(help="List of names for child elements", scope=Scope.content, default=None)
     has_children = True
 
     # The content controls how the Inputs attach to Graders
     @register_view("student_view")
     def student_view(self, context):
+        if self.children_names is None:
+            self.children_names = ["unnamed_child_%d" % idx for idx in range(len(self.children))]
         result = Widget()
-        child_widgets = [self.runtime.render_child(child, context, "problem_view") for child in self.children]
-        result.add_widgets_resources(child_widgets)
+        named_child_widgets = [
+            (name, self.runtime.render_child(child, context, "problem_view"))
+            for name, child
+            in self.named_children
+        ]
+        result.add_widgets_resources(widget for _, widget in named_child_widgets)
+        print named_child_widgets
         result.add_content(self.runtime.render_template("problem.html",
-            named_children=zip(self.children_names, child_widgets))
-        )
+            named_children=named_child_widgets
+        ))
         result.add_javascript("""
             function ProblemBlock(runtime, element) {
 
@@ -52,8 +59,17 @@ class ProblemBlock(XBlock):
         return result
 
     @call_once_property
+    def named_children(self):
+        if self.children_names is None:
+            names = ["unnamed_child_%d" % idx for idx in range(len(self.children))]
+        else:
+            names = self.children_names
+
+        return zip(names, self.children)
+
+    @call_once_property
     def child_name_map(self):
-        return dict(zip(self.children_names, self.children))
+        return dict(self.named_children)
 
     @register_handler("check")
     def check_answer(self, request):
