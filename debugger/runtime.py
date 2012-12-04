@@ -1,12 +1,12 @@
-import inspect
 import itertools
 import logging
+import new
 from collections import MutableMapping
 
 from django.template import loader as django_template_loader, Context as DjangoContext
 from django.core.cache import cache
 
-from xblock.core import XBlock, register_view, MissingXBlockRegistration, BlockScope, Scope, ModelType
+from xblock.core import XBlock, MissingXBlockRegistration, BlockScope, Scope, ModelType
 from xblock.widget import Widget
 
 from .util import call_once_property
@@ -150,12 +150,12 @@ class RuntimeBase(object):
         self._view_name = None
 
     def find_xblock_method(self, block, registration_type, name):
-        for _, fn in inspect.getmembers(block, inspect.ismethod):
-            registered_as = getattr(fn, '_method_registrations', {}).get(registration_type, [])
-
-            if name in registered_as:
-                return fn
-        raise MissingXBlockRegistration(block.__class__, registration_type, name)
+        # TODO: Maybe this should be a method on XBlock?
+        try:
+            fn = block.registered_methods[registration_type + name]
+        except KeyError:
+            raise MissingXBlockRegistration(block.__class__.__name__, registration_type, name)
+        return new.instancemethod(fn, block, block.__class__)
 
     def render(self, block, context, view_name):
         self._view_name = view_name

@@ -2,7 +2,7 @@
 
 import json
 
-from .core import XBlock, register_view, register_handler, Object, Scope, List, String
+from .core import XBlock, Object, Scope, List, String
 from .util import call_once_property
 from .widget import Widget
 from webob import Response
@@ -15,7 +15,7 @@ class ProblemBlock(XBlock):
     has_children = True
 
     # The content controls how the Inputs attach to Graders
-    @register_view("student_view")
+    @XBlock.view("student_view")
     def student_view(self, context):
         if self.children_names is None:
             self.children_names = ["unnamed_child_%d" % idx for idx in range(len(self.children))]
@@ -71,7 +71,7 @@ class ProblemBlock(XBlock):
     def child_name_map(self):
         return dict(self.named_children)
 
-    @register_handler("check")
+    @XBlock.handler("check")
     def check_answer(self, request):
         submissions = json.loads(request.body)
 
@@ -105,11 +105,11 @@ class TextInputBlock(InputBlock):
 
     student_input = String(help="Last input submitted by the student", default="", scope=Scope.student_state)
 
-    @register_view("student_view")
+    @XBlock.view("student_view")
     def student_view(self, context):
         return Widget("<p>I can only appear inside problems.</p>")
 
-    @register_view("problem_view")
+    @XBlock.view("problem_view")
     def problem_view(self, context):
         result = Widget("<input type='text' name='input' value='%s'>" % self.student_input)
         result.add_javascript("""

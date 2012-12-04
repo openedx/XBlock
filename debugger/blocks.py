@@ -1,10 +1,10 @@
-from xblock.core import XBlock, register_view
+from xblock.core import XBlock
 from xblock.widget import Widget
 
 class DebuggingChildBlock(XBlock):
     """A simple gray box, to use as a child placeholder."""
-    @register_view('student_view')
-    def student_view(self, context):
+    @XBlock.view('student_view')
+    def student_view_method(self, context):
         widget = Widget("<div class='debug_child'></div>")
         widget.add_css("""
             .debug_child {

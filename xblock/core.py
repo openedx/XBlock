@@ -6,23 +6,6 @@ from .plugin import Plugin
 from .util import call_once_property
 
 
-def register_view(name):
-    return _register_method('view', name)
-
-
-def register_handler(name):
-    return _register_method('handler', name)
-
-
-def _register_method(registration_type, name):
-    def wrapper(fn):
-        if not hasattr(fn, '_method_registrations'):
-            setattr(fn, '_method_registrations', {})
-        fn._method_registrations.setdefault(registration_type, []).append(name)
-        return fn
-    return wrapper
-
-
 class MissingXBlockRegistration(Exception):
     pass
 
@@ -79,6 +62,14 @@ Int = Float = Boolean = Object = List = String = ModelType
 
 class XBlockMetaclass(type):
     def __new__(cls, name, bases, attrs):
+        # Find registered methods
+        reg_methods = {}
+        for value in attrs.itervalues():
+            for reg_type, names in getattr(value, "_method_registrations", {}).iteritems():
+                for n in names:
+                    reg_methods[reg_type + n] = value
+        attrs['registered_methods'] = reg_methods
+
         if attrs.get('has_children', False):
             attrs['children'] = ModelType(help='The children of this XBlock', default=[], scope=None)
 
@@ -126,10 +117,29 @@ def expires(hours=0, minutes=0, seconds=0):
     return _dec
 
 # -- Base Block
+
+
 class XBlock(Plugin):
     __metaclass__ = XBlockMetaclass
 
     entry_point = 'xblock.v1'
+
+    @classmethod
+    def _register_method(cls, registration_type, name):
+        def wrapper(fn):
+            if not hasattr(fn, '_method_registrations'):
+                setattr(fn, '_method_registrations', {})
+            fn._method_registrations.setdefault(registration_type, []).append(name)
+            return fn
+        return wrapper
+
+    @classmethod
+    def view(cls, name):
+        return cls._register_method('view', name)
+
+    @classmethod
+    def handler(cls, name):
+        return cls._register_method('handler', name)
 
     def __init__(self, runtime, usage, model_data):
         self.runtime = runtime
@@ -148,7 +158,7 @@ class XBlock(Plugin):
 
 class HelloWorldBlock(XBlock):
     """A simple block: just show some fixed content."""
-    @register_view('student_view')
+    @XBlock.view('student_view')
     def student_view(self, context):
         return Widget("Hello, world!")
 
@@ -157,7 +167,7 @@ class VerticalBlock(XBlock):
     """A simple container."""
     has_children = True
 
-    @register_view('student_view')
+    @XBlock.view('student_view')
     def render_student(self, context):
         result = Widget()
         # TODO: self.runtime.children is actual children here, not ids...
@@ -188,13 +198,13 @@ class StaticXBlockMetaclass(XBlockMetaclass):
                 return widget
 
             for view_name in attrs['view_names']:
-                view = register_view(view_name)(view)
+                view = XBlock.view(view_name)(view)
 
             attrs['_view'] = view
 
         attrs['_mime_types_map'] = dict(attrs.get('urls', []))
 
-        @register_handler('static')
+        @XBlock.handler('static')
         def static_handler(self, request):
             path = request.path_info[1:]
             mime_type = self._mime_types_map[path]
