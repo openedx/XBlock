@@ -1,5 +1,4 @@
 from xblock.core import StaticXBlock
-print StaticXBlock
 
 class RandomArboretum(StaticXBlock):
     view_names = ["student_view"]
