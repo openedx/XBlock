@@ -225,11 +225,13 @@ class DebuggerRuntime(RuntimeBase):
 
                 function initializeBlocks(element) {
                     return $(element).immediateDescendents('.wrapper').map(function(idx, elm) {
+                        var children = initializeBlocks($(elm));
+
                         var version = $(elm).data('runtime-version');
                         if (version === undefined) {
                             return null;
                         }
-                        var children = initializeBlocks($(elm));
+                        
                         var runtime = window['runtime_' + version](elm, children);
                         var init_fn = window[$(elm).data('init')];
                         var js_block = init_fn(runtime, elm) || {};
@@ -238,7 +240,7 @@ class DebuggerRuntime(RuntimeBase):
                     }).toArray();
                 }
 
-                initializeBlocks($('body'))
+                initializeBlocks($('body'));
             });
             """)
         wrapped.add_content(html)
