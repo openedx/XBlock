@@ -2,34 +2,34 @@
     <head>
         <style type="text/css">
         .data_label {
-            width: 8em;
-            display: block;
+            margin-left: -8em;
             float: left;
+        }
+        .data {
+            margin: .5em 0 0 8em;
+        }
+        .data p {
+            margin: 0;
         }
         </style>
         {{head_html|safe}}
     </head>
     <body>
-        <!--
-        <div class="runtime">
-            {{block.runtime}}
+        <div class="student_view">
+            {{body|safe}}
         </div>
-        -->
-        <div class="model">
+        <hr />
+        <div class="data">
             <span class="data_label">Usage</span>
             {{usage}}
         </div>
-        <div class="model">
+        <div class="data">
             <span class="data_label">Block</span>
             {{block}}
         </div>
-        <div class="model">
+        <div class="data">
             <span class="data_label">Database</span>
-            {{database}}
-        </div>
-        <hr />
-        <div class="student_view">
-            {{body|safe}}
+            {{database.as_html|safe}}
         </div>
     </body>
 </html>

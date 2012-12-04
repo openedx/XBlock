@@ -41,8 +41,6 @@ class KeyValueStore(object):
         pass
 
 
-DATABASE = {}
-
 class MemoryKeyValueStore(KeyValueStore):
     """Use an in-memory database for a key-value store."""
     def __init__(self, d):
@@ -57,7 +55,15 @@ class MemoryKeyValueStore(KeyValueStore):
     def delete(self, key, name):
         del self.d[key][name]
 
-MEMORY_KVS = MemoryKeyValueStore(DATABASE)
+    def as_html(self):
+        """Just for our Debugger!"""
+        keys = sorted(self.d.keys())
+        html = []
+        for k in keys:
+            html.append("<p>%r: %r</p>" % (k, self.d[k]))
+        return "".join(html)
+
+MEMORY_KVS = MemoryKeyValueStore({})
 
 def create_xblock(usage, student_id):
     block_cls = XBlock.load_class(usage.block_name)

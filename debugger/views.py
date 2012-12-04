@@ -16,7 +16,7 @@ from xblock.core import XBlock, MissingXBlockRegistration
 from xblock.widget import Widget
 
 
-from .runtime import Usage, create_xblock, DATABASE
+from .runtime import Usage, create_xblock, MEMORY_KVS
 
 #---- Data -----
 
@@ -65,7 +65,7 @@ def show_scenario(request, scenario_id):
         widget = Widget("No View Found: %s" % (e.args,))
 
     return render_to_response('block.html', {
-        'database': DATABASE,
+        'database': MEMORY_KVS,
         'block': block,
         'body': widget.html(),
         'head_html': widget.head_html(),
