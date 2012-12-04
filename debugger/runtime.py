@@ -29,26 +29,62 @@ class Usage(object):
     def find_usage(cls, usage_id):
         return cls.usage_index[usage_id]
 
+class KeyValueStore(object):
+    """The abstract interface for Key Value Stores."""
+    def get(key, name):
+        pass
+
+    def set(key, name, value):
+        pass
+
+    def delete(key, name):
+        pass
+
+
+DATABASE = {}
+
+class MemoryKeyValueStore(KeyValueStore):
+    """Use an in-memory database for a key-value store."""
+    def __init__(self, d):
+        self.d = d
+
+    def get(self, key, name):
+        return self.d[key][name]
+
+    def set(self, key, name, value):
+        self.d.setdefault(key, {})[name] = value
+
+    def delete(self, key, name):
+        del self.d[key][name]
+
+MEMORY_KVS = MemoryKeyValueStore(DATABASE)
+
 def create_xblock(usage, student_id):
     block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
-    dbview = DbView(block_cls, student_id, usage.id, usage.def_id)
-    block = block_cls(runtime, usage, DbModel(block_cls, student_id, usage.child_specs, dbview))
+    block = block_cls(runtime, usage, DbModel(MEMORY_KVS, block_cls, student_id, usage))
     return block
 
+
 class DbModel(MutableMapping):
-    def __init__(self, block_cls, student_id, child_specs, dbview):
+    def __init__(self, kvs, block_cls, student_id, usage):
+        self._kvs = kvs
         self._student_id = student_id
         self._block_cls = block_cls
-        self._child_specs = child_specs
-        self._db = dbview
+        self._usage = usage
+
+    def __repr__(self):
+        return "<{0.__class__.__name__} {0._block_cls!r}>".format(self)
+
+    def __str__(self):
+        return str(dict(self.iteritems()))
 
     @call_once_property
     def _children(self):
         """Instantiate the children."""
         return [
             create_xblock(cs, self._student_id) 
-            for cs in self._child_specs
+            for cs in self._usage.child_specs
             ]
 
     def _getfield(self, name):
@@ -57,22 +93,33 @@ class DbModel(MutableMapping):
 
         return getattr(self._block_cls, name)
 
-    def _getview(self, name):
+    def _key(self, name):
+        key = []
         field = self._getfield(name)
-        return self._db.query(student=field.scope.student, block=field.scope.block)
+        block = field.scope.block
+        if block == BlockScope.ALL:
+            pass
+        elif block == BlockScope.USAGE:
+            key.append(self._usage.id)
+        elif block == BlockScope.DEFINITION:
+            key.append(self._usage.def_id)
+        elif block == BlockScope.TYPE:
+            key.append(self.block_type.__name__)
+        if field.scope.student:
+            key.append(self._student_id)
+        key = ".".join(key)
+        return key
 
     def __getitem__(self, name):
         if name == 'children':
             return self._children
-
-        field = self._getfield(name)
-        return self._getview(name)[name]
+        return self._kvs.get(self._key(name), name)
 
     def __setitem__(self, name, value):
-        self._getview(name)[name] = value
+        self._kvs.set(self._key(name), name, value)
 
     def __delitem__(self, name):
-        del self._getview(name)[name]
+        self._kvs.delete(self._key(name), name)
 
     def __iter__(self):
         return iter(self.keys())
@@ -83,11 +130,6 @@ class DbModel(MutableMapping):
     def keys(self):
         return [field.name for field in self._block_cls.fields]
 
-    def __repr__(self):
-        return "<{0.__class__.__name__} {0._block_cls!r} {0._db!r}>".format(self)
-
-    def __str__(self):
-        return str(dict(self.iteritems()))
 
 class RuntimeBase(object):
     """Methods all runtimes need."""
@@ -181,29 +223,3 @@ class DebuggerRuntime(RuntimeBase):
 class User(object):
     id = None
     groups = []
-
-
-DATABASE = {}
-
-class DbView(object):
-    def __init__(self, block_type, student_id, usage_id, definition_id):
-        super(DbView, self).__init__()
-        self.block_type = block_type
-        self.student_id = student_id
-        self.definition_id = definition_id
-        self.usage_id = usage_id
-
-    def query(self, student=False, block=BlockScope.ALL):
-        key = []
-        if block == BlockScope.ALL:
-            pass
-        elif block == BlockScope.USAGE:
-            key.append(self.usage_id)
-        elif block == BlockScope.DEFINITION:
-            key.append(self.definition_id)
-        elif block == BlockScope.TYPE:
-            key.append(self.block_type.__name__)
-        if student:
-            key.append(self.student_id)
-        key = ".".join(key)
-        return DATABASE.setdefault(key, {})
