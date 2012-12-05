@@ -23,7 +23,7 @@ def make_safe_for_html(html):
     return html
 
 class Usage(object):
-    # Not the real way we'll store usages!
+    # TODO: Not the real way we'll store usages!
     ids = itertools.count()
     usage_index = {}
 
@@ -160,10 +160,12 @@ class RuntimeBase(object):
             fn = block.registered_methods[registration_type + name]
         except KeyError:
             return None
+
         return new.instancemethod(fn, block, block.__class__)
 
     def render(self, block, context, view_name):
         self._view_name = view_name
+
         for try_name in [view_name, "default"]:
             view_fn = self.find_xblock_method(block, 'view', try_name)
             if view_fn:
@@ -174,12 +176,15 @@ class RuntimeBase(object):
         cache_info = getattr(view_fn, "_cache", {})
         key = "view.%s.%s" % (block.__class__.__name__, view_name)
         id_type = cache_info.get('id', 'definition')
+
         if id_type == 'usage':
             key += ".%s" % block.usage.id
         elif id_type == 'definition':
             key += ".%s" % block.usage.def_id
+
         for name in cache_info.get('model', ()):
             key += ".%s=%r" % (name, getattr(block, name))
+
         widget = cache.get(key)
         if widget is None:
             widget = view_fn(context)
@@ -188,7 +193,9 @@ class RuntimeBase(object):
                 cache.set(key, widget, seconds)
         else:
             log.debug("Cache hit: %s", key)
+
         self._view_name = None
+
         return self.wrap_child(block, widget, context)
 
     def render_child(self, block, context, view_name=None):
@@ -200,9 +207,11 @@ class RuntimeBase(object):
     def handle(self, block, handler_name, data):
         return self.find_xblock_method(block, 'handler', handler_name)(data)
 
+
 class DebuggerRuntime(RuntimeBase):
     def __init__(self, block_cls, student_id, usage):
         super(DebuggerRuntime, self).__init__()
+
         self.block_cls = block_cls
         self.student_id = student_id
         self.usage = usage
@@ -225,50 +234,15 @@ class DebuggerRuntime(RuntimeBase):
 
         data['name'] = block.name
 
-        html = "<div class='wrapper'%s>%s</div>" % (
+        html = "<div class='xblock'%s>%s</div>" % (
             "".join(" data-%s='%s'" % item for item in data.items()),
             widget.html(),
         )
+        wrapped.add_content(html)
+
         wrapped.add_javascript_url("/static/js/vendor/jquery.min.js")
         wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")
-        wrapped.add_javascript("""
-            $(function() {
-                $.fn.immediateDescendents = function(selector) {
-                    return this.children().map(function(idx, elm) {
-                        if ($(elm).is(selector)) {
-                            return elm;
-                        } else {
-                            return $(elm).immediateDescendents(selector).toArray();
-                        }
-                    });
-                };
-
-                function initializeBlock(element) {
-                        var children = initializeBlocks($(element));
-
-                        var version = $(element).data('runtime-version');
-                        if (version === undefined) {
-                            return null;
-                        }
-
-                        var runtime = window['runtime_' + version](element, children);
-                        var init_fn = window[$(element).data('init')];
-                        var js_block = init_fn(runtime, element) || {};
-                        js_block.element = element;
-                        js_block.name = $(element).data('name');
-                        return js_block;
-                }
-
-                function initializeBlocks(element) {
-                    return $(element).immediateDescendents('.wrapper').map(function(idx, elm) {
-                        return initializeBlock(elm);
-                    }).toArray();
-                }
-
-                initializeBlocks($('body'));
-            });
-            """)
-        wrapped.add_content(html)
+        wrapped.add_javascript(RUNTIME_JS);
         wrapped.add_widget_resources(widget)
         return wrapped
 
