@@ -3,7 +3,6 @@
 import json
 
 from .core import XBlock, Object, Scope, List, String, Any
-from .util import call_once_property
 from .widget import Widget
 from webob import Response
 
@@ -11,19 +10,16 @@ from webob import Response
 class ProblemBlock(XBlock):
 
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
-    children_names = List(help="List of names for child elements", scope=Scope.content, default=[])
     has_children = True
 
     # The content controls how the Inputs attach to Graders
     @XBlock.view("student_view")
     def student_view(self, context):
-        if self.children_names is None:
-            self.children_names = ["unnamed_child_%d" % idx for idx in range(len(self.children))]
         result = Widget()
         named_child_widgets = [
-            (name, self.runtime.render_child(child, context, "problem_view"))
-            for name, child
-            in self.named_children
+            (child.name, self.runtime.render_child(child, context, "problem_view"))
+            for child
+            in self.children
         ]
         result.add_widgets_resources(widget for _, widget in named_child_widgets)
         result.add_content(self.runtime.render_template("problem.html",
@@ -32,59 +28,63 @@ class ProblemBlock(XBlock):
         result.add_javascript("""
             function ProblemBlock(runtime, element) {
 
+                function call_if_exists(obj, fn) {
+                    if (typeof obj[fn] == 'function') {
+                        return obj[fn].apply(obj, Array.prototype.slice.call(arguments, 2));
+                    } else {
+                        return undefined;
+                    }
+                }
+
                 var handler_url = runtime.handler_url('check')
                 $(element).bind('ajaxSend', function(elm, xhr, s) {
                     runtime.prep_xml_http_request(xhr);
                 });
 
-                function update_checkers() {}
+                function handle_check_results(results) {
+                    $.each(results.submit_results || {}, function(input, result) {
+                        call_if_exists(runtime.child_map[input], 'handle_submit', result);
+                    });
+                    $.each(results.check_results || {}, function(checker, result) {
+                        call_if_exists(runtime.child_map[checker], 'handle_check', result);
+                    });
+                }
 
                 $(element).find('.check').bind('click', function() {
                     var data = {};
                     for (var i = 0; i < runtime.children.length; i++) {
                         var child = runtime.children[i];
-                        var name = $(child.element).closest('.problem-child').data('name');
-                        if (typeof child.submit == 'function') {
-                            data[name] = runtime.children[i].submit();
-                        } else {
-                            data[name] = null;
+                        if (child.name !== undefined) {
+                            data[child.name] = call_if_exists(child, 'submit');
                         }
                     }
-                    $.post(handler_url, JSON.stringify(data)).success(update_checkers);
+                    $.post(handler_url, JSON.stringify(data)).success(handle_check_results);
                 });
             }
             """)
         result.initialize_js('ProblemBlock')
         return result
 
-    @call_once_property
-    def named_children(self):
-        names = self.children_names + ["unnamed_child_%d" % idx for idx in range(len(self.children) - len(self.children_names))]
-
-        return zip(names, self.children)
-
-    @call_once_property
-    def child_name_map(self):
-        return dict(self.named_children)
-
-    @XBlock.handler("check")
-    def check_answer(self, request):
-        submissions = json.loads(request.body)
-
+    @XBlock.json_handler("check")
+    def check_answer(self, submissions):
+        submit_results = {}
         for input_name, submission in submissions.items():
-            self.child_name_map[input_name].submit(submission)
+            submit_results[input_name] = self.child_map[input_name].submit(submission)
 
-        results = {}
+        check_results = {}
         for checker, arguments in self.checker_arguments.items():
             kwargs = {}
             kwargs.update(arguments)
             for arg_name, arg_value in arguments.items():
                 if isinstance(arg_value, dict) and arg_value.get('_type') == 'reference':
                     child, _, attribute = arg_value['ref_name'].partition('.')
-                    kwargs[arg_name] = getattr(self.child_name_map[child], attribute)
-            results[checker] = self.child_name_map[checker].check(**kwargs)
+                    kwargs[arg_name] = getattr(self.child_map[child], attribute)
+            check_results[checker] = self.child_map[checker].check(**kwargs)
 
-        return Response(json.dumps(results))
+        return {
+            'submit_results': submit_results,
+            'check_results': check_results,
+        }
 
 
 class InputBlock(XBlock):
@@ -94,6 +94,7 @@ class InputBlock(XBlock):
         Called with the result of the javascript Block's submit() function.
         """
         pass
+
 
 class CheckerBlock(XBlock):
     pass
@@ -110,12 +111,15 @@ class TextInputBlock(InputBlock):
 
     @XBlock.view("problem_view")
     def problem_view(self, context):
-        result = Widget("<input type='text' name='input' value='%s'>" % self.student_input)
+        result = Widget("<input type='text' name='input' value='%s'><span class='message'></span>" % self.student_input)
         result.add_javascript("""
             function TextInputBlock(runtime, element) {
                 return {
                     submit: function() {
                         return $(element).find(':input').serializeArray();
+                    },
+                    handle_submit: function(result) {
+                        $(element).find('.message').text((result || {}).error || '');
                     }
                 }
             }
@@ -129,7 +133,9 @@ class TextInputBlock(InputBlock):
             try:
                 self.student_input = int(submission[0]['value'])
             except ValueError:
+                return {'error': '"%s" is not an integer' % self.student_input}
                 pass
+
 
 class EqualityCheckerBlock(CheckerBlock):
 
@@ -145,7 +151,20 @@ class EqualityCheckerBlock(CheckerBlock):
         else:
             correct = self.left == self.right
 
-        return Widget("<span>%s: %s</span>" % (self.message, correct))
+        result = Widget("<span>%s: <span class='value'>%s</span></span>" % (self.message, correct))
+
+        result.add_javascript("""
+            function EqualityCheckerBlock(runtime, element) {
+                return {
+                    handle_check: function(result) {
+                        $(element).find('.value').text(result ? 'True' : 'False');
+                    }
+                }
+            }
+            """)
+
+        result.initialize_js('EqualityCheckerBlock')
+        return result
 
 
     def check(self, left, right):

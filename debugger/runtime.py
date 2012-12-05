@@ -181,12 +181,12 @@ class RuntimeBase(object):
         else:
             log.debug("Cache hit: %s", key)
         self._view_name = None
-        return self.wrap_child(widget, context)
+        return self.wrap_child(block, widget, context)
 
     def render_child(self, block, context, view_name=None):
         return block.runtime.render(block, context, view_name or self._view_name)
 
-    def wrap_child(self, widget, context):
+    def wrap_child(self, block, widget, context):
         return widget
 
     def handle(self, block, handler_name, data):
@@ -202,7 +202,7 @@ class DebuggerRuntime(RuntimeBase):
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
 
-    def wrap_child(self, widget, context):
+    def wrap_child(self, block, widget, context):
         wrapped = Widget()
         data = {}
         if widget.js_init:
@@ -212,6 +212,8 @@ class DebuggerRuntime(RuntimeBase):
             data['runtime-version'] = version
             data['usage'] = self.usage.id
             data['block-type'] = self.block_cls.plugin_name
+
+        data['name'] = block.name
 
         html = "<div class='wrapper'%s>%s</div>" % (
             "".join(" data-%s='%s'" % item for item in data.items()),
@@ -231,20 +233,25 @@ class DebuggerRuntime(RuntimeBase):
                     });
                 };
 
-                function initializeBlocks(element) {
-                    return $(element).immediateDescendents('.wrapper').map(function(idx, elm) {
-                        var children = initializeBlocks($(elm));
+                function initializeBlock(element) {
+                        var children = initializeBlocks($(element));
 
-                        var version = $(elm).data('runtime-version');
+                        var version = $(element).data('runtime-version');
                         if (version === undefined) {
                             return null;
                         }
-                        
-                        var runtime = window['runtime_' + version](elm, children);
-                        var init_fn = window[$(elm).data('init')];
-                        var js_block = init_fn(runtime, elm) || {};
-                        js_block.element = elm;
+
+                        var runtime = window['runtime_' + version](element, children);
+                        var init_fn = window[$(element).data('init')];
+                        var js_block = init_fn(runtime, element) || {};
+                        js_block.element = element;
+                        js_block.name = $(element).data('name');
                         return js_block;
+                }
+
+                function initializeBlocks(element) {
+                    return $(element).immediateDescendents('.wrapper').map(function(idx, elm) {
+                        return initializeBlock(elm);
                     }).toArray();
                 }
 

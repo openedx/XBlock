@@ -1,7 +1,13 @@
 """Core definitions for XBlocks."""
 
+import functools
+import json
+
 from collections import namedtuple
+from webob import Response
+
 from .plugin import Plugin
+from .util import call_once_property
 
 
 class MissingXBlockRegistration(Exception):
@@ -70,6 +76,10 @@ class XBlockMetaclass(type):
 
         if attrs.get('has_children', False):
             attrs['children'] = ModelType(help='The children of this XBlock', default=[], scope=None)
+            @call_once_property
+            def child_map(self):
+                return dict((child.name, child) for child in self.children)
+            attrs['child_map'] = child_map
 
         fields = []
         for n, v in attrs.items():
@@ -122,6 +132,8 @@ class XBlock(Plugin):
 
     entry_point = 'xblock.v1'
 
+    name = String(help="Short name for the block", scope=Scope.content)
+
     @classmethod
     def _register_method(cls, registration_type, name):
         def wrapper(fn):
@@ -138,6 +150,19 @@ class XBlock(Plugin):
     @classmethod
     def handler(cls, name):
         return cls._register_method('handler', name)
+
+    @classmethod
+    def json_handler(cls, name):
+        def wrap(fn):
+            @XBlock.handler(name)
+            @functools.wraps(fn)
+            def wrapper(self, request):
+                request_json = json.loads(request.body)
+                response_json = json.dumps(fn(self, request_json))
+                return Response(response_json, content_type='application/json')
+
+            return wrapper
+        return wrap
 
     def __init__(self, runtime, usage, model_data):
         self.runtime = runtime

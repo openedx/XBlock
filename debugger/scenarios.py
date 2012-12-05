@@ -29,13 +29,12 @@ SCENARIOS.extend([
     ),
     Scenario("problem with thumbs and textbox",
         Usage("problem", "p1", [
-            Usage("thumbs", "x", []),
-            Usage("textinput", "textin", [], {'input_type': 'int'}),
-            Usage("equality", "e1", [], {'message': 'Upvotes match downvotes'}),
-            Usage("equality", "e2", [], {'message': 'Number of upvotes matches entered string'}),
-            Usage("equality", "e3", [], {'message': 'Number of upvotes is 3'}),
+            Usage("thumbs", "x", [], {'name': 'thumb'}),
+            Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'votecount'}),
+            Usage("equality", "e1", [], {'message': 'Upvotes match downvotes', 'name': 'votes_equal'}),
+            Usage("equality", "e2", [], {'message': 'Number of upvotes matches entered string', 'name': 'votes_named'}),
+            Usage("equality", "e3", [], {'message': 'Number of upvotes is 3', 'name': 'votes_specified'}),
         ], {
-            'children_names': ['thumb', 'votecount', 'votes_equal', 'votes_named', 'votes_specified'],
             'checker_arguments': {
                 'votes_equal': {
                     'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},

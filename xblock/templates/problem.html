@@ -1,9 +1,7 @@
 <p>A Problem:</p>
 <div class="vertical" style="border: solid 1px #888; padding: 3px;">
     {% for name, c in named_children %}
-    <section class='problem-child' data-name="{{name}}">
-        {{c.html|safe}}
-    </section>
+    {{c.html|safe}}
     {% endfor %}
 </div>
 <input type='button' value='check' class='check'></input>
