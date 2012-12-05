@@ -9,7 +9,7 @@ from webob.multidict import MultiDict
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 
-from xblock.core import XBlock, MissingXBlockRegistration
+from xblock.core import XBlock
 from xblock.widget import Widget
 
 from .runtime import Usage, create_xblock, MEMORY_KVS
@@ -44,12 +44,7 @@ def show_scenario(request, scenario_id):
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     block = create_xblock(usage, "student99")
-
-    try:
-        widget = block.runtime.render(block, {}, 'student_view')
-    except MissingXBlockRegistration as e:
-        widget = Widget("No View Found: %s" % (e.args,))
-
+    widget = block.runtime.render(block, {}, 'student_view')
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
         'database': MEMORY_KVS,

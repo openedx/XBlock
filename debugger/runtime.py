@@ -7,13 +7,20 @@ from collections import MutableMapping
 from django.template import loader as django_template_loader, Context as DjangoContext
 from django.core.cache import cache
 
-from xblock.core import XBlock, MissingXBlockRegistration, BlockScope, Scope, ModelType
+from xblock.core import XBlock, BlockScope, Scope, ModelType
 from xblock.widget import Widget
 
 from .util import call_once_property
 
 log = logging.getLogger(__name__)
 
+
+def make_safe_for_html(html):
+    html = html.replace("&", "&amp;")
+    html = html.replace(" ", "&nbsp;")
+    html = html.replace("<", "&lt;")
+    html = html.replace("\n", "<br>")
+    return html
 
 class Usage(object):
     # Not the real way we'll store usages!
@@ -64,11 +71,7 @@ class MemoryKeyValueStore(KeyValueStore):
     def as_html(self):
         """Just for our Debugger!"""
         html = json.dumps(self.d, sort_keys=True, indent=4)
-        html = html.replace("&", "&amp;")
-        html = html.replace(" ", "&nbsp;")
-        html = html.replace("<", "&lt;")
-        html = html.replace("\n", "<br>")
-        return html
+        return make_safe_for_html(html)
 
 MEMORY_KVS = MemoryKeyValueStore({})
 
@@ -156,12 +159,17 @@ class RuntimeBase(object):
         try:
             fn = block.registered_methods[registration_type + name]
         except KeyError:
-            raise MissingXBlockRegistration(block.__class__.__name__, registration_type, name)
+            return None
         return new.instancemethod(fn, block, block.__class__)
 
     def render(self, block, context, view_name):
         self._view_name = view_name
-        view_fn = self.find_xblock_method(block, 'view', view_name)
+        for try_name in [view_name, "default"]:
+            view_fn = self.find_xblock_method(block, 'view', try_name)
+            if view_fn:
+                break
+        else:
+            return Widget("<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
 
         cache_info = getattr(view_fn, "_cache", {})
         key = "view.%s.%s" % (block.__class__.__name__, view_name)

@@ -9,6 +9,7 @@ setup(
     entry_points={
         'xblock.v1': [
             'helloworld = xblock.content:HelloWorldBlock',
+            'html = xblock.content:HtmlBlock',
             'vertical = xblock.structure:VerticalBlock',
             'problem = xblock.problem:ProblemBlock',
             'textinput = xblock.problem:TextInputBlock',

@@ -10,10 +10,6 @@ from .plugin import Plugin
 from .util import call_once_property
 
 
-class MissingXBlockRegistration(Exception):
-    pass
-
-
 class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
@@ -170,8 +166,16 @@ class XBlock(Plugin):
         self._model_data = model_data
 
     def __repr__(self):
+        attrs = []
+        for field in self.fields:
+            value = getattr(self, field.name)
+            if isinstance(value, basestring):
+                value = value.strip()
+                if len(value) > 40:
+                    value = value[:37] + "..."
+            attrs.append(" %s=%r" % (field.name, value))
         return "<%s @%04X%s>" % (
             self.__class__.__name__,
             id(self) % 0xFFFF,
-            ','.join(" %s=%s" % (field.name, getattr(self, field.name)) for field in self.fields)
+            ','.join(attrs)
         )
