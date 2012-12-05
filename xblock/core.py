@@ -1,9 +1,7 @@
-from pkg_resources import resource_string
+"""Core definitions for XBlocks."""
+
 from collections import namedtuple
-from webob import Response
-from .widget import Widget
 from .plugin import Plugin
-from .util import call_once_property
 
 
 class MissingXBlockRegistration(Exception):
@@ -152,68 +150,3 @@ class XBlock(Plugin):
             id(self) % 0xFFFF,
             ','.join(" %s=%s" % (field.name, getattr(self, field.name)) for field in self.fields)
         )
-
-
-#-- specific blocks --------
-
-class HelloWorldBlock(XBlock):
-    """A simple block: just show some fixed content."""
-    @XBlock.view('student_view')
-    def student_view(self, context):
-        return Widget("Hello, world!")
-
-
-class VerticalBlock(XBlock):
-    """A simple container."""
-    has_children = True
-
-    @XBlock.view('student_view')
-    def render_student(self, context):
-        result = Widget()
-        # TODO: self.runtime.children is actual children here, not ids...
-        child_widgets = [self.runtime.render_child(child, context) for child in self.children]
-        result.add_widgets_resources(child_widgets)
-        result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
-        return result
-
-
-class StaticXBlockMetaclass(XBlockMetaclass):
-    def __new__(cls, name, bases, attrs):
-        if 'content' in attrs and 'view_names' in attrs and attrs['view_names']:
-            @call_once_property
-            def _content(self):
-                return resource_string(self.__class__.__module__, 'content/' + attrs['content'])
-
-            attrs['_content'] = _content
-
-            def view(self, context):
-                widget = Widget(self._content)
-
-                for url, mime_type in attrs.get('urls', []):
-                    widget.add_resource_url(self.runtime.handler_url('static') + '/' + url, mime_type)
-
-                if hasattr(self, 'initialize_js'):
-                    widget.initialize_js(self.initialize_js)
-
-                return widget
-
-            for view_name in attrs['view_names']:
-                view = XBlock.view(view_name)(view)
-
-            attrs['_view'] = view
-
-        attrs['_mime_types_map'] = dict(attrs.get('urls', []))
-
-        @XBlock.handler('static')
-        def static_handler(self, request):
-            path = request.path_info[1:]
-            mime_type = self._mime_types_map[path]
-            return Response(body=resource_string(self.__class__.__module__, 'content/' + path), content_type=mime_type)
-
-        attrs['static_handler'] = static_handler
-
-        return super(StaticXBlockMetaclass, cls).__new__(cls, name, bases, attrs)
-
-
-class StaticXBlock(XBlock):
-    __metaclass__ = StaticXBlockMetaclass

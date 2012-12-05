@@ -1,4 +1,4 @@
-from xblock.core import StaticXBlock
+from xblock.static import StaticXBlock
 
 class RandomArboretum(StaticXBlock):
     view_names = ["student_view"]

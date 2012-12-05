@@ -8,12 +8,12 @@ setup(
     packages=['xblock'],
     entry_points={
         'xblock.v1': [
-            'helloworld = xblock.core:HelloWorldBlock',
-            'vertical = xblock.core:VerticalBlock',
+            'helloworld = xblock.content:HelloWorldBlock',
+            'vertical = xblock.structure:VerticalBlock',
             'problem = xblock.problem:ProblemBlock',
             'textinput = xblock.problem:TextInputBlock',
-            'thumbs = xblock.thumbs:ThumbsBlock',
             'equality = xblock.problem:EqualityCheckerBlock',
+            'thumbs = xblock.thumbs:ThumbsBlock',
         ]
     }
 )
