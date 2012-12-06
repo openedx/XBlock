@@ -38,6 +38,9 @@ class ProgressSlider(Slider):
         #
         # widget.add_css("input[type=range] + span { color: red; }")
 
+        # TODO: [rocha] initial progress - could on in constructor or initializer
+        self.runtime.publish('progress', (self.value, self.max_value))
+
         widget.add_javascript(P_SLIDER_JS)
         widget.initialize_js('ProgressSlider')
         return widget
