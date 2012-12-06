@@ -1,4 +1,11 @@
-"""Problem XBlock, and friends."""
+"""Problem XBlock, and friends.
+
+These implement a general mechanism for problems containing input fields
+and checkers, wired together in interesting ways.
+
+This code is in the XBlock layer.
+
+"""
 
 import json
 

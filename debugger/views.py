@@ -1,3 +1,9 @@
+"""Django views implementing the XBlock debugger.
+
+This code is in the Debugger layer.
+
+"""
+
 import itertools
 import json
 import logging

@@ -1,3 +1,9 @@
+"""Generic plugin support so we can find XBlocks.
+
+This code is in the Runtime layer.
+
+"""
+
 import pkg_resources
 import logging
 

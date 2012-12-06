@@ -1,4 +1,8 @@
-"""Widgets for XBlocks."""
+"""Widgets for XBlocks.
+
+This code is in the Runtime layer.
+
+"""
 
 class Widget(object):
     def __init__(self, content=None, mimetype='text/html'):

@@ -1,3 +1,9 @@
+"""An XBlock providing thumbs-up/thumbs-down voting.
+
+This code is in the XBlock layer.
+
+"""
+
 import json
 from webob import Response
 
@@ -7,6 +13,15 @@ from .problem import InputBlock
 
 
 class ThumbsBlock(InputBlock):
+    """
+    An XBlock with thumbs-up/thumbs-down voting.
+
+    Vote totals are stored for all students to see.  Each student is recorded
+    as has-voted or not.
+
+    This demonstrates multiple data scopes and ajax handlers.
+
+    """
 
     upvotes = Int(help="Number of up votes made on this thumb", default=0, scope=Scope.content)
     downvotes = Int(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
@@ -56,7 +71,10 @@ class ThumbsBlock(InputBlock):
 
     @XBlock.handler('vote')
     def handle_vote(self, request):
-        #if self.student.voted:
+        # Here is where we would prevent a student from voting twice, but then
+        # we couldn't click more than once in the demo!
+        #
+        # if self.student.voted:
         #    log.error("cheater!")
         #    return
         data = json.loads(request.body)

@@ -1,3 +1,9 @@
+"""Example scenarios to display in the debugger.
+
+This code is in the Debugger layer.
+
+"""
+
 from collections import namedtuple
 
 from xblock.core import XBlock

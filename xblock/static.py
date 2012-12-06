@@ -1,3 +1,5 @@
+"""An XBlock that produces a view from static content."""
+
 from pkg_resources import resource_string
 
 from webob import Response

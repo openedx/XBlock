@@ -1,3 +1,9 @@
+"""An example of a 'blade': large amounts of Javascript.
+
+This code is in the XBlock layer.
+
+"""
+
 from xblock.static import StaticXBlock
 
 class RandomArboretum(StaticXBlock):

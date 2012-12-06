@@ -1,4 +1,9 @@
-"""Core definitions for XBlocks."""
+"""Implementation of the XBlock facility.
+
+This code is in the Runtime layer, because it is authored once by edX
+and used by all runtimes.
+
+"""
 
 import functools
 import json

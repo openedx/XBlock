@@ -1,3 +1,9 @@
+"""An XBlock to use as a child when you don't care what child to show.
+
+This code is in the Debugger layer.
+
+"""
+
 from xblock.core import XBlock
 from xblock.widget import Widget
 

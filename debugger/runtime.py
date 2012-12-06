@@ -1,3 +1,9 @@
+"""The runtime machinery for the XBlock debugger.
+
+Code in this file is a mix of Runtime layer and Debugger layer.
+
+"""
+
 import itertools
 import json
 import logging

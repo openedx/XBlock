@@ -29,16 +29,18 @@ Installation
 Reading the code
 ----------------
 
-There are three distinct layers to this code:
+There are three distinct layers to this code.  In the comments, we've tried to
+make clear which layer the code lives in:
 
-1.  The sample XBlock code.  This is the most important, it is the code that our
-    customers will be writing, and demonstrates the XBlock interfaces.
+1.  **XBlock** The sample XBlock code.  This is the most important, it is the
+    code that our customers will be writing, and demonstrates the XBlock
+    interfaces.
 
-2.  The runtime code that we think will be common to all runtimes.  This is the
-    behind-the-scenes code edX will write to make XBlocks work.  This layer may
-    not be real code here, but we'll need to write real code to perform these
-    functions.
+2.  **Runtime** The runtime code that we think will be common to all runtimes.
+    This is the behind-the-scenes code edX will write to make XBlocks work.
+    This layer may not be real code here, but we'll need to write real code to
+    perform these functions.
 
-3.  The debugger-specific code we wrote to make everything work.  This code is
-    the least real, in that it might be just stubs, and will be done very
-    differently in real code.
+3.  **Debugger** The debugger-specific code we wrote to make everything work.
+    This code is the least real, in that it might be just stubs, and will be
+    done very differently in real code.
