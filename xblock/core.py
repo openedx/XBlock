@@ -22,6 +22,7 @@ class BlockScope(object):
 class Scope(namedtuple('ScopeBase', 'student block')):
     pass
 
+
 Scope.content = Scope(student=False, block=BlockScope.DEFINITION)
 Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
 Scope.settings = Scope(student=True, block=BlockScope.USAGE)
@@ -124,6 +125,7 @@ def expires(hours=0, minutes=0, seconds=0):
         _set_cache_info(f, seconds=hours*3600+minutes*60+seconds)
         return f
     return _dec
+
 
 # -- Base Block
 

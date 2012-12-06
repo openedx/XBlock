@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 
 class Usage(object):
-    # Not the real way we'll store usages!
+    # TODO: Not the real way we'll store usages!
     ids = itertools.count()
     usage_index = {}
 
@@ -107,7 +107,7 @@ class DbModel(MutableMapping):
     def _children(self):
         """Instantiate the children."""
         return [
-            create_xblock(cs, self._student_id) 
+            create_xblock(cs, self._student_id)
             for cs in self._usage.child_specs
             ]
 
@@ -183,10 +183,12 @@ class RuntimeBase(object):
             fn = block.registered_methods[registration_type + name]
         except KeyError:
             return None
+
         return new.instancemethod(fn, block, block.__class__)
 
     def render(self, block, context, view_name):
         self._view_name = view_name
+
         for try_name in [view_name, "default"]:
             view_fn = self.find_xblock_method(block, 'view', try_name)
             if view_fn:
@@ -197,12 +199,15 @@ class RuntimeBase(object):
         cache_info = getattr(view_fn, "_cache", {})
         key = "view.%s.%s" % (block.__class__.__name__, view_name)
         id_type = cache_info.get('id', 'definition')
+
         if id_type == 'usage':
             key += ".%s" % block.usage.id
         elif id_type == 'definition':
             key += ".%s" % block.usage.def_id
+
         for name in cache_info.get('model', ()):
             key += ".%s=%r" % (name, getattr(block, name))
+
         widget = cache.get(key)
         if widget is None:
             widget = view_fn(context)
@@ -211,7 +216,9 @@ class RuntimeBase(object):
                 cache.set(key, widget, seconds)
         else:
             log.debug("Cache hit: %s", key)
+
         self._view_name = None
+
         return self.wrap_child(block, widget, context)
 
     def render_child(self, block, context, view_name=None):
@@ -223,13 +230,17 @@ class RuntimeBase(object):
     def handle(self, block, handler_name, data):
         return self.find_xblock_method(block, 'handler', handler_name)(data)
 
+
 class DebuggerRuntime(RuntimeBase):
     def __init__(self, block_cls, student_id, usage):
         super(DebuggerRuntime, self).__init__()
+
         self.block_cls = block_cls
         self.student_id = student_id
         self.usage = usage
 
+    # TODO: [rocha] runtime should not provide this, each xblock
+    # should use whatever they want
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
 
@@ -246,56 +257,92 @@ class DebuggerRuntime(RuntimeBase):
 
         data['name'] = block.name
 
-        html = "<div class='wrapper'%s>%s</div>" % (
+        html = "<div class='xblock'%s>%s</div>" % (
             "".join(" data-%s='%s'" % item for item in data.items()),
             widget.html(),
         )
+        wrapped.add_content(html)
+
         wrapped.add_javascript_url("/static/js/vendor/jquery.min.js")
         wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")
-        wrapped.add_javascript("""
-            $(function() {
-                $.fn.immediateDescendents = function(selector) {
-                    return this.children().map(function(idx, elm) {
-                        if ($(elm).is(selector)) {
-                            return elm;
-                        } else {
-                            return $(elm).immediateDescendents(selector).toArray();
-                        }
-                    });
-                };
-
-                function initializeBlock(element) {
-                        var children = initializeBlocks($(element));
-
-                        var version = $(element).data('runtime-version');
-                        if (version === undefined) {
-                            return null;
-                        }
-
-                        var runtime = window['runtime_' + version](element, children);
-                        var init_fn = window[$(element).data('init')];
-                        var js_block = init_fn(runtime, element) || {};
-                        js_block.element = element;
-                        js_block.name = $(element).data('name');
-                        return js_block;
-                }
-
-                function initializeBlocks(element) {
-                    return $(element).immediateDescendents('.wrapper').map(function(idx, elm) {
-                        return initializeBlock(elm);
-                    }).toArray();
-                }
-
-                initializeBlocks($('body'));
-            });
-            """)
-        wrapped.add_content(html)
+        wrapped.add_javascript(RUNTIME_JS);
         wrapped.add_widget_resources(widget)
         return wrapped
 
     def handler_url(self, url):
         return "/%s/%s" % (self.usage.id, url)
 
+    # TODO: [rocha] other name options: gather
+    def collect(self, key, block=None):
+        block_cls = (block and block.__class__) or self.block_cls
+        usage = (block and block.usage) or self.usage
+
+        data_model = AnalyticsDbModel(MEMORY_KVS, block_cls, self.student_id, usage)
+        value = data_model.get(key)
+        children = data_model.get('children', [])
+
+        result = {
+            'class': block_cls.__name__,
+            'value': value,
+            'children': [self.collect(key, b) for b in children]
+        }
+
+        return result
+
+    # TODO: [rocha] other name options: scatter, share
+    def publish(self, key, value):
+        data = AnalyticsDbModel(MEMORY_KVS, self.block_cls, self.student_id, self.usage)
+        data[key] = value
+
+
 class User(object):
     id = None
     groups = []
+
+
+class AnalyticsDbModel(DbModel):
+    def _key(self, name):
+        key = "analytics.{0}".format(super(AnalyticsDbModel, self)._key(name))
+        return key
+
+    def _getfield(self, name):
+        return ModelType(scope=Scope.student_state)
+
+
+RUNTIME_JS = """
+$(function() {
+    $.fn.immediateDescendents = function(selector) {
+        return this.children().map(function(idx, element) {
+            if ($(element).is(selector)) {
+                return element;
+            } else {
+                return $(element).immediateDescendents(selector).toArray();
+            }
+        });
+    };
+
+    function initializeBlock(element) {
+            var children = initializeBlocks($(element));
+
+            var version = $(element).data('runtime-version');
+            if (version === undefined) {
+                return null;
+            }
+
+            var runtime = window['runtime_' + version](element, children);
+            var init_fn = window[$(element).data('init')];
+            var js_block = init_fn(runtime, element) || {};
+            js_block.element = element;
+            js_block.name = $(element).data('name');
+            return js_block;
+    }
+
+    function initializeBlocks(element) {
+        return $(element).immediateDescendents('.xblock').map(function(idx, elem) {
+            return initializeBlock(elem);
+        }).toArray();
+    }
+
+    initializeBlocks($('body'));
+});
+"""

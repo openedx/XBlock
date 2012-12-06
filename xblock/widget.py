@@ -56,11 +56,12 @@ class Widget(object):
         self.js_init = (js_func, runtime_version)
 
     # Implementation methods: don't override
+    # TODO: [rocha] should this go in the runtime?
 
     def html(self):
         if self.mimetype == 'text/html':
             return self.content
-    
+
         return "[[No HTML from %s]]" % self.content_type
 
     def head_html(self):
@@ -68,6 +69,11 @@ class Widget(object):
         hh = []
         # The set of all data we've already seen, so no dups.
         seen = set()
+
+        # TODO: [rocha] aggregate and wrap css and javascript.
+        # - non url js could be wrapped in an anonymous function
+        # - non url css could be rewritten to match the wrapper tag
+
         for kind, data, mimetype in self.resources:
             # De-dup the data.
             if data in seen:
