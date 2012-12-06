@@ -2,7 +2,7 @@ import itertools
 import json
 import logging
 import new
-from collections import MutableMapping
+from collections import MutableMapping, namedtuple
 
 from django.template import loader as django_template_loader, Context as DjangoContext
 from django.core.cache import cache
@@ -35,49 +35,56 @@ class Usage(object):
     def find_usage(cls, usage_id):
         return cls.usage_index[usage_id]
 
+
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
-    def get(key, name):
+
+    # Keys are structured to retain information about the scope of the data.
+    # Stores can use this information however they like to store and retrieve
+    # data.
+    Key = namedtuple("Key", "student_id, block_scope, block_scope_id, field_name")
+
+    def get(key):
         pass
 
-    def set(key, name, value):
+    def set(key, value):
         pass
 
-    def delete(key, name):
+    def delete(key):
         pass
 
 
 class MemoryKeyValueStore(KeyValueStore):
-    """Use an in-memory database for a key-value store."""
+    """Use a simple in-memory database for a key-value store."""
     def __init__(self, d):
         self.d = d
 
-    def get(self, key, name):
-        return self.d[key][name]
+    def actual_key(self, key):
+        k = []
+        k.append(["usage", "definition", "type", "all"][key.block_scope])
+        if key.block_scope_id is not None:
+            k.append(key.block_scope_id)
+        if key.student_id:
+            k.append(key.student_id)
+        return ".".join(k)
 
-    def set(self, key, name, value):
-        self.d.setdefault(key, {})[name] = value
+    def get(self, key):
+        return self.d[self.actual_key(key)][key.field_name]
 
-    def delete(self, key, name):
-        del self.d[key][name]
+    def set(self, key, value):
+        self.d.setdefault(self.actual_key(key), {})[key.field_name] = value
+
+    def delete(self, key):
+        del self.d[self.actual_key(key)][key.field_name]
 
     def as_html(self):
         """Just for our Debugger!"""
         html = json.dumps(self.d, sort_keys=True, indent=4)
         return make_safe_for_html(html)
 
-MEMORY_KVS = MemoryKeyValueStore({})
-
-def create_xblock(usage, student_id):
-    block_cls = XBlock.load_class(usage.block_name)
-    runtime = DebuggerRuntime(block_cls, student_id, usage)
-    block = block_cls(runtime, usage, DbModel(MEMORY_KVS, block_cls, student_id, usage))
-    for name, value in usage.initial_state.items():
-        setattr(block, name, value)
-    return block
-
-
 class DbModel(MutableMapping):
+    """A dictionary-like interface to the fields on a block."""
+
     def __init__(self, kvs, block_cls, student_id, usage):
         self._kvs = kvs
         self._student_id = student_id
@@ -105,32 +112,38 @@ class DbModel(MutableMapping):
         return getattr(self._block_cls, name)
 
     def _key(self, name):
-        key = []
         field = self._getfield(name)
         block = field.scope.block
         if block == BlockScope.ALL:
-            pass
+            block_id = None
         elif block == BlockScope.USAGE:
-            key.append(self._usage.id)
+            block_id = self._usage.id
         elif block == BlockScope.DEFINITION:
-            key.append(self._usage.def_id)
+            block_id = self._usage.def_id
         elif block == BlockScope.TYPE:
-            key.append(self.block_type.__name__)
+            block_id = self.block_type.__name__
         if field.scope.student:
-            key.append(self._student_id)
-        key = ".".join(key)
+            student_id = self._student_id
+        else:
+            student_id = None
+        key = KeyValueStore.Key(
+            student_id=student_id, 
+            block_scope=block, 
+            block_scope_id=block_id, 
+            field_name=name
+            )
         return key
 
     def __getitem__(self, name):
         if name == 'children':
             return self._children
-        return self._kvs.get(self._key(name), name)
+        return self._kvs.get(self._key(name))
 
     def __setitem__(self, name, value):
-        self._kvs.set(self._key(name), name, value)
+        self._kvs.set(self._key(name), value)
 
     def __delitem__(self, name):
-        self._kvs.delete(self._key(name), name)
+        self._kvs.delete(self._key(name))
 
     def __iter__(self):
         return iter(self.keys())
@@ -140,6 +153,17 @@ class DbModel(MutableMapping):
 
     def keys(self):
         return [field.name for field in self._block_cls.fields]
+
+
+MEMORY_KVS = MemoryKeyValueStore({})
+
+def create_xblock(usage, student_id):
+    block_cls = XBlock.load_class(usage.block_name)
+    runtime = DebuggerRuntime(block_cls, student_id, usage)
+    block = block_cls(runtime, usage, DbModel(MEMORY_KVS, block_cls, student_id, usage))
+    for name, value in usage.initial_state.items():
+        setattr(block, name, value)
+    return block
 
 
 class RuntimeBase(object):
