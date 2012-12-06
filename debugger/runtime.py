@@ -10,17 +10,10 @@ from django.core.cache import cache
 from xblock.core import XBlock, BlockScope, Scope, ModelType
 from xblock.widget import Widget
 
-from .util import call_once_property
+from .util import call_once_property, make_safe_for_html
 
 log = logging.getLogger(__name__)
 
-
-def make_safe_for_html(html):
-    html = html.replace("&", "&amp;")
-    html = html.replace(" ", "&nbsp;")
-    html = html.replace("<", "&lt;")
-    html = html.replace("\n", "<br>")
-    return html
 
 class Usage(object):
     # Not the real way we'll store usages!
