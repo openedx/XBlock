@@ -1,2 +1,8 @@
+# 3rd-party needs
 Django >= 1.4, < 1.5
 webob
+
+# local kits that need to be registered so we can find the XBlocks
+-e jdblock
+-e xblock
+-e debugger
