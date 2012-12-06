@@ -133,9 +133,9 @@ class DbModel(MutableMapping):
         else:
             student_id = None
         key = KeyValueStore.Key(
-            student_id=student_id, 
-            block_scope=block, 
-            block_scope_id=block_id, 
+            student_id=student_id,
+            block_scope=block,
+            block_scope_id=block_id,
             field_name=name
             )
         return key
@@ -302,7 +302,7 @@ class User(object):
 
 class AnalyticsDbModel(DbModel):
     def _key(self, name):
-        key = "analytics.{0}".format(super(AnalyticsDbModel, self)._key(name))
+        key = super(AnalyticsDbModel, self)._key('analytics.{0}'.format(name))
         return key
 
     def _getfield(self, name):
