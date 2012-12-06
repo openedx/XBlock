@@ -274,8 +274,8 @@ class DebuggerRuntime(RuntimeBase):
 
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):
-        block_cls = (block and block.__class__) or self.block_cls
-        usage = (block and block.usage) or self.usage
+        block_cls = block.__class__ if block else self.block_cls
+        usage = block.usage if block else self.usage
 
         data_model = AnalyticsDbModel(MEMORY_KVS, block_cls, self.student_id, usage)
         value = data_model.get(key)
