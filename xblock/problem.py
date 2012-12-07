@@ -194,18 +194,52 @@ class EqualityCheckerBlock(CheckerBlock):
 
     @XBlock.view('problem_view')
     def problem(self, context):
-        if not self.attempted:
-            correct = "Not attempted"
-        else:
-            correct = self.left == self.right
+        correct = self.left == self.right
 
-        result = Widget("<span>%s: <span class='value'>%s</span></span>" % (self.message, correct))
+        # TODO: I originally named this class="data", but that conflicted with
+        # the CSS on the page! :(  We might have to do something to namespace
+        # things.
+        # TODO: Should we have a way to spit out JSON islands full of data?
+        # Note the horror of mixed Python-Javascript data below...
+        result = Widget("""
+            <span class="mydata" data-attempted='{self.attempted}' data-correct='{correct}'>
+                {self.message}
+                <span class='indicator'></span>
+            </span>
+            """.format(self=self, correct=correct)
+            )
+        # TODO: This is a runtime-specific URL.  But if each XBlock ships their
+        # own copy of underscore.js, we won't be able to uniquify them.
+        # Perhaps runtimes can offer a palette of popular libraries so that
+        # XBlocks can refer to them in XBlock-standard ways?
+        result.add_javascript_url("/static/js/vendor/underscore-min.js")
+
+        # TODO: I need a way to add a script tag with a different mimetype to
+        # the head.  There's no widget way to do that yet.
+        result.add_content("""
+            <script type="text/template" id="xblock-equality-template">
+                <% if (attempted !== "True") { %>
+                    (Not attempted)
+                <% } else { %>
+                    <img src="/resource/debugger/images/<%= (correct === "True") ? "correct" : "incorrect" %>-icon.png">
+                <% } %>
+            </script>
+            """)
 
         result.add_javascript("""
             function EqualityCheckerBlock(runtime, element) {
+                var template = _.template($("#xblock-equality-template").html());
+                function render() {
+                    var data = $("span.mydata", element).data();
+                    $("span.indicator", element).html(template(data));
+                }
+                render();
                 return {
                     handle_check: function(result) {
-                        $(element).find('.value').text(result ? 'True' : 'False');
+                        $("span.mydata", element)
+                              .data("correct", result ? "True" : "False")
+                              .data("attempted", "True");
+                        render();
                     }
                 }
             }
