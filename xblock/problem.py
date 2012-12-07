@@ -5,16 +5,44 @@ and checkers, wired together in interesting ways.
 
 This code is in the XBlock layer.
 
+A rough protocol diagram::
+
+      BROWSER (Javascript)                 SERVER (Python)
+
+    Problem    Input     Checker          Problem    Input    Checker
+       |         |          |                |         |         |
+       | submit()|          |                |         |         |
+       +-------->|          |                |         |         |
+       |<--------+  submit()|                |         |         |
+       +------------------->|                |         |         |
+       |<-------------------+                |         |         |
+       |         |          |     "check"    |         |         |
+       +------------------------------------>| submit()|         |
+       |         |          |                +-------->|         |
+       |         |          |                |<--------+  check()|
+       |         |          |                +------------------>|
+       |         |          |                |<------------------|
+       |<------------------------------------+         |         |
+       | handle_submit()    |                |         |         |
+       +-------->| handle_check()            |         |         |
+       +------------------->|                |         |         |
+       |         |          |                |         |         |
+
 """
 
 import json
 
-from .core import XBlock, Object, Scope, List, String, Any
+from .core import XBlock, Object, Scope, List, String, Any, Boolean
 from .widget import Widget
 from webob import Response
 
 
 class ProblemBlock(XBlock):
+    """A generalized container of InputBlocks and Checkers.
+
+    The `checker_arguments` field maps checker names to check arguments.
+
+    """
 
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
     has_children = True
@@ -43,7 +71,6 @@ class ProblemBlock(XBlock):
                     }
                 }
 
-                var handler_url = runtime.handler_url('check')
                 $(element).bind('ajaxSend', function(elm, xhr, s) {
                     runtime.prep_xml_http_request(xhr);
                 });
@@ -57,6 +84,9 @@ class ProblemBlock(XBlock):
                     });
                 }
 
+                // To submit a problem, call all the named children's submit() 
+                // function, collect their return values, and post that object
+                // to the check handler.
                 $(element).find('.check').bind('click', function() {
                     var data = {};
                     for (var i = 0; i < runtime.children.length; i++) {
@@ -65,6 +95,7 @@ class ProblemBlock(XBlock):
                             data[child.name] = call_if_exists(child, 'submit');
                         }
                     }
+                    var handler_url = runtime.handler_url('check')
                     $.post(handler_url, JSON.stringify(data)).success(handle_check_results);
                 });
             }
@@ -74,10 +105,14 @@ class ProblemBlock(XBlock):
 
     @XBlock.json_handler("check")
     def check_answer(self, submissions):
+        # For each InputBlock, call the submit() method with the browser-sent 
+        # input data.
         submit_results = {}
         for input_name, submission in submissions.items():
             submit_results[input_name] = self.child_map[input_name].submit(submission)
 
+        # For each Checker, find the values it wants, and pass them to its
+        # check() method.
         check_results = {}
         for checker, arguments in self.checker_arguments.items():
             kwargs = {}
@@ -99,17 +134,28 @@ class InputBlock(XBlock):
     def submit(self, submission):
         """
         Called with the result of the javascript Block's submit() function.
+        Returns any data, which is passed to the Javascript handle_submit
+        function.
+
         """
         pass
 
 
 class CheckerBlock(XBlock):
-    pass
+
+    def check(self, **kwargs):
+        """
+        Called with the data provided by the ProblemBlock.
+        Returns any data, which will be passed to the Javascript handle_check
+        function.
+
+        """
+        pass
 
 
 class TextInputBlock(InputBlock):
 
-    input_type = String(help="Type of input string")
+    input_type = String(help="Type of conversion to attempt on input string")
     student_input = String(help="Last input submitted by the student", default="", scope=Scope.student_state)
 
     @XBlock.view("student_view")
@@ -141,14 +187,13 @@ class TextInputBlock(InputBlock):
                 self.student_input = int(submission[0]['value'])
             except ValueError:
                 return {'error': '"%s" is not an integer' % self.student_input}
-                pass
 
 
 class EqualityCheckerBlock(CheckerBlock):
 
     left = Any(scope=Scope.student_state)
     right = Any(scope=Scope.student_state)
-    attempted = Any(scope=Scope.student_state)
+    attempted = Boolean(scope=Scope.student_state)
     message = String(help="Message describing the equality test", scope=Scope.content, default="Equality test")
 
     @XBlock.view('problem_view')
@@ -172,7 +217,6 @@ class EqualityCheckerBlock(CheckerBlock):
 
         result.initialize_js('EqualityCheckerBlock')
         return result
-
 
     def check(self, left, right):
         self.attempted = True

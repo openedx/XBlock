@@ -321,6 +321,10 @@ class AnalyticsDbModel(DbModel):
 
 RUNTIME_JS = """
 $(function() {
+    // Find all the children of an element that match the selector, but only
+    // the first instance found down any path.  For example, we'll find all
+    // the ".xblock" elements below us, but not the ones that are themselves
+    // contained somewhere inside ".xblock" elements.
     $.fn.immediateDescendents = function(selector) {
         return this.children().map(function(idx, element) {
             if ($(element).is(selector)) {
@@ -332,19 +336,19 @@ $(function() {
     };
 
     function initializeBlock(element) {
-            var children = initializeBlocks($(element));
+        var children = initializeBlocks($(element));
 
-            var version = $(element).data('runtime-version');
-            if (version === undefined) {
-                return null;
-            }
+        var version = $(element).data('runtime-version');
+        if (version === undefined) {
+            return null;
+        }
 
-            var runtime = window['runtime_' + version](element, children);
-            var init_fn = window[$(element).data('init')];
-            var js_block = init_fn(runtime, element) || {};
-            js_block.element = element;
-            js_block.name = $(element).data('name');
-            return js_block;
+        var runtime = window['runtime_' + version](element, children);
+        var init_fn = window[$(element).data('init')];
+        var js_block = init_fn(runtime, element) || {};
+        js_block.element = element;
+        js_block.name = $(element).data('name');
+        return js_block;
     }
 
     function initializeBlocks(element) {
