@@ -5,7 +5,7 @@ and checkers, wired together in interesting ways.
 
 This code is in the XBlock layer.
 
-A rough protocol diagram::
+A rough sequence diagram::
 
       BROWSER (Javascript)                 SERVER (Python)
 
