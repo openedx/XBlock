@@ -8,9 +8,6 @@ function runtime_1(element, children) {
             var usage = $(element).data('usage');
             return "/" + usage + "/" + handler_name;
         },
-        prep_xml_http_request: function(xhr) {
-            xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
-        },
         children: children,
         child_map: child_map
     }

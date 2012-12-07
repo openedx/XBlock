@@ -71,10 +71,6 @@ class ProblemBlock(XBlock):
                     }
                 }
 
-                $(element).bind('ajaxSend', function(elm, xhr, s) {
-                    runtime.prep_xml_http_request(xhr);
-                });
-
                 function handle_check_results(results) {
                     $.each(results.submit_results || {}, function(input, result) {
                         call_if_exists(runtime.child_map[input], 'handle_submit', result);

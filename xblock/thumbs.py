@@ -53,9 +53,6 @@ class ThumbsBlock(InputBlock):
                 }
 
                 var handler_url = runtime.handler_url('vote');
-                $(element).bind('ajaxSend', function(elm, xhr, s) {
-                    runtime.prep_xml_http_request(xhr);
-                });
 
                 $('.upvote', element).bind('click.ThumbsBlock.up', function() {
                     $.post(handler_url, JSON.stringify({vote_type: 'up'})).success(update_votes);

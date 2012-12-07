@@ -357,6 +357,11 @@ $(function() {
         }).toArray();
     }
 
+    $('body').on('ajaxSend', function(elm, xhr, s) {
+        // Pass along the Django-specific CSRF token.
+        xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+    });
+
     initializeBlocks($('body'));
 });
 """

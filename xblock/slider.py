@@ -67,10 +67,6 @@ function Slider(runtime, element) {
 
   var self = this;
 
-  $(element).on('ajaxSend', function(elm, xhr, s) {
-    runtime.prep_xml_http_request(xhr);
-  });
-
   self.input.on('change', function () {
     self.output.html(this.value);
   });
