@@ -60,6 +60,9 @@ class ProblemBlock(XBlock):
         result.add_content(self.runtime.render_template("problem.html",
             named_children=named_child_widgets
         ))
+        # TODO: in the Javascript code, we have "runtime.child_map", but in the
+        # Python code we have "self.child_map"   Can/should we do something about
+        # the difference?
         result.add_javascript("""
             function ProblemBlock(runtime, element) {
 
