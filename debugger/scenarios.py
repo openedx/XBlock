@@ -74,7 +74,7 @@ SCENARIOS.extend([
                                     </ol>
                                     """}),
             Usage("thumbs", "x", [], {'name': 'thumb'}),
-            Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'votecount'}),
+            Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'vote_count'}),
             Usage("equality", "e1", [], {'message': 'Upvotes match downvotes', 'name': 'votes_equal'}),
             Usage("equality", "e2", [], {'message': 'Number of upvotes matches entered string', 'name': 'votes_named'}),
             Usage("equality", "e3", [], {'message': 'Number of upvotes is 3', 'name': 'votes_specified'}),
@@ -86,7 +86,7 @@ SCENARIOS.extend([
                 },
                 'votes_named': {
                     'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
-                    'right': {'_type': 'reference', 'ref_name': 'votecount.student_input'},
+                    'right': {'_type': 'reference', 'ref_name': 'vote_count.student_input'},
                 },
                 'votes_specified': {
                     'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
