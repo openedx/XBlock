@@ -163,12 +163,22 @@ class DbModel(MutableMapping):
 
 MEMORY_KVS = MemoryKeyValueStore({})
 
+initialized_usages = set()
+
 def create_xblock(usage, student_id):
+    """Create an XBlock instance.
+
+    This will be invoked to create new instances for every request.
+    
+    """
     block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
     block = block_cls(runtime, usage, DbModel(MEMORY_KVS, block_cls, student_id, usage))
-    for name, value in usage.initial_state.items():
-        setattr(block, name, value)
+    if usage.id not in initialized_usages:
+        print "Initializing %s" % usage.id
+        for name, value in usage.initial_state.items():
+            setattr(block, name, value)
+        initialized_usages.add(usage.id)
     return block
 
 

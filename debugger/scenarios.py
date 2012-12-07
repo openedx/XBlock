@@ -58,7 +58,7 @@ SCENARIOS.extend([
     ),
     Scenario("three thumbs at once",
         Usage("vertical", "x", [
-            Usage("thumbs", "def1", []),
+            Usage("thumbs", "def1", [], {'upvotes': 3, 'downvotes': 1}),
             Usage("thumbs", "def2", []),
             Usage("thumbs", "def3", []),
         ])
