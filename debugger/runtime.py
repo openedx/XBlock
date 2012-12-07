@@ -175,7 +175,6 @@ def create_xblock(usage, student_id):
     runtime = DebuggerRuntime(block_cls, student_id, usage)
     block = block_cls(runtime, usage, DbModel(MEMORY_KVS, block_cls, student_id, usage))
     if usage.id not in initialized_usages:
-        print "Initializing %s" % usage.id
         for name, value in usage.initial_state.items():
             setattr(block, name, value)
         initialized_usages.add(usage.id)
