@@ -7,13 +7,15 @@ This code is in the Debugger layer.
 import itertools
 import json
 import logging
+import mimetypes
+import pkg_resources
 from StringIO import StringIO
 
 from webob import Request
 from webob.multidict import MultiDict
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from xblock.core import XBlock
 from xblock.widget import Widget
@@ -98,6 +100,17 @@ def handler(request, usage_id, handler):
     result = block.runtime.handle(block, handler, request)
     log.info("End handler %s/%s", usage_id, handler)
     return webob_to_django_response(result)
+
+
+def package_resource(request, package, resource):
+    if ".." in resource:
+        raise Http404
+    try:
+        content = pkg_resources.resource_string(package, "static/" + resource)
+    except IOError:
+        raise Http404
+    mimetype, encoding = mimetypes.guess_type(resource)
+    return HttpResponse(content, mimetype=mimetype)
 
 
 def webob_to_django_response(webob_response):

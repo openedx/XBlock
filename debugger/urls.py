@@ -9,8 +9,10 @@ urlpatterns = patterns('debugger.views',
     url(r'^$', 'index', name='index'),
     url(r'^settings$', 'settings', name='settings'),
     url(r'^scenario/(?P<scenario_id>[^/]+)$', 'show_scenario', name='scenario'),
+    url(r'^resource/(?P<package>[^/]+)/(?P<resource>.*)/?', 'package_resource', name='package_resource'),
 
     url(r'^(?P<usage_id>[^/]+)/(?P<handler>[^/]*)', 'handler', name='handler'),
+
     # Examples:
     # url(r'^$', 'debugger.views.home', name='home'),
     # url(r'^debugger/', include('debugger.foo.urls')),
