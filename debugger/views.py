@@ -91,6 +91,8 @@ def settings(request):
 
 
 def handler(request, usage_id, handler):
+    if usage_id in ("favicon.ico", "favicon.ico/"):
+        raise Http404
     log.info("Start handler %s/%s", usage_id, handler)
     usage = Usage.find_usage(usage_id)
     block = create_xblock(usage, "student99")
