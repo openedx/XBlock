@@ -11,7 +11,7 @@ urlpatterns = patterns('debugger.views',
     url(r'^scenario/(?P<scenario_id>[^/]+)$', 'show_scenario', name='scenario'),
     url(r'^resource/(?P<package>[^/]+)/(?P<resource>.*)/?', 'package_resource', name='package_resource'),
 
-    url(r'^(?P<usage_id>[^/]+)/(?P<handler>[^/]*)', 'handler', name='handler'),
+    url(r'^handler/(?P<usage_id>[^/]+)/(?P<handler>[^/]*)', 'handler', name='handler'),
 
     # Examples:
     # url(r'^$', 'debugger.views.home', name='home'),
