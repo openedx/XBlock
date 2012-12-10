@@ -278,7 +278,7 @@ class DebuggerRuntime(RuntimeBase):
         return wrapped
 
     def handler_url(self, url):
-        return "/handler/%s/%s" % (self.usage.id, url)
+        return "/handler/%s/%s?student=%s" % (self.usage.id, url, self.student_id)
 
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):

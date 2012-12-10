@@ -31,10 +31,13 @@ A rough sequence diagram::
 """
 
 import json
+import string
+
+from webob import Response
 
 from .core import XBlock, Object, Scope, List, String, Any, Boolean
+from .run_script import run_script
 from .widget import Widget
-from webob import Response
 
 
 class ProblemBlock(XBlock):
@@ -43,13 +46,23 @@ class ProblemBlock(XBlock):
     The `checker_arguments` field maps checker names to check arguments.
 
     """
-
+    script = String(help="Python code to compute values", scope=Scope.content, default="")
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
     has_children = True
+
+    def calc_context(self, context):
+        # If we have a script, run it.
+        if self.script:
+            script_vals = run_script(self.script)
+            context = dict(context)
+            context.update(script_vals)
+        return context
 
     # The content controls how the Inputs attach to Graders
     @XBlock.view("student_view")
     def student_view(self, context):
+        context = self.calc_context(context)
+
         result = Widget()
         named_child_widgets = [
             (child.name, self.runtime.render_child(child, context, "problem_view"))
@@ -104,6 +117,8 @@ class ProblemBlock(XBlock):
 
     @XBlock.json_handler("check")
     def check_answer(self, submissions):
+        context = self.calc_context({})
+
         # For each InputBlock, call the submit() method with the browser-sent 
         # input data.
         submit_results = {}
@@ -117,9 +132,13 @@ class ProblemBlock(XBlock):
             kwargs = {}
             kwargs.update(arguments)
             for arg_name, arg_value in arguments.items():
-                if isinstance(arg_value, dict) and arg_value.get('_type') == 'reference':
-                    child, _, attribute = arg_value['ref_name'].partition('.')
-                    kwargs[arg_name] = getattr(self.child_map[child], attribute)
+                if isinstance(arg_value, dict):
+                    _type = arg_value.get('_type')
+                    if _type == 'reference':
+                        child, _, attribute = arg_value['ref_name'].partition('.')
+                        kwargs[arg_name] = getattr(self.child_map[child], attribute)
+                    elif _type == 'context':
+                        kwargs[arg_name] = context.get(arg_value['ref_name'])
             check_results[checker] = self.child_map[checker].check(**kwargs)
 
         return {
@@ -204,12 +223,13 @@ class EqualityCheckerBlock(CheckerBlock):
         # things.
         # TODO: Should we have a way to spit out JSON islands full of data?
         # Note the horror of mixed Python-Javascript data below...
+        message = string.Template(self.message).substitute(**context)
         result = Widget("""
             <span class="mydata" data-attempted='{self.attempted}' data-correct='{correct}'>
-                {self.message}
+                {message}
                 <span class='indicator'></span>
             </span>
-            """.format(self=self, correct=correct)
+            """.format(self=self, message=message, correct=correct)
             )
         # TODO: This is a runtime-specific URL.  But if each XBlock ships their
         # own copy of underscore.js, we won't be able to uniquify them.

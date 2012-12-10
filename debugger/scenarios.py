@@ -70,15 +70,20 @@ SCENARIOS.extend([
                                     <ol>
                                         <li>The upvotes and downvotes must be equal.</li>
                                         <li>You must enter the number of upvotes into the text field.</li>
-                                        <li>The number of upvotes must be 3.</li>
+                                        <li>The number of upvotes must be $numvotes.</li>
                                     </ol>
                                     """}),
             Usage("thumbs", "x", [], {'name': 'thumb'}),
             Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'vote_count'}),
             Usage("equality", "e1", [], {'message': 'Upvotes match downvotes', 'name': 'votes_equal'}),
             Usage("equality", "e2", [], {'message': 'Number of upvotes matches entered string', 'name': 'votes_named'}),
-            Usage("equality", "e3", [], {'message': 'Number of upvotes is 3', 'name': 'votes_specified'}),
+            Usage("equality", "e3", [], {'message': 'Number of upvotes is $numvotes', 'name': 'votes_specified'}),
         ], {
+            'script': """
+                # Compute the random answer.
+                import random
+                numvotes = random.randrange(2,5)
+                """, 
             'checker_arguments': {
                 'votes_equal': {
                     'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
@@ -90,9 +95,9 @@ SCENARIOS.extend([
                 },
                 'votes_specified': {
                     'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
-                    'right': 3,
+                    'right': {'_type': 'context', 'ref_name': 'numvotes'},
                 }
-            }
+            },
         }),
     ),
     Scenario("sequence with progress_sliders",

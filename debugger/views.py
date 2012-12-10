@@ -9,6 +9,7 @@ import json
 import logging
 import mimetypes
 import pkg_resources
+import random
 from StringIO import StringIO
 
 from webob import Request
@@ -39,6 +40,13 @@ setup_logging()
 
 log = logging.getLogger(__name__)
 
+# We don't really have authentication and multiple students, just accept their
+# id on the URL.
+def get_student_id(request):
+    student_id = int(request.GET.get('student', '99'))
+    random.seed(student_id)
+    return student_id
+
 #---- Views -----
 
 def index(request):
@@ -48,10 +56,11 @@ def index(request):
 
 
 def show_scenario(request, scenario_id):
-    log.info("Start show_scenario %s", scenario_id)
+    student_id = get_student_id(request)
+    log.info("Start show_scenario %s for %s", scenario_id, student_id)
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
-    block = create_xblock(usage, "student99")
+    block = create_xblock(usage, "student%s" % student_id)
     widget = block.runtime.render(block, {}, 'student_view')
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
@@ -91,9 +100,10 @@ def settings(request):
 
 
 def handler(request, usage_id, handler):
-    log.info("Start handler %s/%s", usage_id, handler)
+    student_id = get_student_id(request)
+    log.info("Start handler %s/%s for %s", usage_id, handler, student_id)
     usage = Usage.find_usage(usage_id)
-    block = create_xblock(usage, "student99")
+    block = create_xblock(usage, "student%s" % student_id)
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()
