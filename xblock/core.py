@@ -25,7 +25,7 @@ class Scope(namedtuple('ScopeBase', 'student block')):
 
 Scope.content = Scope(student=False, block=BlockScope.DEFINITION)
 Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
-Scope.settings = Scope(student=True, block=BlockScope.USAGE)
+Scope.settings = Scope(student=False, block=BlockScope.USAGE)
 Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
 Scope.student_info = Scope(student=True, block=BlockScope.ALL)
 
@@ -150,7 +150,7 @@ class XBlock(Plugin):
 
     entry_point = 'xblock.v1'
 
-    name = String(help="Short name for the block", scope=Scope.content)
+    name = String(help="Short name for the block", scope=Scope.settings)
 
     @classmethod
     def _register_method(cls, registration_type, name):
