@@ -81,7 +81,88 @@ class ModelType(object):
 Int = Float = Boolean = Object = List = String = Any = ModelType
 
 
-class XBlockMetaclass(type):
+class ModelMetaclass(type):
+    """
+    A metaclass to be used for classes that want to use ModelTypes as class attributes
+    to define data access.
+
+    All class attributes that are ModelTypes will be added to the 'fields' attribute on
+    the instance.
+
+    Additionally, any namespaces registered in the `xmodule.namespace` will be added to
+    the instance
+    """
+    def __new__(cls, name, bases, attrs):
+        fields = []
+        for n, v in attrs.items():
+            if isinstance(v, ModelType):
+                v._name = n
+                fields.append(v)
+        fields.sort()
+        attrs['fields'] = fields
+
+        return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
+
+
+class NamespacesMetaclass(type):
+    """
+    A metaclass to be used for classes that want to include namespaced fields in their
+    instances.
+
+    Any namespaces registered in the `xmodule.namespace` will be added to
+    the instance
+    """
+    def __new__(cls, name, bases, attrs):
+        for ns_name, namespace in Namespace.load_classes():
+            if issubclass(namespace, Namespace):
+                attrs[ns_name] = NamespaceDescriptor(namespace)
+
+        return super(NamespacesMetaclass, cls).__new__(cls, name, bases, attrs)
+
+
+class ParentModelMetaclass(type):
+    """
+    A ModelMetaclass that transforms the attribute `has_children = True`
+    into a List field with an empty scope.
+    """
+    def __new__(cls, name, bases, attrs):
+        if attrs.get('has_children', False):
+            attrs['children'] = List(help='The children of this XModule', default=[], scope=None)
+        else:
+            attrs['has_children'] = False
+
+        return super(ParentModelMetaclass, cls).__new__(cls, name, bases, attrs)
+
+
+class NamespaceDescriptor(object):
+    def __init__(self, namespace):
+        self._namespace = namespace
+
+    def __get__(self, instance, owner):
+        if owner is None:
+            return self
+        return self._namespace(instance)
+
+
+class Namespace(Plugin):
+    """
+    A baseclass that sets up machinery for ModelType fields that proxies the contained fields
+    requests for _model_data to self._container._model_data.
+    """
+    __metaclass__ = ModelMetaclass
+    __slots__ = ['container']
+
+    entry_point = 'xmodule.namespace'
+
+    def __init__(self, container):
+        self._container = container
+
+    @property
+    def _model_data(self):
+        return self._container._model_data
+
+
+class MethodRegistrationMetaclass(type):
     def __new__(cls, name, bases, attrs):
         # Find registered methods
         reg_methods = {}
@@ -91,22 +172,15 @@ class XBlockMetaclass(type):
                     reg_methods[reg_type + n] = value
         attrs['registered_methods'] = reg_methods
 
-        if attrs.get('has_children', False):
-            attrs['children'] = ModelType(help='The children of this XBlock', default=[], scope=None)
-            @call_once_property
-            def child_map(self):
-                return dict((child.name, child) for child in self.children)
-            attrs['child_map'] = child_map
+        return super(MethodRegistrationMetaclass, cls).__new__(cls, name, bases, attrs)
 
-        fields = []
-        for n, v in attrs.items():
-            if isinstance(v, ModelType):
-                v._name = n
-                fields.append(v)
-        fields.sort()
-        attrs['fields'] = fields
 
-        return super(XBlockMetaclass, cls).__new__(cls, name, bases, attrs)
+class XBlockMetaclass(MethodRegistrationMetaclass,
+                      ParentModelMetaclass,
+                      NamespacesMetaclass,
+                      ModelMetaclass):
+    pass
+
 
 # -- Caching tools
 
