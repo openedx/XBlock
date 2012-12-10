@@ -29,8 +29,14 @@ Scope.settings = Scope(student=True, block=BlockScope.USAGE)
 Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
 Scope.student_info = Scope(student=True, block=BlockScope.ALL)
 
-
 class ModelType(object):
+    """
+    A field class that can be used as a class attribute to define what data the class will want
+    to refer to.
+
+    When the class is instantiated, it will be available as an instance attribute of the same
+    name, by proxying through to self._model_data on the containing object.
+    """
     sequence = 0
 
     def __init__(self, help=None, default=None, scope=Scope.content):
@@ -49,10 +55,13 @@ class ModelType(object):
         if instance is None:
             return self
 
-        return instance._model_data.get(self.name, self.default)
+        if self.name not in instance._model_data:
+            return self.default
+
+        return self.from_json(instance._model_data[self.name])
 
     def __set__(self, instance, value):
-        instance._model_data[self.name] = value
+        instance._model_data[self.name] = self.to_json(value)
 
     def __delete__(self, instance):
         del instance._model_data[self.name]
@@ -62,6 +71,12 @@ class ModelType(object):
 
     def __lt__(self, other):
         return self._seq < other._seq
+
+    def to_json(self, value):
+        return value
+
+    def from_json(self, value):
+        return value
 
 Int = Float = Boolean = Object = List = String = Any = ModelType
 
