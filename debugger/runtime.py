@@ -169,7 +169,7 @@ def create_xblock(usage, student_id):
     """Create an XBlock instance.
 
     This will be invoked to create new instances for every request.
-    
+
     """
     block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
@@ -279,7 +279,7 @@ class DebuggerRuntime(RuntimeBase):
         return wrapped
 
     def handler_url(self, url):
-        return "/handler/%s/%s?student=%s" % (self.usage.id, url, self.student_id)
+        return "/handler/%s/%s/?student=%s" % (self.usage.id, url, self.student_id)
 
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):
