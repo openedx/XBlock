@@ -128,9 +128,12 @@ class ParentModelMetaclass(type):
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
             attrs['children'] = List(help='The children of this XModule', default=[], scope=None)
+            @call_once_property
+            def child_map(self):
+                return dict((child.name, child) for child in self.children)
+            attrs['child_map'] = child_map
         else:
             attrs['has_children'] = False
-
         return super(ParentModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 

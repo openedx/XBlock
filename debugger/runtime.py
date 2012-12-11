@@ -88,6 +88,7 @@ class MemoryKeyValueStore(KeyValueStore):
         html = json.dumps(self.d, sort_keys=True, indent=4)
         return make_safe_for_html(html)
 
+
 class DbModel(MutableMapping):
     """A dictionary-like interface to the fields on a block."""
 
@@ -163,7 +164,9 @@ class DbModel(MutableMapping):
 
 MEMORY_KVS = MemoryKeyValueStore({})
 
+
 initialized_usages = set()
+
 
 def create_xblock(usage, student_id):
     """Create an XBlock instance.
