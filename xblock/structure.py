@@ -43,5 +43,10 @@ class VerticalBlock(XBlock):
         # TODO: self.runtime.children is actual children here, not ids...
         child_widgets = [self.runtime.render_child(child, context) for child in self.children]
         result.add_widgets_resources(child_widgets)
+        result.add_css("""
+            .vertical {
+                border: solid 1px #888; padding: 3px;
+            }
+            """)
         result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
         return result

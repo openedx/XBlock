@@ -1,8 +1,6 @@
-<p>A Problem:</p>
-<div class="vertical" style="border: solid 1px #888; padding: 3px;">
+<div class="problem">
     {% for name, c in named_children %}
     {{c.html|safe}}
     {% endfor %}
 </div>
 <input type='button' value='check' class='check'></input>
-

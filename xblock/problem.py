@@ -70,6 +70,11 @@ class ProblemBlock(XBlock):
             in self.children
         ]
         result.add_widgets_resources(widget for _, widget in named_child_widgets)
+        result.add_css("""
+            .problem {
+                border: solid 1px #888; padding: 3px;
+            }
+            """)
         result.add_content(self.runtime.render_template("problem.html",
             named_children=named_child_widgets
         ))
