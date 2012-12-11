@@ -65,7 +65,7 @@ SCENARIOS.extend([
     ),
     Scenario("problem with thumbs and textbox",
         Usage("problem", "p1", [
-            Usage("html", "x", [], {'content': """
+            Usage("html", "desc", [], {'content': """
                                     <p>You have three constraints to satisfy:</p>
                                     <ol>
                                         <li>The upvotes and downvotes must be equal.</li>

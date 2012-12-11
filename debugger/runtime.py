@@ -267,7 +267,8 @@ class DebuggerRuntime(RuntimeBase):
             data['usage'] = self.usage.id
             data['block-type'] = self.block_cls.plugin_name
 
-        data['name'] = block.name
+        if block.name:
+            data['name'] = block.name
 
         html = "<div class='xblock'%s>%s</div>" % (
             "".join(" data-%s='%s'" % item for item in data.items()),
