@@ -9,7 +9,7 @@ function runtime_1(element, children) {
     return {
         handler_url: function(handler_name) {
             var usage = $(element).data('usage');
-            return "/handler/" + usage + "/" + handler_name;
+            return "/handler/" + usage + "/" + handler_name + "?student=" + student_id;
         },
         children: children,
         child_map: child_map

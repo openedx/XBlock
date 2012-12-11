@@ -44,6 +44,8 @@ log = logging.getLogger(__name__)
 # id on the URL.
 def get_student_id(request):
     student_id = int(request.GET.get('student', '99'))
+    # Seed the random number for the student so they each have different but
+    # repeatable data.
     random.seed(student_id)
     return student_id
 
@@ -64,12 +66,13 @@ def show_scenario(request, scenario_id):
     widget = block.runtime.render(block, {}, 'student_view')
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
-        'database': MEMORY_KVS,
         'block': block,
         'body': widget.html(),
+        'database': MEMORY_KVS,
         'head_html': widget.head_html(),
-        'usage': usage,
         'log': LOG_STREAM.getvalue(),
+        'student_id': student_id,
+        'usage': usage,
     })
 
 
