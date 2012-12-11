@@ -21,7 +21,7 @@ for name, cls in XBlock.load_classes():
 
 SCENARIOS.extend([
     Scenario("a bunch of html",
-        Usage("html", "x", [], {'content':"""
+        Usage("html", "", [], {'content':"""
                                     <h2>Installing Enthought for Windows</h2>
 
                                     <p>To download Enthought on your Windows machine, you should follow these steps:</p>
@@ -51,13 +51,13 @@ SCENARIOS.extend([
                                     """}),
     ),
     Scenario("problem with two inputs",
-        Usage("problem", "x", [
-            Usage("textinput", "x", []),
-            Usage("textinput", "x", []),
+        Usage("problem", "", [
+            Usage("textinput", "", []),
+            Usage("textinput", "", []),
         ]),
     ),
     Scenario("three thumbs at once",
-        Usage("vertical", "x", [
+        Usage("vertical", "", [
             Usage("thumbs", "def1", [], {'upvotes': 3, 'downvotes': 1}),
             Usage("thumbs", "def2", []),
             Usage("thumbs", "def3", []),
@@ -73,7 +73,7 @@ SCENARIOS.extend([
                                         <li>The number of upvotes must be $numvotes.</li>
                                     </ol>
                                     """}),
-            Usage("thumbs", "x", [], {'name': 'thumb'}),
+            Usage("thumbs", "", [], {'name': 'thumb'}),
             Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'vote_count'}),
             Usage("equality", "e1", [], {'message': 'Upvotes match downvotes', 'name': 'votes_equal'}),
             Usage("equality", "e2", [], {'message': 'Number of upvotes matches entered string', 'name': 'votes_named'}),

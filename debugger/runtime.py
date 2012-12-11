@@ -29,7 +29,7 @@ class Usage(object):
     def __init__(self, block_name, def_id, child_specs, initial_state={}):
         self.id = "usage_%d" % next(self.ids)
         self.block_name = block_name
-        self.def_id = def_id
+        self.def_id = def_id or ("def_%d" % next(self.ids))
         self.child_specs = child_specs
         self.usage_index[self.id] = self
         self.initial_state = initial_state
