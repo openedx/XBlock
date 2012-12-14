@@ -9,7 +9,7 @@ class Sequence(XBlock):
     @XBlock.view('student_view')
     def render_student(self, context):
         widget = Widget()
-        child_widgets = [self.runtime.render_child(child, context) for child in self.children]
+        child_widgets = [self.runtime.render_child(self.runtime.get_child(child_id), context) for child_id in self.children]
         widget.add_widgets_resources(child_widgets)
 
         progress_per_child = [self.runtime.collect('progress', block) for block in self.children]
@@ -40,8 +40,7 @@ class VerticalBlock(XBlock):
     @XBlock.view('student_view')
     def render_student(self, context):
         result = Widget()
-        # TODO: self.runtime.children is actual children here, not ids...
-        child_widgets = [self.runtime.render_child(child, context) for child in self.children]
+        child_widgets = [self.runtime.render_child(self.runtime.get_child(child_id), context) for child_id in self.children]
         result.add_widgets_resources(child_widgets)
         result.add_css("""
             .vertical {

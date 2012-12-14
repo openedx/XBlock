@@ -85,6 +85,8 @@ class DbModel(MutableMapping):
         return key
 
     def __getitem__(self, name):
+        if name == "children":
+            return [u.id for u in self._usage.children]
         return self._kvs.get(self._key(name))
 
     def __setitem__(self, name, value):

@@ -26,16 +26,16 @@ class Usage(object):
     ids = itertools.count()
     usage_index = {}
 
-    def __init__(self, block_name, def_id, child_specs, initial_state={}):
+    def __init__(self, block_name, def_id, children, initial_state={}):
         self.id = "usage_%d" % next(self.ids)
         self.block_name = block_name
         self.def_id = def_id or ("def_%d" % next(self.ids))
-        self.child_specs = child_specs
+        self.children = children
         self.usage_index[self.id] = self
         self.initial_state = initial_state
 
     def __repr__(self):
-        return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.child_specs!r}>".format(self)
+        return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.children!r}>".format(self)
 
     @classmethod
     def find_usage(cls, usage_id):
@@ -49,7 +49,7 @@ class MemoryKeyValueStore(KeyValueStore):
 
     def actual_key(self, key):
         k = []
-        k.append(["usage", "definition", "type", "all"][key.block_scope])
+        k.append(["usage", "definition", "type", "all"][key.scope.block])
         if key.block_scope_id is not None:
             k.append(key.block_scope_id)
         if key.student_id:
@@ -142,8 +142,11 @@ class RuntimeBase(object):
 
         return self.wrap_child(block, widget, context)
 
-    def render_child(self, block, context, view_name=None):
-        return block.runtime.render(block, context, view_name or self._view_name)
+    def get_child(self, child_id):
+        raise NotImplemented("Runtime needs to provide get_child()")
+
+    def render_child(self, child, context, view_name=None):
+        return child.runtime.render(child, context, view_name or self._view_name)
 
     def wrap_child(self, block, widget, context):
         return widget
@@ -192,6 +195,9 @@ class DebuggerRuntime(RuntimeBase):
 
     def handler_url(self, url):
         return "/handler/%s/%s/?student=%s" % (self.usage.id, url, self.student_id)
+
+    def get_child(self, child_id):
+        return create_xblock(Usage.find_usage(child_id), self.student_id)
 
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):

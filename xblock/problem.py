@@ -64,12 +64,12 @@ class ProblemBlock(XBlock):
         context = self.calc_context(context)
 
         result = Widget()
-        named_child_widgets = [
-            (child.name, self.runtime.render_child(child, context, "problem_view"))
-            for child
-            in self.children
-        ]
-        result.add_widgets_resources(widget for _, widget in named_child_widgets)
+        named_child_widgets = []
+        for child_id in self.children:
+            child = self.runtime.get_child(child_id)
+            widget = self.runtime.render_child(child, context, "problem_view")
+            result.add_widget_resources(widget)
+            named_child_widgets.append((child.name, widget))
         result.add_css("""
             .problem {
                 border: solid 1px #888; padding: 3px;
@@ -78,9 +78,6 @@ class ProblemBlock(XBlock):
         result.add_content(self.runtime.render_template("problem.html",
             named_children=named_child_widgets
         ))
-        # TODO: in the Javascript code, we have "runtime.child_map", but in the
-        # Python code we have "self.child_map"   Can/should we do something about
-        # the difference?
         result.add_javascript("""
             function ProblemBlock(runtime, element) {
 
@@ -124,11 +121,16 @@ class ProblemBlock(XBlock):
     def check_answer(self, submissions):
         context = self.calc_context({})
 
+        child_map = {}
+        for child_id in self.children:
+            child = self.runtime.get_child(child_id)
+            child_map[child.name] = child
+
         # For each InputBlock, call the submit() method with the browser-sent 
         # input data.
         submit_results = {}
         for input_name, submission in submissions.items():
-            submit_results[input_name] = self.child_map[input_name].submit(submission)
+            submit_results[input_name] = child_map[input_name].submit(submission)
 
         # For each Checker, find the values it wants, and pass them to its
         # check() method.
@@ -141,10 +143,10 @@ class ProblemBlock(XBlock):
                     _type = arg_value.get('_type')
                     if _type == 'reference':
                         child, _, attribute = arg_value['ref_name'].partition('.')
-                        kwargs[arg_name] = getattr(self.child_map[child], attribute)
+                        kwargs[arg_name] = getattr(child_map[child], attribute)
                     elif _type == 'context':
                         kwargs[arg_name] = context.get(arg_value['ref_name'])
-            check_results[checker] = self.child_map[checker].check(**kwargs)
+            check_results[checker] = child_map[checker].check(**kwargs)
 
         return {
             'submit_results': submit_results,
