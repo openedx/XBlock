@@ -39,7 +39,7 @@ class ModelType(object):
     sequence = 0
 
     def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None):
-        self._seq = self.sequence
+        self._seq = ModelType.sequence
         self._name = "unknown"
         self.help = help
         self.default = default
