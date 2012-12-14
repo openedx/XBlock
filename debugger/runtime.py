@@ -211,7 +211,7 @@ class DebuggerRuntime(RuntimeBase):
         result = {
             'class': block_cls.__name__,
             'value': value,
-            'children': [self.collect(key, b) for b in children]
+            'children': [self.collect(key, self.get_child(b)) for b in children]
         }
 
         return result

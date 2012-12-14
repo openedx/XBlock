@@ -5,6 +5,8 @@ webob
 # For Tests
 mock
 nose
+django-nose
+lxml
 
 # local kits that need to be registered so we can find the XBlocks
 -e jdblock
