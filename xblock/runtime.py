@@ -42,14 +42,12 @@ class DbModel(MutableMapping):
         if block_field is not None and isinstance(block_field, ModelType):
             return block_field
 
-        # If the class doesn't have the field, and it also
-        # doesn't have any namespaces, then the the name isn't a field
-        # so KeyError
-        if not hasattr(self._block_cls, 'namespaces'):
-            return KeyError(name)
+        # If the class doesn't have the field, and it also doesn't have any
+        # namespaces, then the name isn't a field so KeyError
+        if not hasattr(self._block_cls, 'namespaces'): 
+            raise KeyError(name)
 
-        # Resolve the field name in the first namespace where it's
-        # available
+        # Resolve the field name in the first namespace where it's available.
         for namespace_name in self._block_cls.namespaces:
             namespace = getattr(self._block_cls, namespace_name)
             namespace_field = getattr(type(namespace), name, None)

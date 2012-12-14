@@ -30,7 +30,7 @@ def test_parent_metaclass():
         has_children = True
 
     class WithoutChildren(object):
-        __metaclass = ParentModelMetaclass
+        __metaclass__ = ParentModelMetaclass
 
     assert hasattr(HasChildren, 'children')
     assert not hasattr(WithoutChildren, 'children')
