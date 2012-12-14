@@ -8,15 +8,15 @@ import itertools
 import json
 import logging
 import new
-from collections import MutableMapping, namedtuple
 
 from django.template import loader as django_template_loader, Context as DjangoContext
 from django.core.cache import cache
 
-from xblock.core import XBlock, BlockScope, Scope, ModelType
+from xblock.core import XBlock, Scope, ModelType
+from xblock.runtime import DbModel, KeyValueStore
 from xblock.widget import Widget
 
-from .util import call_once_property, make_safe_for_html
+from .util import make_safe_for_html
 
 log = logging.getLogger(__name__)
 
@@ -40,24 +40,6 @@ class Usage(object):
     @classmethod
     def find_usage(cls, usage_id):
         return cls.usage_index[usage_id]
-
-
-class KeyValueStore(object):
-    """The abstract interface for Key Value Stores."""
-
-    # Keys are structured to retain information about the scope of the data.
-    # Stores can use this information however they like to store and retrieve
-    # data.
-    Key = namedtuple("Key", "student_id, block_scope, block_scope_id, field_name")
-
-    def get(key):
-        pass
-
-    def set(key, value):
-        pass
-
-    def delete(key):
-        pass
 
 
 class MemoryKeyValueStore(KeyValueStore):
@@ -87,79 +69,6 @@ class MemoryKeyValueStore(KeyValueStore):
         """Just for our Debugger!"""
         html = json.dumps(self.d, sort_keys=True, indent=4)
         return make_safe_for_html(html)
-
-
-class DbModel(MutableMapping):
-    """A dictionary-like interface to the fields on a block."""
-
-    def __init__(self, kvs, block_cls, student_id, usage):
-        self._kvs = kvs
-        self._student_id = student_id
-        self._block_cls = block_cls
-        self._usage = usage
-
-    def __repr__(self):
-        return "<{0.__class__.__name__} {0._block_cls!r}>".format(self)
-
-    def __str__(self):
-        return str(dict(self.iteritems()))
-
-    @call_once_property
-    def _children(self):
-        """Instantiate the children."""
-        return [
-            create_xblock(cs, self._student_id)
-            for cs in self._usage.child_specs
-            ]
-
-    def _getfield(self, name):
-        if not hasattr(self._block_cls, name) or not isinstance(getattr(self._block_cls, name), ModelType):
-            raise KeyError(name)
-
-        return getattr(self._block_cls, name)
-
-    def _key(self, name):
-        field = self._getfield(name)
-        block = field.scope.block
-        if block == BlockScope.ALL:
-            block_id = None
-        elif block == BlockScope.USAGE:
-            block_id = self._usage.id
-        elif block == BlockScope.DEFINITION:
-            block_id = self._usage.def_id
-        elif block == BlockScope.TYPE:
-            block_id = self.block_type.__name__
-        if field.scope.student:
-            student_id = self._student_id
-        else:
-            student_id = None
-        key = KeyValueStore.Key(
-            student_id=student_id,
-            block_scope=block,
-            block_scope_id=block_id,
-            field_name=name
-            )
-        return key
-
-    def __getitem__(self, name):
-        if name == 'children':
-            return self._children
-        return self._kvs.get(self._key(name))
-
-    def __setitem__(self, name, value):
-        self._kvs.set(self._key(name), value)
-
-    def __delitem__(self, name):
-        self._kvs.delete(self._key(name))
-
-    def __iter__(self):
-        return iter(self.keys())
-
-    def __len__(self):
-        return len(self.keys())
-
-    def keys(self):
-        return [field.name for field in self._block_cls.fields]
 
 
 MEMORY_KVS = MemoryKeyValueStore({})

@@ -14,7 +14,6 @@ from webob import Response
 from .plugin import Plugin
 from .util import call_once_property
 
-
 class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
@@ -22,12 +21,12 @@ class BlockScope(object):
 class Scope(namedtuple('ScopeBase', 'student block')):
     pass
 
-
 Scope.content = Scope(student=False, block=BlockScope.DEFINITION)
-Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
 Scope.settings = Scope(student=False, block=BlockScope.USAGE)
+Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
 Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
 Scope.student_info = Scope(student=True, block=BlockScope.ALL)
+
 
 class ModelType(object):
     """
@@ -39,11 +38,12 @@ class ModelType(object):
     """
     sequence = 0
 
-    def __init__(self, help=None, default=None, scope=Scope.content):
+    def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None):
         self._seq = self.sequence
         self._name = "unknown"
         self.help = help
         self.default = default
+        self.computed_default = computed_default
         self.scope = scope
         ModelType.sequence += 1
 
@@ -55,10 +55,13 @@ class ModelType(object):
         if instance is None:
             return self
 
-        if self.name not in instance._model_data:
-            return self.default
+        try:
+            return self.from_json(instance._model_data[self.name])
+        except KeyError:
+            if self.default is None and self.computed_default is not None:
+                return self.computed_default(instance)
 
-        return self.from_json(instance._model_data[self.name])
+            return self.default
 
     def __set__(self, instance, value):
         instance._model_data[self.name] = self.to_json(value)
@@ -67,7 +70,7 @@ class ModelType(object):
         del instance._model_data[self.name]
 
     def __repr__(self):
-        return "<{0.__class__.__name} {0.__name__}>".format(self)
+        return "<{0.__class__.__name__} {0._name}>".format(self)
 
     def __lt__(self, other):
         return self._seq < other._seq
@@ -88,6 +91,9 @@ class ModelMetaclass(type):
 
     All class attributes that are ModelTypes will be added to the 'fields' attribute on
     the instance.
+
+    Additionally, any namespaces registered in the `xblock.namespace` will be added to
+    the instance
     """
     def __new__(cls, name, bases, attrs):
         fields = []
@@ -110,9 +116,12 @@ class NamespacesMetaclass(type):
     the instance
     """
     def __new__(cls, name, bases, attrs):
+        namespaces = []
         for ns_name, namespace in Namespace.load_classes():
             if issubclass(namespace, Namespace):
                 attrs[ns_name] = NamespaceDescriptor(namespace)
+                namespaces.append(ns_name)
+        attrs['namespaces'] = namespaces
 
         return super(NamespacesMetaclass, cls).__new__(cls, name, bases, attrs)
 
@@ -124,13 +133,10 @@ class ParentModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = List(help='The children of this XModule', default=[], scope=None)
-            @call_once_property
-            def child_map(self):
-                return dict((child.name, child) for child in self.children)
-            attrs['child_map'] = child_map
+            attrs['children'] = List(help='The children of this XBlock', default=[], scope=Scope.settings)
         else:
             attrs['has_children'] = False
+
         return super(ParentModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
@@ -139,28 +145,52 @@ class NamespaceDescriptor(object):
         self._namespace = namespace
 
     def __get__(self, instance, owner):
-        if owner is None:
-            return self
         return self._namespace(instance)
 
 
 class Namespace(Plugin):
     """
-    A baseclass that sets up machinery for ModelType fields that proxies the contained fields
-    requests for _model_data to self._container._model_data.
+    A baseclass that sets up machinery for ModelType fields that makes those fields be called
+    with the container as the field instance
     """
     __metaclass__ = ModelMetaclass
-    __slots__ = ['container']
 
     entry_point = 'xblock.namespace'
 
     def __init__(self, container):
         self._container = container
 
-    @property
-    def _model_data(self):
-        return self._container._model_data
+    def __getattribute__(self, name):
+        container = super(Namespace, self).__getattribute__('_container')
+        namespace_attr = getattr(type(self), name, None)
 
+        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
+            return super(Namespace, self).__getattribute__(name)
+
+        return namespace_attr.__get__(container, type(container))
+
+    def __setattr__(self, name, value):
+        try:
+            container = super(Namespace, self).__getattribute__('_container')
+        except AttributeError:
+            super(Namespace, self).__setattr__(name, value)
+            return
+
+        namespace_attr = getattr(type(self), name, None)
+
+        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
+            return super(Namespace, self).__setattr__(name, value)
+
+        return namespace_attr.__set__(container, value)
+
+    def __delattr__(self, name):
+        container = super(Namespace, self).__getattribute__('_container')
+        namespace_attr = getattr(type(self), name, None)
+
+        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
+            return super(Namespace, self).__detattr__(name)
+
+        return namespace_attr.__delete__(container)
 
 class MethodRegistrationMetaclass(type):
     def __new__(cls, name, bases, attrs):

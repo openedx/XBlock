@@ -2,6 +2,10 @@
 Django >= 1.4, < 1.5
 webob
 
+# For Tests
+mock
+nose
+
 # local kits that need to be registered so we can find the XBlocks
 -e jdblock
 -e xblock
