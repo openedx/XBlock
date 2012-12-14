@@ -88,9 +88,6 @@ class ModelMetaclass(type):
 
     All class attributes that are ModelTypes will be added to the 'fields' attribute on
     the instance.
-
-    Additionally, any namespaces registered in the `xmodule.namespace` will be added to
-    the instance
     """
     def __new__(cls, name, bases, attrs):
         fields = []
@@ -109,7 +106,7 @@ class NamespacesMetaclass(type):
     A metaclass to be used for classes that want to include namespaced fields in their
     instances.
 
-    Any namespaces registered in the `xmodule.namespace` will be added to
+    Any namespaces registered in the `xblock.namespace` will be added to
     the instance
     """
     def __new__(cls, name, bases, attrs):
@@ -155,7 +152,7 @@ class Namespace(Plugin):
     __metaclass__ = ModelMetaclass
     __slots__ = ['container']
 
-    entry_point = 'xmodule.namespace'
+    entry_point = 'xblock.namespace'
 
     def __init__(self, container):
         self._container = container
