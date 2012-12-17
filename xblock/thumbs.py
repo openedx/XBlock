@@ -7,7 +7,7 @@ This code is in the XBlock layer.
 import json
 from webob import Response
 
-from .core import XBlock, Scope, Int, Boolean, expires, varies_on_block
+from .core import XBlock, Scope, Integer, Boolean, expires, varies_on_block
 from .widget import Widget
 from .problem import InputBlock
 
@@ -23,8 +23,8 @@ class ThumbsBlock(InputBlock):
 
     """
 
-    upvotes = Int(help="Number of up votes made on this thumb", default=0, scope=Scope.content)
-    downvotes = Int(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
+    upvotes = Integer(help="Number of up votes made on this thumb", default=0, scope=Scope.content)
+    downvotes = Integer(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
     voted = Boolean(help="Whether a student has already voted on a thumb", default=False, scope=Scope.student_state)
 
     @XBlock.view('student_view')

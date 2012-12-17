@@ -81,7 +81,7 @@ class ModelType(object):
     def from_json(self, value):
         return value
 
-Int = Float = Boolean = Object = List = String = Any = ModelType
+Integer = Float = Boolean = Object = List = String = Any = ModelType
 
 
 class ModelMetaclass(type):

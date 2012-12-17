@@ -37,7 +37,7 @@ import time
 
 from webob import Response
 
-from .core import XBlock, Int, Object, Scope, List, String, Any, Boolean
+from .core import XBlock, Integer, Object, Scope, List, String, Any, Boolean
 from .run_script import run_script
 from .widget import Widget
 
@@ -50,7 +50,7 @@ class ProblemBlock(XBlock):
     """
     script = String(help="Python code to compute values", scope=Scope.content, default="")
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
-    seed = Int(help="Random seed for this student", scope=Scope.student_state, default=0)
+    seed = Integer(help="Random seed for this student", scope=Scope.student_state, default=0)
     attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.student_state, default=False)
     has_children = True
 

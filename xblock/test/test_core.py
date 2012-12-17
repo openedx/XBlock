@@ -9,8 +9,8 @@ def test_model_metaclass():
     class ModelMetaclassTester(object):
         __metaclass__ = ModelMetaclass
 
-        field_a = Int(scope=Scope.settings)
-        field_b = Int(scope=Scope.content)
+        field_a = Integer(scope=Scope.settings)
+        field_b = Integer(scope=Scope.content)
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -43,9 +43,9 @@ def test_field_access():
     class FieldTester(object):
         __metaclass__ = ModelMetaclass
 
-        field_a = Int(scope=Scope.settings)
-        field_b = Int(scope=Scope.content, default=10)
-        field_c = Int(scope=Scope.student_state, computed_default=lambda s: s.field_a + s.field_b)
+        field_a = Integer(scope=Scope.settings)
+        field_b = Integer(scope=Scope.content, default=10)
+        field_c = Integer(scope=Scope.student_state, computed_default=lambda s: s.field_a + s.field_b)
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -94,9 +94,9 @@ def test_namespace_field_access(mock_load_classes):
     class FieldTester(object):
         __metaclass__ = Metaclass
 
-        field_a = Int(scope=Scope.settings)
-        field_b = Int(scope=Scope.content, default=10)
-        field_c = Int(scope=Scope.student_state, computed_default=lambda s: s.field_a + s.field_b)
+        field_a = Integer(scope=Scope.settings)
+        field_b = Integer(scope=Scope.content, default=10)
+        field_c = Integer(scope=Scope.student_state, computed_default=lambda s: s.field_a + s.field_b)
 
         def __init__(self, model_data):
             self._model_data = model_data

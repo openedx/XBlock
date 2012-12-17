@@ -1,13 +1,13 @@
 import json
 from webob import Response
 
-from xblock.core import XBlock, Scope, Int
+from xblock.core import XBlock, Scope, Integer
 from xblock.widget import Widget
 
 class Slider(XBlock):
-    min_value = Int(help="Minimum value", default=0, scope=Scope.content)
-    max_value = Int(help="Maximum value", default=100, scope=Scope.content)
-    value = Int(help="Student value", default=0, scope=Scope.student_state)
+    min_value = Integer(help="Minimum value", default=0, scope=Scope.content)
+    max_value = Integer(help="Maximum value", default=100, scope=Scope.content)
+    value = Integer(help="Student value", default=0, scope=Scope.student_state)
 
     @XBlock.view('student_view')
     def render_student(self, context):
