@@ -12,6 +12,7 @@ setup(
             'html = xblock.content:HtmlBlock',
             'sequence = xblock.structure:Sequence',
             'vertical = xblock.structure:VerticalBlock',
+            'sidebar = xblock.structure:SidebarBlock',
             'problem = xblock.problem:ProblemBlock',
             'textinput = xblock.problem:TextInputBlock',
             'equality = xblock.problem:EqualityCheckerBlock',

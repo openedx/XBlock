@@ -9,7 +9,6 @@ import json
 import logging
 import mimetypes
 import pkg_resources
-import random
 from StringIO import StringIO
 
 from webob import Request
@@ -44,9 +43,6 @@ log = logging.getLogger(__name__)
 # id on the URL.
 def get_student_id(request):
     student_id = int(request.GET.get('student', '99'))
-    # Seed the random number for the student so they each have different but
-    # repeatable data.
-    random.seed(student_id)
     return student_id
 
 #---- Views -----

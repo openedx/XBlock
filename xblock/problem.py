@@ -31,11 +31,13 @@ A rough sequence diagram::
 """
 
 import json
+import random
 import string
+import time
 
 from webob import Response
 
-from .core import XBlock, Object, Scope, List, String, Any, Boolean
+from .core import XBlock, Int, Object, Scope, List, String, Any, Boolean
 from .run_script import run_script
 from .widget import Widget
 
@@ -48,11 +50,21 @@ class ProblemBlock(XBlock):
     """
     script = String(help="Python code to compute values", scope=Scope.content, default="")
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
+    seed = Int(help="Random seed for this student", scope=Scope.student_state, default=0)
+    attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.student_state, default=False)
     has_children = True
+
+    def set_student_seed(self):
+        self.seed = int(time.clock()*10) % 100 + 1
 
     def calc_context(self, context):
         # If we have a script, run it.
         if self.script:
+            # Seed the random number for the student so they each have different but
+            # repeatable data.
+            if not self.seed:
+                self.set_student_seed()
+            random.seed(self.seed)
             script_vals = run_script(self.script)
             context = dict(context)
             context.update(script_vals)
@@ -112,6 +124,11 @@ class ProblemBlock(XBlock):
                     var handler_url = runtime.handler_url('check')
                     $.post(handler_url, JSON.stringify(data)).success(handle_check_results);
                 });
+
+                $(element).find('.rerandomize').bind('click', function() {
+                    var handler_url = runtime.handler_url('rerandomize');
+                    $.post(handler_url, JSON.stringify({}));
+                });
             }
             """)
         result.initialize_js('ProblemBlock')
@@ -119,12 +136,14 @@ class ProblemBlock(XBlock):
 
     @XBlock.json_handler("check")
     def check_answer(self, submissions):
+        self.attempted = True
         context = self.calc_context({})
 
         child_map = {}
         for child_id in self.children:
             child = self.runtime.get_child(child_id)
-            child_map[child.name] = child
+            if child.name:
+                child_map[child.name] = child
 
         # For each InputBlock, call the submit() method with the browser-sent 
         # input data.
@@ -152,6 +171,11 @@ class ProblemBlock(XBlock):
             'submit_results': submit_results,
             'check_results': check_results,
         }
+
+    @XBlock.json_handler("rerandomize")
+    def handle_rerandomize(self, unused):
+        self.set_student_seed()
+        return {'status': 'ok'}
 
 
 class InputBlock(XBlock):

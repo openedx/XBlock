@@ -120,4 +120,64 @@ SCENARIOS.extend([
             ]),
         ]),
     ),
+    Scenario("three problems",
+        Usage("vertical", "", [
+            Usage("problem", "", [
+                Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
+                Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
+                Usage("equality", "e1", [], {'message': '', 'name': 'sum_checker'}),
+            ], {
+                'script': """
+                    import random
+                    a = random.randint(2, 5)
+                    b = random.randint(1, 4)
+                    c = a + b
+                    """,
+                'checker_arguments': {
+                    'sum_checker': {
+                        'left': {'_type': 'reference', 'ref_name': 'sum_input.student_input'},
+                        'right': {'_type': 'context', 'ref_name': 'c'},
+                    },
+                },
+            }),
+            Usage("sidebar", "", [
+                Usage("problem", "", [
+                    Usage("html", "", [], {'content': "<p>What is $a &times; $b?</p>"}),
+                    Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
+                    Usage("equality", "e1", [], {'message': '', 'name': 'sum_checker'}),
+                ], {
+                    'script': """
+                        import random
+                        a = random.randint(2, 6)
+                        b = random.randint(3, 7)
+                        c = a * b
+                        """,
+                    'checker_arguments': {
+                        'sum_checker': {
+                            'left': {'_type': 'reference', 'ref_name': 'sum_input.student_input'},
+                            'right': {'_type': 'context', 'ref_name': 'c'},
+                        },
+                    },
+                }),
+            ]),
+            Usage("problem", "", [
+                Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
+                Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
+                Usage("equality", "e1", [], {'message': '', 'name': 'sum_checker'}),
+            ], {
+                'script': """
+                    import random
+                    a = random.randint(3, 5)
+                    b = random.randint(2, 6)
+                    c = a + b
+                    """,
+                'checker_arguments': {
+                    'sum_checker': {
+                        'left': {'_type': 'reference', 'ref_name': 'sum_input.student_input'},
+                        'right': {'_type': 'context', 'ref_name': 'c'},
+                    },
+                },
+            }),
+        ]),
+    ),
 ])

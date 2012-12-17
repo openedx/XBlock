@@ -49,3 +49,28 @@ class VerticalBlock(XBlock):
             """)
         result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
         return result
+
+
+class SidebarBlock(XBlock):
+    """A slightly-different vertical."""
+    has_children = True
+
+    @XBlock.view('student_view')
+    def student_view(self, context):
+        result = Widget()
+        child_widgets = [self.runtime.render_child(self.runtime.get_child(child_id), context) for child_id in self.children]
+        result.add_widgets_resources(child_widgets)
+        result.add_css("""
+            .sidebar {
+                border: solid 1px #888;
+                padding: 10px;
+                background: #ccc;
+            }
+            """)
+        html = []
+        html.append("<div class='sidebar'>")
+        for cw in child_widgets:
+            html.append(cw.html())
+        html.append("</div>")
+        result.add_content("".join(html))
+        return result
