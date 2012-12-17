@@ -20,5 +20,4 @@ class DebuggingChildBlock(XBlock):
                 margin: 10px;
             }
             """)
-        widget.initialize_js("foo")
         return widget
