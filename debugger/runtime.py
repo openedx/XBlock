@@ -148,6 +148,15 @@ class RuntimeBase(object):
     def render_child(self, child, context, view_name=None):
         return child.runtime.render(child, context, view_name or self._view_name)
 
+    def render_children(self, block, context, view_name=None):
+        """Render all the children, returning a list of results."""
+        results = []
+        for child_id in block.children:
+            child = self.get_child(child_id)
+            result = self.render_child(child, context, view_name)
+            results.append(result)
+        return results
+
     def wrap_child(self, block, widget, context):
         return widget
 

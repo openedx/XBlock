@@ -9,7 +9,7 @@ class Sequence(XBlock):
     @XBlock.view('student_view')
     def render_student(self, context):
         widget = Widget()
-        child_widgets = [self.runtime.render_child(self.runtime.get_child(child_id), context) for child_id in self.children]
+        child_widgets = self.runtime.render_children(self, context)
         widget.add_widgets_resources(child_widgets)
 
         progress_per_child = [self.runtime.collect('progress', self.runtime.get_child(child_id)) for child_id in self.children]
@@ -40,7 +40,7 @@ class VerticalBlock(XBlock):
     @XBlock.view('student_view')
     def render_student(self, context):
         result = Widget()
-        child_widgets = [self.runtime.render_child(self.runtime.get_child(child_id), context) for child_id in self.children]
+        child_widgets = self.runtime.render_children(self, context)
         result.add_widgets_resources(child_widgets)
         result.add_css("""
             .vertical {
@@ -58,7 +58,7 @@ class SidebarBlock(XBlock):
     @XBlock.view('student_view')
     def student_view(self, context):
         result = Widget()
-        child_widgets = [self.runtime.render_child(self.runtime.get_child(child_id), context) for child_id in self.children]
+        child_widgets = self.runtime.render_children(self, context)
         result.add_widgets_resources(child_widgets)
         result.add_css("""
             .sidebar {
