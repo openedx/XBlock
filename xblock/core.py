@@ -81,7 +81,13 @@ class ModelType(object):
     def from_json(self, value):
         return value
 
-Integer = Float = Boolean = Object = List = String = Any = ModelType
+class Integer(ModelType): pass
+class Float(ModelType): pass
+class Boolean(ModelType): pass
+class Object(ModelType): pass
+class List(ModelType): pass
+class String(ModelType): pass
+class Any(ModelType): pass
 
 
 class ModelMetaclass(type):
@@ -133,12 +139,25 @@ class ParentModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = List(help='The children of this XBlock', default=[], scope=Scope.settings)
+            attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.settings)
         else:
             attrs['has_children'] = False
 
         return super(ParentModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
+
+class ChildModelMetaclass(type):
+    """
+    A metaclass that turns `needs_parent = True` into a parent attribute
+    with the id of the parent block.
+    """
+    def __new__(cls, name, bases, attrs):
+        if attrs.get('needs_parent', False):
+            attrs['parent'] = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.settings)
+        else:
+            attrs['needs_parent'] = False
+
+        return super(ChildModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 class NamespaceDescriptor(object):
     def __init__(self, namespace):
@@ -207,6 +226,7 @@ class MethodRegistrationMetaclass(type):
 
 class XBlockMetaclass(MethodRegistrationMetaclass,
                       ParentModelMetaclass,
+                      ChildModelMetaclass,
                       NamespacesMetaclass,
                       ModelMetaclass):
     pass

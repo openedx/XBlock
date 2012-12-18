@@ -51,7 +51,7 @@ class DictKeyValueStore(KeyValueStore):
         del self.db[key]
 
 
-Usage = namedtuple('Usage', 'id, def_id')
+TestUsage = namedtuple('TestUsage', 'id, def_id')
 
 
 def check_field(collection, field):
@@ -69,7 +69,7 @@ def check_field(collection, field):
 
 
 def test_namespace_actions():
-    tester = TestModel(DbModel(DictKeyValueStore(), TestModel, 's0', Usage('u0', 'd0')))
+    tester = TestModel(DbModel(DictKeyValueStore(), TestModel, 's0', TestUsage('u0', 'd0')))
 
     for collection in (tester, tester.test):
         for field in collection.fields:
@@ -78,7 +78,7 @@ def test_namespace_actions():
 
 def test_db_model_keys():
     key_store = DictKeyValueStore()
-    tester = TestModel(DbModel(key_store, TestModel, 's0', Usage('u0', 'd0')))
+    tester = TestModel(DbModel(key_store, TestModel, 's0', TestUsage('u0', 'd0')))
 
     for collection in (tester, tester.test):
         for field in collection.fields:

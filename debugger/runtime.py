@@ -28,11 +28,16 @@ class Usage(object):
 
     def __init__(self, block_name, def_id, children, initial_state={}):
         self.id = "usage_%d" % next(self.ids)
+        self.parent = None
         self.block_name = block_name
         self.def_id = def_id or ("def_%d" % next(self.ids))
         self.children = children
         self.usage_index[self.id] = self
         self.initial_state = initial_state
+
+        # Create the parent references as we construct children.
+        for child in self.children:
+            child.parent = self
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.children!r}>".format(self)
@@ -85,7 +90,8 @@ def create_xblock(usage, student_id):
     """
     block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
-    block = block_cls(runtime, usage, DbModel(MEMORY_KVS, block_cls, student_id, usage))
+    model = DbModel(MEMORY_KVS, block_cls, student_id, usage)
+    block = block_cls(runtime, usage, model)
     if usage.id not in initialized_usages:
         for name, value in usage.initial_state.items():
             setattr(block, name, value)

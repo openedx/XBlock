@@ -39,6 +39,23 @@ def test_parent_metaclass():
     assert_equals(Scope.settings, HasChildren.children.scope)
 
 
+def test_child_metaclass():
+
+    class HasParent(object):
+        __metaclass__ = ChildModelMetaclass
+
+        needs_parent = True
+
+    class WithoutParent(object):
+        __metaclass__ = ChildModelMetaclass
+
+    assert hasattr(HasParent, 'parent')
+    assert not hasattr(WithoutParent, 'parent')
+
+    assert isinstance(HasParent.parent, Object)
+    assert_equals(Scope.settings, HasParent.parent.scope)
+
+
 def test_field_access():
     class FieldTester(object):
         __metaclass__ = ModelMetaclass
