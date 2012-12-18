@@ -16,6 +16,7 @@ setup(
             'problem = xblock.problem:ProblemBlock',
             'textinput = xblock.problem:TextInputBlock',
             'equality = xblock.problem:EqualityCheckerBlock',
+            'attempts_scoreboard = xblock.problem:AttemptsScoreboardBlock',
             'thumbs = xblock.thumbs:ThumbsBlock',
             'slider = xblock.slider:Slider',
             'progress_slider = xblock.slider:ProgressSlider',

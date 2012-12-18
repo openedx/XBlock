@@ -214,6 +214,41 @@ class DebuggerRuntime(RuntimeBase):
     def get_block(self, block_id):
         return create_xblock(Usage.find_usage(block_id), self.student_id)
 
+    def gather(self, block, attrs):
+        """
+        Gather attributes from `block` and all its children.
+
+        The return value is a dict mapping block ids to dicts:
+
+            {
+                'id1': { 'attr1': value1, 'attr2': value2 },
+                'id2': ...
+                ...
+            }
+
+        Only attributes appearing in the block's schema will be in the block's
+        dict, and only blocks with non-empty dicts will be in the return.
+
+        """
+        block_attrs = {}
+
+        def rec_gather(block, attrs, block_attrs):
+            # Collect this block's attributes
+            d = {}
+            for attr in attrs:
+                if hasattr(block, attr):
+                    d[attr] = getattr(block, attr)
+            if d:
+                block_attrs[block.usage.id] = d
+
+            # Collect the children's attributes
+            for child_id in getattr(block, 'children', []):
+                child = self.get_block(child_id)
+                rec_gather(child, attrs, block_attrs)
+
+        rec_gather(block, attrs, block_attrs)
+        return block_attrs
+
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):
         block_cls = block.__class__ if block else self.block_cls

@@ -122,6 +122,7 @@ SCENARIOS.extend([
     ),
     Scenario("three problems",
         Usage("vertical", "", [
+            Usage("attempts_scoreboard", "", []),
             Usage("problem", "", [
                 Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
                 Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),

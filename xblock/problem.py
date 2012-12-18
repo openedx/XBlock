@@ -51,7 +51,7 @@ class ProblemBlock(XBlock):
     script = String(help="Python code to compute values", scope=Scope.content, default="")
     checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
     seed = Integer(help="Random seed for this student", scope=Scope.student_state, default=0)
-    attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.student_state, default=False)
+    problem_attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.student_state, default=False)
     has_children = True
 
     def set_student_seed(self):
@@ -136,7 +136,7 @@ class ProblemBlock(XBlock):
 
     @XBlock.json_handler("check")
     def check_answer(self, submissions):
-        self.attempted = True
+        self.problem_attempted = True
         context = self.calc_context({})
 
         child_map = {}
@@ -307,3 +307,23 @@ class EqualityCheckerBlock(CheckerBlock):
         self.left = left
         self.right = right
         return left == right
+
+
+class AttemptsScoreboardBlock(XBlock):
+    """
+    Show attempts on problems in my nieces.
+    """
+    needs_parent = True
+
+    @XBlock.view("student_view")
+    def student_view(self, context):
+        # Get the attempts for all problems in my parent.
+        parent = self.runtime.get_block(self.parent)
+        attempts = self.runtime.gather(parent, ["problem_attempted"])
+        num_problems = len(attempts)
+        attempted = sum(d['problem_attempted'] for d in attempts.itervalues())
+        if attempted == num_problems:
+            content = "Great! You attempted all %d problems!" % num_problems
+        else:
+            content = "Hmm, you've only tried %d out of %d problems..." % (attempted, num_problems)
+        return Widget(content)
