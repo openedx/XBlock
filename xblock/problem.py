@@ -78,7 +78,7 @@ class ProblemBlock(XBlock):
         result = Widget()
         named_child_widgets = []
         for child_id in self.children:
-            child = self.runtime.get_child(child_id)
+            child = self.runtime.get_block(child_id)
             widget = self.runtime.render_child(child, context, "problem_view")
             result.add_widget_resources(widget)
             named_child_widgets.append((child.name, widget))
@@ -141,7 +141,7 @@ class ProblemBlock(XBlock):
 
         child_map = {}
         for child_id in self.children:
-            child = self.runtime.get_child(child_id)
+            child = self.runtime.get_block(child_id)
             if child.name:
                 child_map[child.name] = child
 

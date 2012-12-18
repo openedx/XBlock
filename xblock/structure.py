@@ -12,7 +12,7 @@ class Sequence(XBlock):
         child_widgets = self.runtime.render_children(self, context)
         widget.add_widgets_resources(child_widgets)
 
-        progress_per_child = [self.runtime.collect('progress', self.runtime.get_child(child_id)) for child_id in self.children]
+        progress_per_child = [self.runtime.collect('progress', self.runtime.get_block(child_id)) for child_id in self.children]
 
         # TODO: [rocha] calculate total progress per child
         from pprint import pprint

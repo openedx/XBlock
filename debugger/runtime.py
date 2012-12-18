@@ -142,8 +142,8 @@ class RuntimeBase(object):
 
         return self.wrap_child(block, widget, context)
 
-    def get_child(self, child_id):
-        raise NotImplemented("Runtime needs to provide get_child()")
+    def get_block(self, block_id):
+        raise NotImplemented("Runtime needs to provide get_block()")
 
     def render_child(self, child, context, view_name=None):
         return child.runtime.render(child, context, view_name or self._view_name)
@@ -152,7 +152,7 @@ class RuntimeBase(object):
         """Render all the children, returning a list of results."""
         results = []
         for child_id in block.children:
-            child = self.get_child(child_id)
+            child = self.get_block(child_id)
             result = self.render_child(child, context, view_name)
             results.append(result)
         return results
@@ -205,8 +205,8 @@ class DebuggerRuntime(RuntimeBase):
     def handler_url(self, url):
         return "/handler/%s/%s/?student=%s" % (self.usage.id, url, self.student_id)
 
-    def get_child(self, child_id):
-        return create_xblock(Usage.find_usage(child_id), self.student_id)
+    def get_block(self, block_id):
+        return create_xblock(Usage.find_usage(block_id), self.student_id)
 
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):
@@ -220,7 +220,7 @@ class DebuggerRuntime(RuntimeBase):
         result = {
             'class': block_cls.__name__,
             'value': value,
-            'children': [self.collect(key, self.get_child(b)) for b in children]
+            'children': [self.collect(key, self.get_block(b)) for b in children]
         }
 
         return result
