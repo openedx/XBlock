@@ -1,11 +1,11 @@
-"""Widgets for XBlocks.
+"""Fragments for XBlocks.
 
 This code is in the Runtime layer.
 
 """
 
 
-class Widget(object):
+class Fragment(object):
     def __init__(self, content=None, mimetype='text/html'):
         self.content = ""
         self.mimetype = None
@@ -41,19 +41,19 @@ class Widget(object):
     def add_resource_url(self, url, mimetype):
         self.resources.append(('url', url, mimetype))
 
-    def add_widget_resources(self, widget):
-        """Add all the resources from `widget` to my resources."""
-        self.resources.extend(widget.resources)
+    def add_frag_resources(self, frag):
+        """Add all the resources from `frag` to my resources."""
+        self.resources.extend(frag.resources)
 
-    def add_widgets_resources(self, widgets):
-        for w in widgets:
-            self.add_widget_resources(w)
+    def add_frags_resources(self, frags):
+        for w in frags:
+            self.add_frag_resources(w)
 
     def cache_for(self, seconds):
         self.cache_seconds = seconds
 
     def initialize_js(self, js_func, runtime_version=1):
-        """Register a Javascript function to initialize the Widget's browser code."""
+        """Register a Javascript function to initialize the frag's browser code."""
         self.js_init = (js_func, runtime_version)
 
     # Implementation methods: don't override

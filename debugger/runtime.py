@@ -14,7 +14,7 @@ from django.core.cache import cache
 
 from xblock.core import XBlock, Scope, ModelType
 from xblock.runtime import DbModel, KeyValueStore
-from xblock.widget import Widget
+from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
 
@@ -121,7 +121,7 @@ class RuntimeBase(object):
             if view_fn:
                 break
         else:
-            return Widget("<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
+            return Fragment("<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
 
         cache_info = getattr(view_fn, "_cache", {})
         key = "view.%s.%s" % (block.__class__.__name__, view_name)
@@ -135,18 +135,18 @@ class RuntimeBase(object):
         for name in cache_info.get('model', ()):
             key += ".%s=%r" % (name, getattr(block, name))
 
-        widget = cache.get(key)
-        if widget is None:
-            widget = view_fn(context)
+        frag = cache.get(key)
+        if frag is None:
+            frag = view_fn(context)
             seconds = cache_info.get('seconds', 0)
             if seconds:
-                cache.set(key, widget, seconds)
+                cache.set(key, frag, seconds)
         else:
             log.debug("Cache hit: %s", key)
 
         self._view_name = None
 
-        return self.wrap_child(block, widget, context)
+        return self.wrap_child(block, frag, context)
 
     def get_block(self, block_id):
         raise NotImplementedError("Runtime needs to provide get_block()")
@@ -163,8 +163,8 @@ class RuntimeBase(object):
             results.append(result)
         return results
 
-    def wrap_child(self, block, widget, context):
-        return widget
+    def wrap_child(self, block, frag, context):
+        return frag
 
     def handle(self, block, handler_name, data):
         return self.find_xblock_method(block, 'handler', handler_name)(data)
@@ -183,14 +183,14 @@ class DebuggerRuntime(RuntimeBase):
     def render_template(self, template_name, **kwargs):
         return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
 
-    def wrap_child(self, block, widget, context):
-        wrapped = Widget()
+    def wrap_child(self, block, frag, context):
+        wrapped = Fragment()
         wrapped.add_javascript_url("/static/js/vendor/jquery.min.js")
         wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")
 
         data = {}
-        if widget.js_init:
-            fn, version = widget.js_init
+        if frag.js_init:
+            fn, version = frag.js_init
             wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
             data['init'] = fn
             data['runtime-version'] = version
@@ -202,10 +202,10 @@ class DebuggerRuntime(RuntimeBase):
 
         html = "<div class='xblock'%s>%s</div>" % (
             "".join(" data-%s='%s'" % item for item in data.items()),
-            widget.html(),
+            frag.html(),
         )
         wrapped.add_content(html)
-        wrapped.add_widget_resources(widget)
+        wrapped.add_frag_resources(frag)
         return wrapped
 
     def handler_url(self, url):

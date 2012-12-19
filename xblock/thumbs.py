@@ -8,7 +8,7 @@ import json
 from webob import Response
 
 from .core import XBlock, Scope, Integer, Boolean, expires, varies_on_block
-from .widget import Widget
+from .fragment import Fragment
 from .problem import InputBlock
 
 
@@ -32,12 +32,12 @@ class ThumbsBlock(InputBlock):
     @varies_on_block('definition')
     @expires(seconds=5)
     def render_student(self, context):
-        widget = Widget(self.runtime.render_template(
+        frag = Fragment(self.runtime.render_template(
             "upvotes.html",
             upvotes=self.upvotes,
             downvotes=self.downvotes,
         ))
-        widget.add_css("""
+        frag.add_css("""
             .upvote, .downvote {
                 cursor: pointer;
                 border: 1px solid #888;
@@ -46,7 +46,7 @@ class ThumbsBlock(InputBlock):
             .upvote { color: green; }
             .downvote { color: red; }
             """)
-        widget.add_javascript("""
+        frag.add_javascript("""
             function ThumbsBlock(runtime, element) {
                 function update_votes(votes) {
                     $('.upvote .count', element).text(votes.up);
@@ -64,8 +64,8 @@ class ThumbsBlock(InputBlock):
                 });
             };
             """)
-        widget.initialize_js('ThumbsBlock')
-        return widget
+        frag.initialize_js('ThumbsBlock')
+        return frag
 
     @XBlock.handler('vote')
     def handle_vote(self, request):

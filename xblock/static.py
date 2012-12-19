@@ -6,7 +6,7 @@ from webob import Response
 
 from .core import XBlockMetaclass, XBlock
 from .util import call_once_property
-from .widget import Widget
+from .fragment import Fragment
 
 
 class StaticXBlockMetaclass(XBlockMetaclass):
@@ -19,15 +19,15 @@ class StaticXBlockMetaclass(XBlockMetaclass):
             attrs['_content'] = _content
 
             def view(self, context):
-                widget = Widget(self._content)
+                frag = Fragment(self._content)
 
                 for url, mime_type in attrs.get('urls', []):
-                    widget.add_resource_url(self.runtime.handler_url('static') + '/' + url, mime_type)
+                    frag.add_resource_url(self.runtime.handler_url('static') + '/' + url, mime_type)
 
                 if hasattr(self, 'initialize_js'):
-                    widget.initialize_js(self.initialize_js)
+                    frag.initialize_js(self.initialize_js)
 
-                return widget
+                return frag
 
             for view_name in attrs['view_names']:
                 view = XBlock.view(view_name)(view)

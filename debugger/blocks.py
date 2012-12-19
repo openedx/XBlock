@@ -5,14 +5,14 @@ This code is in the Debugger layer.
 """
 
 from xblock.core import XBlock
-from xblock.widget import Widget
+from xblock.fragment import Fragment
 
 class DebuggingChildBlock(XBlock):
     """A simple gray box, to use as a child placeholder."""
     @XBlock.view('student_view')
     def student_view_method(self, context):
-        widget = Widget("<div class='debug_child'></div>")
-        widget.add_css("""
+        frag = Fragment("<div class='debug_child'></div>")
+        frag.add_css("""
             .debug_child {
                 background-color: grey;
                 width: 200px;
@@ -20,4 +20,4 @@ class DebuggingChildBlock(XBlock):
                 margin: 10px;
             }
             """)
-        return widget
+        return frag

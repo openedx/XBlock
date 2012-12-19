@@ -3,14 +3,14 @@
 from string import Template
 
 from .core import XBlock, String, Scope
-from .widget import Widget
+from .fragment import Fragment
 
 
 class HelloWorldBlock(XBlock):
     """A simple block: just show some fixed content."""
     @XBlock.view('default')
     def student_view(self, context):
-        return Widget("Hello, world!")
+        return Fragment("Hello, world!")
 
 
 class HtmlBlock(XBlock):
@@ -25,4 +25,4 @@ class HtmlBlock(XBlock):
 
     @XBlock.view('default')
     def student_view(self, context):
-        return Widget(Template(self.content).substitute(**context))
+        return Fragment(Template(self.content).substitute(**context))

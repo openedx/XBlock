@@ -1,7 +1,7 @@
 """Structure-oriented XBlocks."""
 
 from .core import XBlock
-from .widget import Widget
+from .fragment import Fragment
 
 
 class Sequence(XBlock):
@@ -9,9 +9,9 @@ class Sequence(XBlock):
 
     @XBlock.view('student_view')
     def render_student(self, context):
-        widget = Widget()
-        child_widgets = self.runtime.render_children(self, context)
-        widget.add_widgets_resources(child_widgets)
+        frag = Fragment()
+        child_frags = self.runtime.render_children(self, context)
+        frag.add_frags_resources(child_frags)
 
         progress_per_child = [self.runtime.collect('progress', self.runtime.get_block(child_id)) for child_id in self.children]
 
@@ -19,19 +19,19 @@ class Sequence(XBlock):
         from pprint import pprint
         pprint(progress_per_child)
 
-        widget.add_content(self.runtime.render_template("sequence.html", children=child_widgets))
+        frag.add_content(self.runtime.render_template("sequence.html", children=child_frags))
 
-        widget.add_css_url('http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css')
-        widget.add_javascript_url('http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js')
+        frag.add_css_url('http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css')
+        frag.add_javascript_url('http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js')
 
         # mess things up
-        widget.add_javascript("""
+        frag.add_javascript("""
             function Sequence(runtime, element) {
               $(element).children('.tabs').tabs();
             };
             """)
-        widget.initialize_js('Sequence')
-        return widget
+        frag.initialize_js('Sequence')
+        return frag
 
 
 class VerticalBlock(XBlock):
@@ -40,15 +40,15 @@ class VerticalBlock(XBlock):
 
     @XBlock.view('student_view')
     def render_student(self, context):
-        result = Widget()
-        child_widgets = self.runtime.render_children(self, context)
-        result.add_widgets_resources(child_widgets)
+        result = Fragment()
+        child_frags = self.runtime.render_children(self, context)
+        result.add_frags_resources(child_frags)
         result.add_css("""
             .vertical {
                 border: solid 1px #888; padding: 3px;
             }
             """)
-        result.add_content(self.runtime.render_template("vertical.html", children=child_widgets))
+        result.add_content(self.runtime.render_template("vertical.html", children=child_frags))
         return result
 
 
@@ -58,9 +58,9 @@ class SidebarBlock(XBlock):
 
     @XBlock.view('student_view')
     def student_view(self, context):
-        result = Widget()
-        child_widgets = self.runtime.render_children(self, context)
-        result.add_widgets_resources(child_widgets)
+        result = Fragment()
+        child_frags = self.runtime.render_children(self, context)
+        result.add_frags_resources(child_frags)
         result.add_css("""
             .sidebar {
                 border: solid 1px #888;
@@ -70,7 +70,7 @@ class SidebarBlock(XBlock):
             """)
         html = []
         html.append("<div class='sidebar'>")
-        for cw in child_widgets:
+        for cw in child_frags:
             html.append(cw.html())
         html.append("</div>")
         result.add_content("".join(html))

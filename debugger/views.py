@@ -56,13 +56,13 @@ def show_scenario(request, scenario_id):
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     block = create_xblock(usage, "student%s" % student_id)
-    widget = block.runtime.render(block, {}, 'student_view')
+    frag = block.runtime.render(block, {}, 'student_view')
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
         'block': block,
-        'body': widget.html(),
+        'body': frag.html(),
         'database': MEMORY_KVS,
-        'head_html': widget.head_html(),
+        'head_html': frag.head_html(),
         'log': LOG_STREAM.getvalue(),
         'student_id': student_id,
         'usage': usage,

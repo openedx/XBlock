@@ -36,7 +36,7 @@ import time
 
 from .core import XBlock, Integer, Object, Scope, String, Any, Boolean
 from .run_script import run_script
-from .widget import Widget
+from .fragment import Fragment
 
 
 class ProblemBlock(XBlock):
@@ -72,13 +72,13 @@ class ProblemBlock(XBlock):
     def student_view(self, context):
         context = self.calc_context(context)
 
-        result = Widget()
-        named_child_widgets = []
+        result = Fragment()
+        named_child_frags = []
         for child_id in self.children:
             child = self.runtime.get_block(child_id)
-            widget = self.runtime.render_child(child, context, "problem_view")
-            result.add_widget_resources(widget)
-            named_child_widgets.append((child.name, widget))
+            frag = self.runtime.render_child(child, context, "problem_view")
+            result.add_frag_resources(frag)
+            named_child_frags.append((child.name, frag))
         result.add_css("""
             .problem {
                 border: solid 1px #888; padding: 3px;
@@ -86,7 +86,7 @@ class ProblemBlock(XBlock):
             """)
         result.add_content(self.runtime.render_template(
             "problem.html",
-            named_children=named_child_widgets
+            named_children=named_child_frags
         ))
         result.add_javascript("""
             function ProblemBlock(runtime, element) {
@@ -207,11 +207,11 @@ class TextInputBlock(InputBlock):
 
     @XBlock.view("student_view")
     def student_view(self, context):
-        return Widget("<p>I can only appear inside problems.</p>")
+        return Fragment("<p>I can only appear inside problems.</p>")
 
     @XBlock.view("problem_view")
     def problem_view(self, context):
-        result = Widget("<input type='text' name='input' value='%s'><span class='message'></span>" % self.student_input)
+        result = Fragment("<input type='text' name='input' value='%s'><span class='message'></span>" % self.student_input)
         result.add_javascript("""
             function TextInputBlock(runtime, element) {
                 return {
@@ -253,7 +253,7 @@ class EqualityCheckerBlock(CheckerBlock):
         # TODO: Should we have a way to spit out JSON islands full of data?
         # Note the horror of mixed Python-Javascript data below...
         message = string.Template(self.message).substitute(**context)
-        result = Widget("""
+        result = Fragment("""
             <span class="mydata" data-attempted='{self.attempted}' data-correct='{correct}'>
                 {message}
                 <span class='indicator'></span>
@@ -267,7 +267,7 @@ class EqualityCheckerBlock(CheckerBlock):
         result.add_javascript_url("/static/js/vendor/underscore-min.js")
 
         # TODO: I need a way to add a script tag with a different mimetype to
-        # the head.  There's no widget way to do that yet.
+        # the head.  There's no frag way to do that yet.
         result.add_content("""
             <script type="text/template" id="xblock-equality-template">
                 <% if (attempted !== "True") { %>
@@ -329,4 +329,4 @@ class AttemptsScoreboardBlock(XBlock):
                 content = "Hmm, you've only tried %d out of %d problems..." % (attempted, num_problems)
         else:
             content = "I have nothing to live for! :("
-        return Widget(content)
+        return Fragment(content)

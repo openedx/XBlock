@@ -2,7 +2,7 @@ import json
 from webob import Response
 
 from xblock.core import XBlock, Scope, Integer
-from xblock.widget import Widget
+from xblock.fragment import Fragment
 
 
 class Slider(XBlock):
@@ -15,12 +15,12 @@ class Slider(XBlock):
         html = SLIDER_TEMPLATE.format(min=self.min_value,
                                       max=self.max_value,
                                       val=self.value)
-        widget = Widget(html)
-        widget.add_css("input[type=range] { width=100px; }")
-        widget.add_javascript(SLIDER_JS);
-        widget.initialize_js('Slider')
+        frag = Fragment(html)
+        frag.add_css("input[type=range] { width=100px; }")
+        frag.add_javascript(SLIDER_JS);
+        frag.initialize_js('Slider')
 
-        return widget
+        return frag
 
     @XBlock.handler('update')
     def handle_update(self, request):
@@ -32,19 +32,19 @@ class Slider(XBlock):
 class ProgressSlider(Slider):
     @XBlock.view('student_view')
     def render_student(self, context):
-        widget = super(ProgressSlider, self).render_student(context)
+        frag = super(ProgressSlider, self).render_student(context)
 
         # TODO: [rocha] non-wrapped ccs will make this global
         #               not what we want
         #
-        # widget.add_css("input[type=range] + span { color: red; }")
+        # frag.add_css("input[type=range] + span { color: red; }")
 
         # TODO: [rocha] initial progress - could on in constructor or initializer
         self.runtime.publish('progress', (self.value, self.max_value))
 
-        widget.add_javascript(P_SLIDER_JS)
-        widget.initialize_js('ProgressSlider')
-        return widget
+        frag.add_javascript(P_SLIDER_JS)
+        frag.initialize_js('ProgressSlider')
+        return frag
 
     @XBlock.handler('update')
     def handle_progress(self, request):
