@@ -30,14 +30,11 @@ A rough sequence diagram::
 
 """
 
-import json
 import random
 import string
 import time
 
-from webob import Response
-
-from .core import XBlock, Integer, Object, Scope, List, String, Any, Boolean
+from .core import XBlock, Integer, Object, Scope, String, Any, Boolean
 from .run_script import run_script
 from .widget import Widget
 

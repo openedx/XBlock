@@ -12,7 +12,6 @@ from collections import namedtuple
 from webob import Response
 
 from .plugin import Plugin
-from .util import call_once_property
 
 
 class BlockScope(object):

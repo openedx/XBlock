@@ -149,7 +149,7 @@ class RuntimeBase(object):
         return self.wrap_child(block, widget, context)
 
     def get_block(self, block_id):
-        raise NotImplemented("Runtime needs to provide get_block()")
+        raise NotImplementedError("Runtime needs to provide get_block()")
 
     def render_child(self, child, context, view_name=None):
         return child.runtime.render(child, context, view_name or self._view_name)

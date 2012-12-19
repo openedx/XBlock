@@ -43,7 +43,7 @@ disable=E1102,W0142
 output-format=text
 
 # Include message's id in output
-include-ids=no
+include-ids=yes
 
 # Put messages in a separate file for each module / package specified on the
 # command line instead of printing them on stdout. Reports (if any) will be
@@ -51,7 +51,7 @@ include-ids=no
 files-output=no
 
 # Tells whether to display a full report or only the messages
-reports=yes
+reports=no
 
 # Python expression which should return a note less than 10 (10 is the highest
 # note). You have access to the variables errors warning, statement which
@@ -129,7 +129,7 @@ bad-names=foo,bar,baz,toto,tutu,tata
 
 # Regular expression which should only match functions or classes name which do
 # not require a docstring
-no-docstring-rgx=__.*__
+no-docstring-rgx=__.*__|setUp|tearDown
 
 
 [MISCELLANEOUS]
@@ -170,7 +170,7 @@ init-import=no
 
 # A regular expression matching the beginning of the name of dummy variables
 # (i.e. not used).
-dummy-variables-rgx=_|dummy
+dummy-variables-rgx=_|dummy|unused|.*_unused
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.

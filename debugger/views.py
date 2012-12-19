@@ -4,7 +4,6 @@ This code is in the Debugger layer.
 
 """
 
-import itertools
 import json
 import logging
 import mimetypes
@@ -12,13 +11,11 @@ import pkg_resources
 from StringIO import StringIO
 
 from webob import Request
-from webob.multidict import MultiDict
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
 
 from xblock.core import XBlock
-from xblock.widget import Widget
 
 from .runtime import Usage, create_xblock, MEMORY_KVS
 from .scenarios import SCENARIOS
