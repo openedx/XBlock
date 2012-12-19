@@ -6,6 +6,8 @@ This code is in the Runtime layer.
 
 
 class Fragment(object):
+    """A fragment of a web page, for XBlock views to return."""
+
     def __init__(self, content=None, mimetype='text/html'):
         self.content = ""
         self.mimetype = None
@@ -18,28 +20,28 @@ class Fragment(object):
     def add_content(self, content, mimetype='text/html'):
         if self.mimetype is not None:
             if mimetype != self.mimetype:
-                raise Exception("Can't switch mimetypes midstream: %r -> %r" % (self.mimetype, mimetype))
+                raise ValueError("Can't switch fragment mimetypes midstream: %r -> %r" % (self.mimetype, mimetype))
         else:
             self.mimetype = mimetype
         self.content += content
 
-    def add_resource(self, bytes, mimetype):
-        self.resources.append(('text', bytes, mimetype))
+    def add_resource(self, text, mimetype):
+        self.resources.append(('text', text, mimetype))
 
-    def add_css(self, bytes):
-        self.add_resource(bytes, 'text/css')
+    def add_resource_url(self, url, mimetype):
+        self.resources.append(('url', url, mimetype))
+
+    def add_css(self, text):
+        self.add_resource(text, 'text/css')
 
     def add_css_url(self, url):
         self.add_resource_url(url, 'text/css')
 
-    def add_javascript(self, bytes):
-        self.add_resource(bytes, 'application/javascript')
+    def add_javascript(self, text):
+        self.add_resource(text, 'application/javascript')
 
     def add_javascript_url(self, url):
         self.add_resource_url(url, 'application/javascript')
-
-    def add_resource_url(self, url, mimetype):
-        self.resources.append(('url', url, mimetype))
 
     def add_frag_resources(self, frag):
         """Add all the resources from `frag` to my resources."""
