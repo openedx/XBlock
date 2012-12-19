@@ -7,6 +7,7 @@ This code is in the Debugger layer.
 from xblock.core import XBlock
 from xblock.fragment import Fragment
 
+
 class DebuggingChildBlock(XBlock):
     """A simple gray box, to use as a child placeholder."""
     @XBlock.view('student_view')

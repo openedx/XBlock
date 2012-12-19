@@ -20,6 +20,7 @@ from xblock.core import XBlock
 from .runtime import Usage, create_xblock, MEMORY_KVS
 from .scenarios import SCENARIOS
 
+
 # --- Set up an in-memory logger
 
 def setup_logging():
@@ -36,11 +37,13 @@ setup_logging()
 
 log = logging.getLogger(__name__)
 
+
 # We don't really have authentication and multiple students, just accept their
 # id on the URL.
 def get_student_id(request):
     student_id = int(request.GET.get('student', '99'))
     return student_id
+
 
 #---- Views -----
 

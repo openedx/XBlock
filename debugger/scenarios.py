@@ -20,50 +20,56 @@ for name, cls in XBlock.load_classes():
     SCENARIOS.append(Scenario(name, Usage(name, "defn999", default_children)))
 
 SCENARIOS.extend([
-    Scenario("a bunch of html",
-        Usage("html", "", [], {'content':"""
-                                    <h2>Installing Enthought for Windows</h2>
+    Scenario(
+        "a bunch of html",
+        Usage("html", "", [], {
+            'content': """
+                <h2>Installing Enthought for Windows</h2>
 
-                                    <p>To download Enthought on your Windows machine, you should follow these steps:</p>
+                <p>To download Enthought on your Windows machine, you should follow these steps:</p>
 
-                                    <ul>
-                                        <li><p>Visit the <a href="http://www.enthought.com/products/epd_free.php" target="_blank">Enthought website</a>.</p></li>
+                <ul>
+                    <li><p>Visit the <a href="http://www.enthought.com/products/epd_free.php" target="_blank">Enthought website</a>.</p></li>
 
-                                        <li><p>Click on the Download Button.</p></li>
+                    <li><p>Click on the Download Button.</p></li>
 
-                                        <li><p>On the subsequent page, select the download file for Windows. Do NOT
-                                        download the 64 bit version, even if your operating system is 64-bit.</p></li>
+                    <li><p>On the subsequent page, select the download file for Windows. Do NOT
+                    download the 64 bit version, even if your operating system is 64-bit.</p></li>
 
-                                        <li><p>Once the file has downloaded to your system, complete the
-                                        installation by double-clicking the .msi file. Follow the instructions
-                                        to install on your machine.</p></li>
+                    <li><p>Once the file has downloaded to your system, complete the
+                    installation by double-clicking the .msi file. Follow the instructions
+                    to install on your machine.</p></li>
 
-                                    </ul>
+                </ul>
 
-                                    <p>Once you have completed the installation, you should be ready to use
-                                    the Python environment. To do this, follow these steps:</p>
+                <p>Once you have completed the installation, you should be ready to use
+                the Python environment. To do this, follow these steps:</p>
 
-                                    <ul><li><p>Find the Enthought system on your machine and open the Idle program.
-                                        </p><p>Click on the Start menu, then click on All Programs. Find
-                                        the Enthought folder in the list. Open the folder and click on Idle.</p>
-                                    </li>
-                                    </ul>
-                                    """}),
+                <ul><li><p>Find the Enthought system on your machine and open the Idle program.
+                    </p><p>Click on the Start menu, then click on All Programs. Find
+                    the Enthought folder in the list. Open the folder and click on Idle.</p>
+                </li>
+                </ul>
+                """,
+        }),
     ),
-    Scenario("problem with two inputs",
+    Scenario(
+        "problem with two inputs",
         Usage("problem", "", [
             Usage("textinput", "", []),
             Usage("textinput", "", []),
         ]),
     ),
-    Scenario("three thumbs at once",
+    Scenario(
+        "three thumbs at once",
         Usage("vertical", "", [
             Usage("thumbs", "def1", [], {'upvotes': 3, 'downvotes': 1}),
             Usage("thumbs", "def2", []),
             Usage("thumbs", "def3", []),
         ])
     ),
-    Scenario("problem with thumbs and textbox",
+    Scenario(
+        "problem with thumbs and textbox",
         Usage("problem", "p1", [
             Usage("html", "desc", [], {'content': """
                                     <p>You have three constraints to satisfy:</p>
@@ -83,7 +89,7 @@ SCENARIOS.extend([
                 # Compute the random answer.
                 import random
                 numvotes = random.randrange(2,5)
-                """, 
+                """,
             'checker_arguments': {
                 'votes_equal': {
                     'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
@@ -100,7 +106,8 @@ SCENARIOS.extend([
             },
         }),
     ),
-    Scenario("sequence with progress_sliders",
+    Scenario(
+        "sequence with progress_sliders",
         Usage("sequence", "s-a", [
             Usage("vertical", "v-a", [
                 Usage("slider", "s-aa", []),
@@ -120,7 +127,8 @@ SCENARIOS.extend([
             ]),
         ]),
     ),
-    Scenario("three problems",
+    Scenario(
+        "three problems",
         Usage("vertical", "", [
             Usage("attempts_scoreboard", "", []),
             Usage("problem", "", [
