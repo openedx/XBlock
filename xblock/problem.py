@@ -318,12 +318,17 @@ class AttemptsScoreboardBlock(XBlock):
     @XBlock.view("student_view")
     def student_view(self, context):
         # Get the attempts for all problems in my parent.
-        parent = self.runtime.get_block(self.parent)
-        attempts = self.runtime.gather(parent, ["problem_attempted"])
-        num_problems = len(attempts)
-        attempted = sum(d['problem_attempted'] for d in attempts.itervalues())
-        if attempted == num_problems:
-            content = "Great! You attempted all %d problems!" % num_problems
+        if self.parent:
+            parent = self.runtime.get_block(self.parent)
+            attempts = self.runtime.gather(parent, ["problem_attempted"])
+            num_problems = len(attempts)
+            attempted = sum(d['problem_attempted'] for d in attempts.itervalues())
+            if num_problems == 0:
+                content = "There are no problems here..."
+            elif attempted == num_problems:
+                content = "Great! You attempted all %d problems!" % num_problems
+            else:
+                content = "Hmm, you've only tried %d out of %d problems..." % (attempted, num_problems)
         else:
-            content = "Hmm, you've only tried %d out of %d problems..." % (attempted, num_problems)
+            content = "I have nothing to live for! :("
         return Widget(content)
