@@ -3,6 +3,7 @@
 from .core import XBlock
 from .widget import Widget
 
+
 class Sequence(XBlock):
     has_children = True
 

@@ -44,7 +44,7 @@ class DbModel(MutableMapping):
 
         # If the class doesn't have the field, and it also doesn't have any
         # namespaces, then the name isn't a field so KeyError
-        if not hasattr(self._block_cls, 'namespaces'): 
+        if not hasattr(self._block_cls, 'namespaces'):
             raise KeyError(name)
 
         # Resolve the field name in the first namespace where it's available.

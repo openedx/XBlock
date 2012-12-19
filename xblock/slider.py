@@ -4,6 +4,7 @@ from webob import Response
 from xblock.core import XBlock, Scope, Integer
 from xblock.widget import Widget
 
+
 class Slider(XBlock):
     min_value = Integer(help="Minimum value", default=0, scope=Scope.content)
     max_value = Integer(help="Maximum value", default=100, scope=Scope.content)

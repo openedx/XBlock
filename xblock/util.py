@@ -1,3 +1,6 @@
+"""Utilities."""
+
+
 # from https://github.com/Pylons/pyramid/blob/master/pyramid/decorator.py
 class call_once_property(object):
     """ Use as a class method decorator.  It operates almost exactly like the
@@ -31,7 +34,7 @@ class call_once_property(object):
         self.wrapped = wrapped
         try:
             self.__doc__ = wrapped.__doc__
-        except: # pragma: no cover
+        except:         # pragma: no cover
             pass
 
     def __get__(self, inst, objtype=None):

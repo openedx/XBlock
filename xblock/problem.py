@@ -87,7 +87,8 @@ class ProblemBlock(XBlock):
                 border: solid 1px #888; padding: 3px;
             }
             """)
-        result.add_content(self.runtime.render_template("problem.html",
+        result.add_content(self.runtime.render_template(
+            "problem.html",
             named_children=named_child_widgets
         ))
         result.add_javascript("""
@@ -110,7 +111,7 @@ class ProblemBlock(XBlock):
                     });
                 }
 
-                // To submit a problem, call all the named children's submit() 
+                // To submit a problem, call all the named children's submit()
                 // function, collect their return values, and post that object
                 // to the check handler.
                 $(element).find('.check').bind('click', function() {
@@ -145,7 +146,7 @@ class ProblemBlock(XBlock):
             if child.name:
                 child_map[child.name] = child
 
-        # For each InputBlock, call the submit() method with the browser-sent 
+        # For each InputBlock, call the submit() method with the browser-sent
         # input data.
         submit_results = {}
         for input_name, submission in submissions.items():
@@ -261,7 +262,7 @@ class EqualityCheckerBlock(CheckerBlock):
                 <span class='indicator'></span>
             </span>
             """.format(self=self, message=message, correct=correct)
-            )
+        )
         # TODO: This is a runtime-specific URL.  But if each XBlock ships their
         # own copy of underscore.js, we won't be able to uniquify them.
         # Perhaps runtimes can offer a palette of popular libraries so that

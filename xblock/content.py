@@ -15,7 +15,7 @@ class HelloWorldBlock(XBlock):
 
 class HtmlBlock(XBlock):
     """Render content as HTML.
-    
+
     The content can have $PLACEHOLDERS, which will be substituted with values
     from the context.
 

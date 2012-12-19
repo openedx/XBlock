@@ -14,6 +14,7 @@ from webob import Response
 from .plugin import Plugin
 from .util import call_once_property
 
+
 class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
@@ -159,6 +160,7 @@ class ChildModelMetaclass(type):
 
         return super(ChildModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
+
 class NamespaceDescriptor(object):
     def __init__(self, namespace):
         self._namespace = namespace
@@ -211,6 +213,7 @@ class Namespace(Plugin):
 
         return namespace_attr.__delete__(container)
 
+
 class MethodRegistrationMetaclass(type):
     def __new__(cls, name, bases, attrs):
         # Find registered methods
@@ -239,6 +242,7 @@ def _set_cache_info(f, **kwargs):
         f._cache = {}
     f._cache.update(kwargs)
 
+
 def varies_on_model(*attrs):
     # key = (getattr(self, attr) for attr in attrs)
     def _dec(f):
@@ -246,10 +250,12 @@ def varies_on_model(*attrs):
         return f
     return _dec
 
+
 def varies_on_children(f):
     # not sure how to do this yet...
     # _set_cache_info(f, children=True)
     return f
+
 
 def varies_on_block(type):
     """Use 'usage', 'definition', or 'none'."""
@@ -258,10 +264,11 @@ def varies_on_block(type):
         return f
     return _dec
 
+
 def expires(hours=0, minutes=0, seconds=0):
     # cache expiration
     def _dec(f):
-        _set_cache_info(f, seconds=hours*3600+minutes*60+seconds)
+        _set_cache_info(f, seconds=hours*3600 + minutes*60 + seconds)
         return f
     return _dec
 

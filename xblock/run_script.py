@@ -2,6 +2,7 @@
 
 import textwrap
 
+
 def run_script(pycode):
     """Run the Python in `pycode`, and return a dict of the resulting globals."""
     # Fix up the whitespace in pycode.

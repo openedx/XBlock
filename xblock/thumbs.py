@@ -32,7 +32,8 @@ class ThumbsBlock(InputBlock):
     @varies_on_block('definition')
     @expires(seconds=5)
     def render_student(self, context):
-        widget = Widget(self.runtime.render_template("upvotes.html",
+        widget = Widget(self.runtime.render_template(
+            "upvotes.html",
             upvotes=self.upvotes,
             downvotes=self.downvotes,
         ))

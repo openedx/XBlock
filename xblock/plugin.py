@@ -31,7 +31,6 @@ class Plugin(object):
         setattr(class_, 'plugin_name', entry_point.name)
         return class_
 
-
     @classmethod
     def load_class(cls, identifier, default=None):
         """
@@ -47,8 +46,7 @@ class Plugin(object):
 
         if identifier not in cls._plugin_cache:
             identifier = identifier.lower()
-            classes = list(pkg_resources.iter_entry_points(
-                    cls.entry_point, name=identifier))
+            classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
 
             if len(classes) > 1:
                 log.warning("Found multiple classes for {entry_point} with "
