@@ -69,32 +69,6 @@ def show_scenario(request, scenario_id):
     })
 
 
-def settings(request):
-
-    blocks = {
-        'edx/test/verticala': XBlock.load_class('vertical')(DebuggerRuntime(), {}, {}, {}, {}),
-        'edx/test/verticalb': XBlock.load_class('vertical')(DebuggerRuntime(), {}, {}, {}, {}),
-    }
-
-    course_usages = Usage('course', 'edx/test/course', {
-        'graded': True,
-        'start_date': '1/2/12',
-    }, [
-        Usage('verticala', 'edx/test/verticala', {}, []),
-        Usage('verticalb', 'edx/test/verticalb', {}, [])
-    ]).as_json()
-
-    course = XBlock.load_class('course')(DebuggerRuntime(), {
-            'policy_list': [{'class': 'cascade', 'params': {'keys': ['graded']}}],
-            'usage_tree': course_usages,
-        }, {}, {}, {})
-
-    return render_to_response('settings.html', {
-        'base_tree': json.dumps(course.usage_tree.as_json(), indent=4),
-        'applied_tree': json.dumps(course.apply_policies(User()).as_json(), indent=4),
-    })
-
-
 def handler(request, usage_id, handler):
     student_id = get_student_id(request)
     log.info("Start handler %s/%s for %s", usage_id, handler, student_id)
