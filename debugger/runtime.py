@@ -7,13 +7,12 @@ Code in this file is a mix of Runtime layer and Debugger layer.
 import itertools
 import json
 import logging
-import new
 
 from django.template import loader as django_template_loader, Context as DjangoContext
 from django.core.cache import cache
 
 from xblock.core import XBlock, Scope, ModelType
-from xblock.runtime import DbModel, KeyValueStore
+from xblock.runtime import DbModel, KeyValueStore, RuntimeBase
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
@@ -99,19 +98,13 @@ def create_xblock(usage, student_id):
     return block
 
 
-class RuntimeBase(object):
-    """Methods all runtimes need."""
-    def __init__(self):
-        self._view_name = None
+class DebuggerRuntime(RuntimeBase):
+    def __init__(self, block_cls, student_id, usage):
+        super(DebuggerRuntime, self).__init__()
 
-    def find_xblock_method(self, block, registration_type, name):
-        # TODO: Maybe this should be a method on XBlock?
-        try:
-            fn = block.registered_methods[registration_type + name]
-        except KeyError:
-            return None
-
-        return new.instancemethod(fn, block, block.__class__)
+        self.block_cls = block_cls
+        self.student_id = student_id
+        self.usage = usage
 
     def render(self, block, context, view_name):
         self._view_name = view_name
@@ -147,36 +140,6 @@ class RuntimeBase(object):
         self._view_name = None
 
         return self.wrap_child(block, frag, context)
-
-    def get_block(self, block_id):
-        raise NotImplementedError("Runtime needs to provide get_block()")
-
-    def render_child(self, child, context, view_name=None):
-        return child.runtime.render(child, context, view_name or self._view_name)
-
-    def render_children(self, block, context, view_name=None):
-        """Render all the children, returning a list of results."""
-        results = []
-        for child_id in block.children:
-            child = self.get_block(child_id)
-            result = self.render_child(child, context, view_name)
-            results.append(result)
-        return results
-
-    def wrap_child(self, block, frag, context):
-        return frag
-
-    def handle(self, block, handler_name, data):
-        return self.find_xblock_method(block, 'handler', handler_name)(data)
-
-
-class DebuggerRuntime(RuntimeBase):
-    def __init__(self, block_cls, student_id, usage):
-        super(DebuggerRuntime, self).__init__()
-
-        self.block_cls = block_cls
-        self.student_id = student_id
-        self.usage = usage
 
     # TODO: [rocha] runtime should not provide this, each xblock
     # should use whatever they want
@@ -214,40 +177,8 @@ class DebuggerRuntime(RuntimeBase):
     def get_block(self, block_id):
         return create_xblock(Usage.find_usage(block_id), self.student_id)
 
-    def gather(self, block, attrs):
-        """
-        Gather attributes from `block` and all its children.
-
-        The return value is a dict mapping block ids to dicts:
-
-            {
-                'id1': { 'attr1': value1, 'attr2': value2 },
-                'id2': ...
-                ...
-            }
-
-        Only attributes appearing in the block's schema will be in the block's
-        dict, and only blocks with non-empty dicts will be in the return.
-
-        """
-        block_attrs = {}
-
-        def rec_gather(block, attrs, block_attrs):
-            # Collect this block's attributes
-            d = {}
-            for attr in attrs:
-                if hasattr(block, attr):
-                    d[attr] = getattr(block, attr)
-            if d:
-                block_attrs[block.usage.id] = d
-
-            # Collect the children's attributes
-            for child_id in getattr(block, 'children', []):
-                child = self.get_block(child_id)
-                rec_gather(child, attrs, block_attrs)
-
-        rec_gather(block, attrs, block_attrs)
-        return block_attrs
+    def query(self, block):
+        return _BlockSet(self, [block])
 
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):
@@ -272,9 +203,39 @@ class DebuggerRuntime(RuntimeBase):
         data[key] = value
 
 
-class User(object):
-    id = None
-    groups = []
+class _BlockSet(object):
+    def __init__(self, runtime, blocks):
+        self.runtime = runtime
+        self.blocks = blocks
+
+    def __iter__(self):
+        return iter(self.blocks)
+
+    def parent(self):
+        them = set()
+        for block in self.blocks:
+            if block.parent:
+                parent = self.runtime.get_block(block.parent)
+                them.add(parent)
+        return _BlockSet(self.runtime, them)
+
+    def descendants(self):
+        them = set()
+        def recur(block):
+            for child_id in getattr(block, "children", []):
+                child = self.runtime.get_block(child_id)
+                them.add(child)
+                recur(child)
+
+        for block in self.blocks:
+            recur(block)
+
+        return _BlockSet(self.runtime, them)
+
+    def attr(self, attr_name):
+        for block in self.blocks:
+            if hasattr(block, attr_name):
+                yield getattr(block, attr_name)
 
 
 class AnalyticsDbModel(DbModel):

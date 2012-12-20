@@ -2,6 +2,9 @@
 Machinery to make the common case easy when building new runtimes
 """
 
+import new
+import re
+
 from collections import namedtuple, MutableMapping
 from .core import ModelType, BlockScope
 
@@ -111,3 +114,90 @@ class DbModel(MutableMapping):
         for namespace_name in self._block_cls.namespaces:
             fields.extend(field.name for field in getattr(self._block_cls, namespace_name).fields)
         return fields
+
+
+class RuntimeBase(object):
+    """Methods all runtimes need."""
+    def __init__(self):
+        self._view_name = None
+
+    def find_xblock_method(self, block, registration_type, name):
+        # TODO: Maybe this should be a method on XBlock?
+        try:
+            fn = block.registered_methods[registration_type + name]
+        except KeyError:
+            return None
+
+        return new.instancemethod(fn, block, block.__class__)
+
+    def render(self, block, context, view_name):
+        raise NotImplementedError("Runtime needs to provide render()")
+
+    def get_block(self, block_id):
+        raise NotImplementedError("Runtime needs to provide get_block()")
+
+    def render_child(self, child, context, view_name=None):
+        return child.runtime.render(child, context, view_name or self._view_name)
+
+    def render_children(self, block, context, view_name=None):
+        """Render all the children, returning a list of results."""
+        results = []
+        for child_id in block.children:
+            child = self.get_block(child_id)
+            result = self.render_child(child, context, view_name)
+            results.append(result)
+        return results
+
+    def wrap_child(self, block, frag, context):
+        return frag
+
+    def handle(self, block, handler_name, data):
+        return self.find_xblock_method(block, 'handler', handler_name)(data)
+
+    def query(self, block):
+        raise NotImplementedError("Runtime needs to provide query()")
+
+    def querypath(self, block, path):
+        """An XPath-like interface to `query`."""
+        class BadPath(Exception):
+            pass
+        q = self.query(block)
+        ROOT, SEP, WORD, FINAL = range(4)
+        state = ROOT
+        for tok in re.findall(r"\.\.|\.|//|/|@\w+", path):
+            if state == FINAL:
+                # Shouldn't be any tokens after a last token.
+                raise BadPath()
+            if tok == "..":
+                # .. (parent)
+                if state == WORD:
+                    raise BadPath()
+                q = q.parent()
+                state = WORD
+            elif tok == ".":
+                # . (current node)
+                if state == WORD:
+                    raise BadPath()
+                state = WORD
+            elif tok == "//":
+                # // (descendants)
+                if state == SEP:
+                    raise BadPath()
+                if state == ROOT:
+                    raise NotImplementedError()
+                q = q.descendants()
+                state = SEP
+            elif tok == "/":
+                # / (current node)
+                if state == SEP:
+                    raise BadPath()
+                if state == ROOT:
+                    raise NotImplementedError()
+                state = SEP
+            elif tok.startswith("@"):
+                # @xxx (attribute access)
+                if state != SEP:
+                    raise BadPath()
+                q = q.attr(tok[1:])
+                state = FINAL
+        return q

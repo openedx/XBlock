@@ -70,20 +70,21 @@ SCENARIOS.extend([
     ),
     Scenario(
         "problem with thumbs and textbox",
-        Usage("problem", "p1", [
-            Usage("html", "desc", [], {'content': """
-                                    <p>You have three constraints to satisfy:</p>
-                                    <ol>
-                                        <li>The upvotes and downvotes must be equal.</li>
-                                        <li>You must enter the number of upvotes into the text field.</li>
-                                        <li>The number of upvotes must be $numvotes.</li>
-                                    </ol>
-                                    """}),
+        Usage("problem", "", [
+            Usage("html", "desc", [], {
+                'content': """
+                    <p>You have three constraints to satisfy:</p>
+                    <ol>
+                        <li>The upvotes and downvotes must be equal.</li>
+                        <li>You must enter the number of upvotes into the text field.</li>
+                        <li>The number of upvotes must be $numvotes.</li>
+                    </ol>
+                    """}),
             Usage("thumbs", "", [], {'name': 'thumb'}),
             Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'vote_count'}),
-            Usage("equality", "e1", [], {'message': 'Upvotes match downvotes', 'name': 'votes_equal'}),
-            Usage("equality", "e2", [], {'message': 'Number of upvotes matches entered string', 'name': 'votes_named'}),
-            Usage("equality", "e3", [], {'message': 'Number of upvotes is $numvotes', 'name': 'votes_specified'}),
+            Usage("equality", "e1", [], {'content': 'Upvotes match downvotes', 'name': 'votes_equal'}),
+            Usage("equality", "e2", [], {'content': 'Number of upvotes matches entered string', 'name': 'votes_named'}),
+            Usage("equality", "e3", [], {'content': 'Number of upvotes is $numvotes', 'name': 'votes_specified'}),
         ], {
             'script': """
                 # Compute the random answer.
@@ -134,7 +135,7 @@ SCENARIOS.extend([
             Usage("problem", "", [
                 Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
                 Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                Usage("equality", "e1", [], {'message': '', 'name': 'sum_checker'}),
+                Usage("equality", "e1", [], {'content': '', 'name': 'sum_checker'}),
             ], {
                 'script': """
                     import random
@@ -153,7 +154,7 @@ SCENARIOS.extend([
                 Usage("problem", "", [
                     Usage("html", "", [], {'content': "<p>What is $a &times; $b?</p>"}),
                     Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                    Usage("equality", "e1", [], {'message': '', 'name': 'sum_checker'}),
+                    Usage("equality", "e1", [], {'content': '', 'name': 'sum_checker'}),
                 ], {
                     'script': """
                         import random
@@ -172,7 +173,7 @@ SCENARIOS.extend([
             Usage("problem", "", [
                 Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
                 Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                Usage("equality", "e1", [], {'message': '', 'name': 'sum_checker'}),
+                Usage("equality", "e1", [], {'content': '', 'name': 'sum_checker'}),
             ], {
                 'script': """
                     import random

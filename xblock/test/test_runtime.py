@@ -1,5 +1,5 @@
 from nose.tools import assert_equals
-from mock import patch
+from mock import patch, Mock, call
 
 from xblock.core import *
 from xblock.runtime import *
@@ -103,3 +103,21 @@ def test_db_model_keys():
     assert_equals('new n_by_type', key_store.db[KeyValueStore.Key(Scope(False, BlockScope.TYPE), None, 'TestModel', 'n_by_type')])
     assert_equals('new n_for_all', key_store.db[KeyValueStore.Key(Scope(False, BlockScope.ALL), None, None, 'n_for_all')])
     assert_equals('new n_student_def', key_store.db[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'n_student_def')])
+
+
+class MockRuntimeForQuerying(RuntimeBase):
+    def __init__(self):
+        self.q = Mock()
+
+    def query(self, block):
+        return self.q
+
+
+def test_querypath_parsing():
+    mrun = MockRuntimeForQuerying()
+    block = Mock()
+    q = mrun.querypath(block, "..//@hello")
+    print mrun.q.mock_calls
+    expected = Mock()
+    expected.parent().descendants().attr("hello")
+    assert mrun.q.mock_calls == expected.mock_calls

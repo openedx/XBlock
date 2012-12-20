@@ -238,27 +238,32 @@ class TextInputBlock(InputBlock):
 
 class EqualityCheckerBlock(CheckerBlock):
 
-    left = Any(scope=Scope.student_state)
-    right = Any(scope=Scope.student_state)
+    # Content: the problem will hook us up with our data.
+    content = String(help="Message describing the equality test", scope=Scope.content, default="Equality test")
+    left = String(scope=Scope.content)
+    right = String(scope=Scope.content)
+
+    # Student data
+    left_value = Any(scope=Scope.student_state)
+    right_value = Any(scope=Scope.student_state)
     attempted = Boolean(scope=Scope.student_state)
-    message = String(help="Message describing the equality test", scope=Scope.content, default="Equality test")
 
     @XBlock.view('problem_view')
     def problem(self, context):
-        correct = self.left == self.right
+        correct = self.left_value == self.right_value
 
         # TODO: I originally named this class="data", but that conflicted with
         # the CSS on the page! :(  We might have to do something to namespace
         # things.
         # TODO: Should we have a way to spit out JSON islands full of data?
         # Note the horror of mixed Python-Javascript data below...
-        message = string.Template(self.message).substitute(**context)
+        content = string.Template(self.content).substitute(**context)
         result = Fragment("""
             <span class="mydata" data-attempted='{self.attempted}' data-correct='{correct}'>
-                {message}
+                {content}
                 <span class='indicator'></span>
             </span>
-            """.format(self=self, message=message, correct=correct)
+            """.format(self=self, content=content, correct=correct)
         )
         # TODO: This is a runtime-specific URL.  But if each XBlock ships their
         # own copy of underscore.js, we won't be able to uniquify them.
@@ -302,8 +307,8 @@ class EqualityCheckerBlock(CheckerBlock):
 
     def check(self, left, right):
         self.attempted = True
-        self.left = left
-        self.right = right
+        self.left_value = left
+        self.right_value = right
         return left == right
 
 
@@ -317,10 +322,11 @@ class AttemptsScoreboardBlock(XBlock):
     def student_view(self, context):
         # Get the attempts for all problems in my parent.
         if self.parent:
-            parent = self.runtime.get_block(self.parent)
-            attempts = self.runtime.gather(parent, ["problem_attempted"])
+            # these two lines are equivalent, and both work:
+            attempts = list(self.runtime.query(self).parent().descendants().attr("problem_attempted"))
+            attempts = list(self.runtime.querypath(self, "..//@problem_attempted"))
             num_problems = len(attempts)
-            attempted = sum(d['problem_attempted'] for d in attempts.itervalues())
+            attempted = sum(attempts)
             if num_problems == 0:
                 content = "There are no problems here..."
             elif attempted == num_problems:
