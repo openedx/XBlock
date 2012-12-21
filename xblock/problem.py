@@ -322,7 +322,6 @@ class AttemptsScoreboardBlock(XBlock):
     """
     Show attempts on problems in my nieces.
     """
-    needs_parent = True
 
     @XBlock.view("student_view")
     def student_view(self, context):

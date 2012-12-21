@@ -5,7 +5,7 @@ from xblock.core import *
 from xblock.runtime import *
 
 
-class Metaclass(NamespacesMetaclass, ParentModelMetaclass, ModelMetaclass):
+class Metaclass(NamespacesMetaclass, ChildrenModelMetaclass, ModelMetaclass):
     pass
 
 

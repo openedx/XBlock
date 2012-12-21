@@ -132,7 +132,7 @@ class NamespacesMetaclass(type):
         return super(NamespacesMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class ParentModelMetaclass(type):
+class ChildrenModelMetaclass(type):
     """
     A ModelMetaclass that transforms the attribute `has_children = True`
     into a List field with an empty scope.
@@ -143,21 +143,7 @@ class ParentModelMetaclass(type):
         else:
             attrs['has_children'] = False
 
-        return super(ParentModelMetaclass, cls).__new__(cls, name, bases, attrs)
-
-
-class ChildModelMetaclass(type):
-    """
-    A metaclass that turns `needs_parent = True` into a parent attribute
-    with the id of the parent block.
-    """
-    def __new__(cls, name, bases, attrs):
-        if attrs.get('needs_parent', False):
-            attrs['parent'] = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.settings)
-        else:
-            attrs['needs_parent'] = False
-
-        return super(ChildModelMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super(ChildrenModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
 class NamespaceDescriptor(object):
@@ -242,8 +228,7 @@ class TagCombiningMetaclass(type):
 
 class XBlockMetaclass(
     MethodRegistrationMetaclass,
-    ParentModelMetaclass,
-    ChildModelMetaclass,
+    ChildrenModelMetaclass,
     NamespacesMetaclass,
     ModelMetaclass,
     TagCombiningMetaclass,
@@ -297,6 +282,7 @@ class XBlock(Plugin):
 
     entry_point = 'xblock.v1'
 
+    parent = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.settings)
     name = String(help="Short name for the block", scope=Scope.settings)
     tags = List(help="Tags for this block", scope=Scope.settings)
 

@@ -22,38 +22,21 @@ def test_model_metaclass():
     assert_in(ModelMetaclassTester.field_b, ModelMetaclassTester.fields)
 
 
-def test_parent_metaclass():
+def test_children_metaclass():
 
     class HasChildren(object):
-        __metaclass__ = ParentModelMetaclass
+        __metaclass__ = ChildrenModelMetaclass
 
         has_children = True
 
     class WithoutChildren(object):
-        __metaclass__ = ParentModelMetaclass
+        __metaclass__ = ChildrenModelMetaclass
 
     assert hasattr(HasChildren, 'children')
     assert not hasattr(WithoutChildren, 'children')
 
     assert isinstance(HasChildren.children, List)
     assert_equals(Scope.settings, HasChildren.children.scope)
-
-
-def test_child_metaclass():
-
-    class HasParent(object):
-        __metaclass__ = ChildModelMetaclass
-
-        needs_parent = True
-
-    class WithoutParent(object):
-        __metaclass__ = ChildModelMetaclass
-
-    assert hasattr(HasParent, 'parent')
-    assert not hasattr(WithoutParent, 'parent')
-
-    assert isinstance(HasParent.parent, Object)
-    assert_equals(Scope.settings, HasParent.parent.scope)
 
 
 def test_field_access():
