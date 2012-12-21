@@ -42,11 +42,8 @@ from .fragment import Fragment
 class ProblemBlock(XBlock):
     """A generalized container of InputBlocks and Checkers.
 
-    The `checker_arguments` field maps checker names to check arguments.
-
     """
     script = String(help="Python code to compute values", scope=Scope.content, default="")
-    checker_arguments = Object(help="Map of checker names to `check` arguments", scope=Scope.content, default={})
     seed = Integer(help="Random seed for this student", scope=Scope.student_state, default=0)
     problem_attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.student_state, default=False)
     has_children = True
@@ -151,19 +148,27 @@ class ProblemBlock(XBlock):
 
         # For each Checker, find the values it wants, and pass them to its
         # check() method.
+        checkers = list(self.runtime.querypath(self, "./checker"))
         check_results = {}
-        for checker, arguments in self.checker_arguments.items():
+        for checker in checkers:
+            arguments = checker.arguments
             kwargs = {}
             kwargs.update(arguments)
             for arg_name, arg_value in arguments.items():
-                if isinstance(arg_value, dict):
-                    _type = arg_value.get('_type')
-                    if _type == 'reference':
-                        child, _, attribute = arg_value['ref_name'].partition('.')
-                        kwargs[arg_name] = getattr(child_map[child], attribute)
-                    elif _type == 'context':
-                        kwargs[arg_name] = context.get(arg_value['ref_name'])
-            check_results[checker] = child_map[checker].check(**kwargs)
+                if arg_value.startswith("."):
+                    values = list(self.runtime.querypath(self, arg_value))
+                    # TODO: What is the specific promised semantic of the iterability
+                    # of the value returned by querypath?
+                    kwargs[arg_name] = values[0]
+                elif arg_value.startswith("$"):
+                    kwargs[arg_name] = context.get(arg_value[1:])
+                elif arg_value.startswith("="):
+                    kwargs[arg_name] = int(arg_value[1:])
+                else:
+                    raise ValueError("Couldn't interpret checker argument: %r" % arg_value)
+            result = checker.check(**kwargs)
+            if checker.name:
+                check_results[checker.name] = result
 
         return {
             'submit_results': submit_results,
@@ -190,6 +195,8 @@ class InputBlock(XBlock):
 
 @XBlock.tag("checker")
 class CheckerBlock(XBlock):
+
+    arguments = Object(help="The arguments expected by `check`")
 
     def check(self, **kwargs):
         """
@@ -241,17 +248,15 @@ class EqualityCheckerBlock(CheckerBlock):
 
     # Content: the problem will hook us up with our data.
     content = String(help="Message describing the equality test", scope=Scope.content, default="Equality test")
-    left = String(scope=Scope.content)
-    right = String(scope=Scope.content)
 
     # Student data
-    left_value = Any(scope=Scope.student_state)
-    right_value = Any(scope=Scope.student_state)
+    left = Any(scope=Scope.student_state)
+    right = Any(scope=Scope.student_state)
     attempted = Boolean(scope=Scope.student_state)
 
     @XBlock.view('problem_view')
     def problem(self, context):
-        correct = self.left_value == self.right_value
+        correct = self.left == self.right
 
         # TODO: I originally named this class="data", but that conflicted with
         # the CSS on the page! :(  We might have to do something to namespace
@@ -308,8 +313,8 @@ class EqualityCheckerBlock(CheckerBlock):
 
     def check(self, left, right):
         self.attempted = True
-        self.left_value = left
-        self.right_value = right
+        self.left = left
+        self.right = right
         return left == right
 
 

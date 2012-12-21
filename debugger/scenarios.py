@@ -82,29 +82,36 @@ SCENARIOS.extend([
                     """}),
             Usage("thumbs", "", [], {'name': 'thumb'}),
             Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'vote_count'}),
-            Usage("equality", "e1", [], {'content': 'Upvotes match downvotes', 'name': 'votes_equal'}),
-            Usage("equality", "e2", [], {'content': 'Number of upvotes matches entered string', 'name': 'votes_named'}),
-            Usage("equality", "e3", [], {'content': 'Number of upvotes is $numvotes', 'name': 'votes_specified'}),
+            Usage("equality", "e1", [], {
+                'content': 'Upvotes match downvotes',
+                'name': 'votes_equal',
+                'arguments': {
+                    'left': './thumb/@upvotes',
+                    'right': './thumb/@downvotes',
+                },
+            }),
+            Usage("equality", "e2", [], {
+                'content': 'Number of upvotes matches entered string',
+                'name': 'votes_named',
+                'arguments': {
+                    'left': './thumb/@upvotes',
+                    'right': './vote_count/@student_input',
+                },
+            }),
+            Usage("equality", "e3", [], {
+                'content': 'Number of upvotes is $numvotes',
+                'name': 'votes_specified',
+                'arguments': {
+                    'left': './thumb/@upvotes',
+                    'right': '$numvotes',
+                }
+            }),
         ], {
             'script': """
                 # Compute the random answer.
                 import random
                 numvotes = random.randrange(2,5)
                 """,
-            'checker_arguments': {
-                'votes_equal': {
-                    'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
-                    'right': {'_type': 'reference', 'ref_name': 'thumb.downvotes'},
-                },
-                'votes_named': {
-                    'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
-                    'right': {'_type': 'reference', 'ref_name': 'vote_count.student_input'},
-                },
-                'votes_specified': {
-                    'left': {'_type': 'reference', 'ref_name': 'thumb.upvotes'},
-                    'right': {'_type': 'context', 'ref_name': 'numvotes'},
-                }
-            },
         }),
     ),
     Scenario(
@@ -135,7 +142,14 @@ SCENARIOS.extend([
             Usage("problem", "", [
                 Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
                 Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                Usage("equality", "e1", [], {'content': '', 'name': 'sum_checker'}),
+                Usage("equality", "e1", [], {
+                    'content': '',
+                    'name': 'sum_checker',
+                    'arguments': {
+                        'left': './sum_input/@student_input',
+                        'right': '$c',
+                    },
+                }),
             ], {
                 'script': """
                     import random
@@ -143,18 +157,19 @@ SCENARIOS.extend([
                     b = random.randint(1, 4)
                     c = a + b
                     """,
-                'checker_arguments': {
-                    'sum_checker': {
-                        'left': {'_type': 'reference', 'ref_name': 'sum_input.student_input'},
-                        'right': {'_type': 'context', 'ref_name': 'c'},
-                    },
-                },
             }),
             Usage("sidebar", "", [
                 Usage("problem", "", [
                     Usage("html", "", [], {'content': "<p>What is $a &times; $b?</p>"}),
                     Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                    Usage("equality", "e1", [], {'content': '', 'name': 'sum_checker'}),
+                    Usage("equality", "e1", [], {
+                        'content': '',
+                        'name': 'sum_checker',
+                        'arguments': {
+                            'left': './sum_input/@student_input',
+                            'right': '$c',
+                        },
+                    }),
                 ], {
                     'script': """
                         import random
@@ -162,18 +177,19 @@ SCENARIOS.extend([
                         b = random.randint(3, 7)
                         c = a * b
                         """,
-                    'checker_arguments': {
-                        'sum_checker': {
-                            'left': {'_type': 'reference', 'ref_name': 'sum_input.student_input'},
-                            'right': {'_type': 'context', 'ref_name': 'c'},
-                        },
-                    },
                 }),
             ]),
             Usage("problem", "", [
                 Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
                 Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                Usage("equality", "e1", [], {'content': '', 'name': 'sum_checker'}),
+                Usage("equality", "e1", [], {
+                    'content': '',
+                    'name': 'sum_checker',
+                    'arguments': {
+                        'left': './sum_input/@student_input',
+                        'right': '$c',
+                    },
+                }),
             ], {
                 'script': """
                     import random
@@ -181,12 +197,6 @@ SCENARIOS.extend([
                     b = random.randint(2, 6)
                     c = a + b
                     """,
-                'checker_arguments': {
-                    'sum_checker': {
-                        'left': {'_type': 'reference', 'ref_name': 'sum_input.student_input'},
-                        'right': {'_type': 'context', 'ref_name': 'c'},
-                    },
-                },
             }),
         ]),
     ),

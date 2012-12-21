@@ -219,10 +219,18 @@ class _BlockSet(object):
                 them.add(parent)
         return _BlockSet(self.runtime, them)
 
+    def children(self):
+        them = set()
+        for block in self.blocks:
+            for child_id in getattr(block, "children", ()):
+                child = self.runtime.get_block(child_id)
+                them.add(child)
+        return _BlockSet(self.runtime, them)
+
     def descendants(self):
         them = set()
         def recur(block):
-            for child_id in getattr(block, "children", []):
+            for child_id in getattr(block, "children", ()):
                 child = self.runtime.get_block(child_id)
                 them.add(child)
                 recur(child)
@@ -235,7 +243,11 @@ class _BlockSet(object):
     def tagged(self, tag):
         them = set()
         for block in self.blocks:
-            if tag in block.tags or tag in block._class_tags:
+            if block.name == tag:
+                them.add(block)
+            if block.tags and tag in block.tags:
+                them.add(block)
+            elif tag in block._class_tags:
                 them.add(block)
         return _BlockSet(self.runtime, them)
 

@@ -164,22 +164,31 @@ class RuntimeBase(object):
         q = self.query(block)
         ROOT, SEP, WORD, FINAL = range(4)
         state = ROOT
-        for tok in re.findall(r"\.\.|\.|//|/|@\w+", path):
+        lexer = RegexLexer(
+            ("dotdot", r"\.\."),
+            ("dot", r"\."),
+            ("slashslash", r"//"),
+            ("slash", r"/"),
+            ("atword", r"@\w+"),
+            ("word", r"\w+"),
+            ("err", r"."),
+        )
+        for tokname, toktext in lexer.lex(path):
             if state == FINAL:
                 # Shouldn't be any tokens after a last token.
                 raise BadPath()
-            if tok == "..":
+            if tokname == "dotdot":
                 # .. (parent)
                 if state == WORD:
                     raise BadPath()
                 q = q.parent()
                 state = WORD
-            elif tok == ".":
+            elif tokname == "dot":
                 # . (current node)
                 if state == WORD:
                     raise BadPath()
                 state = WORD
-            elif tok == "//":
+            elif tokname == "slashslash":
                 # // (descendants)
                 if state == SEP:
                     raise BadPath()
@@ -187,17 +196,38 @@ class RuntimeBase(object):
                     raise NotImplementedError()
                 q = q.descendants()
                 state = SEP
-            elif tok == "/":
-                # / (current node)
+            elif tokname == "slash":
+                # / (here)
                 if state == SEP:
                     raise BadPath()
                 if state == ROOT:
                     raise NotImplementedError()
                 state = SEP
-            elif tok.startswith("@"):
+            elif tokname == "atword":
                 # @xxx (attribute access)
                 if state != SEP:
                     raise BadPath()
-                q = q.attr(tok[1:])
+                q = q.attr(toktext[1:])
                 state = FINAL
+            elif tokname == "word":
+                # xxx (tag selection)
+                if state != SEP:
+                    raise BadPath()
+                q = q.children().tagged(toktext)
+                state = WORD
+            else:
+                raise BadPath("Invalid thing: %" % toktext)
         return q
+
+class RegexLexer(object):
+    """Split text into lexical tokens based on regexes."""
+    def __init__(self, *toks):
+        parts = []
+        for name, regex in toks:
+            parts.append("(?P<%s>%s)" % (name, regex))
+        self.regex = re.compile("|".join(parts))
+
+    def lex(self, text):
+        for match in self.regex.finditer(text):
+            name = match.lastgroup
+            yield (name, match.group(name))
