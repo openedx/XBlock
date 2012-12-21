@@ -226,11 +226,28 @@ class MethodRegistrationMetaclass(type):
         return super(MethodRegistrationMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class XBlockMetaclass(MethodRegistrationMetaclass,
-                      ParentModelMetaclass,
-                      ChildModelMetaclass,
-                      NamespacesMetaclass,
-                      ModelMetaclass):
+class TagCombiningMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        class_tags = set([])
+        # Collect the tags from all base classes.
+        for base in bases:
+            try:
+                class_tags.update(base._class_tags)
+            except AttributeError:
+                # Base classes may have no ._class_tags, that's ok.
+                pass
+        attrs['_class_tags'] = class_tags
+        return super(TagCombiningMetaclass, cls).__new__(cls, name, bases, attrs)
+
+
+class XBlockMetaclass(
+    MethodRegistrationMetaclass,
+    ParentModelMetaclass,
+    ChildModelMetaclass,
+    NamespacesMetaclass,
+    ModelMetaclass,
+    TagCombiningMetaclass,
+    ):
     pass
 
 
@@ -281,6 +298,9 @@ class XBlock(Plugin):
     entry_point = 'xblock.v1'
 
     name = String(help="Short name for the block", scope=Scope.settings)
+    tags = List(help="Tags for this block", scope=Scope.settings)
+
+    _class_tags = set()
 
     @classmethod
     def _register_method(cls, registration_type, name):
@@ -311,6 +331,15 @@ class XBlock(Plugin):
 
             return wrapper
         return wrap
+
+    @classmethod
+    def tag(cls, tags):
+        """Add the words in `tags` as class tags to this class."""
+        def dec(cls):
+            # Add in this class's tags
+            cls._class_tags.update(tags.replace(",", " ").split())
+            return cls
+        return dec
 
     def __init__(self, runtime, usage, model_data):
         self.runtime = runtime

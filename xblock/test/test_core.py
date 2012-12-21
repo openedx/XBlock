@@ -169,3 +169,37 @@ def test_field_serialization():
     assert_equals(4, field_tester.field)
     field_tester.field = 5
     assert_equals({'value': 5}, field_tester._model_data['field'])
+
+
+def test_class_tags():
+    xblock = XBlock(None, None, None)
+    assert_equals(xblock._class_tags, set())
+
+    class Sub1Block(XBlock):
+        pass
+
+    sub1block = Sub1Block(None, None, None)
+    assert_equals(sub1block._class_tags, set())
+
+    @XBlock.tag("cat dog")
+    class Sub2Block(Sub1Block):
+        pass
+
+    sub2block = Sub2Block(None, None, None)
+    assert_equals(sub2block._class_tags, set(["cat", "dog"]))
+
+    class Sub3Block(Sub2Block):
+        pass
+
+    sub3block = Sub3Block(None, None, None)
+    assert_equals(sub3block._class_tags, set(["cat", "dog"]))
+
+    @XBlock.tag("mixin")
+    class MixinBlock(XBlock):
+        pass
+
+    class Sub4Block(MixinBlock, Sub3Block):
+        pass
+
+    sub4block = Sub4Block(None, None, None)
+    assert_equals(sub4block._class_tags, set(["cat", "dog", "mixin"]))

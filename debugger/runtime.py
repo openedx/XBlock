@@ -232,6 +232,13 @@ class _BlockSet(object):
 
         return _BlockSet(self.runtime, them)
 
+    def tagged(self, tag):
+        them = set()
+        for block in self.blocks:
+            if tag in block.tags or tag in block._class_tags:
+                them.add(block)
+        return _BlockSet(self.runtime, them)
+
     def attr(self, attr_name):
         for block in self.blocks:
             if hasattr(block, attr_name):

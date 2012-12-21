@@ -188,6 +188,7 @@ class InputBlock(XBlock):
         pass
 
 
+@XBlock.tag("checker")
 class CheckerBlock(XBlock):
 
     def check(self, **kwargs):
