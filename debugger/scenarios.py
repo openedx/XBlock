@@ -7,6 +7,7 @@ This code is in the Debugger layer.
 from collections import namedtuple
 
 from xblock.core import XBlock
+from xblock.parse import parse_xml_string
 from .runtime import Usage
 
 # Build the scenarios, which are named trees of usages.
@@ -113,6 +114,37 @@ SCENARIOS.extend([
                 numvotes = random.randrange(2,5)
                 """,
         }),
+    ),
+    Scenario(
+        "problem with thumbs and textbox, from XML",
+        parse_xml_string("""\
+            <problem>
+                <p>You have three constraints to satisfy:</p>
+                <ol>
+                    <li>The upvotes and downvotes must be equal.</li>
+                    <li>You must enter the number of upvotes into the text field.</li>
+                    <li>The number of upvotes must be $numvotes.</li>
+                </ol>
+
+                <thumbs name='thumb'/>
+                <textinput name='vote_count' input_type='int'/>
+
+                <script>
+                    # Compute the random answer.
+                    import random
+                    numvotes = random.randrange(2,5)
+                </script>
+                <equality name='votes_equal' left='./thumb/@upvotes' right='./thumb/@downvotes'>
+                    Upvotes match downvotes
+                </equality>
+                <equality name='votes_named' left='./thumb/@upvotes' right='./vote_count/@student_input'>
+                    Number of upvotes matches entered string
+                </equality>
+                <equality name='votes_specified' left='./thumb/@upvotes' right='$numvotes'>
+                    Number of upvotes is $numvotes
+                </equality>
+            </problem>
+        """, Usage),
     ),
     Scenario(
         "sequence with progress_sliders",

@@ -327,6 +327,16 @@ class XBlock(Plugin):
             return cls
         return dec
 
+    @classmethod
+    def preprocess_input(cls, node, usage_factory):
+        """The class can adjust the parsed Usage tree."""
+        return node
+
+    @classmethod
+    def postprocess_input(cls, node, usage_factory):
+        """The class can adjust the parsed Usage tree."""
+        return node
+
     def __init__(self, runtime, usage, model_data):
         self.runtime = runtime
         self.usage = usage

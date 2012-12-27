@@ -30,6 +30,7 @@ A rough sequence diagram::
 
 """
 
+import inspect
 import random
 import string
 import time
@@ -47,6 +48,17 @@ class ProblemBlock(XBlock):
     seed = Integer(help="Random seed for this student", scope=Scope.student_state, default=0)
     problem_attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.student_state, default=False)
     has_children = True
+
+    @classmethod
+    def preprocess_input(cls, node, usage_factory):
+        # Find <script> children, turn them into script content.
+        kids = []
+        for kid in node.children:
+            if kid.block_name == "script":
+                node.initial_state['script'] = kid.initial_state['content']
+            else:
+                kids.append(kid)
+        return usage_factory(node.block_name, node.def_id, kids, node.initial_state)
 
     def set_student_seed(self):
         self.seed = int(time.clock()*10) % 100 + 1
@@ -198,6 +210,17 @@ class CheckerBlock(XBlock):
 
     arguments = Object(help="The arguments expected by `check`")
 
+    @classmethod
+    def preprocess_input(cls, node, usage_factory):
+        # Introspect the .check() method, and collect arguments it expects.
+        content = node.initial_state
+        argspec = inspect.getargspec(cls.check)
+        arguments = {}
+        for arg in argspec.args[1:]:
+            arguments[arg] = content.pop(arg)
+        content['arguments'] = arguments
+        return node
+
     def check(self, **kwargs):
         """
         Called with the data provided by the ProblemBlock.
@@ -205,7 +228,7 @@ class CheckerBlock(XBlock):
         function.
 
         """
-        pass
+        raise NotImplementedError()
 
 
 class TextInputBlock(InputBlock):
