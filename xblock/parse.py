@@ -50,13 +50,10 @@ def _usage_from_node(node, usage_factory):
 
 def _process_node(node, usage_factory):
     """Give the XBlock classes a chance to manipulate the tree."""
-
     block_cls = XBlock.load_class(node.block_name)
     node = block_cls.preprocess_input(node, usage_factory)
-    kids = []
-    for kid in node.children:
-        if kid:
-            kids.append(_process_node(kid, usage_factory))
-    node = usage_factory(node.block_name, node.def_id, kids, node.initial_state)
+    kids = [_process_node(kid, usage_factory) for kid in node.children]
+    if any(old is not new for old,new in zip(node.children, kids)):
+        node = usage_factory(node.block_name, node.def_id, kids, node.initial_state)
     node = block_cls.postprocess_input(node, usage_factory)
     return node
