@@ -22,11 +22,30 @@ needed to build components for use in all of these applications.
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
+
+    concepts
+    structure
+
+..
+    Outline:
+
+    - Concepts
+        - Roles
+    - XBlock structure
+        - Python structure
+        - State
+        - Methods
+    - Getting started
+    - The XBlock Debugger
+    - Writing an XBlock
+        - Views
+        - Widgets
+    - Existing XBlock types
 
 
+..
+    Indices and tables
+    ==================
 
-Indices and tables
-==================
-
-* :ref:`modindex`
+    * :ref:`modindex`

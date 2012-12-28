@@ -6,3 +6,6 @@ local_settings.py
 .treerc
 .coverage
 htmlcov
+
+# Documentation
+doc/_build
