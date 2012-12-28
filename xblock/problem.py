@@ -302,6 +302,7 @@ class EqualityCheckerBlock(CheckerBlock):
 
         # TODO: I need a way to add a script tag with a different mimetype to
         # the head.  There's no frag way to do that yet.
+        # TODO: The image tag here needs a magic URL, not a hard-coded one.
         result.add_content("""
             <script type="text/template" id="xblock-equality-template">
                 <% if (attempted !== "True") { %>
