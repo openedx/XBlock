@@ -58,7 +58,7 @@ class ProblemBlock(XBlock):
                 node.initial_state['script'] = kid.initial_state['content']
             else:
                 kids.append(kid)
-        return usage_factory(node.block_name, node.def_id, kids, node.initial_state)
+        return usage_factory(node.block_name, kids, node.initial_state, node.def_id)
 
     def set_student_seed(self):
         self.seed = int(time.clock()*10) % 100 + 1

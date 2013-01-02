@@ -21,22 +21,45 @@ log = logging.getLogger(__name__)
 
 
 class Usage(object):
-    # TODO: Not the real way we'll store usages!
+    """Content usages
+
+    Usages represent uses of content in courses.  They are the basic static
+    building block for course content.
+
+    TODO: Not the real way we'll store usages!
+    """
     ids = itertools.count()
     usage_index = {}
 
-    def __init__(self, block_name, def_id, children, initial_state={}):
+    def __init__(self, block_name, children=None, initial_state=None, def_id=None):
         self.id = "usage_%d" % next(self.ids)
         self.parent = None
         self.block_name = block_name
         self.def_id = def_id or ("def_%d" % next(self.ids))
-        self.children = children
+        self.children = children or []
+        self.initial_state = initial_state or {}
+
+        # Update our global index of all usages.
         self.usage_index[self.id] = self
-        self.initial_state = initial_state
 
         # Create the parent references as we construct children.
         for child in self.children:
             child.parent = self
+
+    def store_initial_state(self):
+        # Create an XBlock from this usage, and use it to create the initial
+        # state.
+        if self.initial_state:
+            block = create_xblock(self, 0)
+            for name, value in self.initial_state.items():
+                setattr(block, name, value)
+
+        # We no longer need initial_state, clobber it to prove it.
+        del self.initial_state
+
+        # Also do this recursively down the tree.
+        for child in self.children:
+            child.store_initial_state()
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.children!r}>".format(self)
@@ -78,9 +101,6 @@ class MemoryKeyValueStore(KeyValueStore):
 MEMORY_KVS = MemoryKeyValueStore({})
 
 
-initialized_usages = set()
-
-
 def create_xblock(usage, student_id):
     """Create an XBlock instance.
 
@@ -91,10 +111,6 @@ def create_xblock(usage, student_id):
     runtime = DebuggerRuntime(block_cls, student_id, usage)
     model = DbModel(MEMORY_KVS, block_cls, student_id, usage)
     block = block_cls(runtime, usage, model)
-    if usage.id not in initialized_usages:
-        for name, value in usage.initial_state.items():
-            setattr(block, name, value)
-        initialized_usages.add(usage.id)
     return block
 
 

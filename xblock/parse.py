@@ -32,7 +32,7 @@ def _usage_from_node(node, usage_factory):
     """A recursive function to create a usage from a dom node."""
 
     if node.tag in HTML_TAGS:
-        return usage_factory("html", "", [], {"content":etree.tostring(node)})
+        return usage_factory("html", [], {"content":etree.tostring(node)})
     else:
         kids = []
         for child in node:
@@ -46,7 +46,7 @@ def _usage_from_node(node, usage_factory):
         text = node.text
         if text and text.strip():
             content["content"] = text
-        return usage_factory(node.tag, "", kids, content)
+        return usage_factory(node.tag, kids, content)
 
 def _process_node(node, usage_factory):
     """Give the XBlock classes a chance to manipulate the tree."""
@@ -54,6 +54,6 @@ def _process_node(node, usage_factory):
     node = block_cls.preprocess_input(node, usage_factory)
     kids = [_process_node(kid, usage_factory) for kid in node.children]
     if any(old is not new for old,new in zip(node.children, kids)):
-        node = usage_factory(node.block_name, node.def_id, kids, node.initial_state)
+        node = usage_factory(node.block_name, kids, node.initial_state, node.def_id)
     node = block_cls.postprocess_input(node, usage_factory)
     return node

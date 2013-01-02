@@ -15,15 +15,15 @@ from .runtime import Usage
 Scenario = namedtuple("Scenario", "description usage")
 
 SCENARIOS = []
-default_children = [Usage("debugchild", "dbgdefn", []) for _ in xrange(3)]
 
 for name, cls in XBlock.load_classes():
-    SCENARIOS.append(Scenario(name, Usage(name, "defn999", default_children)))
+    default_children = [Usage("debugchild", []) for _ in xrange(3)]
+    SCENARIOS.append(Scenario(name, Usage(name, default_children)))
 
 SCENARIOS.extend([
     Scenario(
         "a bunch of html",
-        Usage("html", "", [], {
+        Usage("html", [], {
             'content': """
                 <h2>Installing Enthought for Windows</h2>
 
@@ -56,23 +56,23 @@ SCENARIOS.extend([
     ),
     Scenario(
         "problem with two inputs",
-        Usage("problem", "", [
-            Usage("textinput", "", []),
-            Usage("textinput", "", []),
+        Usage("problem", [
+            Usage("textinput"),
+            Usage("textinput"),
         ]),
     ),
     Scenario(
         "three thumbs at once",
-        Usage("vertical", "", [
-            Usage("thumbs", "def1", [], {'upvotes': 3, 'downvotes': 1}),
-            Usage("thumbs", "def2", []),
-            Usage("thumbs", "def3", []),
+        Usage("vertical", [
+            Usage("thumbs", [], {'upvotes': 3, 'downvotes': 1}),
+            Usage("thumbs"),
+            Usage("thumbs"),
         ])
     ),
     Scenario(
         "problem with thumbs and textbox",
-        Usage("problem", "", [
-            Usage("html", "desc", [], {
+        Usage("problem", [
+            Usage("html", [], {
                 'content': """
                     <p>You have three constraints to satisfy:</p>
                     <ol>
@@ -81,9 +81,9 @@ SCENARIOS.extend([
                         <li>The number of upvotes must be $numvotes.</li>
                     </ol>
                     """}),
-            Usage("thumbs", "", [], {'name': 'thumb'}),
-            Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'vote_count'}),
-            Usage("equality", "e1", [], {
+            Usage("thumbs", [], {'name': 'thumb'}),
+            Usage("textinput", [], {'input_type': 'int', 'name': 'vote_count'}),
+            Usage("equality", [], {
                 'content': 'Upvotes match downvotes',
                 'name': 'votes_equal',
                 'arguments': {
@@ -91,7 +91,7 @@ SCENARIOS.extend([
                     'right': './thumb/@downvotes',
                 },
             }),
-            Usage("equality", "e2", [], {
+            Usage("equality", [], {
                 'content': 'Number of upvotes matches entered string',
                 'name': 'votes_named',
                 'arguments': {
@@ -99,7 +99,7 @@ SCENARIOS.extend([
                     'right': './vote_count/@student_input',
                 },
             }),
-            Usage("equality", "e3", [], {
+            Usage("equality", [], {
                 'content': 'Number of upvotes is $numvotes',
                 'name': 'votes_specified',
                 'arguments': {
@@ -148,33 +148,33 @@ SCENARIOS.extend([
     ),
     Scenario(
         "sequence with progress_sliders",
-        Usage("sequence", "s-a", [
-            Usage("vertical", "v-a", [
-                Usage("slider", "s-aa", []),
-                Usage("progress_slider", "ps-ab", []),
+        Usage("sequence", [
+            Usage("vertical", [
+                Usage("slider"),
+                Usage("progress_slider"),
             ]),
-            Usage("vertical", "v-b", [
-                Usage("thumbs", "t-ba", []),
-                Usage("slider", "ps-bb", []),
-                Usage("progress_slider", "ps-bc", []),
+            Usage("vertical", [
+                Usage("thumbs"),
+                Usage("slider"),
+                Usage("progress_slider"),
             ]),
-            Usage("vertical", "v-c", [
-                Usage("thumbs", "t-ca", []),
-                Usage("slider", "ps-cb", []),
-                Usage("progress_slider", "ps-cc", []),
-                Usage("progress_slider", "ps-cd", []),
-                Usage("progress_slider", "ps-ce", []),
+            Usage("vertical", [
+                Usage("thumbs"),
+                Usage("slider"),
+                Usage("progress_slider"),
+                Usage("progress_slider"),
+                Usage("progress_slider"),
             ]),
         ]),
     ),
     Scenario(
         "three problems",
-        Usage("vertical", "", [
-            Usage("attempts_scoreboard", "", []),
-            Usage("problem", "", [
-                Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
-                Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                Usage("equality", "e1", [], {
+        Usage("vertical", [
+            Usage("attempts_scoreboard"),
+            Usage("problem", [
+                Usage("html", [], {'content': "<p>What is $a+$b?</p>"}),
+                Usage("textinput", [], {'input_type': 'int', 'name': 'sum_input'}),
+                Usage("equality", [], {
                     'content': '',
                     'name': 'sum_checker',
                     'arguments': {
@@ -190,11 +190,11 @@ SCENARIOS.extend([
                     c = a + b
                     """,
             }),
-            Usage("sidebar", "", [
-                Usage("problem", "", [
-                    Usage("html", "", [], {'content': "<p>What is $a &times; $b?</p>"}),
-                    Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                    Usage("equality", "e1", [], {
+            Usage("sidebar", [
+                Usage("problem", [
+                    Usage("html", [], {'content': "<p>What is $a &times; $b?</p>"}),
+                    Usage("textinput", [], {'input_type': 'int', 'name': 'sum_input'}),
+                    Usage("equality", [], {
                         'content': '',
                         'name': 'sum_checker',
                         'arguments': {
@@ -211,10 +211,10 @@ SCENARIOS.extend([
                         """,
                 }),
             ]),
-            Usage("problem", "", [
-                Usage("html", "", [], {'content': "<p>What is $a+$b?</p>"}),
-                Usage("textinput", "textin", [], {'input_type': 'int', 'name': 'sum_input'}),
-                Usage("equality", "e1", [], {
+            Usage("problem", [
+                Usage("html", [], {'content': "<p>What is $a+$b?</p>"}),
+                Usage("textinput", [], {'input_type': 'int', 'name': 'sum_input'}),
+                Usage("equality", [], {
                     'content': '',
                     'name': 'sum_checker',
                     'arguments': {
@@ -233,3 +233,8 @@ SCENARIOS.extend([
         ]),
     ),
 ])
+
+# Create all the initial states in the usages
+
+for scenario in SCENARIOS:
+    scenario.usage.store_initial_state()
