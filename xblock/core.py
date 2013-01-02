@@ -311,7 +311,7 @@ class XBlock(Plugin):
     def json_handler(cls, fn):
         """Wrap a handler to consume and produce JSON.
 
-        Rather than a Request object, the method will now be passed the 
+        Rather than a Request object, the method will now be passed the
         JSON-decoded body of the request.  Any data returned by the function
         will be JSON-encoded and returned as the response.
 

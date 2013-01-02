@@ -11,8 +11,9 @@ from StringIO import StringIO
 
 from webob import Request
 
-from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
+from django.shortcuts import render_to_response
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .runtime import Usage, create_xblock, MEMORY_KVS
 from .scenarios import SCENARIOS
@@ -50,6 +51,7 @@ def index(request):
     })
 
 
+@ensure_csrf_cookie
 def show_scenario(request, scenario_id):
     student_id = get_student_id(request)
     log.info("Start show_scenario %s for %s", scenario_id, student_id)
