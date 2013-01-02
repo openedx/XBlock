@@ -141,7 +141,8 @@ class ProblemBlock(XBlock):
         result.initialize_js('ProblemBlock')
         return result
 
-    @XBlock.json_handler("check")
+    @XBlock.handler("check")
+    @XBlock.json_handler
     def check_answer(self, submissions):
         self.problem_attempted = True
         context = self.calc_context({})
@@ -187,7 +188,8 @@ class ProblemBlock(XBlock):
             'check_results': check_results,
         }
 
-    @XBlock.json_handler("rerandomize")
+    @XBlock.handler("rerandomize")
+    @XBlock.json_handler
     def handle_rerandomize(self, unused):
         self.set_student_seed()
         return {'status': 'ok'}

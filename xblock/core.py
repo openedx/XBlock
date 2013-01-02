@@ -306,17 +306,14 @@ class XBlock(Plugin):
         return cls._register_method('handler', name)
 
     @classmethod
-    def json_handler(cls, name):
-        def wrap(fn):
-            @XBlock.handler(name)
-            @functools.wraps(fn)
-            def wrapper(self, request):
-                request_json = json.loads(request.body)
-                response_json = json.dumps(fn(self, request_json))
-                return Response(response_json, content_type='application/json')
+    def json_handler(cls, fn):
+        @functools.wraps(fn)
+        def wrapper(self, request):
+            request_json = json.loads(request.body)
+            response_json = json.dumps(fn(self, request_json))
+            return Response(response_json, content_type='application/json')
 
-            return wrapper
-        return wrap
+        return wrapper
 
     @classmethod
     def tag(cls, tags):
@@ -329,12 +326,12 @@ class XBlock(Plugin):
 
     @classmethod
     def preprocess_input(cls, node, usage_factory):
-        """The class can adjust the parsed Usage tree."""
+        """The class can adjust a parsed Usage tree."""
         return node
 
     @classmethod
     def postprocess_input(cls, node, usage_factory):
-        """The class can adjust the parsed Usage tree."""
+        """The class can adjust a parsed Usage tree."""
         return node
 
     def __init__(self, runtime, usage, model_data):
