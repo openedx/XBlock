@@ -299,20 +299,28 @@ class XBlock(Plugin):
 
     @classmethod
     def view(cls, name):
+        """Register this method as a named view."""
         return cls._register_method('view', name)
 
     @classmethod
     def handler(cls, name):
+        """Register this method as a named handler."""
         return cls._register_method('handler', name)
 
     @classmethod
     def json_handler(cls, fn):
+        """Wrap a handler to consume and produce JSON.
+
+        Rather than a Request object, the method will now be passed the 
+        JSON-decoded body of the request.  Any data returned by the function
+        will be JSON-encoded and returned as the response.
+
+        """
         @functools.wraps(fn)
         def wrapper(self, request):
             request_json = json.loads(request.body)
             response_json = json.dumps(fn(self, request_json))
             return Response(response_json, content_type='application/json')
-
         return wrapper
 
     @classmethod
