@@ -2,6 +2,7 @@
 Machinery to make the common case easy when building new runtimes
 """
 
+import functools
 import new
 import re
 
@@ -123,12 +124,20 @@ class RuntimeBase(object):
 
     def find_xblock_method(self, block, registration_type, name):
         # TODO: Maybe this should be a method on XBlock?
+        first_arg = None
         try:
             fn = block.registered_methods[registration_type + name]
         except KeyError:
-            return None
+            try:
+                fn = block.registered_methods[registration_type + "_fallback"]
+                first_arg = name
+            except KeyError:
+                return None
 
-        return new.instancemethod(fn, block, block.__class__)
+        fn = new.instancemethod(fn, block, block.__class__)
+        if first_arg:
+            fn = functools.partial(fn, first_arg)
+        return fn
 
     def render(self, block, context, view_name):
         raise NotImplementedError("Runtime needs to provide render()")

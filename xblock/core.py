@@ -316,6 +316,17 @@ class XBlock(Plugin):
         return wrapper
 
     @classmethod
+    def fallback_view(cls, fn):
+        """Register this method as the fallback view.
+
+        This view will be invoked if a specifically named view can't be found.
+        The actual view name requested will be passed in as the first parameter,
+        but otherwise, this view works just like any other.
+
+        """
+        return cls._register_method('view', '_fallback')(fn)
+
+    @classmethod
     def tag(cls, tags):
         """Add the words in `tags` as class tags to this class."""
         def dec(cls):
