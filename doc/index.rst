@@ -26,6 +26,8 @@ Contents:
 
     concepts
     structure
+    xblockapi
+    fragment
 
 ..
     Outline:

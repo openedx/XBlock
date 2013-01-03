@@ -33,13 +33,20 @@ Student
     of XBlocks.
 
 
-Structure
----------
+XBlocks
+-------
 
 XBlocks are components that combine together to create interactive course
 content.  They need to satisfy two conflicting goals: work together with other
 blocks to build a complete course; and be independent of other blocks, so they
 can be combined flexibly.
+
+XBlocks are built similarly to web applications.  They maintain state in a
+storage layer, render themselves through views, and process user actions
+through handlers.
+
+They differ from web applications, though, because each XBlock renders only a
+small piece of a complete web page.
 
 
 Runtime

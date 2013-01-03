@@ -10,9 +10,9 @@ the client.
 Python Structure
 ----------------
 
-XBlocks are implemented as Python applications, and packaged using standard
-Python packaging techniques.  They have Python code, and other file resources,
-including CSS, Javascript needed to fully render themselves in a browser.
+XBlocks are implemented as Python code, and packaged using standard Python
+techniques.  They have Python code, and other file resources, including CSS and
+Javascript needed to fully render themselves in a browser.
 
 
 State
@@ -26,15 +26,15 @@ on several axes:
 * By XBlock: State scoped by XBlock can be scoped by various aspects of the
   XBlock:
 
-    * block usage - the instance of the XBlock in a particular course
+  * block usage - the instance of the XBlock in a particular course
 
-    * block definition - the definition of an XBlock created by a content
-      creator (potentially shared across runs of a course)
+  * block definition - the definition of an XBlock created by a content
+    creator (potentially shared across runs of a course)
 
-    * block type - the Python type of the XBlock (shared across all instances
-      of the XBlock in all courses)
+  * block type - the Python type of the XBlock (shared across all instances
+    of the XBlock in all courses)
 
-    * all - all XBlocks share the same data
+  * all - all XBlocks share the same data
 
 For example:
 
@@ -93,3 +93,46 @@ can defer loading children until they are actually required (if ever).
 
 Methods
 -------
+
+The behavior of an XBlock is determined by its methods, which come in a few
+categories:
+
+* Views: These are invoked by the runtime to render the XBlock. There can be
+  any number of these, registered with the :meth:`@XBlock.view <.XBlock.view>`
+  decorator. Each view has a name, such as "edit" or "read", specified by the
+  runtime that will invoke it.
+
+  A typical use of a view is to produce a :ref:`Fragment` for rendering the block as
+  part of a web page.  The user state, settings, and preferences may be used to
+  affect the output in any way the XBlock likes. Views can indicate what data
+  they rely on, to aid in caching their output.
+
+  Although views typically produce HTML-based renderings, they can be used for
+  anything the runtime wants.  The runtime description of each view should be
+  clear about what return type is expected and how it will be used.
+
+* Handlers: Handlers provide server-side logic invoked by AJAX calls from the
+  browser. There can be any number of these, registered with the
+  :meth:`@XBlock.handler <.XBlock.handler>` decorator.  Each handler has a
+  name, such as "submit" or "preview."  The runtime provides a mapping from
+  handler names to actual URLs so that XBlock Javascript code can make requests
+  to its handlers. Handlers can be used with GET requests as well as POST
+  requests.
+
+* Recalculators: (not a great word!) There can be any number of these,
+  registered with @register_recalculator. Each has a name, and is invoked by
+  the runtime when a particular kind of recalculation needs to be done.  An
+  example is "regrade", run when a TA needs to adjust a problem, and all the
+  students' inputs should be checked again, and their grades republished.
+
+* Methods: XBlocks have access to their children and parent, and can invoke
+  methods on them simply by invoking Python methods.
+
+Views and Handlers are both inspired by web applications, but have different
+uses, and therefore different designs.  Views are invoked by the runtime to
+produce a rendering of some course content.  Their results are aggregated
+together hierarchically, and so are not expressed as an HTTP response, but as a
+structured Widget.  Handlers are invoked by XBlock code in the browser, so they
+are defined more like traditional web applications: they accept an HTTP
+request, and produce an HTTP response.
+

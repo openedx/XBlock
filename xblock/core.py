@@ -278,6 +278,8 @@ def expires(hours=0, minutes=0, seconds=0):
 
 
 class XBlock(Plugin):
+    """Base class for XBlocks."""
+
     __metaclass__ = XBlockMetaclass
 
     entry_point = 'xblock.v1'
@@ -299,12 +301,36 @@ class XBlock(Plugin):
 
     @classmethod
     def view(cls, name):
-        """Register this method as a named view."""
+        """A decorator to register this method as a named view.
+
+        To create a view named "student_view"::
+
+            @XBlock.view("student_view")
+            def student_view(context):
+                ...
+
+        View names are dictated by the runtime, which will invoke the view to
+        render the block.
+
+        """
         return cls._register_method('view', name)
 
     @classmethod
     def handler(cls, name):
-        """Register this method as a named handler."""
+        """A decorator to register this method as a named handler.
+
+        To create a handler named "click"::
+
+            @XBlock.handler("click")
+            def click_handler(request):
+                ...
+
+        You can name your handlers whatever you like, you'll invoke them from
+        your Javascript with the URL produced by::
+
+            var click_url = runtime.handler_url("click");
+
+        """
         return cls._register_method('handler', name)
 
     @classmethod
