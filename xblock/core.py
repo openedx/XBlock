@@ -21,13 +21,22 @@ class BlockScope(object):
 class Scope(namedtuple('ScopeBase', 'student block')):
     pass
 
+
+class Sentinel(object):
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return self.name
+
+
 Scope.content = Scope(student=False, block=BlockScope.DEFINITION)
 Scope.settings = Scope(student=False, block=BlockScope.USAGE)
 Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
 Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
 Scope.student_info = Scope(student=True, block=BlockScope.ALL)
-Scope.children = object()
-Scope.parent = object()
+Scope.children = Sentinel('Scope.children')
+Scope.parent = Sentinel('Scope.parent')
 
 
 class ModelType(object):
