@@ -105,7 +105,7 @@ def test_db_model_keys():
     assert_equals('new n_student_def', key_store.db[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'n_student_def')])
 
 
-class MockRuntimeForQuerying(RuntimeBase):
+class MockRuntimeForQuerying(Runtime):
     def __init__(self):
         self.q = Mock()
 

@@ -117,7 +117,7 @@ class DbModel(MutableMapping):
         return fields
 
 
-class RuntimeBase(object):
+class Runtime(object):
     """Methods all runtimes need."""
     def __init__(self):
         self._view_name = None

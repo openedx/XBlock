@@ -12,7 +12,7 @@ from django.template import loader as django_template_loader, Context as DjangoC
 from django.core.cache import cache
 
 from xblock.core import XBlock, Scope, ModelType
-from xblock.runtime import DbModel, KeyValueStore, RuntimeBase
+from xblock.runtime import DbModel, KeyValueStore, Runtime
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
@@ -114,7 +114,7 @@ def create_xblock(usage, student_id):
     return block
 
 
-class DebuggerRuntime(RuntimeBase):
+class DebuggerRuntime(Runtime):
     def __init__(self, block_cls, student_id, usage):
         super(DebuggerRuntime, self).__init__()
 
