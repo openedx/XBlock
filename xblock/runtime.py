@@ -10,6 +10,13 @@ from collections import namedtuple, MutableMapping
 from .core import ModelType, BlockScope
 
 
+class InvalidScopeError(Exception):
+    """
+    Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
+    """
+    pass
+
+
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
 
@@ -64,21 +71,25 @@ class DbModel(MutableMapping):
 
     def _key(self, name):
         field = self._getfield(name)
-        block = field.scope.block
-
-        if block == BlockScope.ALL:
+        if field.scope is None:
             block_id = None
-        elif block == BlockScope.USAGE:
-            block_id = self._usage.id
-        elif block == BlockScope.DEFINITION:
-            block_id = self._usage.def_id
-        elif block == BlockScope.TYPE:
-            block_id = self._block_cls.__name__
-
-        if field.scope.student:
-            student_id = self._student_id
-        else:
             student_id = None
+        else:
+            block = field.scope.block
+
+            if block == BlockScope.ALL:
+                block_id = None
+            elif block == BlockScope.USAGE:
+                block_id = self._usage.id
+            elif block == BlockScope.DEFINITION:
+                block_id = self._usage.def_id
+            elif block == BlockScope.TYPE:
+                block_id = self._block_cls.__name__
+
+            if field.scope.student:
+                student_id = self._student_id
+            else:
+                student_id = None
 
         key = KeyValueStore.Key(
             scope=field.scope,
@@ -89,13 +100,6 @@ class DbModel(MutableMapping):
         return key
 
     def __getitem__(self, name):
-        if name == "children":
-            return [u.id for u in self._usage.children]
-        if name == "parent":
-            if self._usage.parent:
-                return self._usage.parent.id
-            else:
-                return None
         return self._kvs.get(self._key(name))
 
     def __setitem__(self, name, value):
@@ -109,6 +113,9 @@ class DbModel(MutableMapping):
 
     def __len__(self):
         return len(self.keys())
+
+    def __contains__(self, item):
+        return item in self.keys()
 
     def keys(self):
         fields = [field.name for field in self._block_cls.fields]

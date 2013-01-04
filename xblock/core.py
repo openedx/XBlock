@@ -76,10 +76,41 @@ class ModelType(object):
         return self._seq < other._seq
 
     def to_json(self, value):
+        """
+        Return value in the form of nested lists and dictionaries (suitable
+        for passing to json.dumps).
+
+        This is called during field writes to convert the native python
+        type to the value stored in the database
+        """
         return value
 
     def from_json(self, value):
+        """
+        Return value as a native full featured python type (the inverse of to_json)
+
+        Called during field reads to convert the stored value into a full featured python
+        object
+        """
         return value
+
+    def read_from(self, model):
+        """
+        Retrieve the value for this field from the specified model object
+        """
+        return self.__get__(model, model.__class__)
+
+    def write_to(self, model, value):
+        """
+        Set the value for this field to value on the supplied model object
+        """
+        self.__set__(model, value)
+
+    def delete_from(self, model):
+        """
+        Delete the value for this field from the supplied model object
+        """
+        self.__delete__(model)
 
 class Integer(ModelType): pass
 class Float(ModelType): pass
@@ -108,7 +139,12 @@ class ModelMetaclass(type):
                 v._name = n
                 fields.append(v)
         fields.sort()
-        attrs['fields'] = fields
+        attrs['fields'] = sum([
+            base.fields
+            for base
+            in bases
+            if hasattr(base, 'fields')
+        ], fields)
 
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
