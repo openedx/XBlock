@@ -7,7 +7,7 @@ import new
 import re
 
 from collections import namedtuple, MutableMapping
-from .core import ModelType, BlockScope
+from .core import ModelType, BlockScope, Scope
 
 
 class InvalidScopeError(Exception):
@@ -71,8 +71,8 @@ class DbModel(MutableMapping):
 
     def _key(self, name):
         field = self._getfield(name)
-        if field.scope is None:
-            block_id = None
+        if field.scope in (Scope.children, Scope.parent):
+            block_id = self._usage.id
             student_id = None
         else:
             block = field.scope.block

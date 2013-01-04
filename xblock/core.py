@@ -26,6 +26,8 @@ Scope.settings = Scope(student=False, block=BlockScope.USAGE)
 Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
 Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
 Scope.student_info = Scope(student=True, block=BlockScope.ALL)
+Scope.children = object()
+Scope.parent = object()
 
 
 class ModelType(object):
@@ -175,7 +177,7 @@ class ChildrenModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.settings)
+            attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.children)
         else:
             attrs['has_children'] = False
 
@@ -320,7 +322,7 @@ class XBlock(Plugin):
 
     entry_point = 'xblock.v1'
 
-    parent = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.settings)
+    parent = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
     name = String(help="Short name for the block", scope=Scope.settings)
     tags = List(help="Tags for this block", scope=Scope.settings)
 
