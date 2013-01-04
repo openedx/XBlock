@@ -157,12 +157,10 @@ class ModelMetaclass(type):
                 v._name = n
                 fields.append(v)
         fields.sort()
-        attrs['fields'] = sum([
-            base.fields
-            for base
-            in bases
-            if hasattr(base, 'fields')
-        ], fields)
+        attrs['fields'] = sum(
+            [base.fields for base in bases if hasattr(base, 'fields')],
+            fields
+        )
 
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
