@@ -25,10 +25,18 @@ Contents:
     :maxdepth: 2
 
     concepts
-    structure
-    xblockapi
-    runtime
-    fragment
+    guide/xblock
+    guide/fragment
+
+
+API
+===
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    api/*
 
 ..
     Outline:

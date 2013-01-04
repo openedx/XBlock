@@ -164,6 +164,12 @@ class Runtime(object):
         return self.find_xblock_method(block, 'handler', handler_name)(data)
 
     def query(self, block):
+        """Query for data in the tree, starting from `block`.
+
+        Returns a Query object with methods for navigating the tree and
+        retrieving information.
+
+        """
         raise NotImplementedError("Runtime needs to provide query()")
 
     def querypath(self, block, path):

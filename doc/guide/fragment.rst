@@ -43,10 +43,5 @@ Other information on widgets [[TODO: write this for realz]]:
     can be specified at widget creation, or by using a decorator on the view
     function (if the cache duration is known ahead of time)
 
-
-Fragment API
-------------
-
-.. module:: xblock.fragment
-.. autoclass:: Fragment
-    :members:
+.. seealso::
+    The :doc:`Fragment API </api/fragment>` documentation.

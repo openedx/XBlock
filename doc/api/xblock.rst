@@ -1,6 +1,6 @@
-==========
-XBlock API
-==========
+======
+XBlock
+======
 
 .. module:: xblock.core
 .. autoclass:: XBlock

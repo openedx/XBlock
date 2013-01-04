@@ -1,6 +1,6 @@
-================
-XBlock Structure
-================
+=======
+XBlocks
+=======
 
 XBlocks are Python classes that implement a small web application. Like full
 applications, they have state and methods, and operate on both the server and
@@ -40,13 +40,13 @@ For example:
 
 * A user's progress through a particular set of problems would be stored in a
   User=True, XBlock=Usage scope.
-  
+
 * The content to display in an XBlock would be stored in a User=False,
   XBlock=Definition scope.
-  
+
 * A user's preferences for a type of XBlock, such as the preferences for a
   circuit editor, would be stored in a User=True, XBlock=Type scope.
-  
+
 * Information about the user, such as language or timezone, would be stored in
   a User=True, XBlock=All scope.
 
@@ -102,7 +102,7 @@ categories:
   decorator. Each view has a name, such as "edit" or "read", specified by the
   runtime that will invoke it.
 
-  A typical use of a view is to produce a :ref:`Fragment` for rendering the block as
+  A typical use of a view is to produce a :ref:`fragment <fragment>` for rendering the block as
   part of a web page.  The user state, settings, and preferences may be used to
   affect the output in any way the XBlock likes. Views can indicate what data
   they rely on, to aid in caching their output.
