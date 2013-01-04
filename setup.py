@@ -1,10 +1,10 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='XBlock',
     version='0.1',
     description='XBlock Core Library',
-    packages=['xblock', 'xblock_debugger'],
+    packages=['xblock'],
     entry_points={
         'xblock.v1': [
             'helloworld = xblock.content:HelloWorldBlock',
@@ -19,7 +19,6 @@ setup(
             'thumbs = xblock.thumbs:ThumbsBlock',
             'slider = xblock.slider:Slider',
             'progress_slider = xblock.slider:ProgressSlider',
-            'debugchild = xblock_debugger.blocks:DebuggingChildBlock',
         ]
     }
 )

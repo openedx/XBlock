@@ -7,3 +7,6 @@ mock
 nose
 django-nose
 lxml
+
+-e .
+-e debugger

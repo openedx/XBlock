@@ -49,10 +49,13 @@ class Usage(object):
     def store_initial_state(self):
         # Create an XBlock from this usage, and use it to create the initial
         # state.
+        block = create_xblock(self, 0)
         if self.initial_state:
-            block = create_xblock(self, 0)
             for name, value in self.initial_state.items():
                 setattr(block, name, value)
+
+        block.children = [child.id for child in self.children]
+        block.parent = self.parent
 
         # We no longer need initial_state, clobber it to prove it.
         del self.initial_state
