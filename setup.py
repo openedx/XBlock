@@ -1,10 +1,9 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='XBlock',
     version='0.1',
     description='XBlock Core Library',
-    package_dir={'xblock': ''},
     packages=['xblock'],
     entry_points={
         'xblock.v1': [

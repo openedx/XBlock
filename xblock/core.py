@@ -21,11 +21,29 @@ class BlockScope(object):
 class Scope(namedtuple('ScopeBase', 'student block')):
     pass
 
+
+class Sentinel(object):
+    """
+    Class for implementing sentinel objects (only equal to themselves).
+    """
+    def __init__(self, name):
+        """
+        `name` is the name used to identify the sentinel (which will
+            be displayed as the __repr__) of the sentinel.
+        """
+        self.name = name
+
+    def __repr__(self):
+        return self.name
+
+
 Scope.content = Scope(student=False, block=BlockScope.DEFINITION)
 Scope.settings = Scope(student=False, block=BlockScope.USAGE)
 Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
 Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
 Scope.student_info = Scope(student=True, block=BlockScope.ALL)
+Scope.children = Sentinel('Scope.children')
+Scope.parent = Sentinel('Scope.parent')
 
 
 class ModelType(object):
@@ -76,10 +94,41 @@ class ModelType(object):
         return self._seq < other._seq
 
     def to_json(self, value):
+        """
+        Return value in the form of nested lists and dictionaries (suitable
+        for passing to json.dumps).
+
+        This is called during field writes to convert the native python
+        type to the value stored in the database
+        """
         return value
 
     def from_json(self, value):
+        """
+        Return value as a native full featured python type (the inverse of to_json)
+
+        Called during field reads to convert the stored value into a full featured python
+        object
+        """
         return value
+
+    def read_from(self, model):
+        """
+        Retrieve the value for this field from the specified model object
+        """
+        return self.__get__(model, model.__class__)
+
+    def write_to(self, model, value):
+        """
+        Set the value for this field to value on the supplied model object
+        """
+        self.__set__(model, value)
+
+    def delete_from(self, model):
+        """
+        Delete the value for this field from the supplied model object
+        """
+        self.__delete__(model)
 
 class Integer(ModelType): pass
 class Float(ModelType): pass
@@ -108,7 +157,10 @@ class ModelMetaclass(type):
                 v._name = n
                 fields.append(v)
         fields.sort()
-        attrs['fields'] = fields
+        attrs['fields'] = sum(
+            [base.fields for base in bases if hasattr(base, 'fields')],
+            fields
+        )
 
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
@@ -139,7 +191,7 @@ class ChildrenModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.settings)
+            attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.children)
         else:
             attrs['has_children'] = False
 
@@ -292,7 +344,7 @@ class XBlock(Plugin):
 
     entry_point = 'xblock.v1'
 
-    parent = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.settings)
+    parent = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
     name = String(help="Short name for the block", scope=Scope.settings)
     tags = List(help="Tags for this block", scope=Scope.settings)
 

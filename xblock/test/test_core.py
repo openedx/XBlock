@@ -15,12 +15,21 @@ def test_model_metaclass():
         def __init__(self, model_data):
             self._model_data = model_data
 
+    class ChildClass(ModelMetaclassTester):
+        pass
+        
     assert hasattr(ModelMetaclassTester, 'field_a')
     assert hasattr(ModelMetaclassTester, 'field_b')
 
     assert_in(ModelMetaclassTester.field_a, ModelMetaclassTester.fields)
     assert_in(ModelMetaclassTester.field_b, ModelMetaclassTester.fields)
 
+    assert hasattr(ChildClass, 'field_a')
+    assert hasattr(ChildClass, 'field_b')
+
+    assert_in(ChildClass.field_a, ChildClass.fields)
+    assert_in(ChildClass.field_b, ChildClass.fields)
+    
 
 def test_children_metaclass():
 
@@ -36,7 +45,7 @@ def test_children_metaclass():
     assert not hasattr(WithoutChildren, 'children')
 
     assert isinstance(HasChildren.children, List)
-    assert_equals(Scope.settings, HasChildren.children.scope)
+    assert_equals(Scope.children, HasChildren.children.scope)
 
 
 def test_field_access():

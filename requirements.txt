@@ -8,7 +8,5 @@ nose
 django-nose
 lxml
 
-# local kits that need to be registered so we can find the XBlocks
--e jdblock
--e xblock
+-e .
 -e debugger

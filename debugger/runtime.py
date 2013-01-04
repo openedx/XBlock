@@ -49,10 +49,14 @@ class Usage(object):
     def store_initial_state(self):
         # Create an XBlock from this usage, and use it to create the initial
         # state.
+        block = create_xblock(self, 0)
         if self.initial_state:
-            block = create_xblock(self, 0)
             for name, value in self.initial_state.items():
                 setattr(block, name, value)
+
+        block.children = [child.id for child in self.children]
+        if self.parent is not None:
+            block.parent = self.parent.id
 
         # We no longer need initial_state, clobber it to prove it.
         del self.initial_state
@@ -76,7 +80,13 @@ class MemoryKeyValueStore(KeyValueStore):
 
     def actual_key(self, key):
         k = []
-        k.append(["usage", "definition", "type", "all"][key.scope.block])
+        if key.scope == Scope.children:
+            k.append('children')
+        elif key.scope == Scope.parent:
+            k.append('parent')
+        else:
+            k.append(["usage", "definition", "type", "all"][key.scope.block])
+
         if key.block_scope_id is not None:
             k.append(key.block_scope_id)
         if key.student_id:

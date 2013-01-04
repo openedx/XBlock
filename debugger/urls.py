@@ -17,10 +17,6 @@ urlpatterns = patterns('debugger.views',
     url(r'^handler/(?P<usage_id>[^/]+)/(?P<handler>[^/]*)/$', 'handler', name='handler'),
     url(r'^resource/(?P<package>[^/]+)/(?P<resource>.*)$', 'package_resource', name='package_resource'),
 
-    # Examples:
-    # url(r'^$', 'debugger.views.home', name='home'),
-    # url(r'^debugger/', include('debugger.foo.urls')),
-
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
