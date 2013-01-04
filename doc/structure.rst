@@ -136,3 +136,15 @@ structured Widget.  Handlers are invoked by XBlock code in the browser, so they
 are defined more like traditional web applications: they accept an HTTP
 request, and produce an HTTP response.
 
+
+Querying
+--------
+
+Blocks often need access to information from other blocks in a course.  An exam
+page may want to collect information from each problem on the page, for
+example.
+
+Tags
+----
+
+TODO: Blocks can have tags.  See querying...

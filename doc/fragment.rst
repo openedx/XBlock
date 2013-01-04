@@ -31,11 +31,11 @@ Widgets have a number of attributes:
   runtime object containing a set of functions that generate links back to the
   XBlocks handlers and views on the runtime server.
 
-Since XBlocks nest hierarchically, an XBlock rendering might require collecting
-renderings from each of its children, and composing them together. The parent
-will be responsible for deciding how the children's content composes together
-to create the parent content. The widget system has utilities for composing
-children's resources together into the parent.
+Since XBlocks nest hierarchically, a single XBlock view might require
+collecting renderings from each of its children, and composing them together.
+The parent will be responsible for deciding how the children's content composes
+together to create the parent content. The widget system has utilities for
+composing children's resources together into the parent.
 
 Other information on widgets [[TODO: write this for realz]]:
 

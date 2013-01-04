@@ -278,7 +278,15 @@ def expires(hours=0, minutes=0, seconds=0):
 
 
 class XBlock(Plugin):
-    """Base class for XBlocks."""
+    """Base class for XBlocks.
+
+    Derive from this class to create a new kind of XBlock.  There are no
+    required methods, but you will probably need a view registered with
+    :func:`view`.
+
+    Don't provide the ``__init__`` method when deriving from this class.
+
+    """
 
     __metaclass__ = XBlockMetaclass
 
@@ -362,7 +370,7 @@ class XBlock(Plugin):
 
     @classmethod
     def fallback_handler(cls, fn):
-        """Register this methods as the fallback handler.
+        """Register this method as the fallback handler.
 
         This handler will be invoked if a specifically named view can't be found.
         The actual handler name requested will be passed in as the first parameter,
@@ -392,7 +400,13 @@ class XBlock(Plugin):
 
     def __init__(self, runtime, model_data):
         """
-        `runtime` is an instance of :class:`xblock.core.Runtime`.
+
+        `runtime` is an instance of :class:`xblock.core.Runtime`. Use it to
+        access the environment.  It is available in XBlock code as
+        ``self.runtime``.
+
+        `model_data` is a dictionary-like interface to runtime storage.
+        XBlock uses it to implement your storage fields.
 
         """
         self.runtime = runtime

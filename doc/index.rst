@@ -27,6 +27,7 @@ Contents:
     concepts
     structure
     xblockapi
+    runtime
     fragment
 
 ..
