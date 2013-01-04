@@ -23,7 +23,14 @@ class Scope(namedtuple('ScopeBase', 'student block')):
 
 
 class Sentinel(object):
+    """
+    Class for implementing sentinel objects (only equal to themselves).
+    """
     def __init__(self, name):
+        """
+        `name` is the name used to identify the sentinel (which will
+            be displayed as the __repr__) of the sentinel.
+        """
         self.name = name
 
     def __repr__(self):
