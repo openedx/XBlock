@@ -110,7 +110,7 @@ def create_xblock(usage, student_id):
     block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
     model = DbModel(MEMORY_KVS, block_cls, student_id, usage)
-    block = block_cls(runtime, usage, model)
+    block = block_cls(runtime, model)
     return block
 
 
@@ -137,9 +137,9 @@ class DebuggerRuntime(Runtime):
         id_type = cache_info.get('id', 'definition')
 
         if id_type == 'usage':
-            key += ".%s" % block.usage.id
+            key += ".%s" % self.usage.id
         elif id_type == 'definition':
-            key += ".%s" % block.usage.def_id
+            key += ".%s" % self.usage.def_id
 
         for name in cache_info.get('model', ()):
             key += ".%s=%r" % (name, getattr(block, name))
@@ -199,16 +199,18 @@ class DebuggerRuntime(Runtime):
     # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):
         block_cls = block.__class__ if block else self.block_cls
-        usage = block.usage if block else self.usage
 
-        data_model = AnalyticsDbModel(MEMORY_KVS, block_cls, self.student_id, usage)
+        data_model = AnalyticsDbModel(MEMORY_KVS, block_cls, self.student_id, self.usage)
         value = data_model.get(key)
-        children = data_model.get('children', [])
+        children = []
+        for child_id in data_model.get('children', []):
+            child = self.get_block(child_id)
+            children.append(child.runtime.collect(key, child))
 
         result = {
             'class': block_cls.__name__,
             'value': value,
-            'children': [self.collect(key, self.get_block(b)) for b in children]
+            'children': children,
         }
 
         return result

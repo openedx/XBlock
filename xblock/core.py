@@ -390,13 +390,12 @@ class XBlock(Plugin):
         """The class can adjust a parsed Usage tree."""
         return node
 
-    def __init__(self, runtime, usage, model_data):
+    def __init__(self, runtime, model_data):
         """
         `runtime` is an instance of :class:`xblock.core.Runtime`.
 
         """
         self.runtime = runtime
-        self.usage = usage
         self._model_data = model_data
 
     def __repr__(self):

@@ -155,26 +155,26 @@ def test_field_serialization():
 
 
 def test_class_tags():
-    xblock = XBlock(None, None, None)
+    xblock = XBlock(None, None)
     assert_equals(xblock._class_tags, set())
 
     class Sub1Block(XBlock):
         pass
 
-    sub1block = Sub1Block(None, None, None)
+    sub1block = Sub1Block(None, None)
     assert_equals(sub1block._class_tags, set())
 
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
         pass
 
-    sub2block = Sub2Block(None, None, None)
+    sub2block = Sub2Block(None, None)
     assert_equals(sub2block._class_tags, set(["cat", "dog"]))
 
     class Sub3Block(Sub2Block):
         pass
 
-    sub3block = Sub3Block(None, None, None)
+    sub3block = Sub3Block(None, None)
     assert_equals(sub3block._class_tags, set(["cat", "dog"]))
 
     @XBlock.tag("mixin")
@@ -184,5 +184,5 @@ def test_class_tags():
     class Sub4Block(MixinBlock, Sub3Block):
         pass
 
-    sub4block = Sub4Block(None, None, None)
+    sub4block = Sub4Block(None, None)
     assert_equals(sub4block._class_tags, set(["cat", "dog", "mixin"]))
