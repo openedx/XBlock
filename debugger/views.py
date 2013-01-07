@@ -65,6 +65,7 @@ def show_scenario(request, scenario_id):
         'body': frag.body_html(),
         'database': MEMORY_KVS,
         'head_html': frag.head_html(),
+        'foot_html': frag.foot_html(),
         'log': LOG_STREAM.getvalue(),
         'student_id': student_id,
         'usage': usage,
