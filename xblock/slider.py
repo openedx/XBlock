@@ -52,7 +52,7 @@ class ProgressSlider(Slider):
         self.runtime.publish('progress', (self.value, self.max_value))
         return response
 
-SLIDER_TEMPLATE = """
+SLIDER_TEMPLATE = u"""
 <input type="range" min="{min}" max="{max}" value="{val}"/> <span> {val} </span>
 """
 

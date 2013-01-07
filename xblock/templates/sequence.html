@@ -7,7 +7,7 @@
 
   {% for c in children %}
   <div id="tabs-{{forloop.counter}}">
-    {{c.html|safe}}
+    {{c.body_html|safe}}
   </div>
   {% endfor %}
 </div>

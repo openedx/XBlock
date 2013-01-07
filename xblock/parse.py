@@ -11,10 +11,10 @@ def parse_xml(fileobj, usage_factory):
 
     The result is a usage object constructed by `usage_factory`, which must 
     have a signature like::
-        
-        Usage(block_name, def_id, initial_state, children)
-    
-    and those four attribute must then exist on the result.
+
+        Usage(block_name, initial_state, children, def_id)
+
+    and those four attributes must then exist on the result.
 
     """
     dom = etree.parse(fileobj)
@@ -23,7 +23,11 @@ def parse_xml(fileobj, usage_factory):
     return tree
 
 def parse_xml_string(xml, usage_factory):
-    """Parse the string `xml`, just like `parse_xml`."""
+    """Parse the string `xml`, just like `parse_xml`.
+
+    `xml` is a byte string to parse.
+
+    """
     return parse_xml(StringIO(xml), usage_factory)
 
 HTML_TAGS = set("p ol ul div span b i".split())
@@ -32,7 +36,8 @@ def _usage_from_node(node, usage_factory):
     """A recursive function to create a usage from a dom node."""
 
     if node.tag in HTML_TAGS:
-        return usage_factory("html", [], {"content":etree.tostring(node)})
+        content = etree.tostring(node, encoding='unicode')
+        return usage_factory("html", [], {"content":content})
     else:
         kids = []
         for child in node:

@@ -10,7 +10,7 @@ class HelloWorldBlock(XBlock):
     """A simple block: just show some fixed content."""
     @XBlock.view('default')
     def student_view(self, context):
-        return Fragment("Hello, world!")
+        return Fragment(u"Hello, world!")
 
 
 class HtmlBlock(XBlock):
@@ -21,7 +21,7 @@ class HtmlBlock(XBlock):
 
     """
 
-    content = String(help="The HTML to display", scope=Scope.content, default="<b>DEFAULT</b>")
+    content = String(help="The HTML to display", scope=Scope.content, default=u"<b>DEFAULT</b>")
 
     @XBlock.view('default')
     def student_view(self, context):

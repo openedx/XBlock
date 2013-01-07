@@ -240,11 +240,11 @@ class TextInputBlock(InputBlock):
 
     @XBlock.view("student_view")
     def student_view(self, context):
-        return Fragment("<p>I can only appear inside problems.</p>")
+        return Fragment(u"<p>I can only appear inside problems.</p>")
 
     @XBlock.view("problem_view")
     def problem_view(self, context):
-        result = Fragment("<input type='text' name='input' value='%s'><span class='message'></span>" % self.student_input)
+        result = Fragment(u"<input type='text' name='input' value='%s'><span class='message'></span>" % self.student_input)
         result.add_javascript("""
             function TextInputBlock(runtime, element) {
                 return {
@@ -289,7 +289,7 @@ class EqualityCheckerBlock(CheckerBlock):
         # TODO: Should we have a way to spit out JSON islands full of data?
         # Note the horror of mixed Python-Javascript data below...
         content = string.Template(self.content).substitute(**context)
-        result = Fragment("""
+        result = Fragment(u"""
             <span class="mydata" data-attempted='{self.attempted}' data-correct='{correct}'>
                 {content}
                 <span class='indicator'></span>
@@ -305,7 +305,7 @@ class EqualityCheckerBlock(CheckerBlock):
         # TODO: I need a way to add a script tag with a different mimetype to
         # the head.  There's no frag way to do that yet.
         # TODO: The image tag here needs a magic URL, not a hard-coded one.
-        result.add_content("""
+        result.add_content(u"""
             <script type="text/template" id="xblock-equality-template">
                 <% if (attempted !== "True") { %>
                     (Not attempted)
@@ -359,11 +359,11 @@ class AttemptsScoreboardBlock(XBlock):
             num_problems = len(attempts)
             attempted = sum(attempts)
             if num_problems == 0:
-                content = "There are no problems here..."
+                content = u"There are no problems here..."
             elif attempted == num_problems:
-                content = "Great! You attempted all %d problems!" % num_problems
+                content = u"Great! You attempted all %d problems!" % num_problems
             else:
-                content = "Hmm, you've only tried %d out of %d problems..." % (attempted, num_problems)
+                content = u"Hmm, you've only tried %d out of %d problems..." % (attempted, num_problems)
         else:
-            content = "I have nothing to live for! :("
+            content = u"I have nothing to live for! :("
         return Fragment(content)

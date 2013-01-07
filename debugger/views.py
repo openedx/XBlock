@@ -62,7 +62,7 @@ def show_scenario(request, scenario_id):
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
         'block': block,
-        'body': frag.html(),
+        'body': frag.body_html(),
         'database': MEMORY_KVS,
         'head_html': frag.head_html(),
         'log': LOG_STREAM.getvalue(),

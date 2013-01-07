@@ -24,7 +24,7 @@ SCENARIOS.extend([
     Scenario(
         "a bunch of html",
         Usage("html", [], {
-            'content': """
+            'content': u"""
                 <h2>Installing Enthought for Windows</h2>
 
                 <p>To download Enthought on your Windows machine, you should follow these steps:</p>
@@ -73,7 +73,7 @@ SCENARIOS.extend([
         "problem with thumbs and textbox",
         Usage("problem", [
             Usage("html", [], {
-                'content': """
+                'content': u"""
                     <p>You have three constraints to satisfy:</p>
                     <ol>
                         <li>The upvotes and downvotes must be equal.</li>
@@ -84,7 +84,7 @@ SCENARIOS.extend([
             Usage("thumbs", [], {'name': 'thumb'}),
             Usage("textinput", [], {'input_type': 'int', 'name': 'vote_count'}),
             Usage("equality", [], {
-                'content': 'Upvotes match downvotes',
+                'content': u'Upvotes match downvotes',
                 'name': 'votes_equal',
                 'arguments': {
                     'left': './thumb/@upvotes',
@@ -92,7 +92,7 @@ SCENARIOS.extend([
                 },
             }),
             Usage("equality", [], {
-                'content': 'Number of upvotes matches entered string',
+                'content': u'Number of upvotes matches entered string',
                 'name': 'votes_named',
                 'arguments': {
                     'left': './thumb/@upvotes',
@@ -100,7 +100,7 @@ SCENARIOS.extend([
                 },
             }),
             Usage("equality", [], {
-                'content': 'Number of upvotes is $numvotes',
+                'content': u'Number of upvotes is $numvotes',
                 'name': 'votes_specified',
                 'arguments': {
                     'left': './thumb/@upvotes',
@@ -172,10 +172,10 @@ SCENARIOS.extend([
         Usage("vertical", [
             Usage("attempts_scoreboard"),
             Usage("problem", [
-                Usage("html", [], {'content': "<p>What is $a+$b?</p>"}),
+                Usage("html", [], {'content': u"<p>What is $a+$b?</p>"}),
                 Usage("textinput", [], {'input_type': 'int', 'name': 'sum_input'}),
                 Usage("equality", [], {
-                    'content': '',
+                    'content': u'',
                     'name': 'sum_checker',
                     'arguments': {
                         'left': './sum_input/@student_input',
@@ -192,10 +192,10 @@ SCENARIOS.extend([
             }),
             Usage("sidebar", [
                 Usage("problem", [
-                    Usage("html", [], {'content': "<p>What is $a &times; $b?</p>"}),
+                    Usage("html", [], {'content': u"<p>What is $a &times; $b?</p>"}),
                     Usage("textinput", [], {'input_type': 'int', 'name': 'sum_input'}),
                     Usage("equality", [], {
-                        'content': '',
+                        'content': u'',
                         'name': 'sum_checker',
                         'arguments': {
                             'left': './sum_input/@student_input',
@@ -212,10 +212,10 @@ SCENARIOS.extend([
                 }),
             ]),
             Usage("problem", [
-                Usage("html", [], {'content': "<p>What is $a+$b?</p>"}),
+                Usage("html", [], {'content': u"<p>What is $a+$b?</p>"}),
                 Usage("textinput", [], {'input_type': 'int', 'name': 'sum_input'}),
                 Usage("equality", [], {
-                    'content': '',
+                    'content': u'',
                     'name': 'sum_checker',
                     'arguments': {
                         'left': './sum_input/@student_input',

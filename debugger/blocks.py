@@ -13,7 +13,7 @@ class DebuggingChildBlock(XBlock):
     """A simple gray box, to use as a child placeholder."""
     @XBlock.fallback_view
     def any_view(self, view_name, context):
-        frag = Fragment("<div class='debug_child'>%s<br>%s</div>" % (make_safe_for_html(repr(self)), view_name))
+        frag = Fragment(u"<div class='debug_child'>%s<br>%s</div>" % (make_safe_for_html(repr(self)), view_name))
         frag.add_css("""
             .debug_child {
                 background-color: grey;

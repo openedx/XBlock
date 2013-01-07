@@ -140,7 +140,7 @@ class DebuggerRuntime(Runtime):
             if view_fn:
                 break
         else:
-            return Fragment("<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
+            return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
 
         cache_info = getattr(view_fn, "_cache", {})
         key = "view.%s.%s" % (block.__class__.__name__, view_name)
@@ -189,9 +189,9 @@ class DebuggerRuntime(Runtime):
         if block.name:
             data['name'] = block.name
 
-        html = "<div class='xblock'%s>%s</div>" % (
+        html = u"<div class='xblock'%s>%s</div>" % (
             "".join(" data-%s='%s'" % item for item in data.items()),
-            frag.html(),
+            frag.body_html(),
         )
         wrapped.add_content(html)
         wrapped.add_frag_resources(frag)

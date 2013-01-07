@@ -8,21 +8,23 @@ This code is in the Runtime layer.
 class Fragment(object):
     """A fragment of a web page, for XBlock views to return."""
 
-    def __init__(self, content=None, mimetype='text/html'):
-        self.content = ""
-        self.mimetype = None
+    def __init__(self, content=None):
+        self.content = u""
         self.resources = []
         self.cache_seconds = 0
         self.js_init = None
         if content is not None:
-            self.add_content(content, mimetype)
+            self.add_content(content)
 
-    def add_content(self, content, mimetype='text/html'):
-        if self.mimetype is not None:
-            if mimetype != self.mimetype:
-                raise ValueError("Can't switch fragment mimetypes midstream: %r -> %r" % (self.mimetype, mimetype))
-        else:
-            self.mimetype = mimetype
+    def add_content(self, content):
+        """Add content to this fragment.
+
+        `content` is a Unicode string, HTML to append to the body of the
+        fragment.  It must not contain a ``<body>`` tag, or otherwise assume
+        that it is the only content on the page.
+
+        """
+        assert isinstance(content, unicode)
         self.content += content
 
     def add_resource(self, text, mimetype):
@@ -61,13 +63,20 @@ class Fragment(object):
     # Implementation methods: don't override
     # TODO: [rocha] should this go in the runtime?
 
-    def html(self):
-        if self.mimetype == 'text/html':
-            return self.content
+    def body_html(self):
+        """Get the body HTML for this Fragment.
 
-        return "[[No HTML from %s]]" % self.content_type
+        Returns a Unicode string.
+
+        """
+        return self.content
 
     def head_html(self):
+        """Get the head HTML for this Fragment.
+
+        Returns a Unicode string.
+
+        """
         # The list of head fragments
         hh = []
         # The set of all data we've already seen, so no dups.
@@ -85,15 +94,15 @@ class Fragment(object):
             # Different things get different tags.
             if mimetype == "text/css":
                 if kind == "text":
-                    hh.append("<style type='text/css'>\n%s\n</style>" % data)
+                    hh.append(u"<style type='text/css'>\n%s\n</style>" % data)
                 elif kind == "url":
-                    hh.append("<link rel='stylesheet' href='%s' type='text/css'>" % data)
+                    hh.append(u"<link rel='stylesheet' href='%s' type='text/css'>" % data)
             elif mimetype == "application/javascript":
                 if kind == "text":
-                    hh.append("<script>\n%s\n</script>" % data)
+                    hh.append(u"<script>\n%s\n</script>" % data)
                 elif kind == "url":
-                    hh.append("<script src='%s' type='application/javascript'></script>" % data)
+                    hh.append(u"<script src='%s' type='application/javascript'></script>" % data)
             else:
                 raise Exception("Never heard of mimetype %r" % mimetype)
 
-        return "\n".join(hh)
+        return u"\n".join(hh)
