@@ -6,19 +6,23 @@ This code is in the Runtime layer.
 
 from collections import namedtuple
 
-class _FragmentResource(namedtuple("_FragmentResource", "kind, data, mimetype, placement")):
-    """Record a Fragment's resource need."""
-    pass
-
+_FragmentResource = namedtuple("_FragmentResource", "kind, data, mimetype, placement")
 
 class Fragment(object):
     """A fragment of a web page, for XBlock views to return.
 
-    A fragment consists of HTML for the body of the page, and a series
-    of resources needed by the body.
+    A fragment consists of HTML for the body of the page, and a series of
+    resources needed by the body. Resources are specified with a MIME type
+    (such as "application/javascript" or "text/css") that determines how they
+    are inserted into the page.  The resource is provided either as literal
+    text, or as a URL.  Text will be included on the page, wrapped
+    appropriately for the MIME type.  URLs will be used as-is on the page.
+
+    Resources are only inserted into the page once, even if many Fragments
+    in the page ask for them.  Determining duplicates is done by simple text
+    matching.
 
     """
-
     def __init__(self, content=None):
         self.content = u""
         self.resources = []
@@ -57,11 +61,11 @@ class Fragment(object):
 
         `placement`: where on the page the resource should be placed:
 
-            ``None``: let the Fragment choose based on the MIME type.
+            None: let the Fragment choose based on the MIME type.
 
-            ``"head"``: put this resource in the ``<head>`` of the page.
+            "head": put this resource in the ``<head>`` of the page.
 
-            ``"foot"``: put this resource at the end of the ``<body>`` of the
+            "foot": put this resource at the end of the ``<body>`` of the
             page.
 
         """
@@ -134,9 +138,17 @@ class Fragment(object):
     def cache_for(self, seconds):
         self.cache_seconds = seconds
 
-    def initialize_js(self, js_func, runtime_version=1):
-        """Register a Javascript function to initialize the frag's browser code."""
-        self.js_init = (js_func, runtime_version)
+    def initialize_js(self, js_func):
+        """Register a Javascript function to initialize the Javascript resources.
+
+        `js_func` is the name of a Javascript function defined by one of the
+        Javascript resources.  As part of setting up the browser's runtime
+        environment, the function will be invoked, passing a runtime object
+        and a DOM element.
+
+        """
+        # This is version 1 of the interface.
+        self.js_init = (js_func, 1)
 
     # Implementation methods: don't override
     # TODO: [rocha] should this go in the runtime?
@@ -171,13 +183,13 @@ class Fragment(object):
     def _resource_html(self, placement):
         """Get some resource HTML for this Fragment.
 
-        `placement` is ``"head"`` or ``"foot"``.
+        `placement` is "head" or "foot".
 
         Returns a unicode string, the HTML for the head or foot of the page.
 
         """
-        # The list of head fragments
-        hh = []
+        # The list of HTML to return
+        html = []
         # The set of all data we've already seen, so no dups.
         seen = set()
 
@@ -196,18 +208,18 @@ class Fragment(object):
             # Different things get different tags.
             if mimetype == "text/css":
                 if kind == "text":
-                    hh.append(u"<style type='text/css'>\n%s\n</style>" % data)
+                    html.append(u"<style type='text/css'>\n%s\n</style>" % data)
                 elif kind == "url":
-                    hh.append(u"<link rel='stylesheet' href='%s' type='text/css'>" % data)
+                    html.append(u"<link rel='stylesheet' href='%s' type='text/css'>" % data)
             elif mimetype == "application/javascript":
                 if kind == "text":
-                    hh.append(u"<script>\n%s\n</script>" % data)
+                    html.append(u"<script>\n%s\n</script>" % data)
                 elif kind == "url":
-                    hh.append(u"<script src='%s' type='application/javascript'></script>" % data)
+                    html.append(u"<script src='%s' type='application/javascript'></script>" % data)
             elif mimetype == "text/html":
                 assert kind == "text"
-                hh.append(data)
+                html.append(data)
             else:
                 raise Exception("Never heard of mimetype %r" % mimetype)
 
-        return u"\n".join(hh)
+        return u"\n".join(html)
