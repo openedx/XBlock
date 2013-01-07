@@ -204,6 +204,9 @@ class Fragment(object):
                     hh.append(u"<script>\n%s\n</script>" % data)
                 elif kind == "url":
                     hh.append(u"<script src='%s' type='application/javascript'></script>" % data)
+            elif mimetype == "text/html":
+                assert kind == "text"
+                hh.append(data)
             else:
                 raise Exception("Never heard of mimetype %r" % mimetype)
 

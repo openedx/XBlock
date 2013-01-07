@@ -302,10 +302,8 @@ class EqualityCheckerBlock(CheckerBlock):
         # XBlocks can refer to them in XBlock-standard ways?
         result.add_javascript_url("/static/js/vendor/underscore-min.js")
 
-        # TODO: I need a way to add a script tag with a different mimetype to
-        # the head.  There's no frag way to do that yet.
         # TODO: The image tag here needs a magic URL, not a hard-coded one.
-        result.add_content(u"""
+        result.add_resource(u"""
             <script type="text/template" id="xblock-equality-template">
                 <% if (attempted !== "True") { %>
                     (Not attempted)
@@ -313,7 +311,7 @@ class EqualityCheckerBlock(CheckerBlock):
                     <img src="/resource/debugger/images/<%= (correct === "True") ? "correct" : "incorrect" %>-icon.png">
                 <% } %>
             </script>
-            """)
+            """, "text/html")
 
         result.add_javascript("""
             function EqualityCheckerBlock(runtime, element) {
