@@ -1,12 +1,13 @@
 # 3rd-party needs
 Django >= 1.4, < 1.5
 webob
+lxml
 
 # For Tests
 mock
 nose
 django-nose
-lxml
+coverage
 
 -e .
 -e debugger
