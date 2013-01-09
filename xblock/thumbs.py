@@ -11,6 +11,9 @@ from .core import XBlock, Scope, Integer, Boolean, expires, varies_on_block
 from .fragment import Fragment
 from .problem import InputBlock
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class ThumbsBlock(InputBlock):
     """
