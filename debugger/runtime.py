@@ -16,6 +16,7 @@ from xblock.runtime import DbModel, KeyValueStore, Runtime
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
+from .proxy import RemoteBlockProxy
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ class Usage(object):
     def store_initial_state(self):
         # Create an XBlock from this usage, and use it to create the initial
         # state.
-        block = create_xblock(self, 0)
+        block = create_xblock(self, force_local=True)
         if self.initial_state:
             for name, value in self.initial_state.items():
                 setattr(block, name, value)
@@ -111,17 +112,35 @@ class MemoryKeyValueStore(KeyValueStore):
 MEMORY_KVS = MemoryKeyValueStore({})
 
 
-def create_xblock(usage, student_id):
+def create_xblock(usage, student_id=None, force_local=False):
     """Create an XBlock instance.
 
     This will be invoked to create new instances for every request.
 
     """
-    block_cls = XBlock.load_class(usage.block_name)
+    remote = None if force_local else remote_server(usage, student_id)
+    if remote:
+        block_cls = RemoteBlockProxy
+    else:
+        block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
     model = DbModel(MEMORY_KVS, block_cls, student_id, usage)
     block = block_cls(runtime, model)
+    if remote:
+        block.set_remote(remote)
     return block
+
+
+def remote_server(usage, student_id):
+    """Return the remote server for this block.
+
+    Returns None if this block should not be remoted.
+
+    """
+    # Problems for odd-numbered students are remoted
+    if usage.block_name == "problem" and (int(student_id[-1]) % 2):
+        return "http://127.0.0.1:8000"
+    return None
 
 
 class DebuggerRuntime(Runtime):

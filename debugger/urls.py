@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # This import is here simply to get this file imported explicitly.
@@ -22,6 +22,8 @@ urlpatterns = patterns('debugger.views',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^remote/', include('remote.urls')),
 )
 
 urlpatterns += staticfiles_urlpatterns()

@@ -1,7 +1,8 @@
 # 3rd-party needs
 Django >= 1.4, < 1.5
-webob
 lxml
+requests
+webob
 
 # For Tests
 mock

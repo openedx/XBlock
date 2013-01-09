@@ -238,7 +238,7 @@ class Runtime(object):
                 q = q.children().tagged(toktext)
                 state = WORD
             else:
-                raise BadPath("Invalid thing: %" % toktext)
+                raise BadPath("Invalid thing: %r" % toktext)
         return q
 
 class RegexLexer(object):

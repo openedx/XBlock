@@ -32,6 +32,21 @@ class Fragment(object):
         if content is not None:
             self.add_content(content)
 
+    def to_pods(self):
+        return {
+            'content': self.content,
+            'resources': [r._asdict() for r in self.resources],
+            'js_init': self.js_init
+        }
+
+    @classmethod
+    def from_pods(cls, pods):
+        frag = cls()
+        frag.content = pods['content']
+        frag.resources = [_FragmentResource(**d) for d in pods['resources']]
+        frag.js_init = pods['js_init']
+        return frag
+
     def add_content(self, content):
         """Add content to this fragment.
 
