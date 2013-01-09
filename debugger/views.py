@@ -16,6 +16,7 @@ from django.shortcuts import render_to_response
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .runtime import Usage, create_xblock, MEMORY_KVS
+from .runtime import remote_server, remote_server_handled
 from .scenarios import SCENARIOS
 
 
@@ -57,7 +58,8 @@ def show_scenario(request, scenario_id):
     log.info("Start show_scenario %s for %s", scenario_id, student_id)
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
-    block = create_xblock(usage, "student%s" % student_id)
+    remote = remote_server(usage, student_id)
+    block = create_xblock(usage, "student%s" % student_id, remote=remote)
     frag = block.runtime.render(block, {}, 'student_view')
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
@@ -76,7 +78,8 @@ def handler(request, usage_id, handler):
     student_id = get_student_id(request)
     log.info("Start handler %s/%s for %s", usage_id, handler, student_id)
     usage = Usage.find_usage(usage_id)
-    block = create_xblock(usage, "student%s" % student_id)
+    remote = remote_server_handled(usage, student_id)
+    block = create_xblock(usage, "student%s" % student_id, remote=remote)
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()

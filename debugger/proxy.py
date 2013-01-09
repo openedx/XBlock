@@ -3,6 +3,8 @@
 import json
 import requests
 
+from wsgiproxy.app import WSGIProxyApp
+
 from xblock.core import XBlock
 from xblock.fragment import Fragment
 
@@ -24,3 +26,12 @@ class RemoteBlockProxy(XBlock):
         else:
             frag = Fragment.from_pods(r.json())
         return frag
+
+    @XBlock.fallback_handler
+    def handler(self, handler_name, request):
+        app = WSGIProxyApp(self.server)
+        path_prefix = "/remote/handler/%s/%s" % (self.runtime.usage.id, handler_name)
+        request.path_info = path_prefix + request.path_info
+        request.headers['X-edX-StudentId'] = self.runtime.student_id
+        response = request.get_response(app)
+        return response

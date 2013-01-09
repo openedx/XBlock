@@ -3,12 +3,18 @@ Django >= 1.4, < 1.5
 lxml
 requests
 webob
+WSGIProxy
 
 # For Tests
 mock
 nose
 django-nose
 coverage
+pylint
 
+# For docs
+sphinx
+
+# Our own XBlocks
 -e .
 -e debugger

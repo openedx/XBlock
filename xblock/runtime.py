@@ -168,7 +168,10 @@ class Runtime(object):
         return frag
 
     def handle(self, block, handler_name, data):
-        return self.find_xblock_method(block, 'handler', handler_name)(data)
+        handler = self.find_xblock_method(block, 'handler', handler_name)
+        if not handler:
+            raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
+        return handler(data)
 
     def query(self, block):
         """Query for data in the tree, starting from `block`.

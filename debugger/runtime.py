@@ -50,7 +50,7 @@ class Usage(object):
     def store_initial_state(self):
         # Create an XBlock from this usage, and use it to create the initial
         # state.
-        block = create_xblock(self, force_local=True)
+        block = create_xblock(self)
         if self.initial_state:
             for name, value in self.initial_state.items():
                 setattr(block, name, value)
@@ -112,13 +112,14 @@ class MemoryKeyValueStore(KeyValueStore):
 MEMORY_KVS = MemoryKeyValueStore({})
 
 
-def create_xblock(usage, student_id=None, force_local=False):
+def create_xblock(usage, student_id=None, remote=None):
     """Create an XBlock instance.
 
     This will be invoked to create new instances for every request.
 
+    `remote` is the remote server to create the block on, if any.
+
     """
-    remote = None if force_local else remote_server(usage, student_id)
     if remote:
         block_cls = RemoteBlockProxy
     else:
@@ -132,15 +133,30 @@ def create_xblock(usage, student_id=None, force_local=False):
 
 
 def remote_server(usage, student_id):
-    """Return the remote server for this block.
+    """Return the remote server for this viewed block.
 
     Returns None if this block should not be remoted.
 
     """
-    # Problems for odd-numbered students are remoted
-    if usage.block_name == "problem" and (int(student_id[-1]) % 2):
+    # Problems for odd-numbered students are remoted.
+    if usage.block_name == "problem" and student_id % 2:
         return "http://127.0.0.1:8000"
     return None
+
+
+def remote_server_handled(usage, student_id):
+    """Return the remote server for this handled block.
+
+    This examines the block's parentage, and if any of them are remoted,
+    that remote server is returned.
+
+    """
+    if usage is None:
+        return False
+    remote = remote_server(usage, student_id)
+    if remote:
+        return remote
+    return remote_server_handled(usage.parent, student_id)
 
 
 class DebuggerRuntime(Runtime):
