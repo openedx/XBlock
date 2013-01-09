@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 # We don't really have authentication and multiple students, just accept their
 # id on the URL.
 def get_student_id(request):
-    student_id = int(request.GET.get('student', '99'))
+    student_id = int(request.GET.get('student', '98'))
     return student_id
 
 
