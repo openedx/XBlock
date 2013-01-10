@@ -102,10 +102,10 @@ categories:
   decorator. Each view has a name, such as "edit" or "read", specified by the
   runtime that will invoke it.
 
-  A typical use of a view is to produce a :ref:`fragment <fragment>` for rendering the block as
-  part of a web page.  The user state, settings, and preferences may be used to
-  affect the output in any way the XBlock likes. Views can indicate what data
-  they rely on, to aid in caching their output.
+  A typical use of a view is to produce a :ref:`fragment <fragment>` for
+  rendering the block as part of a web page.  The user state, settings, and
+  preferences may be used to affect the output in any way the XBlock likes.
+  Views can indicate what data they rely on, to aid in caching their output.
 
   Although views typically produce HTML-based renderings, they can be used for
   anything the runtime wants.  The runtime description of each view should be
@@ -137,6 +137,25 @@ are defined more like traditional web applications: they accept an HTTP
 request, and produce an HTTP response.
 
 
+Views
+-----
+
+Views are how XBlocks render themselves.  The runtime will invoke a view as
+part of creating a webpage for part of a course.  The XBlock view should return
+data in the form needed by the runtime.  Often, the result will be a
+:ref:`fragment <fragment>` that the runtime can compose together into a
+complete page.
+
+Views can specify caching information to let runtimes avoid invoking the view
+more frequently than needed.  TODO: Describe this.
+
+
+Handlers
+--------
+
+TODO: Describe handlers.
+
+
 Querying
 --------
 
@@ -144,7 +163,10 @@ Blocks often need access to information from other blocks in a course.  An exam
 page may want to collect information from each problem on the page, for
 example.
 
+TODO: Describe how that works.
+
+
 Tags
 ----
 
-TODO: Blocks can have tags.  See querying...
+TODO: Blocks can have tags and you can use them in querying.

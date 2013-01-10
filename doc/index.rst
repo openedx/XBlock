@@ -1,11 +1,16 @@
-.. XBlock documentation master file, created by
-   sphinx-quickstart on Fri Dec 28 11:23:23 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 ======
 XBlock
 ======
+
+.. note::
+
+    This is extremely preliminary documentation.  Please get in touch with us
+    if you have any questions or concerns. Do not make any plans based on this
+    document without talking to us first.
+
+    The ideas here are our current best guess at how XBlocks will work, but
+    some parts are more settled than others.
+
 
 To create rich engaging online courses, course authors must be able to combine
 components from a variety of sources.  XBlock is edX's component architecture

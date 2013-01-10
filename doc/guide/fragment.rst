@@ -37,7 +37,7 @@ The parent will be responsible for deciding how the children's content composes
 together to create the parent content. The widget system has utilities for
 composing children's resources together into the parent.
 
-Other information on widgets [[TODO: write this for realz]]:
+Other information on widgets [[TODO: write this.]]:
 
     Caching information specifying how long a widget can be cached for. This
     can be specified at widget creation, or by using a decorator on the view
