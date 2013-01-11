@@ -125,7 +125,12 @@ class DbModel(MutableMapping):
 
 
 class Runtime(object):
-    """Methods all runtimes need."""
+    """Access to the runtime environment for XBlocks.
+
+    A pre-configured instance of this class will be available to XBlocks as
+    `self.runtime`.
+
+    """
     def __init__(self):
         self._view_name = None
 
@@ -147,16 +152,48 @@ class Runtime(object):
         return fn
 
     def render(self, block, context, view_name):
+        """Render a block by invoking its view.
+
+        Finds the view named `view_name` on `block`.  The default view will be
+        used if a specific view hasn't be registered.  If there is no default
+        view, an exception will be raised.
+
+        The view is invoked, passing it `context`.  The value returned by the
+        view is returned, with possible modifications by the runtime to
+        integrate it into a larger whole.
+
+        """
         raise NotImplementedError("Runtime needs to provide render()")
 
     def get_block(self, block_id):
+        """Get a block by ID.
+
+        Returns the block identified by `block_id`, or raises an exception.
+
+        """
         raise NotImplementedError("Runtime needs to provide get_block()")
 
     def render_child(self, child, context, view_name=None):
+        """A shortcut to render a child block.
+
+        Use this method to render your children from your own view function.
+
+        If `view_name` is not provided, it will default to the view name you're
+        being rendered with.
+
+        Returns the same value as :func:`render`.
+
+        """
         return child.runtime.render(child, context, view_name or self._view_name)
 
     def render_children(self, block, context, view_name=None):
-        """Render all the children, returning a list of results."""
+        """Render a block's children, returning a list of results.
+
+        Each child of `block` will be rendered, just as :func:`render_child` does.
+
+        Returns a list of values, each as provided by :func:`render`.
+
+        """
         results = []
         for child_id in block.children:
             child = self.get_block(child_id)
@@ -172,6 +209,18 @@ class Runtime(object):
         if not handler:
             raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
         return handler(data)
+
+    def handler_url(self, url):
+        """Get the actual URL to invoke a handler.
+
+        `url` is the abstract URL to your handler.  It should start with the
+        name you used to register your handler.
+
+        The return value is a complete absolute URL that will route through the
+        runtime to your handler.
+
+        """
+        raise NotImplementedError("Runtime needs to provide handler_url()")
 
     def query(self, block):
         """Query for data in the tree, starting from `block`.
