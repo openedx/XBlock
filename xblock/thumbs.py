@@ -71,14 +71,14 @@ class ThumbsBlock(InputBlock):
         return frag
 
     @XBlock.handler('vote')
-    def handle_vote(self, request):
+    @XBlock.json_handler
+    def handle_vote(self, data):
         # Here is where we would prevent a student from voting twice, but then
         # we couldn't click more than once in the demo!
         #
         # if self.student.voted:
         #    log.error("cheater!")
         #    return
-        data = json.loads(request.body)
         if data['vote_type'] not in ('up', 'down'):
             log.error('error!')
             return
@@ -90,7 +90,4 @@ class ThumbsBlock(InputBlock):
 
         self.voted = True
 
-        return Response(
-            body=json.dumps({'up': self.upvotes, 'down': self.downvotes}),
-            content_type='application/json'
-        )
+        return {'up': self.upvotes, 'down': self.downvotes}
