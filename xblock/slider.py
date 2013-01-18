@@ -10,8 +10,7 @@ class Slider(XBlock):
     max_value = Integer(help="Maximum value", default=100, scope=Scope.content)
     value = Integer(help="Student value", default=0, scope=Scope.student_state)
 
-    @XBlock.view('student_view')
-    def render_student(self, context):
+    def student_view(self, context):
         html = SLIDER_TEMPLATE.format(min=self.min_value,
                                       max=self.max_value,
                                       val=self.value)
@@ -22,17 +21,15 @@ class Slider(XBlock):
 
         return frag
 
-    @XBlock.handler('update')
-    def handle_update(self, request):
+    def update(self, request):
         data = json.loads(request.body)
         self.value = int(data['value'])
         return Response()
 
 
 class ProgressSlider(Slider):
-    @XBlock.view('student_view')
-    def render_student(self, context):
-        frag = super(ProgressSlider, self).render_student(context)
+    def student_view(self, context):
+        frag = super(ProgressSlider, self).student_view(context)
 
         # TODO: [rocha] non-wrapped ccs will make this global
         #               not what we want
@@ -46,8 +43,7 @@ class ProgressSlider(Slider):
         frag.initialize_js('ProgressSlider')
         return frag
 
-    @XBlock.handler('update')
-    def handle_progress(self, request):
+    def update(self, request):
         response = super(ProgressSlider, self).handle_update(request)
         self.runtime.publish('progress', (self.value, self.max_value))
         return response

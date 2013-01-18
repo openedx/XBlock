@@ -77,7 +77,6 @@ class ProblemBlock(XBlock):
         return context
 
     # The content controls how the Inputs attach to Graders
-    @XBlock.view("student_view")
     def student_view(self, context):
         context = self.calc_context(context)
 
@@ -141,9 +140,8 @@ class ProblemBlock(XBlock):
         result.initialize_js('ProblemBlock')
         return result
 
-    @XBlock.handler("check")
     @XBlock.json_handler
-    def check_answer(self, submissions):
+    def check(self, submissions):
         self.problem_attempted = True
         context = self.calc_context({})
 
@@ -188,9 +186,8 @@ class ProblemBlock(XBlock):
             'check_results': check_results,
         }
 
-    @XBlock.handler("rerandomize")
     @XBlock.json_handler
-    def handle_rerandomize(self, unused):
+    def rerandomize(self, unused):
         self.set_student_seed()
         return {'status': 'ok'}
 
@@ -238,11 +235,9 @@ class TextInputBlock(InputBlock):
     input_type = String(help="Type of conversion to attempt on input string")
     student_input = String(help="Last input submitted by the student", default="", scope=Scope.student_state)
 
-    @XBlock.view("student_view")
     def student_view(self, context):
         return Fragment(u"<p>I can only appear inside problems.</p>")
 
-    @XBlock.view("problem_view")
     def problem_view(self, context):
         result = Fragment(u"<input type='text' name='input' value='%s'><span class='message'></span>" % self.student_input)
         result.add_javascript("""
@@ -279,8 +274,7 @@ class EqualityCheckerBlock(CheckerBlock):
     right = Any(scope=Scope.student_state)
     attempted = Boolean(scope=Scope.student_state)
 
-    @XBlock.view('problem_view')
-    def problem(self, context):
+    def problem_view(self, context):
         correct = self.left == self.right
 
         # TODO: I originally named this class="data", but that conflicted with
@@ -347,7 +341,6 @@ class AttemptsScoreboardBlock(XBlock):
     Show attempts on problems in my nieces.
     """
 
-    @XBlock.view("student_view")
     def student_view(self, context):
         # Get the attempts for all problems in my parent.
         if self.parent:

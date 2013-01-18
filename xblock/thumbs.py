@@ -30,11 +30,9 @@ class ThumbsBlock(InputBlock):
     downvotes = Integer(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
     voted = Boolean(help="Whether a student has already voted on a thumb", default=False, scope=Scope.student_state)
 
-    @XBlock.view('student_view')
-    @XBlock.view('problem_view')
     @varies_on_block('definition')
     @expires(seconds=5)
-    def render_student(self, context):
+    def student_view(self, context):
         frag = Fragment(self.runtime.render_template(
             "upvotes.html",
             upvotes=self.upvotes,
@@ -70,9 +68,10 @@ class ThumbsBlock(InputBlock):
         frag.initialize_js('ThumbsBlock')
         return frag
 
-    @XBlock.handler('vote')
+    problem_view = student_view
+
     @XBlock.json_handler
-    def handle_vote(self, data):
+    def vote(self, data):
         # Here is where we would prevent a student from voting twice, but then
         # we couldn't click more than once in the demo!
         #

@@ -4,6 +4,7 @@ Code in this file is a mix of Runtime layer and Debugger layer.
 
 """
 
+import functools
 import itertools
 import json
 import logging
@@ -170,12 +171,12 @@ class DebuggerRuntime(Runtime):
     def render(self, block, context, view_name):
         self._view_name = view_name
 
-        for try_name in [view_name, "default"]:
-            view_fn = self.find_xblock_method(block, 'view', try_name)
-            if view_fn:
-                break
-        else:
-            return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
+        view_fn = getattr(block, view_name, None)
+        if view_fn is None:
+            view_fn = getattr(block, "fallback_view", None)
+            if view_fn is None:
+                return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
+            view_fn = functools.partial(view_fn, view_name)
 
         cache_info = getattr(view_fn, "_cache", {})
         key = "view.%s.%s" % (block.__class__.__name__, view_name)
