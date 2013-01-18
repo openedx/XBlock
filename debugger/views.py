@@ -18,6 +18,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from .runtime import Usage, create_xblock, MEMORY_KVS
 from .runtime import remote_server, remote_server_handled
 from .scenarios import SCENARIOS
+from .request import webob_to_django_response, django_to_webob_request
 
 
 # --- Set up an in-memory logger
@@ -97,22 +98,3 @@ def package_resource(request, package, resource):
         raise Http404
     mimetype, encoding = mimetypes.guess_type(resource)
     return HttpResponse(content, mimetype=mimetype)
-
-
-def webob_to_django_response(webob_response):
-    django_response = HttpResponse(
-        webob_response.app_iter,
-        content_type=webob_response.content_type
-    )
-    for name, value in webob_response.headerlist:
-        django_response[name] = value
-    return django_response
-
-
-def django_to_webob_request(django_request):
-    environ = {}
-    environ.update(django_request.META)
-
-    webob_request = Request(django_request.META)
-    webob_request.body = django_request.body
-    return webob_request
