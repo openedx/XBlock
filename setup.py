@@ -5,7 +5,7 @@ setup(
     version='0.1',
     description='XBlock Core Library',
     packages=['xblock'],
-    requires=[
+    install_requires=[
         'webob',
     ],
     entry_points={
