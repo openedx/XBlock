@@ -7,8 +7,7 @@ from .fragment import Fragment
 class Sequence(XBlock):
     has_children = True
 
-    @XBlock.view('student_view')
-    def render_student(self, context):
+    def student_view(self, context):
         frag = Fragment()
         child_frags = self.runtime.render_children(self, context)
         frag.add_frags_resources(child_frags)
@@ -38,8 +37,7 @@ class VerticalBlock(XBlock):
     """A simple container."""
     has_children = True
 
-    @XBlock.view('student_view')
-    def render_student(self, context):
+    def student_view(self, context):
         result = Fragment()
         child_frags = self.runtime.render_children(self, context)
         result.add_frags_resources(child_frags)
@@ -56,7 +54,6 @@ class SidebarBlock(XBlock):
     """A slightly-different vertical."""
     has_children = True
 
-    @XBlock.view('student_view')
     def student_view(self, context):
         result = Fragment()
         child_frags = self.runtime.render_children(self, context)

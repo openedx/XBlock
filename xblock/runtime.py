@@ -2,7 +2,6 @@
 Machinery to make the common case easy when building new runtimes
 """
 
-import functools
 import new
 import re
 
@@ -134,23 +133,6 @@ class Runtime(object):
     def __init__(self):
         self._view_name = None
 
-    def find_xblock_method(self, block, registration_type, name):
-        # TODO: Maybe this should be a method on XBlock?
-        first_arg = None
-        try:
-            fn = block.registered_methods[registration_type + name]
-        except KeyError:
-            try:
-                fn = block.registered_methods[registration_type + "_fallback"]
-                first_arg = name
-            except KeyError:
-                return None
-
-        fn = new.instancemethod(fn, block, block.__class__)
-        if first_arg:
-            fn = functools.partial(fn, first_arg)
-        return fn
-
     def render(self, block, context, view_name):
         """Render a block by invoking its view.
 
@@ -205,10 +187,13 @@ class Runtime(object):
         return frag
 
     def handle(self, block, handler_name, data):
-        handler = self.find_xblock_method(block, 'handler', handler_name)
-        if not handler:
-            raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
-        return handler(data)
+        handler = getattr(block, handler_name, None)
+        if handler:
+            return handler(data)
+        handler = getattr(block, "fallback_handler", None)
+        if handler:
+            return handler(handler_name, data)
+        raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
 
     def handler_url(self, url):
         """Get the actual URL to invoke a handler.

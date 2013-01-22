@@ -36,8 +36,7 @@ class StaticXBlockMetaclass(XBlockMetaclass):
 
         attrs['_mime_types_map'] = dict(attrs.get('urls', []))
 
-        @XBlock.handler('static')
-        def static_handler(self, request):
+        def static(self, request):
             path = request.path_info[1:]
             mime_type = self._mime_types_map[path]
             return Response(body=resource_string(self.__class__.__module__, 'content/' + path), content_type=mime_type)

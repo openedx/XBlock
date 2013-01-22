@@ -251,19 +251,6 @@ class Namespace(Plugin):
         return namespace_attr.__delete__(container)
 
 
-class MethodRegistrationMetaclass(type):
-    def __new__(cls, name, bases, attrs):
-        # Find registered methods
-        reg_methods = {}
-        for value in attrs.itervalues():
-            for reg_type, names in getattr(value, "_method_registrations", {}).iteritems():
-                for n in names:
-                    reg_methods[reg_type + n] = value
-        attrs['registered_methods'] = reg_methods
-
-        return super(MethodRegistrationMetaclass, cls).__new__(cls, name, bases, attrs)
-
-
 class TagCombiningMetaclass(type):
     def __new__(cls, name, bases, attrs):
         class_tags = set([])
@@ -279,7 +266,6 @@ class TagCombiningMetaclass(type):
 
 
 class XBlockMetaclass(
-    MethodRegistrationMetaclass,
     ChildrenModelMetaclass,
     NamespacesMetaclass,
     ModelMetaclass,
@@ -333,8 +319,7 @@ class XBlock(Plugin):
     """Base class for XBlocks.
 
     Derive from this class to create a new kind of XBlock.  There are no
-    required methods, but you will probably need a view registered with
-    :func:`view`.
+    required methods, but you will probably need at least one view.
 
     Don't provide the ``__init__`` method when deriving from this class.
 
@@ -351,49 +336,6 @@ class XBlock(Plugin):
     _class_tags = set()
 
     @classmethod
-    def _register_method(cls, registration_type, name):
-        def wrapper(fn):
-            if not hasattr(fn, '_method_registrations'):
-                setattr(fn, '_method_registrations', {})
-            fn._method_registrations.setdefault(registration_type, []).append(name)
-            return fn
-        return wrapper
-
-    @classmethod
-    def view(cls, name):
-        """A decorator to register this method as a named view.
-
-        To create a view named "student_view"::
-
-            @XBlock.view("student_view")
-            def student_view(context):
-                ...
-
-        View names are dictated by the runtime, which will invoke the view to
-        render the block.
-
-        """
-        return cls._register_method('view', name)
-
-    @classmethod
-    def handler(cls, name):
-        """A decorator to register this method as a named handler.
-
-        To create a handler named "click"::
-
-            @XBlock.handler("click")
-            def click_handler(request):
-                ...
-
-        You can name your handlers whatever you like, you'll invoke them from
-        your Javascript with the URL produced by::
-
-            var click_url = runtime.handler_url("click");
-
-        """
-        return cls._register_method('handler', name)
-
-    @classmethod
     def json_handler(cls, fn):
         """Wrap a handler to consume and produce JSON.
 
@@ -408,28 +350,6 @@ class XBlock(Plugin):
             response_json = json.dumps(fn(self, request_json))
             return Response(response_json, content_type='application/json')
         return wrapper
-
-    @classmethod
-    def fallback_view(cls, fn):
-        """Register this method as the fallback view.
-
-        This view will be invoked if a specifically named view can't be found.
-        The actual view name requested will be passed in as the first parameter,
-        but otherwise, this view works just like any other.
-
-        """
-        return cls._register_method('view', '_fallback')(fn)
-
-    @classmethod
-    def fallback_handler(cls, fn):
-        """Register this method as the fallback handler.
-
-        This handler will be invoked if a specifically named view can't be found.
-        The actual handler name requested will be passed in as the first parameter,
-        but otherwise, this view works just like any other.
-
-        """
-        return cls._register_method('handler', '_fallback')(fn)
 
     @classmethod
     def tag(cls, tags):

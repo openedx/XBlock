@@ -18,8 +18,7 @@ class DirectRemoteBlockProxy(XBlock):
     def set_remote(self, server):
         self.server = server
 
-    @XBlock.fallback_view
-    def view(self, view_name, context):
+    def fallback_view(self, view_name, context):
         payload = {
             'student_id': self.runtime.student_id,
         }
@@ -32,8 +31,7 @@ class DirectRemoteBlockProxy(XBlock):
             frag = Fragment(u"Oops: %s" % r.status_code)
         return frag
 
-    @XBlock.fallback_handler
-    def handler(self, handler_name, request):
+    def fallback_handler(self, handler_name, request):
         app = WSGIProxyApp(self.server)
         path_prefix = "/remote/handler_direct/%s/%s" % (self.runtime.usage.id, handler_name)
         request.path_info = path_prefix + request.path_info
@@ -45,13 +43,7 @@ class DirectRemoteBlockProxy(XBlock):
 class TunneledRemoteBlockProxy(DirectRemoteBlockProxy):
     """The XBlock proxy in the local server for the tunneled protocol."""
 
-    # (The view is the same, ugh, but doesn't inherit)
-    @XBlock.fallback_view
-    def view2(self, view_name, context):
-        return self.view(view_name, context)
-
-    @XBlock.fallback_handler
-    def handler(self, handler_name, request):
+    def fallback_handler(self, handler_name, request):
         url = "%s/remote/handler_tunneled/%s/%s" % (self.server, self.runtime.usage.id, handler_name)
         payload = {
             'json': json.dumps({

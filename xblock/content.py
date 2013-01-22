@@ -8,8 +8,7 @@ from .fragment import Fragment
 
 class HelloWorldBlock(XBlock):
     """A simple block: just show some fixed content."""
-    @XBlock.view('default')
-    def student_view(self, context):
+    def fallback_view(self, view_name, context):
         return Fragment(u"Hello, world!")
 
 
@@ -23,6 +22,5 @@ class HtmlBlock(XBlock):
 
     content = String(help="The HTML to display", scope=Scope.content, default=u"<b>DEFAULT</b>")
 
-    @XBlock.view('default')
-    def student_view(self, context):
+    def fallback_view(self, view_name, context):
         return Fragment(Template(self.content).substitute(**context))

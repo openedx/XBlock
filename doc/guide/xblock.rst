@@ -98,9 +98,9 @@ The behavior of an XBlock is determined by its methods, which come in a few
 categories:
 
 * Views: These are invoked by the runtime to render the XBlock. There can be
-  any number of these, registered with the :meth:`@XBlock.view <.XBlock.view>`
-  decorator. Each view has a name, such as "edit" or "read", specified by the
-  runtime that will invoke it.
+  any number of these, written as ordinary Python methods.  Each view has a
+  specific name, such as "edit" or "read", specified by the runtime that will
+  invoke it.
 
   A typical use of a view is to produce a :ref:`fragment <fragment>` for
   rendering the block as part of a web page.  The user state, settings, and
@@ -112,18 +112,17 @@ categories:
   clear about what return type is expected and how it will be used.
 
 * Handlers: Handlers provide server-side logic invoked by AJAX calls from the
-  browser. There can be any number of these, registered with the
-  :meth:`@XBlock.handler <.XBlock.handler>` decorator.  Each handler has a
-  name, such as "submit" or "preview."  The runtime provides a mapping from
-  handler names to actual URLs so that XBlock Javascript code can make requests
-  to its handlers. Handlers can be used with GET requests as well as POST
-  requests.
+  browser. There can be any number of these, written as ordinary Python
+  methods.  Each handler has a specific name of your choice, such as "submit"
+  or "preview." The runtime provides a mapping from handler names to actual
+  URLs so that XBlock Javascript code can make requests to its handlers.
+  Handlers can be used with GET requests as well as POST requests.
 
-* Recalculators: (not a great word!) There can be any number of these,
-  registered with @register_recalculator. Each has a name, and is invoked by
-  the runtime when a particular kind of recalculation needs to be done.  An
-  example is "regrade", run when a TA needs to adjust a problem, and all the
-  students' inputs should be checked again, and their grades republished.
+* Recalculators: (not a great word!) There can be any number of these, written
+  as ordinary Python methods. Each has a specific name, and is invoked by the
+  runtime when a particular kind of recalculation needs to be done.  An example
+  is "regrade", run when a TA needs to adjust a problem, and all the students'
+  inputs should be checked again, and their grades republished.
 
 * Methods: XBlocks have access to their children and parent, and can invoke
   methods on them simply by invoking Python methods.
