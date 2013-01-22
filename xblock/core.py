@@ -319,8 +319,7 @@ class XBlock(Plugin):
     """Base class for XBlocks.
 
     Derive from this class to create a new kind of XBlock.  There are no
-    required methods, but you will probably need a view registered with
-    :func:`view`.
+    required methods, but you will probably need at least one view.
 
     Don't provide the ``__init__`` method when deriving from this class.
 
