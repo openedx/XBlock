@@ -5,6 +5,9 @@ setup(
     version='0.1',
     description='XBlock Core Library',
     packages=['xblock'],
+    requires=[
+        'webob',
+    ],
     entry_points={
         'xblock.v1': [
             'helloworld = xblock.content:HelloWorldBlock',
