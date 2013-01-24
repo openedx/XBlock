@@ -41,11 +41,21 @@ def test_children_metaclass():
     class WithoutChildren(object):
         __metaclass__ = ChildrenModelMetaclass
 
+    class InheritedChildren(HasChildren):
+        pass
+
+    assert HasChildren.has_children
+    assert not WithoutChildren.has_children
+    assert InheritedChildren.has_children
+
     assert hasattr(HasChildren, 'children')
     assert not hasattr(WithoutChildren, 'children')
+    assert hasattr(InheritedChildren, 'children')
 
     assert isinstance(HasChildren.children, List)
     assert_equals(Scope.children, HasChildren.children.scope)
+    assert isinstance(InheritedChildren.children, List)
+    assert_equals(Scope.children, InheritedChildren.children.scope)
 
 
 def test_field_access():

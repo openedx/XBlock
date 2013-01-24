@@ -190,7 +190,8 @@ class ChildrenModelMetaclass(type):
     into a List field with an empty scope.
     """
     def __new__(cls, name, bases, attrs):
-        if attrs.get('has_children', False):
+        if (attrs.get('has_children', False) or
+            any(getattr(base, 'has_children', False) for base in bases)):
             attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.children)
         else:
             attrs['has_children'] = False
