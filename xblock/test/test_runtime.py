@@ -50,6 +50,9 @@ class DictKeyValueStore(KeyValueStore):
     def delete(self, key):
         del self.db[key]
 
+    def has(self, key):
+        return key in self.db
+
 
 TestUsage = namedtuple('TestUsage', 'id, def_id')
 
