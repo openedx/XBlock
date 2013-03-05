@@ -104,6 +104,9 @@ class MemoryKeyValueStore(KeyValueStore):
     def delete(self, key):
         del self.d[self.actual_key(key)][key.field_name]
 
+    def has(self, key):
+        return key.field_name in self.d[self.actual_key(key)]
+
     def as_html(self):
         """Just for our Debugger!"""
         html = json.dumps(self.d, sort_keys=True, indent=4)

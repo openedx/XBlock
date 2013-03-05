@@ -33,6 +33,9 @@ class KeyValueStore(object):
     def delete(self, key):
         pass
 
+    def has(self, key):
+        pass
+
 
 class DbModel(MutableMapping):
     """A dictionary-like interface to the fields on a block."""
@@ -113,8 +116,8 @@ class DbModel(MutableMapping):
     def __len__(self):
         return len(self.keys())
 
-    def __contains__(self, item):
-        return item in self.keys()
+    def __contains__(self, name):
+        return self._kvs.has(self._key(name))
 
     def keys(self):
         fields = [field.name for field in self._block_cls.fields]
