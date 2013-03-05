@@ -1,4 +1,4 @@
-from nose.tools import assert_equals
+from nose.tools import assert_equals, assert_false, assert_true
 from mock import patch, Mock, call
 
 from xblock.core import *
@@ -81,12 +81,17 @@ def test_namespace_actions():
 
 def test_db_model_keys():
     key_store = DictKeyValueStore()
-    tester = TestModel(DbModel(key_store, TestModel, 's0', TestUsage('u0', 'd0')))
+    db_model = DbModel(key_store, TestModel, 's0', TestUsage('u0', 'd0'))
+    tester = TestModel(db_model)
+
+    assert_false('not a field' in db_model)
 
     for collection in (tester, tester.test):
         for field in collection.fields:
             new_value = 'new ' + field.name
+            assert_false(field.name in db_model)
             setattr(collection, field.name, new_value)
+            assert_true(field.name in db_model)
 
     print key_store.db
     assert_equals('new content', key_store.db[KeyValueStore.Key(Scope.content, None, 'd0', 'content')])
