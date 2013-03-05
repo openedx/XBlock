@@ -117,7 +117,10 @@ class DbModel(MutableMapping):
         return len(self.keys())
 
     def __contains__(self, name):
-        return self._kvs.has(self._key(name))
+        try:
+            return self._kvs.has(self._key(name))
+        except KeyError:
+            return False
 
     def keys(self):
         fields = [field.name for field in self._block_cls.fields]
