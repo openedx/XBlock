@@ -1,7 +1,4 @@
 """An XBlock providing thumbs-up/thumbs-down voting.
-
-This code is in the XBlock layer.
-
 """
 
 import json
@@ -26,9 +23,9 @@ class ThumbsBlock(InputBlock):
 
     """
 
-    upvotes = Integer(help="Number of up votes made on this thumb", default=0, scope=Scope.content)
-    downvotes = Integer(help="Number of down votes made on this thumb", default=0, scope=Scope.content)
-    voted = Boolean(help="Whether a student has already voted on a thumb", default=False, scope=Scope.student_state)
+    upvotes = Integer(help="Number of up votes", default=0, scope=Scope.content)
+    downvotes = Integer(help="Number of down votes", default=0, scope=Scope.content)
+    voted = Boolean(help="Has this student voted?", default=False, scope=Scope.student_state)
 
     @varies_on_block('definition')
     @expires(seconds=5)
