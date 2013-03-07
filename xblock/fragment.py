@@ -26,7 +26,6 @@ class Fragment(object):
     def __init__(self, content=None):
         self.content = u""
         self.resources = []
-        self.cache_seconds = 0
         self.js_init = None
 
         if content is not None:
@@ -149,9 +148,6 @@ class Fragment(object):
         """
         for w in frags:
             self.add_frag_resources(w)
-
-    def cache_for(self, seconds):
-        self.cache_seconds = seconds
 
     def initialize_js(self, js_func):
         """Register a Javascript function to initialize the Javascript resources.

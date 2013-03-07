@@ -274,44 +274,6 @@ class XBlockMetaclass(
     pass
 
 
-# -- Caching tools
-
-def _set_cache_info(f, **kwargs):
-    if not hasattr(f, '_cache'):
-        f._cache = {}
-    f._cache.update(kwargs)
-
-
-def varies_on_model(*attrs):
-    # key = (getattr(self, attr) for attr in attrs)
-    def _dec(f):
-        _set_cache_info(f, model=attrs)
-        return f
-    return _dec
-
-
-def varies_on_children(f):
-    # not sure how to do this yet...
-    # _set_cache_info(f, children=True)
-    return f
-
-
-def varies_on_block(type):
-    """Use 'usage', 'definition', or 'none'."""
-    def _dec(f):
-        _set_cache_info(f, id=type)
-        return f
-    return _dec
-
-
-def expires(hours=0, minutes=0, seconds=0):
-    # cache expiration
-    def _dec(f):
-        _set_cache_info(f, seconds=hours*3600 + minutes*60 + seconds)
-        return f
-    return _dec
-
-
 # -- Base Block
 
 

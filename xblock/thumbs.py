@@ -4,7 +4,7 @@
 import json
 from webob import Response
 
-from .core import XBlock, Scope, Integer, Boolean, expires, varies_on_block
+from .core import XBlock, Scope, Integer, Boolean
 from .fragment import Fragment
 from .problem import InputBlock
 
@@ -27,8 +27,6 @@ class ThumbsBlock(InputBlock):
     downvotes = Integer(help="Number of down votes", default=0, scope=Scope.content)
     voted = Boolean(help="Has this student voted?", default=False, scope=Scope.student_state)
 
-    @varies_on_block('definition')
-    @expires(seconds=5)
     def student_view(self, context):
         frag = Fragment(self.runtime.render_template(
             "upvotes.html",

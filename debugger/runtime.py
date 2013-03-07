@@ -10,7 +10,6 @@ import json
 import logging
 
 from django.template import loader as django_template_loader, Context as DjangoContext
-from django.core.cache import cache
 
 from xblock.core import XBlock, Scope, ModelType
 from xblock.runtime import DbModel, KeyValueStore, Runtime
@@ -178,29 +177,9 @@ class DebuggerRuntime(Runtime):
                 return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
             view_fn = functools.partial(view_fn, view_name)
 
-        cache_info = getattr(view_fn, "_cache", {})
-        key = "view.%s.%s" % (block.__class__.__name__, view_name)
-        id_type = cache_info.get('id', 'definition')
-
-        if id_type == 'usage':
-            key += ".%s" % self.usage.id
-        elif id_type == 'definition':
-            key += ".%s" % self.usage.def_id
-
-        for name in cache_info.get('model', ()):
-            key += ".%s=%r" % (name, getattr(block, name))
-
-        frag = cache.get(key)
-        if frag is None:
-            frag = view_fn(context)
-            seconds = cache_info.get('seconds', 0)
-            if seconds:
-                cache.set(key, frag, seconds)
-        else:
-            log.debug("Cache hit: %s", key)
+        frag = view_fn(context)
 
         self._view_name = None
-
         return self.wrap_child(block, frag, context)
 
     # TODO: [rocha] runtime should not provide this, each xblock
