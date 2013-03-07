@@ -22,8 +22,6 @@ urlpatterns = patterns('debugger.views',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-
-    url(r'^remote/', include('remote.urls')),
 )
 
 urlpatterns += staticfiles_urlpatterns()

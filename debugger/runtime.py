@@ -16,7 +16,6 @@ from xblock.runtime import DbModel, KeyValueStore, Runtime
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
-from .proxy import RemoteBlockProxy
 
 log = logging.getLogger(__name__)
 
@@ -112,51 +111,17 @@ class MemoryKeyValueStore(KeyValueStore):
 MEMORY_KVS = MemoryKeyValueStore({})
 
 
-def create_xblock(usage, student_id=None, remote=None):
+def create_xblock(usage, student_id=None):
     """Create an XBlock instance.
 
     This will be invoked to create new instances for every request.
 
-    `remote` is the remote server to create the block on, if any.
-
     """
-    if remote:
-        block_cls = RemoteBlockProxy
-    else:
-        block_cls = XBlock.load_class(usage.block_name)
+    block_cls = XBlock.load_class(usage.block_name)
     runtime = DebuggerRuntime(block_cls, student_id, usage)
     model = DbModel(MEMORY_KVS, block_cls, student_id, usage)
     block = block_cls(runtime, model)
-    if remote:
-        block.set_remote(remote)
     return block
-
-
-def remote_server(usage, student_id):
-    """Return the remote server for this viewed block.
-
-    Returns None if this block should not be remoted.
-
-    """
-    # Problems for odd-numbered students are remoted.
-    if usage.block_name == "problem" and student_id % 2:
-        return "http://127.0.0.1:8000"
-    return None
-
-
-def remote_server_handled(usage, student_id):
-    """Return the remote server for this handled block.
-
-    This examines the block's parentage, and if any of them are remoted,
-    that remote server is returned.
-
-    """
-    if usage is None:
-        return False
-    remote = remote_server(usage, student_id)
-    if remote:
-        return remote
-    return remote_server_handled(usage.parent, student_id)
 
 
 class DebuggerRuntime(Runtime):
