@@ -191,6 +191,41 @@ class ProblemBlock(XBlock):
         self.set_student_seed()
         return {'status': 'ok'}
 
+    @staticmethod
+    def workbench_scenarios():
+        """A few canned scenarios for display in the workbench."""
+        return [
+            ("problem with thumbs and textbox",
+            """\
+                <problem>
+                    <p>You have three constraints to satisfy:</p>
+                    <ol>
+                        <li>The upvotes and downvotes must be equal.</li>
+                        <li>You must enter the number of upvotes into the text field.</li>
+                        <li>The number of upvotes must be $numvotes.</li>
+                    </ol>
+
+                    <thumbs name='thumb'/>
+                    <textinput name='vote_count' input_type='int'/>
+
+                    <script>
+                        # Compute the random answer.
+                        import random
+                        numvotes = random.randrange(2,5)
+                    </script>
+                    <equality name='votes_equal' left='./thumb/@upvotes' right='./thumb/@downvotes'>
+                        Upvotes match downvotes
+                    </equality>
+                    <equality name='votes_named' left='./thumb/@upvotes' right='./vote_count/@student_input'>
+                        Number of upvotes matches entered string
+                    </equality>
+                    <equality name='votes_specified' left='./thumb/@upvotes' right='$numvotes'>
+                        Number of upvotes is $numvotes
+                    </equality>
+                </problem>
+            """),
+        ]
+
 
 class InputBlock(XBlock):
 
@@ -334,6 +369,14 @@ class EqualityCheckerBlock(CheckerBlock):
         self.left = left
         self.right = right
         return left == right
+
+    @staticmethod
+    def workbench_scenarios():
+        """Provide scenarios to the workbench.
+
+        In this case, there's no point showing this block, so return none.
+        """
+        return []
 
 
 class AttemptsScoreboardBlock(XBlock):

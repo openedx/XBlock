@@ -17,8 +17,14 @@ Scenario = namedtuple("Scenario", "description usage")
 SCENARIOS = []
 
 for name, cls in XBlock.load_classes():
-    default_children = [Usage("debugchild", []) for _ in xrange(3)]
-    SCENARIOS.append(Scenario(name, Usage(name, default_children)))
+    # Each XBlock class can provide scenarios to display in the workbench.
+    if hasattr(cls, "workbench_scenarios"):
+        for desc, xml in cls.workbench_scenarios():
+            SCENARIOS.append(Scenario(desc, parse_xml_string(xml, Usage)))
+    else:
+        # No specific scenarios, just show it with three generic children.
+        default_children = [Usage("debugchild", []) for _ in xrange(3)]
+        SCENARIOS.append(Scenario(name, Usage(name, default_children)))
 
 SCENARIOS.extend([
     Scenario(
@@ -68,83 +74,6 @@ SCENARIOS.extend([
             Usage("thumbs"),
             Usage("thumbs"),
         ])
-    ),
-    Scenario(
-        "problem with thumbs and textbox",
-        Usage("problem", [
-            Usage("html", [], {
-                'content': u"""
-                    <p>You have three constraints to satisfy:</p>
-                    <ol>
-                        <li>The upvotes and downvotes must be equal.</li>
-                        <li>You must enter the number of upvotes into the text field.</li>
-                        <li>The number of upvotes must be $numvotes.</li>
-                    </ol>
-                    """}),
-            Usage("thumbs", [], {'name': 'thumb'}),
-            Usage("textinput", [], {'input_type': 'int', 'name': 'vote_count'}),
-            Usage("equality", [], {
-                'content': u'Upvotes match downvotes',
-                'name': 'votes_equal',
-                'arguments': {
-                    'left': './thumb/@upvotes',
-                    'right': './thumb/@downvotes',
-                },
-            }),
-            Usage("equality", [], {
-                'content': u'Number of upvotes matches entered string',
-                'name': 'votes_named',
-                'arguments': {
-                    'left': './thumb/@upvotes',
-                    'right': './vote_count/@student_input',
-                },
-            }),
-            Usage("equality", [], {
-                'content': u'Number of upvotes is $numvotes',
-                'name': 'votes_specified',
-                'arguments': {
-                    'left': './thumb/@upvotes',
-                    'right': '$numvotes',
-                }
-            }),
-        ], {
-            'script': """
-                # Compute the random answer.
-                import random
-                numvotes = random.randrange(2,5)
-                """,
-        }),
-    ),
-    Scenario(
-        "problem with thumbs and textbox, from XML",
-        parse_xml_string("""\
-            <problem>
-                <p>You have three constraints to satisfy:</p>
-                <ol>
-                    <li>The upvotes and downvotes must be equal.</li>
-                    <li>You must enter the number of upvotes into the text field.</li>
-                    <li>The number of upvotes must be $numvotes.</li>
-                </ol>
-
-                <thumbs name='thumb'/>
-                <textinput name='vote_count' input_type='int'/>
-
-                <script>
-                    # Compute the random answer.
-                    import random
-                    numvotes = random.randrange(2,5)
-                </script>
-                <equality name='votes_equal' left='./thumb/@upvotes' right='./thumb/@downvotes'>
-                    Upvotes match downvotes
-                </equality>
-                <equality name='votes_named' left='./thumb/@upvotes' right='./vote_count/@student_input'>
-                    Number of upvotes matches entered string
-                </equality>
-                <equality name='votes_specified' left='./thumb/@upvotes' right='$numvotes'>
-                    Number of upvotes is $numvotes
-                </equality>
-            </problem>
-        """, Usage),
     ),
     Scenario(
         "sequence with progress_sliders",
