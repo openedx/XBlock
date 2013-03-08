@@ -24,12 +24,9 @@
         </div>
         <hr />
         <div class="data">
-            <span class="data_label">Usage</span>
-            {{usage}}
-        </div>
-        <div class="data">
-            <span class="data_label">Block</span>
-            {{block}}
+            <span class="data_label">Log</span>
+            {{log|safe}}
+            &nbsp;
         </div>
         <div class="data">
             <span class="data_label">Database</span>
@@ -37,9 +34,12 @@
             &nbsp;
         </div>
         <div class="data">
-            <span class="data_label">Log</span>
-            {{log|safe}}
-            &nbsp;
+            <span class="data_label">Usage</span>
+            {{usage}}
+        </div>
+        <div class="data">
+            <span class="data_label">Block</span>
+            {{block}}
         </div>
     {{foot_html|safe}}
     </body>
