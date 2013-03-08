@@ -4,13 +4,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 # This import is here simply to get this file imported explicitly.
 # If it fails to import later, it's inside the url resolver, and we
 # don't see the actual errors.
-from debugger.scenarios import SCENARIOS
+from workbench.scenarios import SCENARIOS
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('debugger.views',
+urlpatterns = patterns('workbench.views',
     url(r'^$', 'index', name='index'),
     url(r'^scenario/(?P<scenario_id>[^/]+)/$', 'show_scenario', name='scenario'),
 

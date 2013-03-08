@@ -1,4 +1,4 @@
-# Django settings for debugger project.
+# Django settings for workbench project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -107,13 +107,13 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'debugger.urls'
+ROOT_URLCONF = 'workbench.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'debugger.wsgi.application'
+WSGI_APPLICATION = 'workbench.wsgi.application'
 
 TEMPLATE_DIRS = (
-    'debugger/templates',
+    'workbench/templates',
     'xblock/templates',
 )
 
@@ -124,7 +124,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debugger',
+    'workbench',
     'django_nose',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',

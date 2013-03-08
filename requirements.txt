@@ -17,4 +17,4 @@ sphinx
 
 # Our own XBlocks
 -e .
--e debugger
+-e workbench

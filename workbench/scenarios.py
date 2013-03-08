@@ -1,6 +1,6 @@
-"""Example scenarios to display in the debugger.
+"""Example scenarios to display in the workbench.
 
-This code is in the Debugger layer.
+This code is in the Workbench layer.
 
 """
 

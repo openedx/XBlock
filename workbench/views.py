@@ -1,6 +1,6 @@
-"""Django views implementing the XBlock debugger.
+"""Django views implementing the XBlock workbench.
 
-This code is in the Debugger layer.
+This code is in the Workbench layer.
 
 """
 

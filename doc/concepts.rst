@@ -75,7 +75,7 @@ Examples of runtimes:
 
 * Studio 
 * LMS
-* XBlock debugging dashboard
+* XBlock workbench
 * Peer grading workflow app
 
 .. todo::

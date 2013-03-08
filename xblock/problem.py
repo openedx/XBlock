@@ -337,7 +337,7 @@ class EqualityCheckerBlock(CheckerBlock):
                 <% if (attempted !== "True") { %>
                     (Not attempted)
                 <% } else { %>
-                    <img src="/resource/debugger/images/<%= (correct === "True") ? "correct" : "incorrect" %>-icon.png">
+                    <img src="/resource/workbench/images/<%= (correct === "True") ? "correct" : "incorrect" %>-icon.png">
                 <% } %>
             </script>
             """, "text/html")

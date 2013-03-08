@@ -53,7 +53,7 @@ API
         - State
         - Methods
     - Getting started
-    - The XBlock Debugger
+    - The XBlock Workbench
     - Writing an XBlock
         - Views
         - Widgets

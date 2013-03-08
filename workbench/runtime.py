@@ -1,6 +1,6 @@
-"""The runtime machinery for the XBlock debugger.
+"""The runtime machinery for the XBlock workbench.
 
-Code in this file is a mix of Runtime layer and Debugger layer.
+Code in this file is a mix of Runtime layer and Workbench layer.
 
 """
 
@@ -103,7 +103,7 @@ class MemoryKeyValueStore(KeyValueStore):
         del self.d[self.actual_key(key)][key.field_name]
 
     def as_html(self):
-        """Just for our Debugger!"""
+        """Just for our Workbench!"""
         html = json.dumps(self.d, sort_keys=True, indent=4)
         return make_safe_for_html(html)
 
@@ -118,15 +118,15 @@ def create_xblock(usage, student_id=None):
 
     """
     block_cls = XBlock.load_class(usage.block_name)
-    runtime = DebuggerRuntime(block_cls, student_id, usage)
+    runtime = WorkbenchRuntime(block_cls, student_id, usage)
     model = DbModel(MEMORY_KVS, block_cls, student_id, usage)
     block = block_cls(runtime, model)
     return block
 
 
-class DebuggerRuntime(Runtime):
+class WorkbenchRuntime(Runtime):
     def __init__(self, block_cls, student_id, usage):
-        super(DebuggerRuntime, self).__init__()
+        super(WorkbenchRuntime, self).__init__()
 
         self.block_cls = block_cls
         self.student_id = student_id

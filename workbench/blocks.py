@@ -1,6 +1,6 @@
 """An XBlock to use as a child when you don't care what child to show.
 
-This code is in the Debugger layer.
+This code is in the Workbench layer.
 
 """
 

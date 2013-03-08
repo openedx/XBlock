@@ -1,4 +1,4 @@
-xmodule-debugger
+XBlock Workbench
 ================
 
 This is a "code sketch" we wrote while designing the new XBlock architecture.
@@ -41,6 +41,6 @@ make clear which layer the code lives in:
     This layer may not be real code here, but we'll need to write real code to
     perform these functions.
 
-3.  **Debugger** The debugger-specific code we wrote to make everything work.
+3.  **Workbench** The workbench-specific code we wrote to make everything work.
     This code is the least real, in that it might be just stubs, and will be
     done very differently in real code.
