@@ -47,6 +47,10 @@ class Usage(object):
             child.parent = self
 
     def store_initial_state(self):
+        # If we've already created the initial state, there's nothing to do.
+        if self.initial_state is None:
+            return
+
         # Create an XBlock from this usage, and use it to create the initial
         # state.
         block = create_xblock(self)
@@ -59,7 +63,7 @@ class Usage(object):
             block.parent = self.parent.id
 
         # We no longer need initial_state, clobber it to prove it.
-        del self.initial_state
+        self.initial_state = None
 
         # Also do this recursively down the tree.
         for child in self.children:

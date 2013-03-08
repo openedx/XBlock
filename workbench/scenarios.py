@@ -162,8 +162,3 @@ SCENARIOS.extend([
         ]),
     ),
 ])
-
-# Create all the initial states in the usages
-
-for scenario in SCENARIOS:
-    scenario.usage.store_initial_state()

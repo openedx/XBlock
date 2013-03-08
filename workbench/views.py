@@ -58,6 +58,7 @@ def show_scenario(request, scenario_id):
     log.info("Start show_scenario %s for %s", scenario_id, student_id)
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
+    usage.store_initial_state()
     block = create_xblock(usage, "student%s" % student_id)
     frag = block.runtime.render(block, {}, 'student_view')
     log.info("End show_scenario %s", scenario_id)
