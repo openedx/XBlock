@@ -1,10 +1,16 @@
+<!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" type="text/css" href="/static/css/workbench.css">
     </head>
     <body>
-        <h3>Try some XBlocks!</h3>
-        {% for i, desc in scenarios %}
-            <p><a href="/scenario/{{i}}">{{desc}}</a></p>
-        {% endfor %}
+        <header>
+            <h1>XBlock scenarios</h1>
+        </header>
+        <section class="main">
+            {% for i, desc in scenarios %}
+                <p><a href="/scenario/{{i}}">{{desc}}</a></p>
+            {% endfor %}
+        </section>
     </body>
 </body>

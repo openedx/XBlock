@@ -1,0 +1,26 @@
+html, body {
+    font-family: "Open Sans",Verdana,Geneva,sans-serif;
+    padding: 0;
+    margin: 0;
+    color: #222222;
+}
+header {
+    position: fixed;
+    height: 1.75em;
+    width: 100%;
+    border-bottom: 1px solid #aaaaaa;
+    background-color: #cccccc;
+    background-image: url(/static/images/header-logo.png);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: 1em .5em;
+    padding: .5em 0 .5em 100px;
+    margin: 0;
+}
+header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+section.main {
+    padding: 2.75em 1em;
+}
