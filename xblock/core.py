@@ -115,6 +115,12 @@ class ModelType(object):
         """
         return self.__get__(model, model.__class__)
 
+    def read_json(self, model):
+        """
+        Retrieve the serialized value for this field from the specified model object
+        """
+        return self.to_json(self.read_from(model))
+
     def write_to(self, model, value):
         """
         Set the value for this field to value on the supplied model object
