@@ -90,9 +90,6 @@ class ModelType(object):
     def __repr__(self):
         return "<{0.__class__.__name__} {0._name}>".format(self)
 
-    def __lt__(self, other):
-        return self._seq < other._seq
-
     def to_json(self, value):
         """
         Return value in the form of nested lists and dictionaries (suitable
@@ -129,6 +126,16 @@ class ModelType(object):
         Delete the value for this field from the supplied model object
         """
         self.__delete__(model)
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __cmp__(self, other):
+        return cmp((self._seq, self.name), (other._seq, other.name))
+
+    def __eq__(self, other):
+        return self.name == other.name
+
 
 class Integer(ModelType): pass
 class Float(ModelType): pass
