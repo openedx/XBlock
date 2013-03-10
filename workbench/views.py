@@ -9,8 +9,6 @@ import mimetypes
 import pkg_resources
 from StringIO import StringIO
 
-from webob import Request
-
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -21,6 +19,8 @@ from .request import webob_to_django_response, django_to_webob_request
 
 
 # --- Set up an in-memory logger
+
+LOG_STREAM = None
 
 def setup_logging():
     global LOG_STREAM
@@ -74,16 +74,16 @@ def show_scenario(request, scenario_id):
     })
 
 
-def handler(request, usage_id, handler):
+def handler(request, usage_id, handler_slug):
     student_id = get_student_id(request)
-    log.info("Start handler %s/%s for %s", usage_id, handler, student_id)
+    log.info("Start handler %s/%s for %s", usage_id, handler_slug, student_id)
     usage = Usage.find_usage(usage_id)
     block = create_xblock(usage, "student%s" % student_id)
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()
-    result = block.runtime.handle(block, handler, request)
-    log.info("End handler %s/%s", usage_id, handler)
+    result = block.runtime.handle(block, handler_slug, request)
+    log.info("End handler %s/%s", usage_id, handler_slug)
     return webob_to_django_response(result)
 
 
@@ -94,5 +94,5 @@ def package_resource(request, package, resource):
         content = pkg_resources.resource_string(package, "static/" + resource)
     except IOError:
         raise Http404
-    mimetype, encoding = mimetypes.guess_type(resource)
+    mimetype, _ = mimetypes.guess_type(resource)
     return HttpResponse(content, mimetype=mimetype)

@@ -1,9 +1,6 @@
 """An XBlock providing thumbs-up/thumbs-down voting.
 """
 
-import json
-from webob import Response
-
 from .core import XBlock, Scope, Integer, Boolean
 from .fragment import Fragment
 from .problem import InputBlock

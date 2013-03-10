@@ -16,7 +16,7 @@ class Slider(XBlock):
                                       val=self.value)
         frag = Fragment(html)
         frag.add_css("input[type=range] { width=100px; }")
-        frag.add_javascript(SLIDER_JS);
+        frag.add_javascript(SLIDER_JS)
         frag.initialize_js('Slider')
 
         return frag

@@ -2,7 +2,6 @@
 Machinery to make the common case easy when building new runtimes
 """
 
-import new
 import re
 
 from collections import namedtuple, MutableMapping

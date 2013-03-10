@@ -1,10 +1,10 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import patterns, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # This import is here simply to get this file imported explicitly.
 # If it fails to import later, it's inside the url resolver, and we
 # don't see the actual errors.
-from workbench.scenarios import SCENARIOS
+from workbench.scenarios import SCENARIOS   # pylint: disable=W0611
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin

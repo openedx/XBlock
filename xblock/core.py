@@ -148,7 +148,7 @@ class ModelMetaclass(type):
     the instance.
 
     Additionally, any namespaces registered in the `xblock.namespace` will be added to
-    the instance
+    the instance.
     """
     def __new__(cls, name, bases, attrs):
         fields = []

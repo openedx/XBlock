@@ -1,6 +1,5 @@
 """XML Parsing for XBlocks."""
 
-import pprint
 from lxml import etree
 from cStringIO import StringIO
 
@@ -58,7 +57,7 @@ def _process_node(node, usage_factory):
     block_cls = XBlock.load_class(node.block_name)
     node = block_cls.preprocess_input(node, usage_factory)
     kids = [_process_node(kid, usage_factory) for kid in node.children]
-    if any(old is not new for old,new in zip(node.children, kids)):
+    if any(old is not new for old, new in zip(node.children, kids)):
         node = usage_factory(node.block_name, kids, node.initial_state, node.def_id)
     node = block_cls.postprocess_input(node, usage_factory)
     return node
