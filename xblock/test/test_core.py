@@ -1,5 +1,4 @@
 from mock import patch
-from unittest import TestCase
 from nose.tools import assert_in, assert_equals, assert_raises
 
 from xblock.core import *

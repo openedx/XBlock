@@ -1,7 +1,5 @@
 """Test that all scenarios render successfully."""
 
-import re
-
 import lxml.html
 
 from django.test.client import Client

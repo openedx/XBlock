@@ -1,5 +1,5 @@
 from nose.tools import assert_equals
-from mock import patch, Mock, call
+from mock import patch, Mock
 
 from xblock.core import *
 from xblock.runtime import *
@@ -116,7 +116,7 @@ class MockRuntimeForQuerying(Runtime):
 def test_querypath_parsing():
     mrun = MockRuntimeForQuerying()
     block = Mock()
-    q = mrun.querypath(block, "..//@hello")
+    mrun.querypath(block, "..//@hello")
     print mrun.q.mock_calls
     expected = Mock()
     expected.parent().descendants().attr("hello")
