@@ -29,7 +29,8 @@ class ThumbsBlock(InputBlock):
             <p>
                 <span class='upvote'><span class='count'>{self.upvotes}</span>&uarr;</span>
                 <span class='downvote'><span class='count'>{self.downvotes}</span>&darr;</span>
-            </p>""".format(self=self))
+            </p>
+            """.format(self=self))
         frag.add_css("""
             .upvote, .downvote {
                 cursor: pointer;
