@@ -63,6 +63,7 @@ def show_scenario(request, scenario_id):
     frag = block.runtime.render(block, {}, 'student_view')
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
+        'scenario': scenario,
         'block': block,
         'body': frag.body_html(),
         'database': MEMORY_KVS,
