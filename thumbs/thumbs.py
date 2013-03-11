@@ -1,9 +1,9 @@
 """An XBlock providing thumbs-up/thumbs-down voting.
 """
 
-from .core import XBlock, Scope, Integer, Boolean
-from .fragment import Fragment
-from .problem import InputBlock
+from xblock.core import XBlock, Scope, Integer, Boolean
+from xblock.fragment import Fragment
+from xblock.problem import InputBlock
 
 import logging
 log = logging.getLogger(__name__)
@@ -25,11 +25,11 @@ class ThumbsBlock(InputBlock):
     voted = Boolean(help="Has this student voted?", default=False, scope=Scope.student_state)
 
     def student_view(self, context):
-        frag = Fragment(self.runtime.render_template(
-            "upvotes.html",
-            upvotes=self.upvotes,
-            downvotes=self.downvotes,
-        ))
+        frag = Fragment(u"""
+            <p>
+                <span class='upvote'><span class='count'>{self.upvotes}</span>&uarr;</span>
+                <span class='downvote'><span class='count'>{self.downvotes}</span>&darr;</span>
+            </p>""".format(self=self))
         frag.add_css("""
             .upvote, .downvote {
                 cursor: pointer;

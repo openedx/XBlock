@@ -18,3 +18,4 @@ sphinx
 # Our own XBlocks
 -e .
 -e workbench
+-e thumbs
