@@ -70,6 +70,12 @@ Different students will see different student state, for example, while seeing
 the same content.
 
 
+Documentation
+-------------
+
+The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org
+
+
 Reading the code
 ----------------
 
