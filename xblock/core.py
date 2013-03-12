@@ -60,10 +60,14 @@ class ModelType(object):
         self._seq = ModelType.sequence
         self._name = "unknown"
         self.help = help
-        self.default = default
+        self._default = default
         self.computed_default = computed_default
         self.scope = scope
         ModelType.sequence += 1
+
+    @property
+    def default(self):
+        return self._default
 
     @property
     def name(self):
@@ -146,8 +150,23 @@ class ModelType(object):
 class Integer(ModelType): pass
 class Float(ModelType): pass
 class Boolean(ModelType): pass
-class Object(ModelType): pass
-class List(ModelType): pass
+
+class Object(ModelType):
+    @property
+    def default(self):
+        if self._default is None:
+            return {}
+        else:
+            return self._default
+
+class List(ModelType):
+    @property
+    def default(self):
+        if self._default is None:
+            return []
+        else:
+            return self._default
+
 class String(ModelType): pass
 class Any(ModelType): pass
 
@@ -203,7 +222,7 @@ class ChildrenModelMetaclass(type):
     def __new__(cls, name, bases, attrs):
         if (attrs.get('has_children', False) or
             any(getattr(base, 'has_children', False) for base in bases)):
-            attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.children)
+            attrs['children'] = List(help='The ids of the children of this XBlock', scope=Scope.children)
         else:
             attrs['has_children'] = False
 
