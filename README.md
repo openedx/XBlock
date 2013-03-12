@@ -73,7 +73,8 @@ the same content.
 Documentation
 -------------
 
-The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org
+The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org .
+
 
 
 Reading the code
@@ -113,3 +114,10 @@ proposing as a standard.
 
 Once you install your XBlock into your virtualenv, the workbench will
 automatically display its scenarios for you to experiment with.
+
+
+Contacts
+--------
+
+The XBlock mailing list is at [edx-xblock@googlegroups.com](https://groups.google.com/forum/#!forum/edx-xblock). 
+You can also write to edX directly at info@edx.org.
