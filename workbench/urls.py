@@ -14,7 +14,7 @@ urlpatterns = patterns('workbench.views',
     url(r'^$', 'index', name='index'),
     url(r'^scenario/(?P<scenario_id>[^/]+)/$', 'show_scenario', name='scenario'),
 
-    url(r'^handler/(?P<usage_id>[^/]+)/(?P<handler>[^/]*)/$', 'handler', name='handler'),
+    url(r'^handler/(?P<usage_id>[^/]+)/(?P<handler_slug>[^/]*)/$', 'handler', name='handler'),
     url(r'^resource/(?P<package>[^/]+)/(?P<resource>.*)$', 'package_resource', name='package_resource'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
