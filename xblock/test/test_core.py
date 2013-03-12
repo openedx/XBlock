@@ -135,7 +135,7 @@ def test_namespace_field_access(mock_load_classes):
     assert_equals(['a', 'b'], field_tester._model_data['field_x'])
 
     del field_tester.test.field_x
-    assert_equals(None, field_tester.test.field_x)
+    assert_equals([], field_tester.test.field_x)
 
     assert_raises(AttributeError, getattr, field_tester.test, 'field_z')
     assert_raises(AttributeError, delattr, field_tester.test, 'field_z')
@@ -145,6 +145,22 @@ def test_namespace_field_access(mock_load_classes):
     field_tester.test.field_z = 'foo'
     assert_raises(AttributeError, getattr, field_tester.test, 'field_z')
     assert 'field_z' not in field_tester._model_data
+
+
+def test_defaults_not_shared():
+    class FieldTester(object):
+        __metaclass__ = ModelMetaclass
+
+        field_a = List(scope=Scope.settings)
+
+        def __init__(self, model_data):
+            self._model_data = model_data
+
+    field_tester_a = FieldTester({})
+    field_tester_b = FieldTester({})
+
+    field_tester_a.field_a.append(1)
+    assert_equals([], field_tester_b.field_a)
 
 
 def test_field_serialization():
