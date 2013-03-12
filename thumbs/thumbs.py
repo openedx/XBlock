@@ -83,3 +83,17 @@ class ThumbsBlock(InputBlock):
         self.voted = True
 
         return {'up': self.upvotes, 'down': self.downvotes}
+
+    @staticmethod
+    def workbench_scenarios():
+        """A canned scenario for display in the workbench."""
+        return [
+            ("three thumbs at once",
+            """\
+                <vertical>
+                    <thumbs/>
+                    <thumbs/>
+                    <thumbs/>
+                </vertical>
+             """)
+        ]

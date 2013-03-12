@@ -68,14 +68,6 @@ SCENARIOS.extend([
         ]),
     ),
     Scenario(
-        "three thumbs at once",
-        Usage("vertical", [
-            Usage("thumbs", [], {'upvotes': 3, 'downvotes': 1}),
-            Usage("thumbs"),
-            Usage("thumbs"),
-        ])
-    ),
-    Scenario(
         "sequence with progress_sliders",
         Usage("sequence", [
             Usage("vertical", [
