@@ -6,6 +6,7 @@ and used by all runtimes.
 """
 
 import functools
+import inspect
 import json
 
 from collections import namedtuple
@@ -184,7 +185,7 @@ class ModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         fields = set()
-        for n, v in attrs.items() + sum([vars(base).items() for base in bases], []):
+        for n, v in attrs.items() + sum([inspect.getmembers(base) for base in bases], []):
             if isinstance(v, ModelType):
                 v._name = n
                 fields.add(v)

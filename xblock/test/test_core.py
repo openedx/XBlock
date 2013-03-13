@@ -41,8 +41,14 @@ def test_model_metaclass_with_mixins():
     class ChildClass(FieldsMixin, BaseClass):
         pass
 
+    class GrandchildClass(ChildClass):
+        pass
+
     assert hasattr(ChildClass, 'field_a')
     assert_in(ChildClass.field_a, ChildClass.fields)
+
+    assert hasattr(GrandchildClass, 'field_a')
+    assert_in(GrandchildClass.field_a, GrandchildClass.fields)
 
 def test_children_metaclass():
 
