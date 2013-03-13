@@ -183,15 +183,13 @@ class ModelMetaclass(type):
     the instance
     """
     def __new__(cls, name, bases, attrs):
-        fields = []
-        for n, v in attrs.items():
+        fields = set()
+        for n, v in attrs.items() + sum([vars(base).items() for base in bases], []):
             if isinstance(v, ModelType):
                 v._name = n
-                fields.append(v)
-        attrs['fields'] = sorted(set(sum(
-            [base.fields for base in bases if hasattr(base, 'fields')],
-            fields
-        )))
+                fields.add(v)
+
+        attrs['fields'] = sorted(fields)
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 

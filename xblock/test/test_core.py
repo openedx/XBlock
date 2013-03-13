@@ -17,7 +17,7 @@ def test_model_metaclass():
 
     class ChildClass(ModelMetaclassTester):
         pass
-        
+
     assert hasattr(ModelMetaclassTester, 'field_a')
     assert hasattr(ModelMetaclassTester, 'field_b')
 
@@ -29,7 +29,20 @@ def test_model_metaclass():
 
     assert_in(ChildClass.field_a, ChildClass.fields)
     assert_in(ChildClass.field_b, ChildClass.fields)
-    
+
+
+def test_model_metaclass_with_mixins():
+    class FieldsMixin(object):
+        field_a = Integer(scope=Scope.settings)
+
+    class BaseClass(object):
+        __metaclass__ = ModelMetaclass
+
+    class ChildClass(FieldsMixin, BaseClass):
+        pass
+
+    assert hasattr(ChildClass, 'field_a')
+    assert_in(ChildClass.field_a, ChildClass.fields)
 
 def test_children_metaclass():
 
