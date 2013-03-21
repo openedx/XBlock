@@ -12,12 +12,12 @@ class Metaclass(NamespacesMetaclass, ChildrenModelMetaclass, ModelMetaclass):
 class TestNamespace(Namespace):
     n_content = String(scope=Scope.content, default='nc')
     n_settings = String(scope=Scope.settings, default='ns')
-    n_student_state = String(scope=Scope.student_state, default='nss')
-    n_student_preferences = String(scope=Scope.student_preferences, default='nsp')
-    n_student_info = String(scope=Scope.student_info, default='nsi')
+    n_user_state = String(scope=Scope.user_state, default='nss')
+    n_preferences = String(scope=Scope.preferences, default='nsp')
+    n_user_info = String(scope=Scope.user_info, default='nsi')
     n_by_type = String(scope=Scope(False, BlockScope.TYPE), default='nbt')
     n_for_all = String(scope=Scope(False, BlockScope.ALL), default='nfa')
-    n_student_def = String(scope=Scope(True, BlockScope.DEFINITION), default='nsd')
+    n_user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='nsd')
 
 
 with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)]):
@@ -26,12 +26,12 @@ with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestName
 
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')
-        student_state = String(scope=Scope.student_state, default='ss')
-        student_preferences = String(scope=Scope.student_preferences, default='sp')
-        student_info = String(scope=Scope.student_info, default='si')
+        user_state = String(scope=Scope.user_state, default='ss')
+        preferences = String(scope=Scope.preferences, default='sp')
+        user_info = String(scope=Scope.user_info, default='si')
         by_type = String(scope=Scope(False, BlockScope.TYPE), default='bt')
         for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
-        student_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
+        user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -88,21 +88,21 @@ def test_db_model_keys():
     print key_store.db
     assert_equals('new content', key_store.db[KeyValueStore.Key(Scope.content, None, 'd0', 'content')])
     assert_equals('new settings', key_store.db[KeyValueStore.Key(Scope.settings, None, 'u0', 'settings')])
-    assert_equals('new student_state', key_store.db[KeyValueStore.Key(Scope.student_state, 's0', 'u0', 'student_state')])
-    assert_equals('new student_preferences', key_store.db[KeyValueStore.Key(Scope.student_preferences, 's0', 'TestModel', 'student_preferences')])
-    assert_equals('new student_info', key_store.db[KeyValueStore.Key(Scope.student_info, 's0', None, 'student_info')])
+    assert_equals('new user_state', key_store.db[KeyValueStore.Key(Scope.user_state, 's0', 'u0', 'user_state')])
+    assert_equals('new preferences', key_store.db[KeyValueStore.Key(Scope.preferences, 's0', 'TestModel', 'preferences')])
+    assert_equals('new user_info', key_store.db[KeyValueStore.Key(Scope.user_info, 's0', None, 'user_info')])
     assert_equals('new by_type', key_store.db[KeyValueStore.Key(Scope(False, BlockScope.TYPE), None, 'TestModel', 'by_type')])
     assert_equals('new for_all', key_store.db[KeyValueStore.Key(Scope(False, BlockScope.ALL), None, None, 'for_all')])
-    assert_equals('new student_def', key_store.db[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'student_def')])
+    assert_equals('new user_def', key_store.db[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'user_def')])
 
     assert_equals('new n_content', key_store.db[KeyValueStore.Key(Scope.content, None, 'd0', 'n_content')])
     assert_equals('new n_settings', key_store.db[KeyValueStore.Key(Scope.settings, None, 'u0', 'n_settings')])
-    assert_equals('new n_student_state', key_store.db[KeyValueStore.Key(Scope.student_state, 's0', 'u0', 'n_student_state')])
-    assert_equals('new n_student_preferences', key_store.db[KeyValueStore.Key(Scope.student_preferences, 's0', 'TestModel', 'n_student_preferences')])
-    assert_equals('new n_student_info', key_store.db[KeyValueStore.Key(Scope.student_info, 's0', None, 'n_student_info')])
+    assert_equals('new n_user_state', key_store.db[KeyValueStore.Key(Scope.user_state, 's0', 'u0', 'n_user_state')])
+    assert_equals('new n_preferences', key_store.db[KeyValueStore.Key(Scope.preferences, 's0', 'TestModel', 'n_preferences')])
+    assert_equals('new n_user_info', key_store.db[KeyValueStore.Key(Scope.user_info, 's0', None, 'n_user_info')])
     assert_equals('new n_by_type', key_store.db[KeyValueStore.Key(Scope(False, BlockScope.TYPE), None, 'TestModel', 'n_by_type')])
     assert_equals('new n_for_all', key_store.db[KeyValueStore.Key(Scope(False, BlockScope.ALL), None, None, 'n_for_all')])
-    assert_equals('new n_student_def', key_store.db[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'n_student_def')])
+    assert_equals('new n_user_def', key_store.db[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'n_user_def')])
 
 
 class MockRuntimeForQuerying(Runtime):

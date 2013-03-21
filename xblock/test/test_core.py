@@ -53,7 +53,7 @@ def test_field_access():
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.student_state, computed_default=lambda s: s.field_a + s.field_b)
+        field_c = Integer(scope=Scope.user_state, computed_default=lambda s: s.field_a + s.field_b)
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -77,7 +77,7 @@ def test_field_access():
 
 class TestNamespace(Namespace):
     field_x = List(scope=Scope.content)
-    field_y = String(scope=Scope.student_state, default="default_value")
+    field_y = String(scope=Scope.user_state, default="default_value")
 
 
 @patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)])
@@ -104,7 +104,7 @@ def test_namespace_field_access(mock_load_classes):
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.student_state, computed_default=lambda s: s.field_a + s.field_b)
+        field_c = Integer(scope=Scope.user_state, computed_default=lambda s: s.field_a + s.field_b)
 
         def __init__(self, model_data):
             self._model_data = model_data

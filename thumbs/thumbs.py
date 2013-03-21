@@ -22,7 +22,7 @@ class ThumbsBlock(InputBlock):
 
     upvotes = Integer(help="Number of up votes", default=0, scope=Scope.content)
     downvotes = Integer(help="Number of down votes", default=0, scope=Scope.content)
-    voted = Boolean(help="Has this student voted?", default=False, scope=Scope.student_state)
+    voted = Boolean(help="Has this student voted?", default=False, scope=Scope.user_state)
 
     def student_view(self, context):
         frag = Fragment(u"""

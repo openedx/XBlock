@@ -45,8 +45,8 @@ class ProblemBlock(XBlock):
 
     """
     script = String(help="Python code to compute values", scope=Scope.content, default="")
-    seed = Integer(help="Random seed for this student", scope=Scope.student_state, default=0)
-    problem_attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.student_state, default=False)
+    seed = Integer(help="Random seed for this student", scope=Scope.user_state, default=0)
+    problem_attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.user_state, default=False)
     has_children = True
 
     @classmethod
@@ -268,7 +268,7 @@ class CheckerBlock(XBlock):
 class TextInputBlock(InputBlock):
 
     input_type = String(help="Type of conversion to attempt on input string")
-    student_input = String(help="Last input submitted by the student", default="", scope=Scope.student_state)
+    student_input = String(help="Last input submitted by the student", default="", scope=Scope.user_state)
 
     def student_view(self, context):
         return Fragment(u"<p>I can only appear inside problems.</p>")
@@ -305,9 +305,9 @@ class EqualityCheckerBlock(CheckerBlock):
     content = String(help="Message describing the equality test", scope=Scope.content, default="Equality test")
 
     # Student data
-    left = Any(scope=Scope.student_state)
-    right = Any(scope=Scope.student_state)
-    attempted = Boolean(scope=Scope.student_state)
+    left = Any(scope=Scope.user_state)
+    right = Any(scope=Scope.user_state)
+    attempted = Boolean(scope=Scope.user_state)
 
     def problem_view(self, context):
         correct = self.left == self.right

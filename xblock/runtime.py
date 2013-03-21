@@ -84,7 +84,7 @@ class DbModel(MutableMapping):
             elif block == BlockScope.TYPE:
                 block_id = self._block_cls.__name__
 
-            if field.scope.student:
+            if field.scope.user:
                 student_id = self._student_id
             else:
                 student_id = None

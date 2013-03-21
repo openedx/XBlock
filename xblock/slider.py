@@ -8,7 +8,7 @@ from xblock.fragment import Fragment
 class Slider(XBlock):
     min_value = Integer(help="Minimum value", default=0, scope=Scope.content)
     max_value = Integer(help="Maximum value", default=100, scope=Scope.content)
-    value = Integer(help="Student value", default=0, scope=Scope.student_state)
+    value = Integer(help="Student value", default=0, scope=Scope.user_state)
 
     def student_view(self, context):
         html = SLIDER_TEMPLATE.format(min=self.min_value,

@@ -18,7 +18,7 @@ class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
 
-class Scope(namedtuple('ScopeBase', 'student block')):
+class Scope(namedtuple('ScopeBase', 'user block')):
     pass
 
 
@@ -37,11 +37,11 @@ class Sentinel(object):
         return self.name
 
 
-Scope.content = Scope(student=False, block=BlockScope.DEFINITION)
-Scope.settings = Scope(student=False, block=BlockScope.USAGE)
-Scope.student_state = Scope(student=True, block=BlockScope.USAGE)
-Scope.student_preferences = Scope(student=True, block=BlockScope.TYPE)
-Scope.student_info = Scope(student=True, block=BlockScope.ALL)
+Scope.content = Scope(user=False, block=BlockScope.DEFINITION)
+Scope.settings = Scope(user=False, block=BlockScope.USAGE)
+Scope.user_state = Scope(user=True, block=BlockScope.USAGE)
+Scope.preferences = Scope(user=True, block=BlockScope.TYPE)
+Scope.user_info = Scope(user=True, block=BlockScope.ALL)
 Scope.children = Sentinel('Scope.children')
 Scope.parent = Sentinel('Scope.parent')
 

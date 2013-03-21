@@ -275,4 +275,4 @@ class AnalyticsDbModel(DbModel):
         return key
 
     def _getfield(self, name):
-        return ModelType(scope=Scope.student_state)
+        return ModelType(scope=Scope.user_state)
