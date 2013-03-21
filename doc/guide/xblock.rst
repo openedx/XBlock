@@ -58,8 +58,9 @@ type, and a scope::
     downvotes = Int(help="Number of down votes", default=0, scope=Scope(user=False, module=DEFINITION))
     voted = Boolean(help="Whether a student has already voted", default=False, scope=Scope(user=True, module=USAGE))
 
-For convenience, we also provide predefined scopes: ``Scope.content``,
-``Scope.user_state``, ``Scope.preferences``, and ``Scope.user_info``.
+For convenience, we also provide five predefined scopes: ``Scope.content``,
+``Scope.settings``, ``Scope.user_state``, ``Scope.preferences``, and
+``Scope.user_info``.
 
 In XBlock code, state is accessed as attributes on self. In our example above,
 the data is available as ``self.upvotes``, ``self.downvotes``, and
