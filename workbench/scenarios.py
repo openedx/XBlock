@@ -31,32 +31,34 @@ SCENARIOS.extend([
         "a bunch of html",
         Usage("html", [], {
             'content': u"""
-                <h2>Installing Enthought for Windows</h2>
+                <h2>Gettysburg Address</h2>
 
-                <p>To download Enthought on your Windows machine, you should follow these steps:</p>
+                <p>Four score and seven years ago our fathers brought forth on
+                this continent a new nation, conceived in liberty, and dedicated to
+                the proposition that all men are created equal.</p>
 
-                <ul>
-                    <li><p>Visit the <a href="http://www.enthought.com/products/epd_free.php" target="_blank">Enthought website</a>.</p></li>
+                <p>Now we are engaged in a great civil war, testing whether
+                that nation, or any nation so conceived and so dedicated, can long
+                endure. We are met on a great battle-field of that war. We have
+                come to dedicate a portion of that field, as a final resting place
+                for those who here gave their lives that that nation might live. It
+                is altogether fitting and proper that we should do this.</p>
 
-                    <li><p>Click on the Download Button.</p></li>
-
-                    <li><p>On the subsequent page, select the download file for Windows. Do NOT
-                    download the 64 bit version, even if your operating system is 64-bit.</p></li>
-
-                    <li><p>Once the file has downloaded to your system, complete the
-                    installation by double-clicking the .msi file. Follow the instructions
-                    to install on your machine.</p></li>
-
-                </ul>
-
-                <p>Once you have completed the installation, you should be ready to use
-                the Python environment. To do this, follow these steps:</p>
-
-                <ul><li><p>Find the Enthought system on your machine and open the Idle program.
-                    </p><p>Click on the Start menu, then click on All Programs. Find
-                    the Enthought folder in the list. Open the folder and click on Idle.</p>
-                </li>
-                </ul>
+                <p>But, in a larger sense, we can not dedicate, we can not
+                consecrate, we can not hallow this ground. The brave men, living
+                and dead, who struggled here, have consecrated it, far above our
+                poor power to add or detract. The world will little note, nor long
+                remember what we say here, but it can never forget what they did
+                here. It is for us the living, rather, to be dedicated here to the
+                unfinished work which they who fought here have thus far so nobly
+                advanced. It is rather for us to be here dedicated to the great
+                task remaining before us &mdash; that from these honored dead we
+                take increased devotion to that cause for which they gave the last
+                full measure of devotion &mdash; that we here highly resolve that
+                these dead shall not have died in vain &mdash; that this nation,
+                under God, shall have a new birth of freedom &mdash; and that
+                government of the people, by the people, for the people, shall not
+                perish from the earth.</p>
                 """,
         }),
     ),
