@@ -34,6 +34,8 @@ it.
 Installation
 ------------
 
+This code runs on Python 2.7.
+
 1.  Get a local copy of this repo.
 
 2.  (Optional)  Create and activate a virtualenv to work in.
