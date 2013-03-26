@@ -121,5 +121,5 @@ automatically display its scenarios for you to experiment with.
 Contacts
 --------
 
-The XBlock mailing list is at [edx-xblock@googlegroups.com](https://groups.google.com/forum/#!forum/edx-xblock). 
+The XBlock mailing list is [edx-xblock on Google Groups](https://groups.google.com/forum/#!forum/edx-xblock). 
 You can also write to edX directly at info@edx.org.
