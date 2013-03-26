@@ -15,20 +15,21 @@ Background
 ----------
 
 EdX courseware is built out of components that are combined hierarchically.
-These include components like the video player, LON-CAPA problems, as well as
-compound components like learning sequences. We are developing a
-second-generation API for these components called XBlocks. Although they're in
-a prototype stage, we like the API, and want to collaborate with others to
-develop them into an industry standard. This is our proposed API and
-specification for XBlocks.
+These include components like the video player,
+[LON-CAPA](http://www.lon-capa.org/) problems, as well as compound components
+like learning sequences. We are developing a second-generation API for these
+components called XBlocks. Although they're in a prototype stage, we like the
+API, and want to collaborate with others to develop them into an industry
+standard. This is our proposed API and specification for XBlocks.
 
-How does this differ from existing industry standards like LTI and SCORM? On a
-high level, XBlocks is a Python language-level API, and it provides sensible
-defaults for things like storing data. XBlocks could be wrapped up in LTI, and
-one could make an LTI XBlock. The core reason to write an XBlock is that it is
-deployable. You can give us the code to an XBlock, and we can embed it in our
-courseware. LTI would require you to give us a virtual machine image which ran
-it.
+How does this differ from existing industry standards like [Learning Tools
+Interoperability](http://www.imsglobal.org/toolsinteroperability2.cfm) (LTI)
+and [SCORM](http://scorm.com/scorm-explained/)? On a high level, XBlocks is a
+Python language-level API, and it provides sensible defaults for things like
+storing data. XBlocks could be wrapped up in LTI, and one could make an LTI
+XBlock. The core reason to write an XBlock is that it is deployable. You can
+give us the code to an XBlock, and we can embed it in our courseware. LTI would
+require you to give us a virtual machine image which ran it.
 
 
 Installation
