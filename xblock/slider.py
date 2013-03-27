@@ -44,7 +44,7 @@ class ProgressSlider(Slider):
         return frag
 
     def update(self, request):
-        response = super(ProgressSlider, self).handle_update(request)
+        response = super(ProgressSlider, self).update(request)
         self.runtime.publish('progress', (self.value, self.max_value))
         return response
 
