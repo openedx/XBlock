@@ -4,6 +4,7 @@ lxml
 requests
 webob
 WSGIProxy
+simplejson
 
 # For Tests
 mock
