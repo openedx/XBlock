@@ -6,7 +6,12 @@ Code in this file is a mix of Runtime layer and Workbench layer.
 
 import functools
 import itertools
-import json
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 import logging
 
 from django.template import loader as django_template_loader, Context as DjangoContext

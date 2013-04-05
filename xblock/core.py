@@ -7,7 +7,10 @@ and used by all runtimes.
 
 import functools
 import inspect
-import json
+try:
+    import simplesjson as json
+except ImportError:
+    import json
 
 from collections import namedtuple
 from webob import Response
