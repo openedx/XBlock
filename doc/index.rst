@@ -56,7 +56,7 @@ API
     - The XBlock Workbench
     - Writing an XBlock
         - Views
-        - Widgets
+        - Fragments
     - Existing XBlock types
 
 

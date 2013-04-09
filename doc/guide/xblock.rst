@@ -132,7 +132,7 @@ Views and Handlers are both inspired by web applications, but have different
 uses, and therefore different designs.  Views are invoked by the runtime to
 produce a rendering of some course content.  Their results are aggregated
 together hierarchically, and so are not expressed as an HTTP response, but as a
-structured Widget.  Handlers are invoked by XBlock code in the browser, so they
+structured Fragment.  Handlers are invoked by XBlock code in the browser, so they
 are defined more like traditional web applications: they accept an HTTP
 request, and produce an HTTP response.
 
