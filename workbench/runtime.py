@@ -6,7 +6,12 @@ Code in this file is a mix of Runtime layer and Workbench layer.
 
 import functools
 import itertools
-import json
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 import logging
 
 from django.template import loader as django_template_loader, Context as DjangoContext
@@ -105,6 +110,9 @@ class MemoryKeyValueStore(KeyValueStore):
 
     def delete(self, key):
         del self.d[self.actual_key(key)][key.field_name]
+
+    def has(self, key):
+        return key.field_name in self.d[self.actual_key(key)]
 
     def as_html(self):
         """Just for our Workbench!"""

@@ -16,7 +16,7 @@ def test_model_metaclass():
 
     class ChildClass(ModelMetaclassTester):
         pass
-        
+
     assert hasattr(ModelMetaclassTester, 'field_a')
     assert hasattr(ModelMetaclassTester, 'field_b')
 
@@ -28,7 +28,26 @@ def test_model_metaclass():
 
     assert_in(ChildClass.field_a, ChildClass.fields)
     assert_in(ChildClass.field_b, ChildClass.fields)
-    
+
+
+def test_model_metaclass_with_mixins():
+    class FieldsMixin(object):
+        field_a = Integer(scope=Scope.settings)
+
+    class BaseClass(object):
+        __metaclass__ = ModelMetaclass
+
+    class ChildClass(FieldsMixin, BaseClass):
+        pass
+
+    class GrandchildClass(ChildClass):
+        pass
+
+    assert hasattr(ChildClass, 'field_a')
+    assert_in(ChildClass.field_a, ChildClass.fields)
+
+    assert hasattr(GrandchildClass, 'field_a')
+    assert_in(GrandchildClass.field_a, GrandchildClass.fields)
 
 def test_children_metaclass():
 
@@ -40,11 +59,21 @@ def test_children_metaclass():
     class WithoutChildren(object):
         __metaclass__ = ChildrenModelMetaclass
 
+    class InheritedChildren(HasChildren):
+        pass
+
+    assert HasChildren.has_children
+    assert not WithoutChildren.has_children
+    assert InheritedChildren.has_children
+
     assert hasattr(HasChildren, 'children')
     assert not hasattr(WithoutChildren, 'children')
+    assert hasattr(InheritedChildren, 'children')
 
     assert isinstance(HasChildren.children, List)
     assert_equals(Scope.children, HasChildren.children.scope)
+    assert isinstance(InheritedChildren.children, List)
+    assert_equals(Scope.children, InheritedChildren.children.scope)
 
 
 def test_field_access():
@@ -124,7 +153,7 @@ def test_namespace_field_access(mock_load_classes):
     assert_equals(['a', 'b'], field_tester._model_data['field_x'])
 
     del field_tester.test.field_x
-    assert_equals(None, field_tester.test.field_x)
+    assert_equals([], field_tester.test.field_x)
 
     assert_raises(AttributeError, getattr, field_tester.test, 'field_z')
     assert_raises(AttributeError, delattr, field_tester.test, 'field_z')
@@ -134,6 +163,22 @@ def test_namespace_field_access(mock_load_classes):
     field_tester.test.field_z = 'foo'
     assert_raises(AttributeError, getattr, field_tester.test, 'field_z')
     assert 'field_z' not in field_tester._model_data
+
+
+def test_defaults_not_shared():
+    class FieldTester(object):
+        __metaclass__ = ModelMetaclass
+
+        field_a = List(scope=Scope.settings)
+
+        def __init__(self, model_data):
+            self._model_data = model_data
+
+    field_tester_a = FieldTester({})
+    field_tester_b = FieldTester({})
+
+    field_tester_a.field_a.append(1)
+    assert_equals([], field_tester_b.field_a)
 
 
 def test_field_serialization():

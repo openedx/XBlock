@@ -6,7 +6,11 @@ and used by all runtimes.
 """
 
 import functools
-import json
+import inspect
+try:
+    import simplesjson as json
+except ImportError:
+    import json
 
 from collections import namedtuple
 from webob import Response
@@ -60,10 +64,14 @@ class ModelType(object):
         self._seq = ModelType.sequence
         self._name = "unknown"
         self.help = help
-        self.default = default
+        self._default = default
         self.computed_default = computed_default
         self.scope = scope
         ModelType.sequence += 1
+
+    @property
+    def default(self):
+        return self._default
 
     @property
     def name(self):
@@ -90,9 +98,6 @@ class ModelType(object):
     def __repr__(self):
         return "<{0.__class__.__name__} {0._name}>".format(self)
 
-    def __lt__(self, other):
-        return self._seq < other._seq
-
     def to_json(self, value):
         """
         Return value in the form of nested lists and dictionaries (suitable
@@ -118,6 +123,12 @@ class ModelType(object):
         """
         return self.__get__(model, model.__class__)
 
+    def read_json(self, model):
+        """
+        Retrieve the serialized value for this field from the specified model object
+        """
+        return self.to_json(self.read_from(model))
+
     def write_to(self, model, value):
         """
         Set the value for this field to value on the supplied model object
@@ -130,11 +141,36 @@ class ModelType(object):
         """
         self.__delete__(model)
 
+    def __hash__(self):
+        return hash(self.name)
+
+    def __cmp__(self, other):
+        return cmp((self._seq, self.name), (other._seq, other.name))
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+
 class Integer(ModelType): pass
 class Float(ModelType): pass
 class Boolean(ModelType): pass
-class Object(ModelType): pass
-class List(ModelType): pass
+
+class Object(ModelType):
+    @property
+    def default(self):
+        if self._default is None:
+            return {}
+        else:
+            return self._default
+
+class List(ModelType):
+    @property
+    def default(self):
+        if self._default is None:
+            return []
+        else:
+            return self._default
+
 class String(ModelType): pass
 class Any(ModelType): pass
 
@@ -151,17 +187,13 @@ class ModelMetaclass(type):
     the instance.
     """
     def __new__(cls, name, bases, attrs):
-        fields = []
-        for n, v in attrs.items():
+        fields = set()
+        for n, v in attrs.items() + sum([inspect.getmembers(base) for base in bases], []):
             if isinstance(v, ModelType):
                 v._name = n
-                fields.append(v)
-        fields.sort()
-        attrs['fields'] = sum(
-            [base.fields for base in bases if hasattr(base, 'fields')],
-            fields
-        )
+                fields.add(v)
 
+        attrs['fields'] = sorted(fields)
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
@@ -190,8 +222,9 @@ class ChildrenModelMetaclass(type):
     into a List field with an empty scope.
     """
     def __new__(cls, name, bases, attrs):
-        if attrs.get('has_children', False):
-            attrs['children'] = List(help='The ids of the children of this XBlock', default=[], scope=Scope.children)
+        if (attrs.get('has_children', False) or
+            any(getattr(base, 'has_children', False) for base in bases)):
+            attrs['children'] = List(help='The ids of the children of this XBlock', scope=Scope.children)
         else:
             attrs['has_children'] = False
 
