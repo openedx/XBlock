@@ -66,7 +66,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = 'static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -77,6 +77,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    "chat/static",
 )
 
 # List of finder classes that know how to find static files in
@@ -115,6 +116,7 @@ WSGI_APPLICATION = 'workbench.wsgi.application'
 TEMPLATE_DIRS = (
     'workbench/templates',
     'xblock/templates',
+    'chat/templates',
 )
 
 INSTALLED_APPS = (
@@ -161,4 +163,13 @@ LOGGING = {
             'propagate': True,
         },
     }
+}
+
+# Chat XBlock settings. These should probably be moved elsewhere,
+# but we'll leave these in here for demo purposes.
+CHAT = {
+    "chat_room": "MITx-6.002x-2013_Spring_class",
+    "jabber_domain": "jabber.dev.c2gops.com",
+    "nick": "nate@jabber.dev.c2gops.com",
+    "password": "nate@jabber.dev.c2gops.com"
 }
