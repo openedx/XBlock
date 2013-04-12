@@ -101,7 +101,7 @@ clear which layer the code lives in, though sometimes the lines are blurred:
 4.  **Thumbs** This is a sample XBlock written as a separate installable kit as
     an example of how third-party XBlocks can be structured.
 
-5. *Chat* This is another sample XBlock written to demonstrate the use
+5. **Chat** This is another sample XBlock written to demonstrate the use
    of Django templates and third-party libraries in XBlocks. Note that
    to run this XBlock, you'll need to run `python manage.py
    collectstatic` _before_ running the workbench server.
