@@ -58,16 +58,13 @@ class ModelType(object):
     When the class is instantiated, it will be available as an instance attribute of the same
     name, by proxying through to self._model_data on the containing object.
     """
-    sequence = 0
 
     def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None):
-        self._seq = ModelType.sequence
         self._name = "unknown"
         self.help = help
         self._default = default
         self.computed_default = computed_default
         self.scope = scope
-        ModelType.sequence += 1
 
     @property
     def default(self):
@@ -144,9 +141,6 @@ class ModelType(object):
     def __hash__(self):
         return hash(self.name)
 
-    def __cmp__(self, other):
-        return cmp((self._seq, self.name), (other._seq, other.name))
-
     def __eq__(self, other):
         return self.name == other.name
 
@@ -193,7 +187,7 @@ class ModelMetaclass(type):
                 v._name = n
                 fields.add(v)
 
-        attrs['fields'] = sorted(fields)
+        attrs['fields'] = list(fields)
         return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
