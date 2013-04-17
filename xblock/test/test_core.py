@@ -1,5 +1,5 @@
-from mock import patch
-from nose.tools import assert_in, assert_equals, assert_raises
+from mock import patch, MagicMock
+from nose.tools import assert_in, assert_equals, assert_raises, assert_not_equals
 
 from xblock.core import *
 
@@ -48,6 +48,7 @@ def test_model_metaclass_with_mixins():
 
     assert hasattr(GrandchildClass, 'field_a')
     assert_in(GrandchildClass.field_a, GrandchildClass.fields)
+
 
 def test_children_metaclass():
 
@@ -179,6 +180,60 @@ def test_defaults_not_shared():
 
     field_tester_a.field_a.append(1)
     assert_equals([], field_tester_b.field_a)
+
+
+def test_caching():
+    '''Check that values that are modified are what is returned'''
+    class FieldTester(object):
+        __metaclass__ = ModelMetaclass
+
+        field_a = List(scope=Scope.settings)
+
+        def __init__(self, model_data):
+            self._model_data = model_data
+
+    model_data = MagicMock(spec=dict)
+    model_data.__getitem__ = lambda self, name: [name]
+
+    field_tester_a = FieldTester(model_data)
+    value = field_tester_a.field_a
+    assert_equals(value, field_tester_a.field_a)
+    # changing the field in place matches a previously fetched value
+    field_tester_a.field_a.append(1)
+    assert_equals(value, field_tester_a.field_a)
+    # changing the previously-fetched value also changes the field:
+    value.append(2)
+    assert_equals(value, field_tester_a.field_a)
+
+
+def test_caching_is_per_instance():
+    '''Test that values cached for one instance do not appear on another'''
+    class FieldTester(object):
+        __metaclass__ = ModelMetaclass
+
+        field_a = List(scope=Scope.settings)
+
+        def __init__(self, model_data):
+            self._model_data = model_data
+
+    model_data = MagicMock(spec=dict)
+    model_data.__getitem__ = lambda self, name: [name]
+
+    # same model_data used in different objects should result
+    # in separately-cached values, so that changing a value
+    # in one instance doesn't affect values stored in others.
+    field_tester_a = FieldTester(model_data)
+    field_tester_b = FieldTester(model_data)
+    value = field_tester_a.field_a
+    assert_equals(value, field_tester_a.field_a)
+    field_tester_a.field_a.append(1)
+    assert_equals(value, field_tester_a.field_a)
+    assert_not_equals(value, field_tester_b.field_a)
+
+# TODO: things to test:
+#   deletion restores the default value if there is one
+#   deletion restores the computed value if there is one
+#
 
 
 def test_field_serialization():
