@@ -65,12 +65,13 @@ in-memory dictionary.  The data is all lost and reset when you restart the
 server.
 
 If you want to experiment with different students, you can use a URL parameter
-to set the numeric student ID, which defaults to 1:
+to set the student ID, which defaults to 1:
 
     http://127.0.0.1:8000/?student_id=17
 
 Different students will see different student state, for example, while seeing
-the same content.
+the same content.  Student ids are strings, even if they contain only digits
+as the default does.
 
 
 Documentation
