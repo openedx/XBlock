@@ -3,6 +3,7 @@
 import lxml.html
 
 from django.test.client import Client
+from django.test import TestCase
 
 
 def test_all_scenarios():
@@ -15,8 +16,14 @@ def test_all_scenarios():
         yield try_scenario, a.get('href'), a.text
 
 
-def try_scenario(url, text):
-    # Check that the scenario renders without error.
+def try_scenario(url, name):
+    """Check that a scenario renders without error.
+
+    `url`: the URL to the scenario to test.
+
+    `name`: the name of the scenario, used in error messages.
+
+    """
     c = Client()
     response = c.get(url, follow=True)
     assert response.status_code == 200, text

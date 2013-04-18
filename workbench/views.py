@@ -53,14 +53,14 @@ def index(request):
 
 
 @ensure_csrf_cookie
-def show_scenario(request, scenario_id):
+def show_scenario(request, scenario_id, view_name='student_view'):
     student_id = get_student_id(request)
     log.info("Start show_scenario %s for student %s", scenario_id, student_id)
     scenario = SCENARIOS[int(scenario_id)]
     usage = scenario.usage
     usage.store_initial_state()
     block = create_xblock(usage, "student_%s" % student_id)
-    frag = block.runtime.render(block, {}, 'student_view')
+    frag = block.runtime.render(block, {}, view_name)
     log.info("End show_scenario %s", scenario_id)
     return render_to_response('block.html', {
         'scenario': scenario,
