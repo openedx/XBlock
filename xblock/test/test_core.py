@@ -105,6 +105,48 @@ def test_field_access():
     assert hasattr(FieldTester, 'field_a')
 
 
+def test_list_field_access():
+    '''Check that values that are deleted are restored to their default values'''
+    class FieldTester(object):
+        __metaclass__ = ModelMetaclass
+
+        field_a = List(scope=Scope.settings)
+        field_b = List(scope=Scope.content, default=[1, 2, 3])
+        field_c = List(scope=Scope.user_state, computed_default=lambda instance: instance.field_a + instance.field_b)
+
+        def __init__(self, model_data):
+            self._model_data = model_data
+
+    field_tester = FieldTester({})
+
+    # check initial values
+    assert_equals([], field_tester.field_a)
+    assert_equals([1, 2, 3], field_tester.field_b)
+    assert_equals([1, 2, 3], field_tester.field_c)
+
+    # test no default specified
+    field_tester.field_a.append(1)
+    assert_equals([1], field_tester.field_a)
+    del field_tester.field_a
+    assert_equals([], field_tester.field_a)
+
+    # test default explicitly specified
+    field_tester.field_b.append(4)
+    assert_equals([1, 2, 3, 4], field_tester.field_b)
+    del field_tester.field_b
+    assert_equals([1, 2, 3], field_tester.field_b)
+
+    # check computed default:
+    #   if we mutate a computed default, it is not persisted.
+    field_tester.field_c.append(4)
+    assert_equals([1, 2, 3], field_tester.field_c)
+    #   confirm that it is computed at the time it is fetched, not the time it is deleted
+    field_tester.field_a.append(5)
+    del field_tester.field_c
+    field_tester.field_b.append(6)
+    assert_equals([5, 1, 2, 3, 6], field_tester.field_c)
+
+
 class TestNamespace(Namespace):
     field_x = List(scope=Scope.content)
     field_y = String(scope=Scope.user_state, default="default_value")
@@ -182,7 +224,7 @@ def test_defaults_not_shared():
     assert_equals([], field_tester_b.field_a)
 
 
-def test_caching():
+def test_object_identity():
     '''Check that values that are modified are what is returned'''
     class FieldTester(object):
         __metaclass__ = ModelMetaclass
@@ -192,18 +234,28 @@ def test_caching():
         def __init__(self, model_data):
             self._model_data = model_data
 
+    # make sure that model_data always returns a different object
+    # each time it's actually queried, so that the caching is
+    # doing the work to maintain object identity.
     model_data = MagicMock(spec=dict)
     model_data.__getitem__ = lambda self, name: [name]
+    field_tester = FieldTester(model_data)
 
-    field_tester_a = FieldTester(model_data)
-    value = field_tester_a.field_a
-    assert_equals(value, field_tester_a.field_a)
+    value = field_tester.field_a
+    assert_equals(value, field_tester.field_a)
+
     # changing the field in place matches a previously fetched value
-    field_tester_a.field_a.append(1)
-    assert_equals(value, field_tester_a.field_a)
-    # changing the previously-fetched value also changes the field:
+    field_tester.field_a.append(1)
+    assert_equals(value, field_tester.field_a)
+
+    # changing the previously-fetched value also changes the value returned by the field:
     value.append(2)
-    assert_equals(value, field_tester_a.field_a)
+    assert_equals(value, field_tester.field_a)
+
+    # deletion restores the default value.  In the case of a List with
+    # no default defined, this is the empty list.
+    del field_tester.field_a
+    assert_equals([], field_tester.field_a)
 
 
 def test_caching_is_per_instance():
