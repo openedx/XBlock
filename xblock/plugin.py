@@ -15,12 +15,12 @@ class PluginMissingError(Exception):
 
 
 class Plugin(object):
-    """
-    Base class for a system that uses entry_points to load plugins.
+    """Base class for a system that uses entry_points to load plugins.
 
     Implementing classes are expected to have the following attributes:
 
-        entry_point: The name of the entry point to load plugins from
+        `entry_point`: The name of the entry point to load plugins from.
+
     """
 
     _plugin_cache = None
@@ -33,13 +33,14 @@ class Plugin(object):
 
     @classmethod
     def load_class(cls, identifier, default=None):
-        """
-        Loads a single class instance specified by identifier. If identifier
-        specifies more than a single class, then logs a warning and returns the
-        first class identified.
+        """Load a single class specified by identifier.
 
-        If default is not None, will return default if no entry_point matching
-        identifier is found. Otherwise, will raise a PluginMissingError
+        If `identifier` specifies more than a single class, then log a warning
+        and return the first class identified.
+
+        If `default` is provided, return it if no entry_point matching
+        `identifier` is found. Otherwise, will raise a PluginMissingError
+
         """
         if cls._plugin_cache is None:
             cls._plugin_cache = {}
@@ -67,9 +68,11 @@ class Plugin(object):
 
     @classmethod
     def load_classes(cls):
-        """
+        """Load all the classes for a plugin.
+
         Returns a list of containing the identifiers and their corresponding classes for all
-        of the available instances of this plugin
+        of the available instances of this plugin.
+
         """
         return [(class_.name, cls._load_class_entry_point(class_))
                 for class_
