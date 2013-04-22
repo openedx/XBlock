@@ -70,10 +70,9 @@ class Plugin(object):
     def load_classes(cls):
         """Load all the classes for a plugin.
 
-        Returns a list of containing the identifiers and their corresponding classes for all
-        of the available instances of this plugin.
+        Produces a sequence containing the identifiers and their corresponding
+        classes for all of the available instances of this plugin.
 
         """
-        return [(class_.name, cls._load_class_entry_point(class_))
-                for class_
-                in pkg_resources.iter_entry_points(cls.entry_point)]
+        for class_ in pkg_resources.iter_entry_points(cls.entry_point):
+            yield (class_.name, cls._load_class_entry_point(class_))

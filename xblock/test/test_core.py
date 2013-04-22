@@ -239,3 +239,21 @@ def test_class_tags():
 
     sub4block = Sub4Block(None, None)
     assert_equals(sub4block._class_tags, set(["cat", "dog", "mixin"]))
+
+
+def test_loading_tagged_classes():
+
+    @XBlock.tag("thetag")
+    class HasTag1(XBlock):
+        pass
+
+    class HasTag2(HasTag1):
+        pass
+
+    class HasntTag(XBlock):
+        pass
+
+    the_classes = [('hastag1', HasTag1), ('hastag2', HasTag2), ('hasnttag', HasntTag)]
+    tagged_classes = [('hastag1', HasTag1), ('hastag2', HasTag2)]
+    with patch('xblock.core.XBlock.load_classes', return_value=the_classes):
+        assert_equals(set(XBlock.load_tagged_classes('thetag')), set(tagged_classes))

@@ -350,6 +350,13 @@ class XBlock(Plugin):
         return dec
 
     @classmethod
+    def load_tagged_classes(cls, tag):
+        """Produce a sequence of all XBlock classes tagged with `tag`."""
+        for name, class_ in cls.load_classes():
+            if tag in class_._class_tags:
+                yield name, class_
+
+    @classmethod
     def preprocess_input(cls, node, usage_factory):
         """The class can adjust a parsed Usage tree."""
         return node
