@@ -14,7 +14,7 @@ from django.shortcuts import render_to_response
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .runtime import Usage, create_xblock, MEMORY_KVS
-from .scenarios import SCENARIOS
+from .scenarios import SCENARIOS, Scenario
 from .request import webob_to_django_response, django_to_webob_request
 
 
@@ -47,22 +47,32 @@ def get_student_id(request):
 #---- Views -----
 
 def index(request):
+    the_scenarios = sorted(SCENARIOS.items())
     return render_to_response('index.html', {
-        'scenarios': [(i, scenario.description) for i, scenario in enumerate(SCENARIOS)]
+        'scenarios': [(desc, scenario.description) for desc, scenario in the_scenarios]
     })
 
 
 @ensure_csrf_cookie
-def show_scenario(request, scenario_id, view_name='student_view'):
+def show_scenario(request, scenario_id, view_name='student_view', template='block.html'):
     student_id = get_student_id(request)
-    log.info("Start show_scenario %s for student %s", scenario_id, student_id)
-    scenario = SCENARIOS[int(scenario_id)]
+    log.info("Start show_scenario %r for student %s", scenario_id, student_id)
+
+    try:
+        scenario = SCENARIOS[scenario_id]
+    except KeyError:
+        # Hmm, someone wants a class sceanario auto-generated.
+        description = "Auto-generated for %s" % scenario_id
+        usage = Usage(scenario_id, [])
+        scenario = Scenario(description, usage)
+        SCENARIOS[scenario_id] = scenario
+
     usage = scenario.usage
     usage.store_initial_state()
     block = create_xblock(usage, "student_%s" % student_id)
     frag = block.runtime.render(block, {}, view_name)
     log.info("End show_scenario %s", scenario_id)
-    return render_to_response('block.html', {
+    return render_to_response(template, {
         'scenario': scenario,
         'block': block,
         'body': frag.body_html(),

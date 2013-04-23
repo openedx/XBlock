@@ -14,20 +14,24 @@ from .runtime import Usage
 
 Scenario = namedtuple("Scenario", "description usage")
 
-SCENARIOS = []
+SCENARIOS = {}
 
-for name, cls in XBlock.load_classes():
+for class_name, cls in XBlock.load_classes():
     # Each XBlock class can provide scenarios to display in the workbench.
     if hasattr(cls, "workbench_scenarios"):
-        for desc, xml in cls.workbench_scenarios():
-            SCENARIOS.append(Scenario(desc, parse_xml_string(xml, Usage)))
+        for i, (desc, xml) in enumerate(cls.workbench_scenarios()):
+            scname = "%s.%d" % (class_name, i)
+            usage = parse_xml_string(xml, Usage)
+            SCENARIOS[scname] = Scenario(desc, usage)
     else:
         # No specific scenarios, just show it with three generic children.
         default_children = [Usage("debugchild", []) for _ in xrange(3)]
-        SCENARIOS.append(Scenario(name, Usage(name, default_children)))
+        scname = "%s.0" % class_name
+        usage = Usage(class_name, default_children)
+        SCENARIOS[scname] = Scenario(class_name, usage)
 
-SCENARIOS.extend([
-    Scenario(
+SCENARIOS.update({
+    'gettysburg': Scenario(
         "a bunch of html",
         Usage("html", [], {
             'content': u"""
@@ -62,14 +66,16 @@ SCENARIOS.extend([
                 """,
         }),
     ),
-    Scenario(
+
+    'two_inputs': Scenario(
         "problem with two inputs",
         Usage("problem", [
             Usage("textinput"),
             Usage("textinput"),
         ]),
     ),
-    Scenario(
+
+    'seq_progress': Scenario(
         "sequence with progress_sliders",
         Usage("sequence", [
             Usage("vertical", [
@@ -90,7 +96,8 @@ SCENARIOS.extend([
             ]),
         ]),
     ),
-    Scenario(
+
+    'three_problems': Scenario(
         "three problems",
         Usage("vertical", [
             Usage("attempts_scoreboard"),
@@ -155,4 +162,4 @@ SCENARIOS.extend([
             }),
         ]),
     ),
-])
+})

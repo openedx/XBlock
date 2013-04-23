@@ -8,8 +8,8 @@
             <h1>XBlock scenarios</h1>
         </header>
         <section class="main">
-            {% for i, desc in scenarios %}
-                <p><a href="/scenario/{{i}}">{{desc}}</a></p>
+            {% for scname, desc in scenarios %}
+                <p><a href="/scenario/{{scname}}">{{desc}}</a></p>
             {% endfor %}
         </section>
     </body>
