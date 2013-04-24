@@ -54,8 +54,8 @@ XBlocks declare their data with a schema in the XBlock class definition.  The
 schema defines a series of properties, each of which has at least a name, a
 type, and a scope::
 
-    upvotes = Int(help="Number of up votes", default=0, scope=Scope(user=False, module=DEFINITION))
-    downvotes = Int(help="Number of down votes", default=0, scope=Scope(user=False, module=DEFINITION))
+    upvotes = Integer(help="Number of up votes", display_name="Up Votes", default=0, scope=Scope(user=False, module=DEFINITION))
+    downvotes = Integer(help="Number of down votes", display_name="Down Votes", default=0, scope=Scope(user=False, module=DEFINITION))
     voted = Boolean(help="Whether a student has already voted", default=False, scope=Scope(user=True, module=USAGE))
 
 For convenience, we also provide five predefined scopes: ``Scope.content``,

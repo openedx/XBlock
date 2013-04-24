@@ -359,3 +359,26 @@ def test_loading_tagged_classes():
     tagged_classes = [('hastag1', HasTag1), ('hastag2', HasTag2)]
     with patch('xblock.core.XBlock.load_classes', return_value=the_classes):
         assert_equals(set(XBlock.load_tagged_classes('thetag')), set(tagged_classes))
+
+
+def test_field_display_name_defaults():
+    attempts = Integer()
+    attempts._name = "max_problem_attempts"
+    assert_equals('max_problem_attempts', attempts.display_name)
+
+    class TestNamespace(Namespace):
+        field_x = List()
+
+    assert_equals("field_x", TestNamespace.field_x.display_name)
+
+
+def test_field_display_name():
+    attempts = Integer(display_name = 'Maximum Problem Attempts')
+    attempts._name = "max_problem_attempts"
+    assert_equals("Maximum Problem Attempts", attempts.display_name)
+
+    class TestNamespace(Namespace):
+        field_x = List(display_name="Field Known as X")
+
+    assert_equals("Field Known as X", TestNamespace.field_x.display_name)
+
