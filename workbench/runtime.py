@@ -35,6 +35,8 @@ class Usage(object):
     """
     ids = itertools.count()
     usage_index = {}
+    # TODO: hacked @ hackathon, fix the comments
+    inited = set()
 
     def __init__(self, block_name, children=None, initial_state=None, def_id=None):
         self.id = "usage_%d" % next(self.ids)
@@ -52,8 +54,9 @@ class Usage(object):
             child.parent = self
 
     def store_initial_state(self):
+        # TODO: hacked @ hackathon, fix the comments
         # If we've already created the initial state, there's nothing to do.
-        if self.initial_state is None:
+        if id(self) in self.inited:
             return
 
         # Create an XBlock from this usage, and use it to create the initial
@@ -67,8 +70,9 @@ class Usage(object):
         if self.parent is not None:
             block.parent = self.parent.id
 
+        # TODO: hacked @ hackathon, fix the comments
         # We no longer need initial_state, clobber it to prove it.
-        self.initial_state = None
+        self.inited.add(id(self))
 
         # Also do this recursively down the tree.
         for child in self.children:

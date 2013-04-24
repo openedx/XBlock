@@ -12,6 +12,7 @@ nose
 django-nose
 coverage
 pylint
+selenium
 
 # For docs
 sphinx
