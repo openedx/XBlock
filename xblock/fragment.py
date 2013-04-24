@@ -8,6 +8,7 @@ from collections import namedtuple
 
 _FragmentResource = namedtuple("_FragmentResource", "kind, data, mimetype, placement")
 
+
 class Fragment(object):
     """A fragment of a web page, for XBlock views to return.
 

@@ -4,7 +4,7 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
-
+import copy
 import functools
 import inspect
 try:
@@ -49,6 +49,10 @@ Scope.user_info = Scope(user=True, block=BlockScope.ALL)
 Scope.children = Sentinel('Scope.children')
 Scope.parent = Sentinel('Scope.parent')
 
+# define a placeholder ('nil') value to indicate when nothing has been stored in
+# the cache.  ("None" may be a valid value in the cache, so we cannot use it.)
+NO_CACHE_VALUE = object()
+
 
 class ModelType(object):
     """
@@ -74,23 +78,76 @@ class ModelType(object):
     def name(self):
         return self._name
 
+    def _get_cached_value(self, instance):
+        """
+        Return a value from the instance's cache, or a marker value if either the cache
+        doesn't exist or the value is not found in the cache.
+        """
+        return getattr(instance, '_model_data_cache', {}).get(self.name, NO_CACHE_VALUE)
+
+    def _set_cached_value(self, instance, value):
+        """Store a value in the instance's cache, creating the cache if necessary."""
+        if not hasattr(instance, '_model_data_cache'):
+            instance._model_data_cache = {}
+        instance._model_data_cache[self.name] = value
+
+    def _del_cached_value(self, instance):
+        """Remove a value from the instance's cache, if the cache exists."""
+        if hasattr(instance, '_model_data_cache') and self.name in instance._model_data_cache:
+            del instance._model_data_cache[self.name]
+
+    def _use_computed_default(self):
+        """Returns boolean indicating if a default value can/should be computed"""
+        # Check self._default to see if a default was provided (and not
+        # self.default, since that property may be redefined).
+        return self._default is None and self.computed_default is not None
+
     def __get__(self, instance, owner):
         if instance is None:
             return self
 
-        try:
-            return self.from_json(instance._model_data[self.name])
-        except KeyError:
-            if self.default is None and self.computed_default is not None:
-                return self.computed_default(instance)
+        value = self._get_cached_value(instance)
+        if value is NO_CACHE_VALUE:
+            try:
+                value = self.from_json(instance._model_data[self.name])
+                self._set_cached_value(instance, value)
+            except KeyError:
+                # Computed defaults are not stored in cache, but are
+                # always recomputed.  Regular defaults are always copied,
+                # in case the provided default value is mutable (e.g list or
+                # dict).  Regular defaults are also cached.
+                if self._use_computed_default():
+                    value = self.computed_default(instance)
+                else:
+                    value = copy.deepcopy(self.default)
+                    self._set_cached_value(instance, value)
 
-            return self.default
+        return value
 
     def __set__(self, instance, value):
-        instance._model_data[self.name] = self.to_json(value)
+        value = self.to_json(value)
+        # Update both the persistent store and the cache:
+        instance._model_data[self.name] = value
+        self._set_cached_value(instance, value)
 
     def __delete__(self, instance):
-        del instance._model_data[self.name]
+        # Try to perform the deletion on the model_data, and accept
+        # that it's okay if the key is not present.  (It may never
+        # have been persisted at all.)
+        try:
+            del instance._model_data[self.name]
+        except KeyError:
+            pass
+
+        # Since we know that the model_data no longer contains the value, we can
+        # avoid the possible database lookup that a future get() call would
+        # entail by setting the cached value now to its default value.
+        # However, we should not store cached values for computed defaults, so
+        # we just clear the cache in that case.
+        if self._use_computed_default():
+            self._del_cached_value(instance)
+        else:
+            self._set_cached_value(instance, copy.deepcopy(self.default))
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0._name}>".format(self)
@@ -145,9 +202,17 @@ class ModelType(object):
         return self.name == other.name
 
 
-class Integer(ModelType): pass
-class Float(ModelType): pass
-class Boolean(ModelType): pass
+class Integer(ModelType):
+    pass
+
+
+class Float(ModelType):
+    pass
+
+
+class Boolean(ModelType):
+    pass
+
 
 class Object(ModelType):
     @property
@@ -157,6 +222,7 @@ class Object(ModelType):
         else:
             return self._default
 
+
 class List(ModelType):
     @property
     def default(self):
@@ -165,8 +231,13 @@ class List(ModelType):
         else:
             return self._default
 
-class String(ModelType): pass
-class Any(ModelType): pass
+
+class String(ModelType):
+    pass
+
+
+class Any(ModelType):
+    pass
 
 
 class ModelMetaclass(type):
