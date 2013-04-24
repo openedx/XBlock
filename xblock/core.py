@@ -80,24 +80,24 @@ class ModelType(object):
 
     def _get_cached_value(self, instance):
         """
-        return a value from the instance's cache, or a marker value if either the cache
+        Return a value from the instance's cache, or a marker value if either the cache
         doesn't exist or the value is not found in the cache.
         """
         return getattr(instance, '_model_data_cache', {}).get(self.name, NO_CACHE_VALUE)
 
     def _set_cached_value(self, instance, value):
-        """store a value in the instance's cache, creating the cache if necessary."""
+        """Store a value in the instance's cache, creating the cache if necessary."""
         if not hasattr(instance, '_model_data_cache'):
             instance._model_data_cache = {}
         instance._model_data_cache[self.name] = value
 
     def _del_cached_value(self, instance):
-        """remove a value from the instance's cache, if the cache exists."""
+        """Remove a value from the instance's cache, if the cache exists."""
         if hasattr(instance, '_model_data_cache') and self.name in instance._model_data_cache:
             del instance._model_data_cache[self.name]
 
     def _use_computed_default(self):
-        """returns boolean indicating if a default value can/should be computed"""
+        """Returns boolean indicating if a default value can/should be computed"""
         # Check self._default to see if a default was provided (and not
         # self.default, since that property may be redefined).
         return self._default is None and self.computed_default is not None
@@ -107,7 +107,7 @@ class ModelType(object):
             return self
 
         value = self._get_cached_value(instance)
-        if value == NO_CACHE_VALUE:
+        if value is NO_CACHE_VALUE:
             try:
                 value = self.from_json(instance._model_data[self.name])
                 self._set_cached_value(instance, value)
@@ -126,7 +126,7 @@ class ModelType(object):
 
     def __set__(self, instance, value):
         value = self.to_json(value)
-        # update both the persistent store and the cache:
+        # Update both the persistent store and the cache:
         instance._model_data[self.name] = value
         self._set_cached_value(instance, value)
 

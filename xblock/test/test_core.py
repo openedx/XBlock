@@ -119,28 +119,28 @@ def test_list_field_access():
 
     field_tester = FieldTester({})
 
-    # check initial values
+    # Check initial values
     assert_equals([], field_tester.field_a)
     assert_equals([1, 2, 3], field_tester.field_b)
     assert_equals([1, 2, 3], field_tester.field_c)
 
-    # test no default specified
+    # Test no default specified
     field_tester.field_a.append(1)
     assert_equals([1], field_tester.field_a)
     del field_tester.field_a
     assert_equals([], field_tester.field_a)
 
-    # test default explicitly specified
+    # Test default explicitly specified
     field_tester.field_b.append(4)
     assert_equals([1, 2, 3, 4], field_tester.field_b)
     del field_tester.field_b
     assert_equals([1, 2, 3], field_tester.field_b)
 
-    # check computed default:
-    #   if we mutate a computed default, it is not persisted.
+    # Check computed default:
+    #   If we mutate a computed default, it is not persisted.
     field_tester.field_c.append(4)
     assert_equals([1, 2, 3], field_tester.field_c)
-    #   confirm that it is computed at the time it is fetched, not the time it is deleted
+    #   Confirm that it is computed at the time it is fetched, not the time it is deleted
     field_tester.field_a.append(5)
     del field_tester.field_c
     field_tester.field_b.append(6)
@@ -234,7 +234,7 @@ def test_object_identity():
         def __init__(self, model_data):
             self._model_data = model_data
 
-    # make sure that model_data always returns a different object
+    # Make sure that model_data always returns a different object
     # each time it's actually queried, so that the caching is
     # doing the work to maintain object identity.
     model_data = MagicMock(spec=dict)
@@ -244,15 +244,15 @@ def test_object_identity():
     value = field_tester.field_a
     assert_equals(value, field_tester.field_a)
 
-    # changing the field in place matches a previously fetched value
+    # Changing the field in place matches a previously fetched value
     field_tester.field_a.append(1)
     assert_equals(value, field_tester.field_a)
 
-    # changing the previously-fetched value also changes the value returned by the field:
+    # Changing the previously-fetched value also changes the value returned by the field:
     value.append(2)
     assert_equals(value, field_tester.field_a)
 
-    # deletion restores the default value.  In the case of a List with
+    # Deletion restores the default value.  In the case of a List with
     # no default defined, this is the empty list.
     del field_tester.field_a
     assert_equals([], field_tester.field_a)
@@ -271,7 +271,7 @@ def test_caching_is_per_instance():
     model_data = MagicMock(spec=dict)
     model_data.__getitem__ = lambda self, name: [name]
 
-    # same model_data used in different objects should result
+    # Same model_data used in different objects should result
     # in separately-cached values, so that changing a value
     # in one instance doesn't affect values stored in others.
     field_tester_a = FieldTester(model_data)
@@ -281,11 +281,6 @@ def test_caching_is_per_instance():
     field_tester_a.field_a.append(1)
     assert_equals(value, field_tester_a.field_a)
     assert_not_equals(value, field_tester_b.field_a)
-
-# TODO: things to test:
-#   deletion restores the default value if there is one
-#   deletion restores the computed value if there is one
-#
 
 
 def test_field_serialization():
