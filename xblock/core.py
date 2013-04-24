@@ -63,12 +63,13 @@ class ModelType(object):
     name, by proxying through to self._model_data on the containing object.
     """
 
-    def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None):
+    def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None, display_name=None):
         self._name = "unknown"
         self.help = help
         self._default = default
         self.computed_default = computed_default
         self.scope = scope
+        self._display_name = display_name
 
     @property
     def default(self):
@@ -77,6 +78,15 @@ class ModelType(object):
     @property
     def name(self):
         return self._name
+
+    @property
+    def display_name(self):
+        """
+        Returns the display name for this class, suitable for use in a GUI.
+
+        If no display name has been set, returns the name of the class.
+        """
+        return self._display_name if self._display_name is not None else self.name
 
     def _get_cached_value(self, instance):
         """
