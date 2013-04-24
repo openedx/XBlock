@@ -53,6 +53,32 @@ This code runs on Python 2.7.
 5.  Open a web browser to: http://127.0.0.1:8000
 
 
+Testing
+--------
+
+To run the test suite:
+
+    $ python manage.py test
+
+This will run:
+* Unit tests of the XBlock core and runtime.
+* Integration tests of XBlocks running within the workbench.
+
+Since XBlocks can contain client-side scripts, it is important to test them through a browser.  For example, the ``thumbs`` XBlock uses Javascript to record user votes by sending an AJAX POST request back to the `ThumbsBlock` XBlock.
+
+You can test XBlocks through a browser using [Selenium](http://docs.seleniumhq.org/). We have included an example Selenium test for ``thumbs`` that uses Django's [LiveServerTestCase](https://docs.djangoproject.com/en/1.4/topics/testing/#django.test.LiveServerTestCase). It runs as part of the test suite as executed by the above command. You need to have Firefox installed for this test case to run successfully.
+
+To run the test suite under coverage:
+
+    $ coverage run manage.py test
+
+to execute the tests. Then to view the coverage report:
+
+    $ coverage report
+
+See the [coverage.py](http://nedbatchelder.com/code/coverage/) docs for more info and options.
+
+
 Using the workbench
 -------------------
 
@@ -123,5 +149,5 @@ automatically display its scenarios for you to experiment with.
 Contacts
 --------
 
-The XBlock mailing list is [edx-xblock on Google Groups](https://groups.google.com/forum/#!forum/edx-xblock). 
+The XBlock mailing list is [edx-xblock on Google Groups](https://groups.google.com/forum/#!forum/edx-xblock).
 You can also write to edX directly at info@edx.org.
