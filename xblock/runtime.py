@@ -283,6 +283,7 @@ class Runtime(object):
                 raise BadPath("Invalid thing: %r" % toktext)
         return q
 
+
 class RegexLexer(object):
     """Split text into lexical tokens based on regexes."""
     def __init__(self, *toks):

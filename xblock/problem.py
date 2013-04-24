@@ -61,7 +61,7 @@ class ProblemBlock(XBlock):
         return usage_factory(node.block_name, kids, node.initial_state, node.def_id)
 
     def set_student_seed(self):
-        self.seed = int(time.clock()*10) % 100 + 1
+        self.seed = int(time.clock() * 10) % 100 + 1
 
     def calc_context(self, context):
         # If we have a script, run it.

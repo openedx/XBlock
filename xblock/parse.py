@@ -5,10 +5,11 @@ from cStringIO import StringIO
 
 from xblock.core import XBlock
 
+
 def parse_xml(fileobj, usage_factory):
     """Parse the data in the open file `fileobj`.
 
-    The result is a usage object constructed by `usage_factory`, which must 
+    The result is a usage object constructed by `usage_factory`, which must
     have a signature like::
 
         Usage(block_name, initial_state, children, def_id)
@@ -21,6 +22,7 @@ def parse_xml(fileobj, usage_factory):
     tree = _process_node(tree, usage_factory)
     return tree
 
+
 def parse_xml_string(xml, usage_factory):
     """Parse the string `xml`, just like `parse_xml`.
 
@@ -31,12 +33,13 @@ def parse_xml_string(xml, usage_factory):
 
 HTML_TAGS = set("p ol ul div span b i".split())
 
+
 def _usage_from_node(node, usage_factory):
     """A recursive function to create a usage from a dom node."""
 
     if node.tag in HTML_TAGS:
         content = etree.tostring(node, encoding='unicode')
-        return usage_factory("html", [], {"content":content})
+        return usage_factory("html", [], {"content": content})
     else:
         kids = []
         for child in node:
@@ -51,6 +54,7 @@ def _usage_from_node(node, usage_factory):
         if text and text.strip():
             content["content"] = text
         return usage_factory(node.tag, kids, content)
+
 
 def _process_node(node, usage_factory):
     """Give the XBlock classes a chance to manipulate the tree."""
