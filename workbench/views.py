@@ -40,7 +40,7 @@ log = logging.getLogger(__name__)
 # We don't really have authentication and multiple students, just accept their
 # id on the URL.
 def get_student_id(request):
-    student_id = request.GET.get('student', '1')
+    student_id = request.GET.get('student', 'student_1')
     return student_id
 
 
@@ -69,7 +69,7 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
 
     usage = scenario.usage
     usage.store_initial_state()
-    block = create_xblock(usage, "student_%s" % student_id)
+    block = create_xblock(usage, student_id)
     frag = block.runtime.render(block, {}, view_name)
     log.info("End show_scenario %s", scenario_id)
     return render_to_response(template, {
@@ -89,7 +89,7 @@ def handler(request, usage_id, handler_slug):
     student_id = get_student_id(request)
     log.info("Start handler %s/%s for student %s", usage_id, handler_slug, student_id)
     usage = Usage.find_usage(usage_id)
-    block = create_xblock(usage, "student_%s" % student_id)
+    block = create_xblock(usage, student_id)
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()
