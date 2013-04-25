@@ -135,9 +135,8 @@ class ModelType(object):
         return value
 
     def __set__(self, instance, value):
-        value = self.to_json(value)
         # Update both the persistent store and the cache:
-        instance._model_data[self.name] = value
+        instance._model_data[self.name] = self.to_json(value)
         self._set_cached_value(instance, value)
 
     def __delete__(self, instance):
