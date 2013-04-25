@@ -1,5 +1,8 @@
 from mock import patch, MagicMock
 from nose.tools import assert_in, assert_equals, assert_raises, assert_not_equals
+from dateutil.parser import parse
+import datetime
+
 
 from xblock.core import *
 
@@ -145,6 +148,78 @@ def test_list_field_access():
     del field_tester.field_c
     field_tester.field_b.append(6)
     assert_equals([5, 1, 2, 3, 6], field_tester.field_c)
+
+
+def test_json_field_access():
+    '''Check that values are correctly converted to and from json in accessors.'''
+    class Date(ModelType):
+        '''
+        Date needs to convert between JSON-compatible persistence and a datetime object
+        '''
+        def from_json(self, field):
+            """
+            Parse an optional metadata key containing a time: if present, complain
+            if it doesn't parse. Return None if not present or invalid.
+            """
+            if field is None:
+                return field
+            elif field is "":
+                return None
+            elif isinstance(field, basestring):
+                datevalue = parse(field)
+                return datevalue.utctimetuple()
+            else:
+                return None
+
+        def to_json(self, value):
+            """
+            Convert a datetime object to a string
+            """
+            if value is None:
+                return None
+            elif isinstance(value, datetime.datetime):
+                return value.isoformat() + 'Z'
+            else:
+                return None
+
+    class FieldTester(object):
+        __metaclass__ = ModelMetaclass
+
+        field_a = Date(scope=Scope.settings)
+        field_b = Date(scope=Scope.content, default=parse('4/1/2013'))
+        field_c = Date(scope=Scope.user_state, computed_default=lambda instance: None if instance.field_b is None else instance.field_b.replace(day=25))
+
+        def __init__(self, model_data):
+            self._model_data = model_data
+
+    field_tester = FieldTester({})
+
+    # Check initial values
+    assert_equals(None, field_tester.field_a)
+    assert_equals(parse('4/1/2013'), field_tester.field_b)
+    assert_equals(parse('4/25/2013'), field_tester.field_c)
+
+    # Test no default specified
+    field_tester.field_a = parse('1/2/2013')
+    assert_equals(parse('1/2/2013'), field_tester.field_a)
+    del field_tester.field_a
+    assert_equals(None, field_tester.field_a)
+
+    # Test default explicitly specified
+    field_tester.field_b = parse('1/2/2013')
+    assert_equals(parse('1/2/2013'), field_tester.field_b)
+    del field_tester.field_b
+    assert_equals(parse('4/1/2013'), field_tester.field_b)
+
+    # Check computed default:
+    #   If we mutate a computed default, it is not persisted.
+    field_tester.field_c = parse('1/2/2013')
+    assert_equals(parse('1/2/2013'), field_tester.field_c)
+    #   Confirm that it is computed at the time it is fetched, not the time it is deleted
+    field_tester.field_b = parse('11/21/2011')
+    del field_tester.field_c
+    field_tester.field_b = parse('10/20/2012')
+    assert_equals(parse('10/25/2012'), field_tester.field_c)
 
 
 class TestNamespace(Namespace):
