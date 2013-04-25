@@ -21,8 +21,8 @@ class ThreeThumbsTest(SeleniumTests):
 
     def setUp(self):
         # Clear the in-memory key value store
-        MEMORY_KVS.d.clear()
-        Usage.inited.clear()
+        MEMORY_KVS.clear()
+        Usage.reinitialize_all()
 
         # Suzy opens the browser to visit the workbench
         self.browser.get(self.live_server_url)

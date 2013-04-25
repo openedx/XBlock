@@ -32,31 +32,36 @@ class Usage(object):
     building block for course content.
 
     TODO: Not the real way we'll store usages!
+
     """
-    ids = itertools.count()
-    usage_index = {}
-    # TODO: hacked @ hackathon, fix the comments
-    inited = set()
+
+    # An infinite stream of ids, for giving each Usage an id.
+    _ids = itertools.count()
+
+    # Maps ids to Usages, a dict of all instances created, ever.
+    _usage_index = {}
+
+    # The set of Usages that have been initialized.
+    _inited = set()
 
     def __init__(self, block_name, children=None, initial_state=None, def_id=None):
-        self.id = "usage_%d" % next(self.ids)
+        self.id = "usage_%d" % next(self._ids)
         self.parent = None
         self.block_name = block_name
-        self.def_id = def_id or ("def_%d" % next(self.ids))
+        self.def_id = def_id or ("def_%d" % next(self._ids))
         self.children = children or []
         self.initial_state = initial_state or {}
 
         # Update our global index of all usages.
-        self.usage_index[self.id] = self
+        self._usage_index[self.id] = self
 
         # Create the parent references as we construct children.
         for child in self.children:
             child.parent = self
 
     def store_initial_state(self):
-        # TODO: hacked @ hackathon, fix the comments
         # If we've already created the initial state, there's nothing to do.
-        if id(self) in self.inited:
+        if self.id in self._inited:
             return
 
         # Create an XBlock from this usage, and use it to create the initial
@@ -70,9 +75,8 @@ class Usage(object):
         if self.parent is not None:
             block.parent = self.parent.id
 
-        # TODO: hacked @ hackathon, fix the comments
-        # We no longer need initial_state, clobber it to prove it.
-        self.inited.add(id(self))
+        # We've initialized this instance, keep track.
+        self._inited.add(self.id)
 
         # Also do this recursively down the tree.
         for child in self.children:
@@ -83,13 +87,28 @@ class Usage(object):
 
     @classmethod
     def find_usage(cls, usage_id):
-        return cls.usage_index[usage_id]
+        return cls._usage_index[usage_id]
+
+
+    @classmethod
+    def reinitialize_all(cls):
+        """
+        Reset all the inited flags, so that Usages will be initialized again.
+
+        Used to isolate tests from each other.
+
+        """
+        cls._inited.clear()
 
 
 class MemoryKeyValueStore(KeyValueStore):
     """Use a simple in-memory database for a key-value store."""
     def __init__(self, d):
         self.d = d
+
+    def clear(self):
+        """Clear all data from the store."""
+        self.d.clear()
 
     def actual_key(self, key):
         k = []
