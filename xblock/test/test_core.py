@@ -1,7 +1,6 @@
 from mock import patch, MagicMock
 from nose.tools import assert_in, assert_equals, assert_raises, assert_not_equals
-import datetime
-
+from datetime import datetime
 
 from xblock.core import *
 
@@ -152,44 +151,21 @@ def test_list_field_access():
 def test_json_field_access():
     '''Check that values are correctly converted to and from json in accessors.'''
 
-    def parse(datestring):
-        return datetime.datetime.strptime(datestring, "%m/%d/%Y")
-
     class Date(ModelType):
-        '''
-        Date needs to convert between JSON-compatible persistence and a datetime object
-        '''
+        '''Date needs to convert between JSON-compatible persistence and a datetime object'''
         def from_json(self, field):
-            """
-            Parse an optional metadata key containing a time: if present, complain
-            if it doesn't parse. Return None if not present or invalid.
-            """
-            if field is None:
-                return field
-            elif field is "":
-                return None
-            elif isinstance(field, basestring):
-                datevalue = parse(field)
-                return datevalue.utctimetuple()
-            else:
-                return None
+            """Convert a string representation of a date to a datetime object"""
+            return datetime.strptime(field, "%m/%d/%Y")
 
         def to_json(self, value):
-            """
-            Convert a datetime object to a string
-            """
-            if value is None:
-                return None
-            elif isinstance(value, datetime.datetime):
-                return value.isoformat() + 'Z'
-            else:
-                return None
+            """Convert a datetime object to a string"""
+            return value.strftime("%m/%d/%Y")
 
     class FieldTester(object):
         __metaclass__ = ModelMetaclass
 
         field_a = Date(scope=Scope.settings)
-        field_b = Date(scope=Scope.content, default=parse('4/1/2013'))
+        field_b = Date(scope=Scope.content, default=datetime(2013,4,1))
         field_c = Date(scope=Scope.user_state, computed_default=lambda instance: None if instance.field_b is None else instance.field_b.replace(day=25))
 
         def __init__(self, model_data):
@@ -199,30 +175,30 @@ def test_json_field_access():
 
     # Check initial values
     assert_equals(None, field_tester.field_a)
-    assert_equals(parse('4/1/2013'), field_tester.field_b)
-    assert_equals(parse('4/25/2013'), field_tester.field_c)
+    assert_equals(datetime(2013,4,1), field_tester.field_b)
+    assert_equals(datetime(2013,4,25), field_tester.field_c)
 
     # Test no default specified
-    field_tester.field_a = parse('1/2/2013')
-    assert_equals(parse('1/2/2013'), field_tester.field_a)
+    field_tester.field_a = datetime(2013,1,2)
+    assert_equals(datetime(2013,1,2), field_tester.field_a)
     del field_tester.field_a
     assert_equals(None, field_tester.field_a)
 
     # Test default explicitly specified
-    field_tester.field_b = parse('1/2/2013')
-    assert_equals(parse('1/2/2013'), field_tester.field_b)
+    field_tester.field_b = datetime(2013,1,2)
+    assert_equals(datetime(2013,1,2), field_tester.field_b)
     del field_tester.field_b
-    assert_equals(parse('4/1/2013'), field_tester.field_b)
+    assert_equals(datetime(2013,4,1), field_tester.field_b)
 
     # Check computed default:
     #   If we mutate a computed default, it is not persisted.
-    field_tester.field_c = parse('1/2/2013')
-    assert_equals(parse('1/2/2013'), field_tester.field_c)
+    field_tester.field_c = datetime(2013,1,2)
+    assert_equals(datetime(2013,1,2), field_tester.field_c)
     #   Confirm that it is computed at the time it is fetched, not the time it is deleted
-    field_tester.field_b = parse('11/21/2011')
+    field_tester.field_b = datetime(2011,11,21)
     del field_tester.field_c
-    field_tester.field_b = parse('10/20/2012')
-    assert_equals(parse('10/25/2012'), field_tester.field_c)
+    field_tester.field_b = datetime(2012,10,20)
+    assert_equals(datetime(2012,10,25), field_tester.field_c)
 
 
 class TestNamespace(Namespace):
