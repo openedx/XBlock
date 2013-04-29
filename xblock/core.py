@@ -68,22 +68,19 @@ class ModelType(object):
       scope - the scope in which this field class is used (defaults to Scope.content)
       computed_default - provides the ability to specify a function for computing a default value (defaults to None)
       display_name - the display name for the field class, suitable for presenting in a GUI (defaults to name of class)
-      validate - provides the ability to specify a function for validating a potential value of this field class
-                 (defaults to None)
       values - for field classes with a finite number of valid values, provides the ability to specify the set of
                valid values. This can be specified as either a static return value, or a function that generates
                the valid values.
     """
 
     def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None, display_name=None,
-                 validate=None, values=None):
+                 values=None):
         self._name = "unknown"
         self.help = help
         self._default = default
         self.computed_default = computed_default
         self.scope = scope
         self._display_name = display_name
-        self.validate = validate
         self._values = values
 
     @property

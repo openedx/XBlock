@@ -470,15 +470,3 @@ def test_values():
 
     # default if nothing specified
     assert_equals(None, String().values)
-
-
-def test_validate():
-    field_values = ['foo', 'bar']
-    test_field = String(validate = lambda x : x in field_values)
-
-    assert_equals(True, test_field.validate('foo'))
-    assert_equals(False, test_field.validate('x'))
-    assert_equals(False, test_field.validate(None))
-
-    # No validate function set.
-    assert_equals(None, String().validate)
