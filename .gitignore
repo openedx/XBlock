@@ -9,3 +9,4 @@ htmlcov
 
 # Documentation
 doc/_build
+.pip_cache
