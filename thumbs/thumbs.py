@@ -4,6 +4,7 @@
 from xblock.core import XBlock, Scope, Integer, Boolean
 from xblock.fragment import Fragment
 from xblock.problem import InputBlock
+import pkg_resources
 
 import logging
 log = logging.getLogger(__name__)
@@ -25,39 +26,23 @@ class ThumbsBlock(InputBlock):
     voted = Boolean(help="Has this student voted?", default=False, scope=Scope.user_state)
 
     def student_view(self, context):
-        frag = Fragment(u"""
-            <p>
-                <span class='upvote'><span class='count'>{self.upvotes}</span>&uarr;</span>
-                <span class='downvote'><span class='count'>{self.downvotes}</span>&darr;</span>
-            </p>
-            """.format(self=self))
-        frag.add_css("""
-            .upvote, .downvote {
-                cursor: pointer;
-                border: 1px solid #888;
-                padding: 0 .5em;
-            }
-            .upvote { color: green; }
-            .downvote { color: red; }
-            """)
-        frag.add_javascript("""
-            function ThumbsBlock(runtime, element) {
-                function update_votes(votes) {
-                    $('.upvote .count', element).text(votes.up);
-                    $('.downvote .count', element).text(votes.down);
-                }
+        """ Create a fragment used to display the XBlock to a student.
+        `context` is a dictionary used to configure the display (unused)
 
-                var handler_url = runtime.handler_url('vote');
+        Returns a `Fragment` object specifying the HTML, CSS, and JavaScript
+        to display."""
 
-                $('.upvote', element).bind('click.ThumbsBlock.up', function() {
-                    $.post(handler_url, JSON.stringify({vote_type: 'up'})).success(update_votes);
-                });
+        # Load the HTML fragment from within the package and fill in the template
+        html_str = pkg_resources.resource_string(__name__, "static/thumbs.html")
+        frag = Fragment(unicode(html_str).format(self=self))
 
-                $('.downvote', element).bind('click.ThumbsBlock.up', function() {
-                    $.post(handler_url, JSON.stringify({vote_type: 'down'})).success(update_votes);
-                });
-            };
-            """)
+        # Load the CSS and JavaScript fragments from within the package
+        css_str = pkg_resources.resource_string(__name__, "static/thumbs.css")
+        frag.add_css(unicode(css_str))
+
+        js_str = pkg_resources.resource_string(__name__, "static/thumbs.js")
+        frag.add_javascript(unicode(js_str))
+
         frag.initialize_js('ThumbsBlock')
         return frag
 
@@ -65,6 +50,7 @@ class ThumbsBlock(InputBlock):
 
     @XBlock.json_handler
     def vote(self, data):
+        """ Update the vote count in response to a user action. """
         # Here is where we would prevent a student from voting twice, but then
         # we couldn't click more than once in the demo!
         #
