@@ -26,21 +26,24 @@ class ThumbsBlock(InputBlock):
     voted = Boolean(help="Has this student voted?", default=False, scope=Scope.user_state)
 
     def student_view(self, context):
-        """ Create a fragment used to display the XBlock to a student.
+        """
+        Create a fragment used to display the XBlock to a student.
         `context` is a dictionary used to configure the display (unused)
 
         Returns a `Fragment` object specifying the HTML, CSS, and JavaScript
-        to display."""
+        to display.
+        """
 
         # Load the HTML fragment from within the package and fill in the template
-        html_str = pkg_resources.resource_string(__name__, "static/thumbs.html")
+        html_str = pkg_resources.resource_string(__name__, "static/html/thumbs.html")
         frag = Fragment(unicode(html_str).format(self=self))
 
         # Load the CSS and JavaScript fragments from within the package
-        css_str = pkg_resources.resource_string(__name__, "static/thumbs.css")
+        css_str = pkg_resources.resource_string(__name__, "static/css/thumbs.css")
         frag.add_css(unicode(css_str))
 
-        js_str = pkg_resources.resource_string(__name__, "static/thumbs.js")
+        js_str = pkg_resources.resource_string(__name__, 
+                                               "static/js/public/javascripts/thumbs.js")
         frag.add_javascript(unicode(js_str))
 
         frag.initialize_js('ThumbsBlock')
