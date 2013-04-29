@@ -63,12 +63,12 @@ class ModelType(object):
     name, by proxying through to self._model_data on the containing object.
 
     Parameters:
-      help - documentation of field class, suitable for presenting in a GUI (defaults to None)
-      default - static value to default to if not otherwise specified (defaults to None)
-      scope - the scope in which this field class is used (defaults to Scope.content)
-      computed_default - provides the ability to specify a function for computing a default value (defaults to None)
-      display_name - the display name for the field class, suitable for presenting in a GUI (defaults to name of class)
-      values - for field classes with a finite number of valid values, provides the ability to specify the set of
+      help : documentation of field class, suitable for presenting in a GUI (defaults to None)
+      default : static value to default to if not otherwise specified (defaults to None)
+      scope : the scope in which this field class is used (defaults to Scope.content)
+      computed_default : provides the ability to specify a function for computing a default value (defaults to None)
+      display_name : the display name for the field class, suitable for presenting in a GUI (defaults to name of class)
+      values : for field classes with a finite number of valid values, provides the ability to specify the set of
                valid values. This can be specified as either a static return value, or a function that generates
                the valid values.
     """
@@ -100,7 +100,7 @@ class ModelType(object):
         """
         if self._values is None:
             return None
-        elif hasattr(self._values, '__call__'):
+        elif callable(self._values):
             return self._values()
         else:
             return self._values
