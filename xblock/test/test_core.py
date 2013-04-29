@@ -1,6 +1,5 @@
 from mock import patch, MagicMock
 from nose.tools import assert_in, assert_equals, assert_raises, assert_not_equals
-from dateutil.parser import parse
 import datetime
 
 
@@ -152,6 +151,10 @@ def test_list_field_access():
 
 def test_json_field_access():
     '''Check that values are correctly converted to and from json in accessors.'''
+
+    def parse(datestring):
+        return datetime.datetime.strptime(datestring, "%m/%d/%Y")
+
     class Date(ModelType):
         '''
         Date needs to convert between JSON-compatible persistence and a datetime object
