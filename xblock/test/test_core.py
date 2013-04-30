@@ -457,3 +457,16 @@ def test_field_display_name():
 
     assert_equals("Field Known as X", TestNamespace.field_x.display_name)
 
+
+def test_values():
+    # static return value
+    field_values = ['foo', 'bar']
+    test_field = String(values = field_values)
+    assert_equals(field_values, test_field.values)
+
+    # function to generate values
+    test_field = String(values = lambda : [1, 4])
+    assert_equals([1, 4], test_field.values)
+
+    # default if nothing specified
+    assert_equals(None, String().values)
