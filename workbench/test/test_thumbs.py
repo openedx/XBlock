@@ -1,8 +1,9 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from workbench.runtime import MEMORY_KVS, Usage
+from nose.plugins.attrib import attr
 
-
+@attr('selenium')
 class SeleniumTests(LiveServerTestCase):
 
     @classmethod
