@@ -12,3 +12,5 @@ doc/_build
 .pip_cache
 nosetests.xml
 coverage.xml
+pep8.report
+pylint.report
