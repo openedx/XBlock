@@ -14,6 +14,7 @@ coverage
 pylint
 selenium
 rednose
+pep8
 
 # For docs
 sphinx

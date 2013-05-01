@@ -21,3 +21,7 @@ NOSE_ATTR='!selenium' coverage run manage.py test
 # Compute coverage
 coverage html
 coverage xml
+
+# Compute style violations
+pep8 > pep8.report || echo "Not pep9 clean"
+pylint -f parseable xblock workbench thumbs/thumbs.py > pylint.report || echo "Not pylint clean"
