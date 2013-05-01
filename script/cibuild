@@ -3,6 +3,9 @@
 # Fail immediately on errors
 set -e
 
+# Display commands as they execute
+set -x
+
 # Cache pip downloads
 export PIP_DOWNLOAD_CACHE=${PIP_DOWNLOAD_CACHE-.pip_cache}
 
