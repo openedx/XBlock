@@ -66,19 +66,17 @@ class ModelType(object):
       `help` : documentation of field class, suitable for presenting in a GUI (defaults to None)
       `default` : static value to default to if not otherwise specified (defaults to None)
       `scope` : the scope in which this field class is used (defaults to Scope.content)
-      `computed_default` : provides the ability to specify a function for computing a default value (defaults to None)
       `display_name` : the display name for the field class, suitable for presenting in a GUI (defaults to name of class)
       `values` : for field classes with a finite number of valid values, provides the ability to specify the set of
                valid values. This can be specified as either a static return value, or a function that generates
                the valid values.
     """
 
-    def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None, display_name=None,
+    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None,
                  values=None):
         self._name = "unknown"
         self.help = help
         self._default = default
-        self.computed_default = computed_default
         self.scope = scope
         self._display_name = display_name
         self._values = values
@@ -130,12 +128,6 @@ class ModelType(object):
         if hasattr(instance, '_model_data_cache') and self.name in instance._model_data_cache:
             del instance._model_data_cache[self.name]
 
-    def _use_computed_default(self):
-        """Returns boolean indicating if a default value can/should be computed"""
-        # Check self._default to see if a default was provided (and not
-        # self.default, since that property may be redefined).
-        return self._default is None and self.computed_default is not None
-
     def __get__(self, instance, owner):
         if instance is None:
             return self
@@ -146,15 +138,10 @@ class ModelType(object):
                 value = self.from_json(instance._model_data[self.name])
                 self._set_cached_value(instance, value)
             except KeyError:
-                # Computed defaults are not stored in cache, but are
-                # always recomputed.  Regular defaults are always copied,
-                # in case the provided default value is mutable (e.g list or
-                # dict).  Regular defaults are also cached.
-                if self._use_computed_default():
-                    value = self.computed_default(instance)
-                else:
-                    value = copy.deepcopy(self.default)
-                    self._set_cached_value(instance, value)
+                # Defaults are always copied, in case the provided default value
+                # is mutable (e.g list or dict).  Defaults are also cached.
+                value = copy.deepcopy(self.default)
+                self._set_cached_value(instance, value)
 
         return value
 
@@ -175,12 +162,7 @@ class ModelType(object):
         # Since we know that the model_data no longer contains the value, we can
         # avoid the possible database lookup that a future get() call would
         # entail by setting the cached value now to its default value.
-        # However, we should not store cached values for computed defaults, so
-        # we just clear the cache in that case.
-        if self._use_computed_default():
-            self._del_cached_value(instance)
-        else:
-            self._set_cached_value(instance, copy.deepcopy(self.default))
+        self._set_cached_value(instance, copy.deepcopy(self.default))
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0._name}>".format(self)

@@ -84,7 +84,7 @@ def test_field_access():
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.user_state, computed_default=lambda s: s.field_a + s.field_b)
+        field_c = Integer(scope=Scope.user_state, default='field c')
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -93,13 +93,13 @@ def test_field_access():
 
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
-    assert_equals(15, field_tester.field_c)
+    assert_equals('field c', field_tester.field_c)
     assert not hasattr(field_tester, 'field_x')
 
     field_tester.field_a = 20
     assert_equals(20, field_tester._model_data['field_a'])
     assert_equals(10, field_tester.field_b)
-    assert_equals(30, field_tester.field_c)
+    assert_equals('field c', field_tester.field_c)
 
     del field_tester.field_a
     assert_equals(None, field_tester.field_a)
@@ -113,7 +113,6 @@ def test_list_field_access():
 
         field_a = List(scope=Scope.settings)
         field_b = List(scope=Scope.content, default=[1, 2, 3])
-        field_c = List(scope=Scope.user_state, computed_default=lambda instance: instance.field_a + instance.field_b)
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -123,7 +122,6 @@ def test_list_field_access():
     # Check initial values
     assert_equals([], field_tester.field_a)
     assert_equals([1, 2, 3], field_tester.field_b)
-    assert_equals([1, 2, 3], field_tester.field_c)
 
     # Test no default specified
     field_tester.field_a.append(1)
@@ -136,16 +134,6 @@ def test_list_field_access():
     assert_equals([1, 2, 3, 4], field_tester.field_b)
     del field_tester.field_b
     assert_equals([1, 2, 3], field_tester.field_b)
-
-    # Check computed default:
-    #   If we mutate a computed default, it is not persisted.
-    field_tester.field_c.append(4)
-    assert_equals([1, 2, 3], field_tester.field_c)
-    #   Confirm that it is computed at the time it is fetched, not the time it is deleted
-    field_tester.field_a.append(5)
-    del field_tester.field_c
-    field_tester.field_b.append(6)
-    assert_equals([5, 1, 2, 3, 6], field_tester.field_c)
 
 
 def test_json_field_access():
@@ -166,7 +154,6 @@ def test_json_field_access():
 
         field_a = Date(scope=Scope.settings)
         field_b = Date(scope=Scope.content, default=datetime(2013,4,1))
-        field_c = Date(scope=Scope.user_state, computed_default=lambda instance: None if instance.field_b is None else instance.field_b.replace(day=25))
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -176,7 +163,6 @@ def test_json_field_access():
     # Check initial values
     assert_equals(None, field_tester.field_a)
     assert_equals(datetime(2013,4,1), field_tester.field_b)
-    assert_equals(datetime(2013,4,25), field_tester.field_c)
 
     # Test no default specified
     field_tester.field_a = datetime(2013,1,2)
@@ -189,16 +175,6 @@ def test_json_field_access():
     assert_equals(datetime(2013,1,2), field_tester.field_b)
     del field_tester.field_b
     assert_equals(datetime(2013,4,1), field_tester.field_b)
-
-    # Check computed default:
-    #   If we mutate a computed default, it is not persisted.
-    field_tester.field_c = datetime(2013,1,2)
-    assert_equals(datetime(2013,1,2), field_tester.field_c)
-    #   Confirm that it is computed at the time it is fetched, not the time it is deleted
-    field_tester.field_b = datetime(2011,11,21)
-    del field_tester.field_c
-    field_tester.field_b = datetime(2012,10,20)
-    assert_equals(datetime(2012,10,25), field_tester.field_c)
 
 
 class TestNamespace(Namespace):
@@ -230,7 +206,7 @@ def test_namespace_field_access(mock_load_classes):
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.user_state, computed_default=lambda s: s.field_a + s.field_b)
+        field_c = Integer(scope=Scope.user_state, default='field c')
 
         def __init__(self, model_data):
             self._model_data = model_data
@@ -242,7 +218,7 @@ def test_namespace_field_access(mock_load_classes):
 
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
-    assert_equals(15, field_tester.field_c)
+    assert_equals('field c', field_tester.field_c)
     assert_equals([1, 2, 3], field_tester.test.field_x)
     assert_equals('default_value', field_tester.test.field_y)
 
