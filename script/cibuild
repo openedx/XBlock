@@ -3,6 +3,9 @@
 # Fail immediately on errors
 set -e
 
+# Display commands as they execute
+set -x
+
 # Cache pip downloads
 export PIP_DOWNLOAD_CACHE=${PIP_DOWNLOAD_CACHE-.pip_cache}
 
@@ -13,4 +16,12 @@ pip install -r requirements.txt
 export DJANGO_LIVE_TEST_SERVER_ADDRESS=${DJANGO_LIVE_TEST_SERVER_ADDRESS-localhost:8000-9000}
 
 # Run the tests
-python manage.py test
+NOSE_ATTR='!selenium' coverage run manage.py test
+
+# Compute coverage
+coverage html
+coverage xml
+
+# Compute style violations
+pep8 > pep8.report || echo "Not pep9 clean"
+pylint -f parseable xblock workbench thumbs/thumbs.py > pylint.report || echo "Not pylint clean"
