@@ -6,9 +6,6 @@ describe("Thumbs XBlock", function() {
 
     beforeEach(function() {
 
-        // Set up fixtures
-        loadFixtures('thumbs_fixture.html');
-
         // Create a mock for the runtime
         mockRuntime = jasmine.createSpyObj('runtime', ['handler_url']);
         mockRuntime.handler_url.andCallFake(function() {

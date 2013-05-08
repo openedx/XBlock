@@ -1,42 +1,22 @@
 # JavaScript Testing
 
-This is an example of how to use Jasmine to unit-test the
+This is an example of how to use 
+[Jasmine](http://pivotal.github.io/jasmine/) to unit-test the
 JavaScript used by the `thumbs` XBlock.
 
-## Installing Jasmine
-
-We use the Ruby gem version of Jasmine to run the tests.
-To install the gem:
-
-    gem install jasmine
-
-
-## Directory Structure
-
-* JavaScript files being tested are located in `public/javascripts`
-
-* Tests (called "specs") are located in `spec/javascripts`
-
-* HTML fixtures are located in `spec/javascripts/fixtures`
-
-* Library dependencies (such as jquery) are located in `lib`
-
-
-The directory structure was set up using the Jasmine gem.  You can
-set up something similar in another directory using the command:
-
-    jasmine init
-
-See [jasmine-gem](http://github.com/pivotal/jasmine-gem) for more
-information.
-
+Since this is a small project, we use the stand-alone version
+of Jasmine.
 
 ## Running the Tests
 
-To run the tests, first run:
+To run the tests, open `SpecRunner.html` in a browser.
 
-    rake jasmine
+## Directory Structure
 
-from this directory.
+The tests are located in `spec/thumbs_spec.js`.
 
-Then point your browser to `localhost:8888` to view test results.
+JavaScript dependencies such as JQuery are located in the `lib` folder.
+`SpecRunner.html` handles loading these dependencies.
+
+`SpecRunner.html` includes an HTML fixture (contained in `<div id=fixture>`)
+that the code under test manipulates.
