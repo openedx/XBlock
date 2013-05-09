@@ -6,6 +6,12 @@ describe("Thumbs XBlock", function() {
 
     beforeEach(function() {
 
+        // Install the HTML fixture for this test
+        setFixtures('<div id="fixture">\n' +
+                    '<span class="upvote"><span class="count">NOT UPDATED</span></span>\n' +
+                    '<span class="downvote"><span class="count">NOT UPDATED</span></span>\n' +
+                    '</div>');
+
         // Create a mock for the runtime
         mockRuntime = jasmine.createSpyObj('runtime', ['handler_url']);
         mockRuntime.handler_url.andCallFake(function() {
