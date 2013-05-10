@@ -15,21 +15,25 @@ Background
 ----------
 
 EdX courseware is built out of components that are combined hierarchically.
-These include components like the video player,
-[LON-CAPA](http://www.lon-capa.org/) problems, as well as compound components
-like learning sequences. We are developing a second-generation API for these
-components called XBlocks. Although they're in a prototype stage, we like the
-API, and want to collaborate with others to develop them into an industry
-standard. This is our proposed API and specification for XBlocks.
+These include components like the video player, `LON-CAPA`_ problems, as well
+as compound components like learning sequences. We are developing a
+second-generation API for these components called XBlocks. Although they're in
+a prototype stage, we like the API, and want to collaborate with others to
+develop them into an industry standard. This is our proposed API and
+specification for XBlocks.
 
-How does this differ from existing industry standards like [Learning Tools
-Interoperability](http://www.imsglobal.org/toolsinteroperability2.cfm) (LTI)
-and [SCORM](http://scorm.com/scorm-explained/)? On a high level, XBlocks is a
-Python language-level API, and it provides sensible defaults for things like
-storing data. XBlocks could be wrapped up in LTI, and one could make an LTI
-XBlock. The core reason to write an XBlock is that it is deployable. You can
-give us the code to an XBlock, and we can embed it in our courseware. LTI would
-require you to give us a virtual machine image which ran it.
+.. _LON-CAPA: http://www.lon-capa.org/
+
+How does this differ from existing industry standards like `Learning Tools
+Interoperability`_ (LTI) and `SCORM`_? On a high level, XBlocks is a Python
+language-level API, and it provides sensible defaults for things like storing
+data. XBlocks could be wrapped up in LTI, and one could make an LTI XBlock. The
+core reason to write an XBlock is that it is deployable. You can give us the
+code to an XBlock, and we can embed it in our courseware. LTI would require you
+to give us a virtual machine image which ran it.
+
+.. _Learning Tools Interoperability: http://www.imsglobal.org/toolsinteroperability2.cfm
+.. _SCORM: http://scorm.com/scorm-explained/
 
 
 Installation
@@ -61,12 +65,23 @@ To run the test suite:
     $ python manage.py test
 
 This will run:
-* Unit tests of the XBlock core and runtime.
-* Integration tests of XBlocks running within the workbench.
 
-Since XBlocks can contain client-side scripts, it is important to test them through a browser.  For example, the ``thumbs`` XBlock uses Javascript to record user votes by sending an AJAX POST request back to the `ThumbsBlock` XBlock.
+    * Unit tests of the XBlock core and runtime.
 
-You can test XBlocks through a browser using [Selenium](http://docs.seleniumhq.org/). We have included an example Selenium test for ``thumbs`` that uses Django's [LiveServerTestCase](https://docs.djangoproject.com/en/1.4/topics/testing/#django.test.LiveServerTestCase). It runs as part of the test suite as executed by the above command. You need to have Firefox installed for this test case to run successfully.
+    * Integration tests of XBlocks running within the workbench.
+
+Since XBlocks can contain client-side scripts, it is important to test them
+through a browser.  For example, the ``thumbs`` XBlock uses Javascript to
+record user votes by sending an AJAX POST request back to the `ThumbsBlock`
+XBlock.
+
+You can test XBlocks through a browser using `Selenium`_. We have included an
+example Selenium test for ``thumbs`` that uses Django's `LiveServerTestCase`_.
+It runs as part of the test suite as executed by the above command. You need to
+have Firefox installed for this test case to run successfully.
+
+.. _Selenium: http://docs.seleniumhq.org/
+.. _LiveServerTestCase: https://docs.djangoproject.com/en/1.4/topics/testing/#django.test.LiveServerTestCase
 
 To run the test suite under coverage:
 
@@ -76,7 +91,9 @@ to execute the tests. Then to view the coverage report:
 
     $ coverage report
 
-See the [coverage.py](http://nedbatchelder.com/code/coverage/) docs for more info and options.
+See the `coverage.py`_ docs for more info and options.
+
+.. _coverage.py: http://nedbatchelder.com/code/coverage/
 
 
 Using the workbench
@@ -149,5 +166,7 @@ automatically display its scenarios for you to experiment with.
 Contacts
 --------
 
-The XBlock mailing list is [edx-xblock on Google Groups](https://groups.google.com/forum/#!forum/edx-xblock).
-You can also write to edX directly at info@edx.org.
+The XBlock mailing list is `edx-xblock on Google Groups`__.  You can also write
+to edX directly at info@edx.org.
+
+__ https://groups.google.com/forum/#!forum/edx-xblock
