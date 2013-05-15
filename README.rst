@@ -70,11 +70,6 @@ This will run:
 
     * Integration tests of XBlocks running within the workbench.
 
-Since XBlocks can contain client-side scripts, it is important to test them
-through a browser.  For example, the ``thumbs`` XBlock uses Javascript to
-record user votes by sending an AJAX POST request back to the `ThumbsBlock`
-XBlock.
-
 You can test XBlocks through a browser using `Selenium`_. We have included an
 example Selenium test for ``thumbs`` that uses Django's `LiveServerTestCase`_.
 It runs as part of the test suite as executed by the above command. You need to
@@ -94,6 +89,9 @@ to execute the tests. Then to view the coverage report:
 See the `coverage.py`_ docs for more info and options.
 
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
+
+You can also run unit tests of the JavaScript used by the `thumbs` example.
+See `thumbs/static/js/README.md` for details.
 
 
 Using the workbench
