@@ -17,6 +17,3 @@ The tests are located in `spec/thumbs_spec.js`.
 
 JavaScript dependencies such as JQuery are located in the `lib` folder.
 `SpecRunner.html` handles loading these dependencies.
-
-`SpecRunner.html` includes an HTML fixture (contained in `<div id=fixture>`)
-that the code under test manipulates.
