@@ -95,10 +95,10 @@ class ModelType(object):
         Returns the valid values for this class. This is useful for representing possible values in a UI.
 
         Example formats:
-            '[1, 2, 3]' : a finite set of elements
-            '[{"display_name": "Always", "value": "always"}, {"display_name": "Past Due", "value": "past_due"}] :
+            `[1, 2, 3]` : a finite set of elements
+            `[{"display_name": "Always", "value": "always"}, {"display_name": "Past Due", "value": "past_due"}]` :
                 a finite set of elements where the display names differ from the values
-            '{"min" : 0 , "max" : 10, "step": .1}' : a range for floating point numbers with increment .1
+            `{"min" : 0 , "max" : 10, "step": .1}` : a range for floating point numbers with increment .1
 
         If this field class does not define a set of valid values, this method will return None.
         """
