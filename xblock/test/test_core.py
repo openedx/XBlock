@@ -407,6 +407,9 @@ def test_field_display_name():
     attempts._name = "max_problem_attempts"
     assert_equals("Maximum Problem Attempts", attempts.display_name)
 
+    boolean_field = Boolean(display_name= "boolean field")
+    assert_equals("boolean field", boolean_field.display_name)
+
     class TestNamespace(Namespace):
         field_x = List(display_name="Field Known as X")
 
@@ -425,3 +428,15 @@ def test_values():
 
     # default if nothing specified
     assert_equals(None, String().values)
+
+    # Test boolean, which by default has values specified
+    test_field = Boolean()
+    assert_equals(({'display_name': "True", "value": True}, {'display_name': "False", "value": False}), test_field.values)
+
+    # Test that you can override the Boolean default for values
+    test_field = Boolean(values=[False])
+    assert_equals([False], test_field.values)
+
+    # Test the format expected for integers
+    test_field = Integer(values={"min": 1, "max" : 100})
+    assert_equals({"min": 1, "max" : 100}, test_field.values)
