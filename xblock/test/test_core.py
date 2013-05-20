@@ -429,14 +429,14 @@ def test_values():
     # default if nothing specified
     assert_equals(None, String().values)
 
-    # Test boolean, which by default has values specified
+
+def test_values_boolean():
+    # Test Boolean, which has values defined
     test_field = Boolean()
     assert_equals(({'display_name': "True", "value": True}, {'display_name': "False", "value": False}), test_field.values)
 
-    # Test that you can override the Boolean default for values
-    test_field = Boolean(values=[False])
-    assert_equals([False], test_field.values)
 
-    # Test the format expected for integers
+def test_values_dict():
+    # Test that the format expected for integers is allowed
     test_field = Integer(values={"min": 1, "max" : 100})
     assert_equals({"min": 1, "max" : 100}, test_field.values)

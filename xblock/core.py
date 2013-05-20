@@ -233,11 +233,11 @@ class Float(ModelType):
 
 class Boolean(ModelType):
     """
-    A field class for representing a Boolean. This class has the values property predefined.
+    A field class for representing a Boolean. This class has the values property defined.
     """
-    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None,
-                 values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False})):
-        super( Boolean, self ).__init__(help, default, scope, display_name, values)
+    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
+        super(Boolean, self).__init__(help, default, scope, display_name,
+            values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False}))
 
 
 class Object(ModelType):
