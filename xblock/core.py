@@ -67,9 +67,9 @@ class ModelType(object):
       `default` : static value to default to if not otherwise specified (defaults to None)
       `scope` : the scope in which this field class is used (defaults to Scope.content)
       `display_name` : the display name for the field class, suitable for presenting in a GUI (defaults to name of class)
-      `values` : for field classes with a finite number of valid values, provides the ability to specify the set of
+      `values` : for field classes with a known set of valid values, provides the ability to explicitly specify the
                valid values. This can be specified as either a static return value, or a function that generates
-               the valid values.
+               the valid values. For example formats, see the values property definition.
     """
 
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None,
@@ -92,9 +92,15 @@ class ModelType(object):
     @property
     def values(self):
         """
-        Returns the valid values for this class.
+        Returns the valid values for this class. This is useful for representing possible values in a UI.
 
-        If this field class does not define a finite number of valid values, this method will return None.
+        Example formats:
+            `[1, 2, 3]` : a finite set of elements
+            `[{"display_name": "Always", "value": "always"}, {"display_name": "Past Due", "value": "past_due"}]` :
+                a finite set of elements where the display names differ from the values
+            `{"min" : 0 , "max" : 10, "step": .1}` : a range for floating point numbers with increment .1
+
+        If this field class does not define a set of valid values, this method will return None.
         """
         if callable(self._values):
             return self._values()
@@ -226,7 +232,12 @@ class Float(ModelType):
 
 
 class Boolean(ModelType):
-    pass
+    """
+    A field class for representing a Boolean. This class has the values property defined.
+    """
+    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
+        super(Boolean, self).__init__(help, default, scope, display_name,
+            values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False}))
 
 
 class Object(ModelType):
