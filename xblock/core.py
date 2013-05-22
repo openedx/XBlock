@@ -22,10 +22,6 @@ class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
 
-class Scope(namedtuple('ScopeBase', 'user block')):
-    pass
-
-
 class Sentinel(object):
     """
     Class for implementing sentinel objects (only equal to themselves).
@@ -40,14 +36,16 @@ class Sentinel(object):
     def __repr__(self):
         return self.name
 
+ScopeBase = namedtuple('ScopeBase', 'user block')
 
-Scope.content = Scope(user=False, block=BlockScope.DEFINITION)
-Scope.settings = Scope(user=False, block=BlockScope.USAGE)
-Scope.user_state = Scope(user=True, block=BlockScope.USAGE)
-Scope.preferences = Scope(user=True, block=BlockScope.TYPE)
-Scope.user_info = Scope(user=True, block=BlockScope.ALL)
-Scope.children = Sentinel('Scope.children')
-Scope.parent = Sentinel('Scope.parent')
+class Scope(ScopeBase):
+    content = ScopeBase(user=False, block=BlockScope.DEFINITION)
+    settings = ScopeBase(user=False, block=BlockScope.USAGE)
+    user_state = ScopeBase(user=True, block=BlockScope.USAGE)
+    preferences = ScopeBase(user=True, block=BlockScope.TYPE)
+    user_info = ScopeBase(user=True, block=BlockScope.ALL)
+    children = Sentinel('Scope.children')
+    parent = Sentinel('Scope.parent')
 
 # define a placeholder ('nil') value to indicate when nothing has been stored in
 # the cache.  ("None" may be a valid value in the cache, so we cannot use it.)
