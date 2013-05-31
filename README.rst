@@ -1,3 +1,7 @@
+Part of `edX code`__.
+
+__ http://code.edx.org/
+
 XBlock Courseware Components
 ============================
 
@@ -160,11 +164,30 @@ proposing as a standard.
 Once you install your XBlock into your virtualenv, the workbench will
 automatically display its scenarios for you to experiment with.
 
+License
+-------
 
-Contacts
---------
+The code in this repository is licensed under version 3 of the AGPL unless
+otherwise noted.
 
-The XBlock mailing list is `edx-xblock on Google Groups`__.  You can also write
-to edX directly at info@edx.org.
+Please see ``LICENSE.txt`` for details.
+
+How to Contribute
+-----------------
+
+Contributions are very welcome. The easiest way is to fork this repo, and then
+make a pull request from your fork. The first time you make a pull request, you
+may be asked to sign a Contributor Agreement.
+
+Reporting Security Issues
+-------------------------
+
+Please do not report security issues in public. Please email security@edx.org
+
+Mailing List and IRC Channel
+----------------------------
+
+You can discuss this code on the `edx-xblock Google Group`__ or in the
+``edx-code`` IRC channel on Freenode.
 
 __ https://groups.google.com/forum/#!forum/edx-xblock
