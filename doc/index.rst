@@ -32,6 +32,7 @@ Contents:
     concepts
     guide/xblock
     guide/fragment
+    tutorial
 
 
 API
