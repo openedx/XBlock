@@ -190,6 +190,27 @@ class ModelType(object):
         """
         return value
 
+    def serialize(self, value):
+        """
+        Return a string version of the value (where value is the JSON-formatted, internally stored value).
+
+        By default, this is the result of calling json.dumps on the input value.
+        """
+        return json.dumps(value)
+
+    def deserialize(self, value):
+        """
+        Deserialize the string version to the value stored internally. Note that this is not the same
+        as the value returned by from_json, as model types typically store their value internally as JSON.
+
+        By default, this is the result of calling json.loads on the supplied value, unless that operation
+        throws an exception. In that case, this method returns the input value.
+        """
+        try:
+            return json.loads(value)
+        except:
+            return value
+
     def read_from(self, model):
         """
         Retrieve the value for this field from the specified model object
@@ -222,20 +243,65 @@ class ModelType(object):
 
 
 class Integer(ModelType):
-    pass
+    """
+    A model type that contains an integer. The value, as stored, can either be a Python integer, or
+    a string that will parse to an integer. If the value stored does not parse to an integer, the result
+    of from_json will be None.
+
+    Note that a floating point value will convert to an integer, but a string containing a floating point
+    number ('3.48') will convert to None.
+    """
+    def from_json(self, value):
+        try:
+            return int(value)
+        except:
+            return None
 
 
 class Float(ModelType):
-    pass
+    """
+    A model type that contains a float. The value, as stored, can either be a Python float, or
+    a string that will parse to a float. If the value stored does not parse to an float, the result
+    of from_json will be None.
+    """
+    def from_json(self, value):
+        try:
+            return float(value)
+        except:
+            return None
 
 
 class Boolean(ModelType):
     """
-    A field class for representing a Boolean. This class has the values property defined.
+    A field class for representing a Boolean. This class has the 'values' property defined.
+
+    The stored value can be either a Python bool, a string, or any value that will then be converted
+    to a bool in the from_json method.
+
+    Examples:
+        True -> True
+        'true' -> True
+        'TRUE' -> True
+        'any other string' -> False
+        [] -> False
+        ['123]' -> True
+        None - > False
     """
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
         super(Boolean, self).__init__(help, default, scope, display_name,
             values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False}))
+
+    def from_json(self, value):
+        if isinstance(value, basestring):
+            return value.lower() == 'true'
+        else:
+            return bool(value)
+
+    def to_json(self, value):
+        if value is None:
+            return False
+        else:
+            return value
 
 
 class Object(ModelType):
