@@ -1,27 +1,45 @@
+"""
+Tests for classes extending ModelType.
+"""
+
 from nose.tools import assert_equals
 import unittest
 from xblock.core import *
 
 
 def assertJSONEquals(field, expected, arg):
+    """
+    Asserts the result of field.from_json.
+    """
     assert_equals(expected, field.from_json(arg))
 
 
 def assertSerializeEqual(field, expected, arg):
+    """
+    Asserts the result of field.serialize.
+    """
     assert_equals(expected, field.serialize(arg))
 
 
 def assertDeserializeEqual(field, expected, arg):
+    """
+    Asserts the result of field.deserialize.
+    """
     assert_equals(expected, field.deserialize(arg))
 
 
 class IntegerTest(unittest.TestCase):
+    """
+    Tests the Integer ModelType.
+    """
 
     def test_integer(self):
         assertJSONEquals(Integer(), 5, '5')
         assertJSONEquals(Integer(), 0, '0')
         assertJSONEquals(Integer(), -1023, '-1023')
         assertJSONEquals(Integer(), 7, 7)
+        assertJSONEquals(Integer(), 0, False)
+        assertJSONEquals(Integer(), 1, True)
 
     def test_none(self):
         assertJSONEquals(Integer(), None, None)
@@ -46,8 +64,20 @@ class IntegerTest(unittest.TestCase):
         assertDeserializeEqual(Integer(), -2, '-2')
         assertDeserializeEqual(Integer(), "450", '"450"')
 
+        # False can be parsed as a int (converts to 0)
+        assertDeserializeEqual(Integer(), False, 'false')
+        # True can be parsed as a int (converts to 1)
+        assertDeserializeEqual(Integer(), True, 'true')
+
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(Integer(), '[3]', '[3]')
+        self.assertRaises(TypeError, Integer().deserialize, None)
+
 
 class FloatTest(unittest.TestCase):
+    """
+    Tests the Float ModelType.
+    """
 
     def test_float(self):
         assertJSONEquals(Float(), .23, '.23')
@@ -57,6 +87,8 @@ class FloatTest(unittest.TestCase):
         assertJSONEquals(Float(), 0, 0.0)
         assertJSONEquals(Float(), 4, 4)
         assertJSONEquals(Float(), -0.23, -0.23)
+        assertJSONEquals(Float(), 0, False)
+        assertJSONEquals(Float(), 1, True)
 
     def test_none(self):
         assertJSONEquals(Float(), None, None)
@@ -79,8 +111,20 @@ class FloatTest(unittest.TestCase):
         assertDeserializeEqual(Float(), -2.78, '-2.78')
         assertDeserializeEqual(Float(), "0.45", '"0.45"')
 
+        # False can be parsed as a float (converts to 0)
+        assertDeserializeEqual(Float(), False, 'false')
+        # True can be parsed as a float (converts to 1)
+        assertDeserializeEqual(Float(), True, 'true')
+
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(Float(), '[3]', '[3]')
+        self.assertRaises(TypeError, Float().deserialize, None)
+
 
 class BooleanTest(unittest.TestCase):
+    """
+    Tests the Boolean ModelType.
+    """
 
     def test_false(self):
         assertJSONEquals(Boolean(), False, "false")
@@ -123,8 +167,14 @@ class BooleanTest(unittest.TestCase):
         assertDeserializeEqual(Boolean(), 'fAlse', '"fAlse"')
         assertDeserializeEqual(Boolean(), "TruE", '"TruE"')
 
+    def test_deserialize_unsupported_types(self):
+        self.assertRaises(TypeError, Boolean().deserialize, None)
+
 
 class StringTest(unittest.TestCase):
+    """
+    Tests the String ModelType.
+    """
 
     def test_json_equals(self):
         assertJSONEquals(String(), "false", "false")
@@ -141,8 +191,18 @@ class StringTest(unittest.TestCase):
         assertDeserializeEqual(String(), 'single quote', 'single quote')
         assertDeserializeEqual(String(), None, 'null')
 
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(String(), '3.4', '3.4')
+        assertDeserializeEqual(String(), 'false', 'false')
+        assertDeserializeEqual(String(), '2', '2')
+        assertDeserializeEqual(String(), '[3]', '[3]')
+        self.assertRaises(TypeError, String().deserialize, None)
+
 
 class AnyTest(unittest.TestCase):
+    """
+    Tests the Any ModelType.
+    """
 
     def test_json_equals(self):
         assertJSONEquals(Any(), {'bar'}, {'bar'})
@@ -162,9 +222,17 @@ class AnyTest(unittest.TestCase):
         assertDeserializeEqual(Any(), {'bar': 'hat', 'frog' : 'green'}, '{"bar": "hat", "frog": "green"}')
         assertDeserializeEqual(Any(), [3.5, 5.6], '[3.5, 5.6]')
         assertDeserializeEqual(Any(), '[', '[')
+        assertDeserializeEqual(Any(), False, 'false')
+        assertDeserializeEqual(Any(), 3.4, '3.4')
+
+    def test_deserialize_unsupported_types(self):
+        self.assertRaises(TypeError, Any().deserialize, None)
 
 
 class ListTest(unittest.TestCase):
+    """
+    Tests the List ModelType.
+    """
 
     def test_json_equals(self):
         assertJSONEquals(List(), [], [])
@@ -183,4 +251,10 @@ class ListTest(unittest.TestCase):
         assertDeserializeEqual(List(), [], '[]')
         assertDeserializeEqual(List(), None, 'null')
 
-        # TODO: what should Object contain? It doesn't differ at all from List (in implementation), not sure what to test.
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(List(), '3.4', '3.4')
+        assertDeserializeEqual(List(), 'false', 'false')
+        assertDeserializeEqual(List(), '2', '2')
+        self.assertRaises(TypeError, List().deserialize, None)
+
+# TODO: what should Object contain? It doesn't differ at all from List (in implementation), not sure what to test.

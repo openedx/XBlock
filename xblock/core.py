@@ -200,17 +200,31 @@ class ModelType(object):
 
     def deserialize(self, value):
         """
-        Deserialize the string version to the value stored internally. Note that this is not the same
-        as the value returned by from_json, as model types typically store their value internally as JSON.
+        Deserialize the string version to the value stored internally.
 
-        By default, this is the result of calling json.loads on the supplied value, unless that operation
-        throws an exception. In that case, this method returns the input value.
+        Note that this is not the same as the value returned by from_json, as model types typically store
+        their value internally as JSON. By default, this method will return the result of calling json.loads
+        on the supplied value, unless json.loads throws a TypeError, or the type of the value returned by json.loads
+        is not supported for this class (see 'is_type_supported'). In either of those cases, this method returns
+        the input value.
         """
         try:
-            return json.loads(value)
-        except:
+            deserialized = json.loads(value)
+            if self.is_type_supported(deserialized):
+                return deserialized
+            else:
+                return value
+        except ValueError:
             # Support older serialized version, which was just the String (not the result of json.dumps).
             return value
+
+    def is_type_supported(self, value):
+        """
+        Return true if value is of the correct type for this class.
+
+        By default, this returns true for None or strings only.
+        """
+        return value is None or isinstance(value, basestring)
 
     def read_from(self, model):
         """
@@ -245,9 +259,10 @@ class ModelType(object):
 
 class Integer(ModelType):
     """
-    A model type that contains an integer. The value, as stored, can either be a Python integer, or
-    a string that will parse to an integer. If the value stored does not parse to an integer, the result
-    of from_json will be None.
+    A model type that contains an integer.
+
+    The value, as stored, can either be a Python integer, or a string that will parse to an integer.
+    If the value stored does not parse to an integer, the result of from_json will be None.
 
     Note that a floating point value will convert to an integer, but a string containing a floating point
     number ('3.48') will convert to None.
@@ -255,26 +270,43 @@ class Integer(ModelType):
     def from_json(self, value):
         try:
             return int(value)
-        except:
+        except ValueError:
             return None
+        except TypeError:
+            return None
+
+    def is_type_supported(self, value):
+        """
+        Returns true for values that will parse to an integer.
+        """
+        return value is None or self.from_json(value) is not None
 
 
 class Float(ModelType):
     """
-    A model type that contains a float. The value, as stored, can either be a Python float, or
-    a string that will parse to a float. If the value stored does not parse to an float, the result
-    of from_json will be None.
+    A model type that contains a float.
+
+    The value, as stored, can either be a Python float, or a string that will parse to a float.
+    If the value stored does not parse to an float, the result of from_json will be None.
     """
     def from_json(self, value):
         try:
             return float(value)
-        except:
+        except ValueError:
             return None
+        except TypeError:
+            return None
+
+    def is_type_supported(self, value):
+        """
+        Returns true for values that will parse to a float.
+        """
+        return value is None or self.from_json(value) is not None
 
 
 class Boolean(ModelType):
     """
-    A field class for representing a Boolean. This class has the 'values' property defined.
+    A field class for representing a Boolean.
 
     The stored value can be either a Python bool, a string, or any value that will then be converted
     to a bool in the from_json method.
@@ -287,6 +319,8 @@ class Boolean(ModelType):
         [] -> False
         ['123]' -> True
         None - > False
+
+    This class has the 'values' property defined.
     """
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
         super(Boolean, self).__init__(help, default, scope, display_name,
@@ -297,6 +331,12 @@ class Boolean(ModelType):
             return value.lower() == 'true'
         else:
             return bool(value)
+
+    def is_type_supported(self, value):
+        """
+        Returns true for all values, as everything can be converted to a Bool.
+        """
+        return True
 
 
 class Object(ModelType):
@@ -316,13 +356,23 @@ class List(ModelType):
         else:
             return self._default
 
+    def is_type_supported(self, value):
+        """
+        Returns true for Lists.
+        """
+        return value is None or isinstance(value, list)
+
 
 class String(ModelType):
     pass
 
 
 class Any(ModelType):
-    pass
+    def is_type_supported(self, value):
+        """
+        Returns true for all values, as this ModelType has no restrictions.
+        """
+        return True
 
 
 class ModelMetaclass(type):
