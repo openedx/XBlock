@@ -209,6 +209,7 @@ class ModelType(object):
         try:
             return json.loads(value)
         except:
+            # Support older serialized version, which was just the String (not the result of json.dumps).
             return value
 
     def read_from(self, model):
@@ -296,12 +297,6 @@ class Boolean(ModelType):
             return value.lower() == 'true'
         else:
             return bool(value)
-
-    def to_json(self, value):
-        if value is None:
-            return False
-        else:
-            return value
 
 
 class Object(ModelType):
