@@ -222,22 +222,60 @@ class ModelType(object):
 
 
 class Integer(ModelType):
-    pass
+    """
+    A model type that contains an integer.
+
+    The value, as stored, can either be a Python integer, or a string that will parse to an integer.
+    If the value stored does not parse to an integer, an Error will be thrown.
+
+    Note that a floating point value will convert to an integer, but a string containing a floating point
+    number ('3.48') will throw an Error.
+    """
+    def from_json(self, value):
+        return None if value is None else int(value)
 
 
 class Float(ModelType):
-    pass
+    """
+    A model type that contains a float.
+
+    The value, as stored, can either be a Python float, or a string that will parse to a float.
+    If the value stored does not parse to an float, the result of from_json will be None.
+    """
+    def from_json(self, value):
+        return None if value is None else float(value)
 
 
 class Boolean(ModelType):
     """
-    A field class for representing a Boolean. This class has the values property defined.
+    A field class for representing a Boolean.
+
+    The stored value can be either a Python bool, a string, or any value that will then be converted
+    to a bool in the from_json method.
+
+    Examples:
+        True -> True
+        'true' -> True
+        'TRUE' -> True
+        'any other string' -> False
+        [] -> False
+        ['123]' -> True
+        None - > False
+
+    This class has the 'values' property defined.
     """
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
         super(Boolean, self).__init__(help, default, scope, display_name,
             values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False}))
 
+    def from_json(self, value):
+        if isinstance(value, basestring):
+            return value.lower() == 'true'
+        else:
+            return bool(value)
 
+
+# TODO: think through Object class (extend from_json?)
 class Object(ModelType):
     @property
     def default(self):
@@ -254,6 +292,9 @@ class List(ModelType):
             return []
         else:
             return self._default
+
+    def from_json(self, value):
+        return None if value is None else list(value)
 
 
 class String(ModelType):
