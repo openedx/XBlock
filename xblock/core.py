@@ -222,23 +222,69 @@ class ModelType(object):
 
 
 class Integer(ModelType):
-    pass
+    """
+    A model type that contains an integer.
+
+    The value, as stored, can be None, '' (which will be treated as None), a Python integer,
+    or a value that will parse as an integer, ie., something for which int(value) does not throw an Error.
+
+    Note that a floating point value will convert to an integer, but a string containing a floating point
+    number ('3.48') will throw an Error.
+    """
+    def from_json(self, value):
+        if value is None or value == '':
+            return None
+        return int(value)
 
 
 class Float(ModelType):
-    pass
+    """
+    A model type that contains a float.
+
+    The value, as stored, can be None, '' (which will be treated as None), a Python float,
+    or a value that will parse as an float, ie., something for which float(value) does not throw an Error.
+    """
+    def from_json(self, value):
+        if value is None or value == '':
+            return None
+        return float(value)
 
 
 class Boolean(ModelType):
     """
-    A field class for representing a Boolean. This class has the values property defined.
+    A field class for representing a boolean.
+
+    The stored value can be either a Python bool, a string, or any value that will then be converted
+    to a bool in the from_json method.
+
+    Examples:
+        True -> True
+        'true' -> True
+        'TRUE' -> True
+        'any other string' -> False
+        [] -> False
+        ['123'] -> True
+        None - > False
+
+    This class has the 'values' property defined.
     """
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
         super(Boolean, self).__init__(help, default, scope, display_name,
             values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False}))
 
+    def from_json(self, value):
+        if isinstance(value, basestring):
+            return value.lower() == 'true'
+        else:
+            return bool(value)
 
-class Object(ModelType):
+
+class Dict(ModelType):
+    """
+    A field class for representing a Python dict.
+
+    The stored value must be either be None or a dict.
+    """
     @property
     def default(self):
         if self._default is None:
@@ -246,8 +292,19 @@ class Object(ModelType):
         else:
             return self._default
 
+    def from_json(self, value):
+        if value is None or isinstance(value, dict):
+            return value
+        else:
+            raise TypeError('Value stored in a Dict must be None or a dict.')
+
 
 class List(ModelType):
+    """
+    A field class for representing a list.
+
+    The stored value can either be None or a list.
+    """
     @property
     def default(self):
         if self._default is None:
@@ -255,9 +312,24 @@ class List(ModelType):
         else:
             return self._default
 
+    def from_json(self, value):
+        if value is None or isinstance(value, list):
+            return value
+        else:
+            raise TypeError('Value stored in an Object must be None or a list.')
+
 
 class String(ModelType):
-    pass
+    """
+    A field class for representing a string.
+
+    The stored value can either be None or a basestring instance.
+    """
+    def from_json(self, value):
+        if value is None or isinstance(value, basestring):
+            return value
+        else:
+            raise TypeError('Value stored in a String must be None or a String.')
 
 
 class Any(ModelType):
@@ -413,7 +485,7 @@ class XBlock(Plugin):
 
     entry_point = 'xblock.v1'
 
-    parent = Object(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
+    parent = String(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
     name = String(help="Short name for the block", scope=Scope.settings)
     tags = List(help="Tags for this block", scope=Scope.settings)
 
