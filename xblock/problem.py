@@ -35,7 +35,7 @@ import random
 import string
 import time
 
-from .core import XBlock, Integer, Object, Scope, String, Any, Boolean
+from .core import XBlock, Integer, Scope, String, Any, Boolean, Dict
 from .run_script import run_script
 from .fragment import Fragment
 
@@ -242,7 +242,7 @@ class InputBlock(XBlock):
 @XBlock.tag("checker")
 class CheckerBlock(XBlock):
 
-    arguments = Object(help="The arguments expected by `check`")
+    arguments = Dict(help="The arguments expected by `check`")
 
     @classmethod
     def preprocess_input(cls, node, usage_factory):
