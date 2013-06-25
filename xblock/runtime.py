@@ -143,7 +143,7 @@ class DbModel(MutableMapping):
             other_dict[key] = kwargs[key]
 
         # generate a new dict with the correct mappings
-        for (key, value) in other_dict:
+        for (key, value) in other_dict.items():
             updated_dict[self._key(key)] = value
 
         self._kvs.update(updated_dict)

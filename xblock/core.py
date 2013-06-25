@@ -330,7 +330,8 @@ class Boolean(ModelType):
     """
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
         super(Boolean, self).__init__(help, default, scope, display_name,
-            values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False}))
+                                      values=({'display_name': "True", "value": True},
+                                              {'display_name': "False", "value": False}))
 
     def from_json(self, value):
         if isinstance(value, basestring):
@@ -595,21 +596,29 @@ class XBlock(Plugin):
 
     def save(self):
         """
-        Save all dirty fields attached to the XBlock
+        Save all dirty fields attached to this XBlock
         """
-        if not self.hasattr(_dirty_fields) or not self._dirty_fields:
-            return # nop if we never created _dirty_fields attribute or it is empty
+        if not self._dirty_fields:
+            # nop if _dirty_fields attribute is empty
+            return
         try:
-            # create dictionary mapping b/w dirty fields and data cache values
+            # Create dictionary mapping between dirty fields and data cache values
             fields_to_save = {}
             for mt_name in self._dirty_fields:
-                fields_to_save[mt_name] = self._model_data_cache[mt_name]  # cache should have the right values;
-            self._model_data.update(fields_to_save)  # change to DbModel to support update that calls kvstore update
+                # Cache should have the right values
+                fields_to_save[mt_name] = self._model_data_cache[mt_name]
+
+            # Change to DbModel to support `update` that calls kvstore `update`
+            # Throws KeyValueMultiSaveError if things go wrong
+            self._model_data.update(fields_to_save)
+
         except KeyValueMultiSaveError as save_error:
             for field in save_error.saved_fields:
                 self._dirty_fields.remove(field)
             raise XBlockFieldSaveError(save_error.saved_fields,  self._dirty_fields)
-        self._clear_dirty_fields()  # remove all dirty fields, since the save was successful
+
+        # Remove all dirty fields, since the save was successful
+        self._clear_dirty_fields()
 
     def _clear_dirty_fields(self):
         """

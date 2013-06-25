@@ -10,6 +10,9 @@ class Metaclass(NamespacesMetaclass, ChildrenModelMetaclass, ModelMetaclass):
 
 
 class TestNamespace(Namespace):
+    """
+    Set up namespaces for each scope to use.
+    """
     n_content = String(scope=Scope.content, default='nc')
     n_settings = String(scope=Scope.settings, default='ns')
     n_user_state = String(scope=Scope.user_state, default='nss')
@@ -21,9 +24,10 @@ class TestNamespace(Namespace):
 
 
 with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)]):
-    class TestModel(object):
-        __metaclass__ = Metaclass
-
+    class TestModel(XBlock):
+        """
+        Set up a class that contains ModelTypes as fields.
+        """
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')
         user_state = String(scope=Scope.user_state, default='ss')
@@ -33,11 +37,11 @@ with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestName
         for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
         user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
-        def __init__(self, model_data):
-            self._model_data = model_data
-
 
 class DictKeyValueStore(KeyValueStore):
+    """
+    Mock key value store backed by a dictionary.
+    """
     def __init__(self):
         self.db = {}
 
@@ -46,6 +50,10 @@ class DictKeyValueStore(KeyValueStore):
 
     def set(self, key, value):
         self.db[key] = value
+
+    def update(self, d):
+        for key in d:
+            self.db[key] = d[key]
 
     def delete(self, key):
         del self.db[key]
@@ -72,7 +80,7 @@ def check_field(collection, field):
 
 
 def test_namespace_actions():
-    tester = TestModel(DbModel(DictKeyValueStore(), TestModel, 's0', TestUsage('u0', 'd0')))
+    tester = TestModel(Mock(), DbModel(DictKeyValueStore(), TestModel, 's0', TestUsage('u0', 'd0')))
 
     for collection in (tester, tester.test):
         for field in collection.fields:
@@ -80,9 +88,13 @@ def test_namespace_actions():
 
 
 def test_db_model_keys():
+    """
+    Tests that updates to fields are properly recorded in the KeyValueStore,
+    and that the keys have been constructed correctly
+    """
     key_store = DictKeyValueStore()
     db_model = DbModel(key_store, TestModel, 's0', TestUsage('u0', 'd0'))
-    tester = TestModel(db_model)
+    tester = TestModel(Mock(), db_model)
 
     assert_false('not a field' in db_model)
 
@@ -91,9 +103,18 @@ def test_db_model_keys():
             new_value = 'new ' + field.name
             assert_false(field.name in db_model)
             setattr(collection, field.name, new_value)
+
+    # Write out the values
+    tester.save()
+
+    # Make sure everything saved correctly
+    for collection in (tester, tester.test):
+        for field in collection.fields:
             assert_true(field.name in db_model)
 
     print key_store.db
+
+    # Examine each value in the database and ensure that keys were constructed correctly
     assert_equals('new content', key_store.db[KeyValueStore.Key(Scope.content, None, 'd0', 'content')])
     assert_equals('new settings', key_store.db[KeyValueStore.Key(Scope.settings, None, 'u0', 'settings')])
     assert_equals('new user_state', key_store.db[KeyValueStore.Key(Scope.user_state, 's0', 'u0', 'user_state')])
