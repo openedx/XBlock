@@ -156,6 +156,10 @@ class MemoryKeyValueStore(KeyValueStore):
         html = json.dumps(self.d, sort_keys=True, indent=4)
         return make_safe_for_html(html)
 
+    def update(self, update_dict):
+        for key, value in update_dict:
+            self.set(key, value)
+
 
 MEMORY_KVS = MemoryKeyValueStore({})
 

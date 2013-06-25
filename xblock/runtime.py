@@ -35,6 +35,9 @@ class KeyValueStore(object):
     def has(self, key):
         pass
 
+    def update(self, update_dict):
+        pass
+
 
 class DbModel(MutableMapping):
     """A dictionary-like interface to the fields on a block."""
@@ -97,7 +100,7 @@ class DbModel(MutableMapping):
             student_id=student_id,
             block_scope_id=block_id,
             field_name=name
-            )
+        )
         return key
 
     def __getitem__(self, name):
@@ -126,6 +129,24 @@ class DbModel(MutableMapping):
         for namespace_name in self._block_cls.namespaces:
             fields.extend(field.name for field in getattr(self._block_cls, namespace_name).fields)
         return fields
+
+    def update(self, *args, **kwargs):
+        """
+        Update the underlying model with the correct values
+        """
+        updated_dict = {}
+        other_dict = {}
+        # combine all the arguments into a single dict
+        if args:
+            other_dict = args[0]
+        for key in kwargs:
+            other_dict[key] = kwargs[key]
+
+        # generate a new dict with the correct mappings
+        for (key, value) in other_dict:
+            updated_dict[self._key(key)] = value
+
+        self._kvs.update(updated_dict)
 
 
 class Runtime(object):

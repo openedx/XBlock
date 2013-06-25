@@ -18,6 +18,36 @@ from webob import Response
 from .plugin import Plugin
 
 
+class KeyValueMultiSaveError(Exception):
+    """
+    Raised to indicated an error in saving multiple fields in a KeyValueStore
+    """
+    def __init__(self, saved_fields):
+        """
+        Create a new KeyValueMultiSaveError
+
+        saved_fields - a set of fields that were successfully saved before the exception occured
+        """
+        super(KeyValueMultiSaveError, self).__init__()
+        self.saved_fields = saved_fields
+
+
+class XBlockSaveError(Exception):
+    """
+    Raised to indicated an error in saving an XBlock
+    """
+    def __init__(self, saved_fields, dirty_fields):
+        """
+        Create a new XBlockSaveError
+
+        saved_fields - a set of fields that were successfully saved before the error occured
+        dirty_fields - a set of fields that were left dirty after the save
+        """
+        super(XBlockSaveError, self).__init__()
+        self.saved_fields = saved_fields
+        self.dirty_fields = dirty_fields
+
+
 class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
@@ -157,6 +187,11 @@ class ModelType(object):
         if hasattr(instance, '_model_data_cache') and self.name in instance._model_data_cache:
             del instance._model_data_cache[self.name]
 
+    def _mark_dirty(self, instance):
+        """ Set this field to dirty on the instance """
+        if self.name not in instance._dirty_fields:
+            instance._dirty_fields.add(self.name)
+
     def __get__(self, instance, owner):
         if instance is None:
             return self
@@ -175,8 +210,8 @@ class ModelType(object):
         return value
 
     def __set__(self, instance, value):
-        # Update both the persistent store and the cache:
-        instance._model_data[self.name] = self.to_json(value)
+        # Mark the field as dirty and update the cache:
+        self._mark_dirty(instance)
         self._set_cached_value(instance, value)
 
     def __delete__(self, instance):
@@ -558,6 +593,30 @@ class XBlock(Plugin):
         """The class can adjust a parsed Usage tree."""
         return node
 
+    def save(self):
+        """
+        Save all dirty fields attached to the XBlock
+        """
+        if not self.hasattr(_dirty_fields) or not self._dirty_fields:
+            return # nop if we never created _dirty_fields attribute or it is empty
+        try:
+            # create dictionary mapping b/w dirty fields and data cache values
+            fields_to_save = {}
+            for mt_name in self._dirty_fields:
+                fields_to_save[mt_name] = self._model_data_cache[mt_name]  # cache should have the right values;
+            self._model_data.update(fields_to_save)  # change to DbModel to support update that calls kvstore update
+        except KeyValueMultiSaveError as save_error:
+            for field in save_error.saved_fields:
+                self._dirty_fields.remove(field)
+            raise XBlockFieldSaveError(save_error.saved_fields,  self._dirty_fields)
+        self._clear_dirty_fields()  # remove all dirty fields, since the save was successful
+
+    def _clear_dirty_fields(self):
+        """
+        Remove all dirty fields from an XBlock
+        """
+        self._dirty_fields.clear()
+
     def __init__(self, runtime, model_data):
         """
 
@@ -571,6 +630,7 @@ class XBlock(Plugin):
         """
         self.runtime = runtime
         self._model_data = model_data
+        self._dirty_fields = set()
 
     def __repr__(self):
         attrs = []
