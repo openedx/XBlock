@@ -38,17 +38,42 @@ class Sentinel(object):
 
 ScopeBase = namedtuple('ScopeBase', 'user block')
 
+
 class Scope(ScopeBase):
+    # The `content` scope is used to save data for all users, for
+    # one particular block, across all runs of a course. An example
+    # might be an XBlock that wishes to tabulate user "upvotes", 
+    # or HTML content to display literally on the page (this example
+    # being the reason this scope is named `content`)
     content = ScopeBase(user=False, block=BlockScope.DEFINITION)
+
+    # The `settings` scope is used to save data for all users, for
+    # one particular block, for one specific run of a course. This is
+    # like the `content` scope, but scoped to one run of a course.
+    # An example might be a due date for a problem.
     settings = ScopeBase(user=False, block=BlockScope.USAGE)
+
+    # The `user_state` scope is used to save data for one user,
+    # for one block, for one run of a course. An example might
+    # be how many points a user scored on one specific problem.
     user_state = ScopeBase(user=True, block=BlockScope.USAGE)
+
+    # The `preferences` scope is used to save data for one user, for
+    # all instances of one specific TYPE of block, across the entire platform.
+    # An example might be that a user can set their preferred default speed
+    # for the video player. This default would apply to all instances of
+    # the video player, across the whole platform, but only for that student.
     preferences = ScopeBase(user=True, block=BlockScope.TYPE)
+
+    # The `user_info` scope is used to save data for one user,
+    # across the entire platform. An example might be a user's
+    # time zone or language preference.
     user_info = ScopeBase(user=True, block=BlockScope.ALL)
     children = Sentinel('Scope.children')
     parent = Sentinel('Scope.parent')
 
-# define a placeholder ('nil') value to indicate when nothing has been stored in
-# the cache.  ("None" may be a valid value in the cache, so we cannot use it.)
+# define a placeholder ('nil') value to indicate when nothing has been stored
+# in the cache ("None" may be a valid value in the cache, so we cannot use it).
 NO_CACHE_VALUE = object()
 
 
