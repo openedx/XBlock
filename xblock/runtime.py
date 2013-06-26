@@ -213,13 +213,28 @@ class Runtime(object):
         return frag
 
     def handle(self, block, handler_name, data):
+        """
+        Handles any calls to the specified `handler_name`.
+
+        Provides a fallback handler if the specified handler isn't found.
+        """
         handler = getattr(block, handler_name, None)
         if handler:
-            return handler(data)
-        handler = getattr(block, "fallback_handler", None)
-        if handler:
-            return handler(handler_name, data)
-        raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
+            # Cache results of the handler call for later saving
+            results = handler(data)
+        else:
+            handler = getattr(block, "fallback_handler", None)
+            if handler:
+                # Cache results of the handler call for later saving
+                results = handler(handler_name, data)
+            else:
+                raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
+
+        # TODO [dkh/sarina] Omitting this only causes one test to fail. Should have 
+        # better coverage of both original & (esp) fallback handlers
+        # Write out dirty fields
+        block.save()
+        return results
 
     def handler_url(self, url):
         """Get the actual URL to invoke a handler.

@@ -66,9 +66,9 @@ class SidebarBlock(XBlock):
             }
             """)
         html = []
-        html.append("<div class='sidebar'>")
+        html.append(u"<div class='sidebar'>")
         for cw in child_frags:
             html.append(cw.body_html())
-        html.append("</div>")
+        html.append(u"</div>")
         result.add_content("".join(html))
         return result

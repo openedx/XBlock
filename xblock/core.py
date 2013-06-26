@@ -72,7 +72,7 @@ ScopeBase = namedtuple('ScopeBase', 'user block')
 class Scope(ScopeBase):
     # The `content` scope is used to save data for all users, for
     # one particular block, across all runs of a course. An example
-    # might be an XBlock that wishes to tabulate user "upvotes", 
+    # might be an XBlock that wishes to tabulate user "upvotes",
     # or HTML content to display literally on the page (this example
     # being the reason this scope is named `content`)
     content = ScopeBase(user=False, block=BlockScope.DEFINITION)
@@ -189,8 +189,10 @@ class ModelType(object):
 
     def _mark_dirty(self, instance):
         """ Set this field to dirty on the instance """
-        if self.name not in instance._dirty_fields:
-            instance._dirty_fields.add(self.name)
+        if not hasattr(instance, '_dirty_fields'):
+            instance._dirty_fields = set()
+        if self not in instance._dirty_fields:
+            instance._dirty_fields.add(self)
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -604,10 +606,10 @@ class XBlock(Plugin):
         try:
             # Create dictionary mapping between dirty fields and data cache values
             fields_to_save = {}
-            for mt_name in self._dirty_fields:
+            for mt in self._dirty_fields:
                 # Cache should have the right values
-                fields_to_save[mt_name] = self._model_data_cache[mt_name]
-
+                mt_value = self._model_data_cache[mt.name]
+                fields_to_save[mt.name] = mt.to_json(mt_value)
             # Change to DbModel to support `update` that calls kvstore `update`
             # Throws KeyValueMultiSaveError if things go wrong
             self._model_data.update(fields_to_save)

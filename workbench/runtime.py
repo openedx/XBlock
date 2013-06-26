@@ -96,6 +96,9 @@ class Usage(object):
         for child in self.children:
             child.store_initial_state()
 
+        # Explicitly save all of the initial state we've just written
+        block.save()
+
     def __repr__(self):
         return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.children!r}>".format(self)
 
@@ -157,7 +160,7 @@ class MemoryKeyValueStore(KeyValueStore):
         return make_safe_for_html(html)
 
     def update(self, update_dict):
-        for key, value in update_dict:
+        for key, value in update_dict.items():
             self.set(key, value)
 
 
@@ -197,6 +200,10 @@ class WorkbenchRuntime(Runtime):
 
         frag = view_fn(context)
 
+        # TODO: [dkh/sarina] Need to test this path 
+        # (such as a view counter)
+        # Explicitly save because render action may have changed state
+        block.save()
         self._view_name = None
         return self.wrap_child(block, frag, context)
 

@@ -79,24 +79,26 @@ def test_children_metaclass():
 
 
 def test_field_access():
-    class FieldTester(object):
+    class FieldTester(XBlock):
         __metaclass__ = ModelMetaclass
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default='field c')
 
-        def __init__(self, model_data):
-            self._model_data = model_data
+    field_tester = FieldTester(MagicMock(), {'field_a': 5, 'field_x': 15})
 
-    field_tester = FieldTester({'field_a': 5, 'field_x': 15})
-
+    # verify that the fields have been set
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
     assert_equals('field c', field_tester.field_c)
     assert not hasattr(field_tester, 'field_x')
 
+    # set one of the fields
     field_tester.field_a = 20
+    # save the XBlock
+    field_tester.save()
+    # verify that the fields have been updated correctly
     assert_equals(20, field_tester._model_data['field_a'])
     assert_equals(10, field_tester.field_b)
     assert_equals('field c', field_tester.field_c)
@@ -108,16 +110,13 @@ def test_field_access():
 
 def test_list_field_access():
     '''Check that values that are deleted are restored to their default values'''
-    class FieldTester(object):
+    class FieldTester(XBlock):
         __metaclass__ = ModelMetaclass
 
         field_a = List(scope=Scope.settings)
         field_b = List(scope=Scope.content, default=[1, 2, 3])
 
-        def __init__(self, model_data):
-            self._model_data = model_data
-
-    field_tester = FieldTester({})
+    field_tester = FieldTester(MagicMock(), {})
 
     # Check initial values
     assert_equals([], field_tester.field_a)
@@ -198,23 +197,20 @@ def test_namespace_metaclass(mock_load_classes):
 
 @patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)])
 def test_namespace_field_access(mock_load_classes):
-    class Metaclass(ModelMetaclass, NamespacesMetaclass):
-        pass
 
-    class FieldTester(object):
-        __metaclass__ = Metaclass
+    class FieldTester(XBlock):
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default='field c')
 
-        def __init__(self, model_data):
-            self._model_data = model_data
-
-    field_tester = FieldTester({
-        'field_a': 5,
-        'field_x': [1, 2, 3],
-    })
+    field_tester = FieldTester(
+        MagicMock(),
+        {
+            'field_a': 5,
+            'field_x': [1, 2, 3],
+        }
+    )
 
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
@@ -223,6 +219,7 @@ def test_namespace_field_access(mock_load_classes):
     assert_equals('default_value', field_tester.test.field_y)
 
     field_tester.test.field_x = ['a', 'b']
+    field_tester.save()
     assert_equals(['a', 'b'], field_tester._model_data['field_x'])
 
     del field_tester.test.field_x
@@ -314,28 +311,35 @@ def test_caching_is_per_instance():
 
 
 def test_field_serialization():
+    """
+    Some ModelTypes can define their own serialization mechanisms.
+
+    This test ensures that we are using them properly.
+    """
 
     class CustomField(ModelType):
+        """
+        Specifiy a custom field that defines its own serialization
+        """
         def from_json(self, value):
             return value['value']
 
         def to_json(self, value):
             return {'value': value}
 
-    class FieldTester(object):
-        __metaclass__ = ModelMetaclass
-
+    class FieldTester(XBlock):
         field = CustomField()
 
-        def __init__(self, model_data):
-            self._model_data = model_data
-
-    field_tester = FieldTester({
-        'field': {'value': 4}
-    })
+    field_tester = FieldTester(
+        MagicMock(),
+        {
+            'field': {'value': 4}
+        }
+    )
 
     assert_equals(4, field_tester.field)
     field_tester.field = 5
+    field_tester.save()
     assert_equals({'value': 5}, field_tester._model_data['field'])
 
 
