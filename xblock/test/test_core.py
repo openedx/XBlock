@@ -199,7 +199,6 @@ def test_namespace_metaclass(mock_load_classes):
 def test_namespace_field_access(mock_load_classes):
 
     class FieldTester(XBlock):
-
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default='field c')
@@ -407,11 +406,11 @@ def test_field_display_name_defaults():
 
 
 def test_field_display_name():
-    attempts = Integer(display_name = 'Maximum Problem Attempts')
+    attempts = Integer(display_name='Maximum Problem Attempts')
     attempts._name = "max_problem_attempts"
     assert_equals("Maximum Problem Attempts", attempts.display_name)
 
-    boolean_field = Boolean(display_name= "boolean field")
+    boolean_field = Boolean(display_name="boolean field")
     assert_equals("boolean field", boolean_field.display_name)
 
     class TestNamespace(Namespace):
@@ -423,11 +422,11 @@ def test_field_display_name():
 def test_values():
     # static return value
     field_values = ['foo', 'bar']
-    test_field = String(values = field_values)
+    test_field = String(values=field_values)
     assert_equals(field_values, test_field.values)
 
     # function to generate values
-    test_field = String(values = lambda : [1, 4])
+    test_field = String(values=lambda: [1, 4])
     assert_equals([1, 4], test_field.values)
 
     # default if nothing specified
@@ -442,5 +441,73 @@ def test_values_boolean():
 
 def test_values_dict():
     # Test that the format expected for integers is allowed
-    test_field = Integer(values={"min": 1, "max" : 100})
-    assert_equals({"min": 1, "max" : 100}, test_field.values)
+    test_field = Integer(values={"min": 1, "max": 100})
+    assert_equals({"min": 1, "max": 100}, test_field.values)
+
+
+def setup_save_failure(update_method):
+    """
+    Set up tests for when there's a save error in the underlying KeyValueStore
+    """
+    model_data = MagicMock(spec=dict)
+    model_data.__getitem__ = lambda self, name: [name]
+
+    model_data.update = update_method
+
+    class FieldTester(XBlock):
+        """
+        Test XBlock with three fields
+        """
+        field_a = Integer(scope=Scope.settings)
+        field_b = Integer(scope=Scope.content, default=10)
+        field_c = Integer(scope=Scope.user_state, default='field c')
+
+    field_tester = FieldTester(MagicMock(), model_data)
+    return field_tester
+
+
+def test_xblock_save_one():
+    """
+    Mimics a save failure when we only manage to save one of the values
+    """
+    # mock the update method so that it throws a KeyValueMultiSaveError
+    def fake_update(*args, **kwargs):
+        other_dict = args[0]
+        raise KeyValueMultiSaveError(other_dict.keys()[0])
+
+    field_tester = setup_save_failure(fake_update)
+
+    field_tester.field_a = 20
+    field_tester.field_b = 40
+
+    try:
+        field_tester.save()
+        # we should raise an XBlockSaveError, so we shouldn't reach this line
+        assert_equals(True, False)
+    except XBlockSaveError as save_error:
+        # verify that the correct data is getting stored by the error
+        assert_equals(len(save_error.saved_fields), 1)
+        assert_equals(len(save_error.dirty_fields), 1)
+
+
+def test_xblock_save_failure_none():
+    """
+    Mimics a save failure when we don't manage to save any of the values
+    """
+    # mock the update method so that it throws a KeyValueMultiSaveError
+    def fake_update(*args, **kwargs):
+        raise KeyValueMultiSaveError([])
+
+    field_tester = setup_save_failure(fake_update)
+    field_tester.field_a = 20
+    field_tester.field_b = 30
+    field_tester.field_c = "hello world"
+
+    try:
+        field_tester.save()
+        # we should raise an XBlockSaveError, so we shouldn't reach this line
+        assert_equals(True, False)
+    except XBlockSaveError as save_error:
+        # verify that the correct data is getting stored by the error
+        assert_equals(len(save_error.saved_fields), 0)
+        assert_equals(len(save_error.dirty_fields), 3)

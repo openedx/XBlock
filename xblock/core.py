@@ -22,14 +22,14 @@ class KeyValueMultiSaveError(Exception):
     """
     Raised to indicated an error in saving multiple fields in a KeyValueStore
     """
-    def __init__(self, saved_fields):
+    def __init__(self, saved_field_names):
         """
         Create a new KeyValueMultiSaveError
 
-        saved_fields - a set of fields that were successfully saved before the exception occured
+        saved_fields - a iterable of field names that were successfully saved before the exception occured
         """
         super(KeyValueMultiSaveError, self).__init__()
-        self.saved_fields = saved_fields
+        self.saved_field_names = saved_field_names
 
 
 class XBlockSaveError(Exception):
@@ -615,9 +615,11 @@ class XBlock(Plugin):
             self._model_data.update(fields_to_save)
 
         except KeyValueMultiSaveError as save_error:
-            for field in save_error.saved_fields:
+            saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
+            for field in saved_fields:
+                # should only find one corresponding field
                 self._dirty_fields.remove(field)
-            raise XBlockFieldSaveError(save_error.saved_fields,  self._dirty_fields)
+            raise XBlockSaveError(saved_fields, self._dirty_fields)
 
         # Remove all dirty fields, since the save was successful
         self._clear_dirty_fields()
