@@ -15,11 +15,13 @@ class InvalidScopeError(Exception):
     """
     pass
 
+
 class NoSuchViewError(Exception):
     """
     Raised to indicate that the view requested was not found.
     """
     pass
+
 
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
@@ -185,13 +187,12 @@ class Runtime(object):
         if view_fn is None:
             view_fn = getattr(block, "fallback_view", None)
             if view_fn is None:
-                raise NoSuchViewError() 
+                raise NoSuchViewError()
             view_fn = functools.partial(view_fn, view_name)
 
         frag = view_fn(context)
 
-        # TODO: [dkh/sarina] Need to test this path 
-        # (such as a view counter)
+        # TODO [dkh/sarina]: Need to test this path (eg, view counter)
 
         # Explicitly save because render action may have changed state
         block.save()
@@ -236,7 +237,7 @@ class Runtime(object):
 
     def wrap_child(self, block, frag, context):
         """
-        Wraps the fragment with any necessary HTML, informed by 
+        Wraps the fragment with any necessary HTML, informed by
         the block and the context.
         """
         # By default, just return the fragment itself.
@@ -260,8 +261,6 @@ class Runtime(object):
             else:
                 raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
 
-        # TODO [dkh/sarina] Omitting this only causes one test to fail. Should have 
-        # better coverage of both original & (esp) fallback handlers
         # Write out dirty fields
         block.save()
         return results

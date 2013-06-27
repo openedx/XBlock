@@ -21,6 +21,7 @@ setup(
             'attempts_scoreboard = xblock.problem:AttemptsScoreboardBlock',
             'slider = xblock.slider:Slider',
             'progress_slider = xblock.slider:ProgressSlider',
+            'view_counter = xblock.view_counter:ViewCounter'
         ]
     }
 )

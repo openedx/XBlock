@@ -26,7 +26,8 @@ class KeyValueMultiSaveError(Exception):
         """
         Create a new KeyValueMultiSaveError
 
-        saved_fields - a iterable of field names that were successfully saved before the exception occured
+        saved_fields - a iterable of field names that were successfully
+        saved before the exception occured
         """
         super(KeyValueMultiSaveError, self).__init__()
         self.saved_field_names = saved_field_names
@@ -40,7 +41,8 @@ class XBlockSaveError(Exception):
         """
         Create a new XBlockSaveError
 
-        saved_fields - a set of fields that were successfully saved before the error occured
+        saved_fields - a set of fields that were successfully
+        saved before the error occured
         dirty_fields - a set of fields that were left dirty after the save
         """
         super(XBlockSaveError, self).__init__()
@@ -109,24 +111,31 @@ NO_CACHE_VALUE = object()
 
 class ModelType(object):
     """
-    A field class that can be used as a class attribute to define what data the class will want
-    to refer to.
+    A field class that can be used as a class attribute to define what data the
+    class will want to refer to.
 
-    When the class is instantiated, it will be available as an instance attribute of the same
-    name, by proxying through to self._model_data on the containing object.
+    When the class is instantiated, it will be available as an instance
+    attribute of the same name, by proxying through to self._model_data on
+    the containing object.
 
     Parameters:
-      `help` : documentation of field class, suitable for presenting in a GUI (defaults to None)
-      `default` : static value to default to if not otherwise specified (defaults to None)
-      `scope` : the scope in which this field class is used (defaults to Scope.content)
-      `display_name` : the display name for the field class, suitable for presenting in a GUI (defaults to name of class)
-      `values` : for field classes with a known set of valid values, provides the ability to explicitly specify the
-               valid values. This can be specified as either a static return value, or a function that generates
-               the valid values. For example formats, see the values property definition.
+      `help` : documentation of field class, suitable for presenting in a GUI
+               (defaults to None)
+      `default` : static value to default to if not otherwise specified
+                  (defaults to None)
+      `scope` : the scope in which this field class is used (defaults to
+                Scope.content)
+      `display_name` : the display name for the field class, suitable for
+                       presenting in a GUI (defaults to name of class)
+      `values` : for field classes with a known set of valid values, provides
+                 the ability to explicitly specify the valid values. This can
+                 be specified as either a static return value, or a function
+                 that generates the valid values. For example formats, see the
+                 values property definition.
     """
 
-    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None,
-                 values=None):
+    def __init__(self, help=None, default=None, scope=Scope.content,
+                 display_name=None, values=None):
         self._name = "unknown"
         self.help = help
         self._default = default
@@ -145,15 +154,20 @@ class ModelType(object):
     @property
     def values(self):
         """
-        Returns the valid values for this class. This is useful for representing possible values in a UI.
+        Returns the valid values for this class. This is useful
+        for representing possible values in a UI.
 
         Example formats:
             `[1, 2, 3]` : a finite set of elements
-            `[{"display_name": "Always", "value": "always"}, {"display_name": "Past Due", "value": "past_due"}]` :
-                a finite set of elements where the display names differ from the values
-            `{"min" : 0 , "max" : 10, "step": .1}` : a range for floating point numbers with increment .1
+            `[{"display_name": "Always", "value": "always"},
+              {"display_name": "Past Due", "value": "past_due"}]` :
+                a finite set of elements where the display names differ from
+                the values
+            `{"min" : 0 , "max" : 10, "step": .1}` :
+                a range for floating point numbers with increment .1
 
-        If this field class does not define a set of valid values, this method will return None.
+        If this field class does not define a set of valid values, this method
+        will return None.
         """
         if callable(self._values):
             return self._values()
@@ -447,8 +461,9 @@ class ChildrenModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         if (attrs.get('has_children', False) or
-            any(getattr(base, 'has_children', False) for base in bases)):
-            attrs['children'] = List(help='The ids of the children of this XBlock', scope=Scope.children)
+                any(getattr(base, 'has_children', False) for base in bases)):
+            attrs['children'] = List(help='The ids of the children of this XBlock',
+                                     scope=Scope.children)
         else:
             attrs['has_children'] = False
 
@@ -523,11 +538,11 @@ class TagCombiningMetaclass(type):
 
 
 class XBlockMetaclass(
-    ChildrenModelMetaclass,
-    NamespacesMetaclass,
-    ModelMetaclass,
-    TagCombiningMetaclass,
-    ):
+        ChildrenModelMetaclass,
+        NamespacesMetaclass,
+        ModelMetaclass,
+        TagCombiningMetaclass,
+):
     pass
 
 
