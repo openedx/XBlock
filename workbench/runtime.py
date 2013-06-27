@@ -41,7 +41,7 @@ class Usage(object):
     # Maps ids to Usages, a dict of all instances created, ever.
     _usage_index = {}
 
-    # The set of Usages that have been initialized.
+    # The set of Usage ids that have been initialized by store_initial_state.
     _inited = set()
 
     def __init__(self, block_name, children=None, initial_state=None, def_id=None):
@@ -60,12 +60,26 @@ class Usage(object):
             child.parent = self
 
     def store_initial_state(self):
+        """Ensure that the initial state of this Usage is created.
+
+        This method is called before using the Usage.  It will use the
+        `initial_state` argument to the Usage to populate XBlock
+        attributes, and then recursively do the same for its children.
+
+        All this work is only done once for each Usage no matter how often
+        this function is called.
+
+        """
         # If we've already created the initial state, there's nothing to do.
         if self.id in self._inited:
             return
 
         # Create an XBlock from this usage, and use it to create the initial
-        # state.
+        # state. This block is created just so we can use the block to set
+        # attributes, which will cause the data to be written through the
+        # fields. This isolates us from the storage mechanism: however the
+        # block saves its attributes, that's how the initial state will be
+        # saved.
         block = create_xblock(self)
         if self.initial_state:
             for name, value in self.initial_state.items():
