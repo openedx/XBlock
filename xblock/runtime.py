@@ -3,6 +3,7 @@ Machinery to make the common case easy when building new runtimes
 """
 
 import re
+import functools
 
 from collections import namedtuple, MutableMapping
 from .core import ModelType, BlockScope, Scope
@@ -14,6 +15,11 @@ class InvalidScopeError(Exception):
     """
     pass
 
+class NoSuchViewError(Exception):
+    """
+    Raised to indicate that the view requested was not found.
+    """
+    pass
 
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
@@ -150,7 +156,8 @@ class DbModel(MutableMapping):
 
 
 class Runtime(object):
-    """Access to the runtime environment for XBlocks.
+    """
+    Access to the runtime environment for XBlocks.
 
     A pre-configured instance of this class will be available to XBlocks as
     `self.runtime`.
@@ -160,7 +167,8 @@ class Runtime(object):
         self._view_name = None
 
     def render(self, block, context, view_name):
-        """Render a block by invoking its view.
+        """
+        Render a block by invoking its view.
 
         Finds the view named `view_name` on `block`.  The default view will be
         used if a specific view hasn't be registered.  If there is no default
@@ -171,7 +179,24 @@ class Runtime(object):
         integrate it into a larger whole.
 
         """
-        raise NotImplementedError("Runtime needs to provide render()")
+        self._view_name = view_name
+
+        view_fn = getattr(block, view_name, None)
+        if view_fn is None:
+            view_fn = getattr(block, "fallback_view", None)
+            if view_fn is None:
+                raise NoSuchViewError() 
+            view_fn = functools.partial(view_fn, view_name)
+
+        frag = view_fn(context)
+
+        # TODO: [dkh/sarina] Need to test this path 
+        # (such as a view counter)
+
+        # Explicitly save because render action may have changed state
+        block.save()
+        self._view_name = None
+        return self.wrap_child(block, frag, context)
 
     def get_block(self, block_id):
         """Get a block by ID.
@@ -210,6 +235,11 @@ class Runtime(object):
         return results
 
     def wrap_child(self, block, frag, context):
+        """
+        Wraps the fragment with any necessary HTML, informed by 
+        the block and the context.
+        """
+        # By default, just return the fragment itself.
         return frag
 
     def handle(self, block, handler_name, data):

@@ -4,7 +4,6 @@ Code in this file is a mix of Runtime layer and Workbench layer.
 
 """
 
-import functools
 import itertools
 
 try:
@@ -17,7 +16,7 @@ import logging
 from django.template import loader as django_template_loader, Context as DjangoContext
 
 from xblock.core import XBlock, Scope, ModelType
-from xblock.runtime import DbModel, KeyValueStore, Runtime
+from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
@@ -189,23 +188,11 @@ class WorkbenchRuntime(Runtime):
         self.usage = usage
 
     def render(self, block, context, view_name):
-        self._view_name = view_name
+        try:
+            return super(WorkbenchRuntime, self).render(block, context, view_name)
+        except NoSuchViewError:
+            return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
 
-        view_fn = getattr(block, view_name, None)
-        if view_fn is None:
-            view_fn = getattr(block, "fallback_view", None)
-            if view_fn is None:
-                return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
-            view_fn = functools.partial(view_fn, view_name)
-
-        frag = view_fn(context)
-
-        # TODO: [dkh/sarina] Need to test this path 
-        # (such as a view counter)
-        # Explicitly save because render action may have changed state
-        block.save()
-        self._view_name = None
-        return self.wrap_child(block, frag, context)
 
     # TODO: [rocha] runtime should not provide this, each xblock
     # should use whatever they want
