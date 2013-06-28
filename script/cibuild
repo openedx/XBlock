@@ -20,7 +20,8 @@ NOSE_ATTR='!selenium' coverage run manage.py test
 
 # Compute coverage
 coverage html
-coverage xml
+coverage xml -o coverage.xml
+diff-cover coverage.xml --html-report diff_cover.html
 
 # Compute style violations
 pep8 > pep8.report || echo "Not pep8 clean"
