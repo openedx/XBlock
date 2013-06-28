@@ -43,7 +43,8 @@ class Usage(object):
     # The set of Usage ids that have been initialized by store_initial_state.
     _inited = set()
 
-    def __init__(self, block_name, children=None, initial_state=None, def_id=None):
+    def __init__(self, block_name, children=None,
+                 initial_state=None, def_id=None):
         self.id = "usage_%d" % next(self._ids)
         self.parent = None
         self.block_name = block_name
@@ -91,12 +92,12 @@ class Usage(object):
         # We've initialized this instance, keep track.
         self._inited.add(self.id)
 
+        # Explicitly save all of the initial state we've just written
+        block.save()
+
         # Also do this recursively down the tree.
         for child in self.children:
             child.store_initial_state()
-
-        # Explicitly save all of the initial state we've just written
-        block.save()
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.children!r}>".format(self)
@@ -104,7 +105,6 @@ class Usage(object):
     @classmethod
     def find_usage(cls, usage_id):
         return cls._usage_index[usage_id]
-
 
     @classmethod
     def reinitialize_all(cls):
@@ -189,15 +189,17 @@ class WorkbenchRuntime(Runtime):
 
     def render(self, block, context, view_name):
         try:
-            return super(WorkbenchRuntime, self).render(block, context, view_name)
+            return super(WorkbenchRuntime, self).render(
+                block, context, view_name)
         except NoSuchViewError:
-            return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
-
+            return Fragment(u"<i>No such view: %s on %s</i>"
+                            % (view_name, make_safe_for_html(repr(block))))
 
     # TODO: [rocha] runtime should not provide this, each xblock
     # should use whatever they want
     def render_template(self, template_name, **kwargs):
-        return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
+        return django_template_loader.get_template(
+            template_name).render(DjangoContext(kwargs))
 
     def wrap_child(self, block, frag, context):
         wrapped = Fragment()
@@ -237,7 +239,8 @@ class WorkbenchRuntime(Runtime):
     def collect(self, key, block=None):
         block_cls = block.__class__ if block else self.block_cls
 
-        data_model = AnalyticsDbModel(MEMORY_KVS, block_cls, self.student_id, self.usage)
+        data_model = AnalyticsDbModel(
+            MEMORY_KVS, block_cls, self.student_id, self.usage)
         value = data_model.get(key)
         children = []
         for child_id in data_model.get('children', []):
@@ -254,7 +257,8 @@ class WorkbenchRuntime(Runtime):
 
     # TODO: [rocha] other name options: scatter, share
     def publish(self, key, value):
-        data = AnalyticsDbModel(MEMORY_KVS, self.block_cls, self.student_id, self.usage)
+        data = AnalyticsDbModel(MEMORY_KVS,
+                                self.block_cls, self.student_id, self.usage)
         data[key] = value
 
 
@@ -284,6 +288,7 @@ class _BlockSet(object):
 
     def descendants(self):
         them = set()
+
         def recur(block):
             for child_id in getattr(block, "children", ()):
                 child = self.runtime.get_block(child_id)

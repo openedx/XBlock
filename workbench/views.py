@@ -22,6 +22,7 @@ from .request import webob_to_django_response, django_to_webob_request
 
 LOG_STREAM = None
 
+
 def setup_logging():
     global LOG_STREAM
     LOG_STREAM = StringIO()
@@ -29,7 +30,8 @@ def setup_logging():
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     handler = logging.StreamHandler(LOG_STREAM)
-    handler.setFormatter(logging.Formatter("<p>%(asctime)s %(name)s %(levelname)s: %(message)s</p>"))
+    handler.setFormatter(logging.Formatter(
+        "<p>%(asctime)s %(name)s %(levelname)s: %(message)s</p>"))
     root_logger.addHandler(handler)
 
 setup_logging()
@@ -49,12 +51,14 @@ def get_student_id(request):
 def index(request):
     the_scenarios = sorted(SCENARIOS.items())
     return render_to_response('index.html', {
-        'scenarios': [(desc, scenario.description) for desc, scenario in the_scenarios]
+        'scenarios':
+        [(desc, scenario.description) for desc, scenario in the_scenarios]
     })
 
 
 @ensure_csrf_cookie
-def show_scenario(request, scenario_id, view_name='student_view', template='block.html'):
+def show_scenario(request, scenario_id,
+                  view_name='student_view', template='block.html'):
     student_id = get_student_id(request)
     log.info("Start show_scenario %r for student %s", scenario_id, student_id)
 
@@ -87,7 +91,8 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
 
 def handler(request, usage_id, handler_slug):
     student_id = get_student_id(request)
-    log.info("Start handler %s/%s for student %s", usage_id, handler_slug, student_id)
+    log.info("Start handler %s/%s for student %s",
+             usage_id, handler_slug, student_id)
     usage = Usage.find_usage(usage_id)
     block = create_xblock(usage, student_id)
     request = django_to_webob_request(request)

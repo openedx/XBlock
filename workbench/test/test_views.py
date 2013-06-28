@@ -57,7 +57,8 @@ class XBlockWithHandlerAndStudentState(XBlock):
         return {'the_data': self.the_data}
 
 
-@patch('xblock.core.XBlock.load_class', return_value=XBlockWithHandlerAndStudentState)
+@patch('xblock.core.XBlock.load_class',
+       return_value=XBlockWithHandlerAndStudentState)
 def test_xblock_with_handler_and_student_state(mock_load_class):
     c = Client()
 
@@ -80,7 +81,10 @@ def test_xblock_with_handler_and_student_state(mock_load_class):
 
 
 class XBlockWithoutHandlerAndStudentState(XBlock):
-
+    # This class doesn't provide any form of handler (neither
+    # a normal handler nor a fallback handler), thus calling
+    # handle should raise an exception
+    # (from xblock.runtime.Runtime.handle)
     the_data = String(default="def", scope=Scope.user_state)
 
     def student_view(self, context):
@@ -89,8 +93,9 @@ class XBlockWithoutHandlerAndStudentState(XBlock):
         return Fragment(body)
 
 
-@patch('xblock.core.XBlock.load_class', return_value=XBlockWithoutHandlerAndStudentState)
-def test_xblock_with_fallback_handler_and_student_state(mock_load_class):
+@patch('xblock.core.XBlock.load_class',
+       return_value=XBlockWithoutHandlerAndStudentState)
+def test_xblock_without_handler_and_student_state(mock_load_class):
     c = Client()
 
     # Initially, the data is the default.
@@ -100,5 +105,24 @@ def test_xblock_with_fallback_handler_and_student_state(mock_load_class):
     assert len(parsed) == 3
     handler_url = parsed[1]
 
-    # Now try changing the data. We don't have a handler so this should fail.
+    # Now try changing the data. The mock xblock doesn't provide
+    # a handler, so this call should raise an exception
+    # (from xblock.runtime.Runtime.handle)
     assert_raises(Exception,  c.post, handler_url, "{}", "text/json")
+
+
+class XBlockWithoutStudentView(XBlock):
+    """
+    Test WorkbechRuntime.render caught `NoSuchViewError` exception path
+    """
+    the_data = String(default="def", scope=Scope.user_state)
+
+
+@patch('xblock.core.XBlock.load_class', return_value=XBlockWithoutStudentView)
+def test_xblock_without_student_view(mock_load_class):
+    # Try to get a response. Will try to render via WorkbenchRuntime.render;
+    # since no view is provided in the XBlock, will return a Fragment that
+    # indicates there is no view available.
+    c = Client()
+    response = c.get("/view/xblockwithoutstudentview/")
+    assert 'No such view' in response.content

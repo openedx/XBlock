@@ -87,15 +87,6 @@ with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestName
         for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
         user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
-        def existing_handler(self, data):
-            """ an existing handler to be used """
-            self.user_state = data
-            return "I am the existing test handler"
-
-        def student_view(self, context):
-            self.preferences = context[0]
-            return Fragment(self.preferences)
-
 TestUsage = namedtuple('TestUsage', 'id, def_id')
 
 
