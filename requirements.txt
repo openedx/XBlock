@@ -15,6 +15,7 @@ pylint
 selenium
 rednose
 pep8
+diff-cover
 
 # For docs
 sphinx
