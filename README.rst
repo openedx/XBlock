@@ -94,9 +94,6 @@ See the `coverage.py`_ docs for more info and options.
 
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
 
-You can also run unit tests of the JavaScript used by the `thumbs` example.
-See `thumbs/static/js/README.md` for details.
-
 
 Using the workbench
 -------------------
@@ -145,19 +142,16 @@ clear which layer the code lives in, though sometimes the lines are blurred:
     This code is the least real, in that it might be just stubs, and will be
     done very differently in real code.
 
-4.  **Thumbs** This is a sample XBlock written as a separate installable kit as
-    an example of how third-party XBlocks can be structured.
-
 
 Making your own XBlock
 ----------------------
 
 Making an XBlock can be as simple as creating a Python class with a few
-specific methods.  The ``thumbs`` module demonstrates an XBlock with state,
+specific methods.  The repository ``xblock-thumbs`` demonstrates an XBlock with state,
 views, and input handling.
 
-You can provide scenarios for the workbench to display, see the thumbs.py
-sample for an example, or the xblock/problem.py file.  The scenarios are
+You can provide scenarios for the workbench to display. For an example, see the
+repository ``xblock-thumbs``, or the xblock/problem.py file.  The scenarios are
 written in a simple XML language.  Note this is not an XML format we are
 proposing as a standard.
 
