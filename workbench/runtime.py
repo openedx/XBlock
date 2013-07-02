@@ -13,7 +13,8 @@ except ImportError:
 
 import logging
 
-from django.template import loader as django_template_loader, Context as DjangoContext
+from django.template import loader as django_template_loader,\
+    Context as DjangoContext
 
 from xblock.core import XBlock, Scope, ModelType
 from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
@@ -43,8 +44,7 @@ class Usage(object):
     # The set of Usage ids that have been initialized by store_initial_state.
     _inited = set()
 
-    def __init__(self, block_name, children=None,
-                 initial_state=None, def_id=None):
+    def __init__(self, block_name, children=None, initial_state=None, def_id=None):
         self.id = "usage_%d" % next(self._ids)
         self.parent = None
         self.block_name = block_name
@@ -145,6 +145,7 @@ class MemoryKeyValueStore(KeyValueStore):
         return self.d[self.actual_key(key)][key.field_name]
 
     def set(self, key, value):
+        """Sets the key to the new value"""
         self.d.setdefault(self.actual_key(key), {})[key.field_name] = value
 
     def delete(self, key):
@@ -158,7 +159,11 @@ class MemoryKeyValueStore(KeyValueStore):
         html = json.dumps(self.d, sort_keys=True, indent=4)
         return make_safe_for_html(html)
 
-    def update(self, update_dict):
+    def set_many(self, update_dict):
+        """
+        Takes in a dictionary of dirty_fields: values, and sets the value
+        of each dirty_field to the specified value using `set`.
+        """
         for key, value in update_dict.items():
             self.set(key, value)
 
@@ -189,8 +194,7 @@ class WorkbenchRuntime(Runtime):
 
     def render(self, block, context, view_name):
         try:
-            return super(WorkbenchRuntime, self).render(
-                block, context, view_name)
+            return super(WorkbenchRuntime, self).render(block, context, view_name)
         except NoSuchViewError:
             return Fragment(u"<i>No such view: %s on %s</i>"
                             % (view_name, make_safe_for_html(repr(block))))
@@ -198,8 +202,8 @@ class WorkbenchRuntime(Runtime):
     # TODO: [rocha] runtime should not provide this, each xblock
     # should use whatever they want
     def render_template(self, template_name, **kwargs):
-        return django_template_loader.get_template(
-            template_name).render(DjangoContext(kwargs))
+        template = django_template_loader.get_template(template_name)
+        return template.render(DjangoContext(kwargs))
 
     def wrap_child(self, block, frag, context):
         wrapped = Fragment()
@@ -227,7 +231,11 @@ class WorkbenchRuntime(Runtime):
         return wrapped
 
     def handler_url(self, url):
-        return "/handler/%s/%s/?student=%s" % (self.usage.id, url, self.student_id)
+        return "/handler/{0}/{1}/?student={2}".format(
+            self.usage.id,
+            url,
+            self.student_id
+        )
 
     def get_block(self, block_id):
         return create_xblock(Usage.find_usage(block_id), self.student_id)
@@ -240,7 +248,11 @@ class WorkbenchRuntime(Runtime):
         block_cls = block.__class__ if block else self.block_cls
 
         data_model = AnalyticsDbModel(
-            MEMORY_KVS, block_cls, self.student_id, self.usage)
+            MEMORY_KVS,
+            block_cls,
+            self.student_id,
+            self.usage
+        )
         value = data_model.get(key)
         children = []
         for child_id in data_model.get('children', []):
@@ -257,8 +269,12 @@ class WorkbenchRuntime(Runtime):
 
     # TODO: [rocha] other name options: scatter, share
     def publish(self, key, value):
-        data = AnalyticsDbModel(MEMORY_KVS,
-                                self.block_cls, self.student_id, self.usage)
+        data = AnalyticsDbModel(
+            MEMORY_KVS,
+            self.block_cls,
+            self.student_id,
+            self.usage
+        )
         data[key] = value
 
 

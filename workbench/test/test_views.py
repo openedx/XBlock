@@ -57,8 +57,10 @@ class XBlockWithHandlerAndStudentState(XBlock):
         return {'the_data': self.the_data}
 
 
-@patch('xblock.core.XBlock.load_class',
-       return_value=XBlockWithHandlerAndStudentState)
+@patch(
+    'xblock.core.XBlock.load_class',
+    return_value=XBlockWithHandlerAndStudentState
+)
 def test_xblock_with_handler_and_student_state(mock_load_class):
     c = Client()
 
@@ -80,35 +82,18 @@ def test_xblock_with_handler_and_student_state(mock_load_class):
     assert the_data == "defxx"
 
 
-class XBlockWithoutHandlerAndStudentState(XBlock):
-    # This class doesn't provide any form of handler (neither
-    # a normal handler nor a fallback handler), thus calling
-    # handle should raise an exception
-    # (from xblock.runtime.Runtime.handle)
-    the_data = String(default="def", scope=Scope.user_state)
-
-    def student_view(self, context):
-        body = u"The data: %r." % self.the_data
-        body += u":::%s:::" % self.runtime.handler_url("update_the_data")
-        return Fragment(body)
-
-
-@patch('xblock.core.XBlock.load_class',
-       return_value=XBlockWithoutHandlerAndStudentState)
+@patch('xblock.core.XBlock.load_class', return_value=XBlock)
 def test_xblock_without_handler_and_student_state(mock_load_class):
+    # Test that an XBlock without a handler raises an Exception
+    # when we try to hit a handler on it
     c = Client()
+    handler_url = "/handler/usage_175/update_the_data/?student=student_1"
 
-    # Initially, the data is the default.
-    response = c.get("/view/xblockwithouthandlerandstudentstate/")
-    assert "The data: 'def'." in response.content
-    parsed = response.content.split(':::')
-    assert len(parsed) == 3
-    handler_url = parsed[1]
-
-    # Now try changing the data. The mock xblock doesn't provide
+    # The default XBlock implementation doesn't provide
     # a handler, so this call should raise an exception
     # (from xblock.runtime.Runtime.handle)
-    assert_raises(Exception,  c.post, handler_url, "{}", "text/json")
+    with assert_raises(Exception):
+        c.post(handler_url, '{}', 'text/json')
 
 
 class XBlockWithoutStudentView(XBlock):

@@ -201,8 +201,8 @@ def test_runtime_handle():
     # handler can't be found & no fallback handler supplied, should throw an exception
     tester = TestXBlockNoFallback(Mock(), db_model)
     ultimate_string = "ultimate update"
-    assert_raises(Exception, runtime.handle, tester,
-                  'test_nonexistant_fallback_handler', ultimate_string)
+    with assert_raises(Exception):
+        runtime.handle(tester, 'test_nonexistant_fallback_handler', ultimate_string)
 
 
 def test_runtime_render():
@@ -227,5 +227,5 @@ def test_runtime_render():
     # test against the no-fallback XBlock
     update_string = u"ultimate update"
     tester = TestXBlockNoFallback(Mock(), db_model)
-    assert_raises(NoSuchViewError, runtime.render,
-                  tester, [update_string], 'test_nonexistant_view')
+    with assert_raises(NoSuchViewError):
+        runtime.render(tester, [update_string], 'test_nonexistant_view')

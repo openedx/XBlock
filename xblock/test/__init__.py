@@ -13,9 +13,8 @@ class DictKeyValueStore(KeyValueStore):
     def set(self, key, value):
         self.db[key] = value
 
-    def update(self, d):
-        for key in d:
-            self.db[key] = d[key]
+    def set_many(self, d):
+        self.db.update(d)
 
     def delete(self, key):
         del self.db[key]

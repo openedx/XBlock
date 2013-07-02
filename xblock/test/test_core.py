@@ -1,8 +1,11 @@
 from mock import patch, MagicMock
-from nose.tools import assert_in, assert_equals, assert_raises, assert_not_equals
+from nose.tools import assert_in, assert_equals, assert_raises,\
+    assert_not_equals
 from datetime import datetime
 
-from xblock.core import *
+from xblock.core import Boolean, ChildrenModelMetaclass, Integer,\
+    KeyValueMultiSaveError, List, ModelMetaclass, ModelType,\
+    Namespace, NamespacesMetaclass, Scope, String, XBlock, XBlockSaveError
 
 
 def test_model_metaclass():
@@ -80,14 +83,11 @@ def test_children_metaclass():
 
 def test_field_access():
     class FieldTester(XBlock):
-        __metaclass__ = ModelMetaclass
-
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default='field c')
 
     field_tester = FieldTester(MagicMock(), {'field_a': 5, 'field_x': 15})
-
     # verify that the fields have been set
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
@@ -111,8 +111,6 @@ def test_field_access():
 def test_list_field_access():
     '''Check that values that are deleted are restored to their default values'''
     class FieldTester(XBlock):
-        __metaclass__ = ModelMetaclass
-
         field_a = List(scope=Scope.settings)
         field_b = List(scope=Scope.content, default=[1, 2, 3])
 
@@ -152,28 +150,29 @@ def test_json_field_access():
         __metaclass__ = ModelMetaclass
 
         field_a = Date(scope=Scope.settings)
-        field_b = Date(scope=Scope.content, default=datetime(2013,4,1))
+        field_b = Date(scope=Scope.content, default=datetime(2013, 4, 1))
 
         def __init__(self, model_data):
             self._model_data = model_data
+            self._dirty_fields = set()
 
     field_tester = FieldTester({})
 
     # Check initial values
     assert_equals(None, field_tester.field_a)
-    assert_equals(datetime(2013,4,1), field_tester.field_b)
+    assert_equals(datetime(2013, 4, 1), field_tester.field_b)
 
     # Test no default specified
-    field_tester.field_a = datetime(2013,1,2)
-    assert_equals(datetime(2013,1,2), field_tester.field_a)
+    field_tester.field_a = datetime(2013, 1, 2)
+    assert_equals(datetime(2013, 1, 2), field_tester.field_a)
     del field_tester.field_a
     assert_equals(None, field_tester.field_a)
 
     # Test default explicitly specified
-    field_tester.field_b = datetime(2013,1,2)
-    assert_equals(datetime(2013,1,2), field_tester.field_b)
+    field_tester.field_b = datetime(2013, 1, 2)
+    assert_equals(datetime(2013, 1, 2), field_tester.field_b)
     del field_tester.field_b
-    assert_equals(datetime(2013,4,1), field_tester.field_b)
+    assert_equals(datetime(2013, 4, 1), field_tester.field_b)
 
 
 class TestNamespace(Namespace):
@@ -224,13 +223,16 @@ def test_namespace_field_access(mock_load_classes):
     del field_tester.test.field_x
     assert_equals([], field_tester.test.field_x)
 
-    assert_raises(AttributeError, getattr, field_tester.test, 'field_z')
-    assert_raises(AttributeError, delattr, field_tester.test, 'field_z')
+    with assert_raises(AttributeError):
+        getattr(field_tester.test, 'field_z')
+    with assert_raises(AttributeError):
+        delattr(field_tester.test, 'field_z')
 
     # Namespaces are created on the fly, so setting a new attribute on one
     # has no long-term effect
     field_tester.test.field_z = 'foo'
-    assert_raises(AttributeError, getattr, field_tester.test, 'field_z')
+    with assert_raises(AttributeError):
+        getattr(field_tester.test, 'field_z')
     assert 'field_z' not in field_tester._model_data
 
 
@@ -242,6 +244,7 @@ def test_defaults_not_shared():
 
         def __init__(self, model_data):
             self._model_data = model_data
+            self._dirty_fields = set()
 
     field_tester_a = FieldTester({})
     field_tester_b = FieldTester({})
@@ -259,6 +262,7 @@ def test_object_identity():
 
         def __init__(self, model_data):
             self._model_data = model_data
+            self._dirty_fields = set()
 
     # Make sure that model_data always returns a different object
     # each time it's actually queried, so that the caching is
@@ -293,6 +297,7 @@ def test_caching_is_per_instance():
 
         def __init__(self, model_data):
             self._model_data = model_data
+            self._dirty_fields = set()
 
     model_data = MagicMock(spec=dict)
     model_data.__getitem__ = lambda self, name: [name]
@@ -436,7 +441,10 @@ def test_values():
 def test_values_boolean():
     # Test Boolean, which has values defined
     test_field = Boolean()
-    assert_equals(({'display_name': "True", "value": True}, {'display_name': "False", "value": False}), test_field.values)
+    assert_equals(
+        ({'display_name': "True", "value": True}, {'display_name': "False", "value": False}),
+        test_field.values
+    )
 
 
 def test_values_dict():
@@ -480,12 +488,11 @@ def test_xblock_save_one():
     field_tester.field_a = 20
     field_tester.field_b = 40
 
-    try:
+    with assert_raises(XBlockSaveError) as save_error:
+        # This call should raise an XBlockSaveError
         field_tester.save()
-        # we should raise an XBlockSaveError, so we shouldn't reach this line
-        assert_equals(True, False)
-    except XBlockSaveError as save_error:
-        # verify that the correct data is getting stored by the error
+
+        # Verify that the correct data is getting stored by the error
         assert_equals(len(save_error.saved_fields), 1)
         assert_equals(len(save_error.dirty_fields), 1)
 
@@ -503,11 +510,10 @@ def test_xblock_save_failure_none():
     field_tester.field_b = 30
     field_tester.field_c = "hello world"
 
-    try:
+    with assert_raises(XBlockSaveError) as save_error:
+        # This call should raise an XBlockSaveError
         field_tester.save()
-        # we should raise an XBlockSaveError, so we shouldn't reach this line
-        assert_equals(True, False)
-    except XBlockSaveError as save_error:
-        # verify that the correct data is getting stored by the error
+
+        # Verify that the correct data is getting stored by the error
         assert_equals(len(save_error.saved_fields), 0)
         assert_equals(len(save_error.dirty_fields), 3)

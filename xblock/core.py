@@ -26,8 +26,8 @@ class KeyValueMultiSaveError(Exception):
         """
         Create a new KeyValueMultiSaveError
 
-        saved_fields - a iterable of field names that were successfully
-        saved before the exception occured
+        `saved_field_names` - an iterable of field names that were
+        successfully saved before the exception occured
         """
         super(KeyValueMultiSaveError, self).__init__()
         self.saved_field_names = saved_field_names
@@ -41,9 +41,9 @@ class XBlockSaveError(Exception):
         """
         Create a new XBlockSaveError
 
-        saved_fields - a set of fields that were successfully
+        `saved_fields` - a set of fields that were successfully
         saved before the error occured
-        dirty_fields - a set of fields that were left dirty after the save
+        `dirty_fields` - a set of fields that were left dirty after the save
         """
         super(XBlockSaveError, self).__init__()
         self.saved_fields = saved_fields
@@ -202,11 +202,8 @@ class ModelType(object):
             del instance._model_data_cache[self.name]
 
     def _mark_dirty(self, instance):
-        """ Set this field to dirty on the instance """
-        if not hasattr(instance, '_dirty_fields'):
-            instance._dirty_fields = set()
-        if self not in instance._dirty_fields:
-            instance._dirty_fields.add(self)
+        """Set this field to dirty on the instance."""
+        instance._dirty_fields.add(self)
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -612,9 +609,7 @@ class XBlock(Plugin):
         return node
 
     def save(self):
-        """
-        Save all dirty fields attached to this XBlock
-        """
+        """Save all dirty fields attached to this XBlock."""
         if not self._dirty_fields:
             # nop if _dirty_fields attribute is empty
             return
@@ -625,7 +620,7 @@ class XBlock(Plugin):
                 # Cache should have the right values
                 mt_value = self._model_data_cache[mt.name]
                 fields_to_save[mt.name] = mt.to_json(mt_value)
-            # Change to DbModel to support `update` that calls kvstore `update`
+
             # Throws KeyValueMultiSaveError if things go wrong
             self._model_data.update(fields_to_save)
 
@@ -647,7 +642,6 @@ class XBlock(Plugin):
 
     def __init__(self, runtime, model_data):
         """
-
         `runtime` is an instance of :class:`xblock.core.Runtime`. Use it to
         access the environment.  It is available in XBlock code as
         ``self.runtime``.
