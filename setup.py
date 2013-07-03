@@ -1,3 +1,4 @@
+"""Set up XBlock test blocks"""
 from setuptools import setup
 
 setup(

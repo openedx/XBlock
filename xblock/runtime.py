@@ -31,27 +31,31 @@ class KeyValueStore(object):
     # data.
     Key = namedtuple("Key", "scope, student_id, block_scope_id, field_name")
 
-    # TODO [sarina] : provide docstrings for these methods
     def get(self, key):
+        """Abstract get method. Implementations should return the value of the given `key`."""
         pass
 
     def set(self, key, value):
+        """Abstract set method. Implementations should set `key` equal to `value`."""
         pass
 
     def delete(self, key):
+        """Abstract delete method. Implementations should remove the `key`."""
         pass
 
     def has(self, key):
+        """Abstract has method. Implementations should return Boolean, whether or not `key` is present."""
         pass
 
     def set_many(self, update_dict):
+        """Abstract set_many method. Implementations should accept an `update_dict` of
+        key-value pairs, and set all the `keys` to the given `value`s."""
         pass
 
 
 class DbModel(MutableMapping):
     """A dictionary-like interface to the fields on a block."""
 
-    # TODO [dkh/sarina] : provide docstrings for these class methods
     def __init__(self, kvs, block_cls, student_id, usage):
         self._kvs = kvs
         self._student_id = student_id
@@ -62,6 +66,11 @@ class DbModel(MutableMapping):
         return "<{0.__class__.__name__} {0._block_cls!r}>".format(self)
 
     def _getfield(self, name):
+        """
+        Return the field with the given `name`.
+        If no field with `name` exists in any namespace, raises a KeyError.
+        """
+
         # First, get the field from the class, if defined
         block_field = getattr(self._block_cls, name, None)
         if block_field is not None and isinstance(block_field, ModelType):
@@ -84,6 +93,16 @@ class DbModel(MutableMapping):
         raise KeyError(name)
 
     def _key(self, name):
+        """
+        Resolves `name` to a key, in the following form:
+
+        KeyValueStore.Key(
+            scope=field.scope,
+            student_id=student_id,
+            block_scope_id=block_id,
+            field_name=name
+        )
+        """
         field = self._getfield(name)
         if field.scope in (Scope.children, Scope.parent):
             block_id = self._usage.id
@@ -233,13 +252,16 @@ class Runtime(object):
             results.append(result)
         return results
 
+    # pylint: disable=W0613
     def wrap_child(self, block, frag, context):
         """
         Wraps the fragment with any necessary HTML, informed by
-        the block and the context.
+        the block and the context. This default implementation
+        simply returns the fragment.
         """
         # By default, just return the fragment itself.
         return frag
+    # pylint: enable=W0613
 
     def handle(self, block, handler_name, data):
         """
@@ -287,7 +309,9 @@ class Runtime(object):
     def querypath(self, block, path):
         """An XPath-like interface to `query`."""
         class BadPath(Exception):
+            """Bad path exception thrown when path cannot be found."""
             pass
+        # pylint: disable=C0103
         q = self.query(block)
         ROOT, SEP, WORD, FINAL = range(4)
         state = ROOT
@@ -356,6 +380,7 @@ class RegexLexer(object):
         self.regex = re.compile("|".join(parts))
 
     def lex(self, text):
+        """Iterator that tokenizes `text` and yields up tokens as they are found"""
         for match in self.regex.finditer(text):
             name = match.lastgroup
             yield (name, match.group(name))

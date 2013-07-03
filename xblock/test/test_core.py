@@ -1,15 +1,23 @@
+"""Tests the fundamentals of XBlocks, including - but not limited to -
+metaclassing, field access, caching, serialization, and bulk saves."""
+# Allow accessing protected members for testing purposes
+# pylint: disable=W0212
 from mock import patch, MagicMock
-from nose.tools import assert_in, assert_equals, assert_raises,\
+# Nose redefines assert_equal and assert_not_equal
+# pylint: disable=E0611
+from nose.tools import assert_in, assert_equals, assert_raises, \
     assert_not_equals
+# pylint: enable=E0611
 from datetime import datetime
 
-from xblock.core import Boolean, ChildrenModelMetaclass, Integer,\
-    KeyValueMultiSaveError, List, ModelMetaclass, ModelType,\
+from xblock.core import Boolean, ChildrenModelMetaclass, Integer, \
+    KeyValueMultiSaveError, List, ModelMetaclass, ModelType, \
     Namespace, NamespacesMetaclass, Scope, String, XBlock, XBlockSaveError
 
 
 def test_model_metaclass():
     class ModelMetaclassTester(object):
+        """Toy class for ModelMetaclass testing"""
         __metaclass__ = ModelMetaclass
 
         field_a = Integer(scope=Scope.settings)
@@ -19,8 +27,13 @@ def test_model_metaclass():
             self._model_data = model_data
 
     class ChildClass(ModelMetaclassTester):
+        """Toy class for ModelMetaclass testing"""
         pass
 
+    # `ModelMetaclassTester` and `ChildClass` both obtain the `fields` attribute
+    # from the `ModelMetaclass`. Since this is not understood by static analysis,
+    # silence this error for the duration of this test.
+    # pylint: disable=E1101
     assert hasattr(ModelMetaclassTester, 'field_a')
     assert hasattr(ModelMetaclassTester, 'field_b')
 
@@ -34,18 +47,28 @@ def test_model_metaclass():
     assert_in(ChildClass.field_b, ChildClass.fields)
 
 
-def test_model_metaclass_with_mixins():
+def test_with_mixins():
+    # Testing model metaclass with mixins
     class FieldsMixin(object):
+        """Toy class for field testing"""
         field_a = Integer(scope=Scope.settings)
 
     class BaseClass(object):
+        """Toy class for ModelMetaclass testing"""
         __metaclass__ = ModelMetaclass
 
     class ChildClass(FieldsMixin, BaseClass):
+        """Toy class for ModelMetaclass and field testing"""
         pass
 
     class GrandchildClass(ChildClass):
+        """Toy class for ModelMetaclass and field testing"""
         pass
+
+    # `ChildClass` and `GrandchildClass` both obtain the `fields` attribute
+    # from the `ModelMetaclass`. Since this is not understood by static analysis,
+    # silence this error for the duration of this test.
+    # pylint: disable=E1101
 
     assert hasattr(ChildClass, 'field_a')
     assert_in(ChildClass.field_a, ChildClass.fields)
@@ -57,15 +80,23 @@ def test_model_metaclass_with_mixins():
 def test_children_metaclass():
 
     class HasChildren(object):
+        """Toy class for ChildrenModelMetaclass testing"""
         __metaclass__ = ChildrenModelMetaclass
 
         has_children = True
 
     class WithoutChildren(object):
+        """Toy class for ChildrenModelMetaclass testing"""
         __metaclass__ = ChildrenModelMetaclass
 
     class InheritedChildren(HasChildren):
+        """Toy class for ChildrenModelMetaclass testing"""
         pass
+
+    # `HasChildren` and `WithoutChildren` both obtain the `children` attribute and
+    # the `has_children` method from the `ChildrenModelMetaclass`. Since this is not
+    # understood by static analysis, silence this error for the duration of this test.
+    # pylint: disable=E1101
 
     assert HasChildren.has_children
     assert not WithoutChildren.has_children
@@ -83,6 +114,7 @@ def test_children_metaclass():
 
 def test_field_access():
     class FieldTester(XBlock):
+        """Test XBlock for field access testing"""
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default='field c')
@@ -109,8 +141,9 @@ def test_field_access():
 
 
 def test_list_field_access():
-    '''Check that values that are deleted are restored to their default values'''
+    # Check that values that are deleted are restored to their default values
     class FieldTester(XBlock):
+        """Test XBlock for field access testing"""
         field_a = List(scope=Scope.settings)
         field_b = List(scope=Scope.content, default=[1, 2, 3])
 
@@ -134,10 +167,10 @@ def test_list_field_access():
 
 
 def test_json_field_access():
-    '''Check that values are correctly converted to and from json in accessors.'''
+    # Check that values are correctly converted to and from json in accessors.
 
     class Date(ModelType):
-        '''Date needs to convert between JSON-compatible persistence and a datetime object'''
+        """Date needs to convert between JSON-compatible persistence and a datetime object"""
         def from_json(self, field):
             """Convert a string representation of a date to a datetime object"""
             return datetime.strptime(field, "%m/%d/%Y")
@@ -147,6 +180,7 @@ def test_json_field_access():
             return value.strftime("%m/%d/%Y")
 
     class FieldTester(object):
+        """Toy class for ModelMetaclass and field access testing"""
         __metaclass__ = ModelMetaclass
 
         field_a = Date(scope=Scope.settings)
@@ -176,14 +210,21 @@ def test_json_field_access():
 
 
 class TestNamespace(Namespace):
+    """Toy class for namespace testing"""
     field_x = List(scope=Scope.content)
     field_y = String(scope=Scope.user_state, default="default_value")
 
 
+# pylint: disable=W0613
 @patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)])
 def test_namespace_metaclass(mock_load_classes):
     class TestClass(object):
+        """Toy class for NamespacesMetaclass testing"""
         __metaclass__ = NamespacesMetaclass
+
+    # `TestNamespace` obtains the `fields` attribute from the `NamespacesMetaclass`. Since this
+    # is not understood by static analysis, silence this error for the duration of this test.
+    # pylint: disable=E1101
 
     assert hasattr(TestClass, 'test')
     assert hasattr(TestClass.test, 'field_x')
@@ -198,6 +239,7 @@ def test_namespace_metaclass(mock_load_classes):
 def test_namespace_field_access(mock_load_classes):
 
     class FieldTester(XBlock):
+        """Test XBlock for field access testing"""
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default='field c')
@@ -209,6 +251,11 @@ def test_namespace_field_access(mock_load_classes):
             'field_x': [1, 2, 3],
         }
     )
+
+    # `test` is a namespace provided by the @patch method above, which ultimately
+    # comes from the NamespacesMetaclass. Since this is not understood by static
+    # analysis, silence this error for the duration of this test.
+    # pylint: disable=E1101
 
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
@@ -234,10 +281,12 @@ def test_namespace_field_access(mock_load_classes):
     with assert_raises(AttributeError):
         getattr(field_tester.test, 'field_z')
     assert 'field_z' not in field_tester._model_data
+# pylint: enable=W0613
 
 
 def test_defaults_not_shared():
     class FieldTester(object):
+        """Toy class for ModelMetaclass and field access testing"""
         __metaclass__ = ModelMetaclass
 
         field_a = List(scope=Scope.settings)
@@ -254,8 +303,9 @@ def test_defaults_not_shared():
 
 
 def test_object_identity():
-    '''Check that values that are modified are what is returned'''
+    # Check that values that are modified are what is returned
     class FieldTester(object):
+        """Toy class for ModelMetaclass and field access testing"""
         __metaclass__ = ModelMetaclass
 
         field_a = List(scope=Scope.settings)
@@ -289,8 +339,9 @@ def test_object_identity():
 
 
 def test_caching_is_per_instance():
-    '''Test that values cached for one instance do not appear on another'''
+    # Test that values cached for one instance do not appear on another
     class FieldTester(object):
+        """Toy class for ModelMetaclass and field access testing"""
         __metaclass__ = ModelMetaclass
 
         field_a = List(scope=Scope.settings)
@@ -315,11 +366,8 @@ def test_caching_is_per_instance():
 
 
 def test_field_serialization():
-    """
-    Some ModelTypes can define their own serialization mechanisms.
-
-    This test ensures that we are using them properly.
-    """
+    # Some ModelTypes can define their own serialization mechanisms.
+    # This test ensures that we are using them properly.
 
     class CustomField(ModelType):
         """
@@ -332,6 +380,7 @@ def test_field_serialization():
             return {'value': value}
 
     class FieldTester(XBlock):
+        """Test XBlock for field serialization testing"""
         field = CustomField()
 
     field_tester = FieldTester(
@@ -352,6 +401,7 @@ def test_class_tags():
     assert_equals(xblock._class_tags, set())
 
     class Sub1Block(XBlock):
+        """Toy XBlock"""
         pass
 
     sub1block = Sub1Block(None, None)
@@ -359,12 +409,14 @@ def test_class_tags():
 
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
+        """Toy XBlock"""
         pass
 
     sub2block = Sub2Block(None, None)
     assert_equals(sub2block._class_tags, set(["cat", "dog"]))
 
     class Sub3Block(Sub2Block):
+        """Toy XBlock"""
         pass
 
     sub3block = Sub3Block(None, None)
@@ -372,9 +424,11 @@ def test_class_tags():
 
     @XBlock.tag("mixin")
     class MixinBlock(XBlock):
+        """Toy XBlock"""
         pass
 
     class Sub4Block(MixinBlock, Sub3Block):
+        """Toy XBlock"""
         pass
 
     sub4block = Sub4Block(None, None)
@@ -385,12 +439,15 @@ def test_loading_tagged_classes():
 
     @XBlock.tag("thetag")
     class HasTag1(XBlock):
+        """Toy XBlock"""
         pass
 
     class HasTag2(HasTag1):
+        """Toy XBlock"""
         pass
 
     class HasntTag(XBlock):
+        """Toy XBlock"""
         pass
 
     the_classes = [('hastag1', HasTag1), ('hastag2', HasTag2), ('hasnttag', HasntTag)]
@@ -399,15 +456,17 @@ def test_loading_tagged_classes():
         assert_equals(set(XBlock.load_tagged_classes('thetag')), set(tagged_classes))
 
 
-def test_field_display_name_defaults():
+def test_field_name_defaults():
+    # Tests field display name default values
     attempts = Integer()
     attempts._name = "max_problem_attempts"
     assert_equals('max_problem_attempts', attempts.display_name)
 
-    class TestNamespace(Namespace):
+    class NamespaceTestClass(Namespace):
+        """Toy class for Namespace testing"""
         field_x = List()
 
-    assert_equals("field_x", TestNamespace.field_x.display_name)
+    assert_equals("field_x", NamespaceTestClass.field_x.display_name)
 
 
 def test_field_display_name():
@@ -418,10 +477,11 @@ def test_field_display_name():
     boolean_field = Boolean(display_name="boolean field")
     assert_equals("boolean field", boolean_field.display_name)
 
-    class TestNamespace(Namespace):
+    class NamespaceTestClass(Namespace):
+        """Toy class for Namespace testing"""
         field_x = List(display_name="Field Known as X")
 
-    assert_equals("Field Known as X", TestNamespace.field_x.display_name)
+    assert_equals("Field Known as X", NamespaceTestClass.field_x.display_name)
 
 
 def test_values():
@@ -475,13 +535,15 @@ def setup_save_failure(update_method):
 
 
 def test_xblock_save_one():
-    """
-    Mimics a save failure when we only manage to save one of the values
-    """
-    # mock the update method so that it throws a KeyValueMultiSaveError
+    # Mimics a save failure when we only manage to save one of the values
+
+    # pylint: disable=W0613
     def fake_update(*args, **kwargs):
+        """Mock update method that throws a KeyValueMultiSaveError indicating
+           that only one field was correctly saved."""
         other_dict = args[0]
         raise KeyValueMultiSaveError(other_dict.keys()[0])
+    # pylint: enable=W0613
 
     field_tester = setup_save_failure(fake_update)
 
@@ -498,12 +560,14 @@ def test_xblock_save_one():
 
 
 def test_xblock_save_failure_none():
-    """
-    Mimics a save failure when we don't manage to save any of the values
-    """
-    # mock the update method so that it throws a KeyValueMultiSaveError
+    # Mimics a save failure when we don't manage to save any of the values
+
+    # pylint: disable=W0613
     def fake_update(*args, **kwargs):
+        """Mock update method that throws a KeyValueMultiSaveError indicating
+           that no fields were correctly saved."""
         raise KeyValueMultiSaveError([])
+    # pylint: enable=W0613
 
     field_tester = setup_save_failure(fake_update)
     field_tester.field_a = 20
@@ -517,3 +581,47 @@ def test_xblock_save_failure_none():
         # Verify that the correct data is getting stored by the error
         assert_equals(len(save_error.saved_fields), 0)
         assert_equals(len(save_error.dirty_fields), 3)
+
+
+def test_xblock_write_then_delete():
+    # Tests that setting a field, then deleting it later, doesn't
+    # cause an erroneous write of the originally set value after
+    # a call to `XBlock.save`
+    class FieldTester(XBlock):
+        """Test XBlock with two fields"""
+        field_a = Integer(scope=Scope.settings)
+        field_b = Integer(scope=Scope.content, default=10)
+
+    field_tester = FieldTester(MagicMock(), {'field_a': 5})
+    # verify that the fields have been set
+    assert_equals(5, field_tester.field_a)
+    assert_equals(10, field_tester.field_b)
+
+    # Set the fields to new values
+    field_tester.field_a = 20
+    field_tester.field_b = 20
+
+    # Additionally assert that in the model data, we cached the value of field_a
+    # (field_b has a default value, so it will not be present in the cache)
+    assert_equals(len(field_tester._model_data), 1)
+    assert_in('field_a', field_tester._model_data)
+
+    # Before saving, delete all the fields
+    del field_tester.field_a
+    del field_tester.field_b
+
+    # Assert that we're now finding the right cached values
+    assert_equals(None, field_tester.field_a)
+    assert_equals(10, field_tester.field_b)
+
+    # Additionally assert that in the model data, we don't have any values set
+    assert_equals(len(field_tester._model_data), 0)
+    # Perform explicit save
+    field_tester.save()
+
+    # Assert that we're now finding the right cached values
+    assert_equals(None, field_tester.field_a)
+    assert_equals(10, field_tester.field_b)
+
+    # Additionally assert that in the model data, we don't have any values set
+    assert_equals(len(field_tester._model_data), 0)
