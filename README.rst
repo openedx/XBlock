@@ -75,11 +75,12 @@ This will run:
     * Integration tests of XBlocks running within the workbench.
 
 You can test XBlocks through a browser using `Selenium`_. We have included an
-example Selenium test for ``thumbs`` that uses Django's `LiveServerTestCase`_.
+example Selenium test for `thumbs_` that uses Django's `LiveServerTestCase`_.
 It runs as part of the test suite as executed by the above command. You need to
 have Firefox installed for this test case to run successfully.
 
 .. _Selenium: http://docs.seleniumhq.org/
+.. _thumbs: https://github.com/edx/xblock-thumbs
 .. _LiveServerTestCase: https://docs.djangoproject.com/en/1.4/topics/testing/#django.test.LiveServerTestCase
 
 To run the test suite under coverage:
@@ -147,16 +148,18 @@ Making your own XBlock
 ----------------------
 
 Making an XBlock can be as simple as creating a Python class with a few
-specific methods.  The repository ``xblock-thumbs`` demonstrates an XBlock with state,
+specific methods.  The repository `xblock-thumbs_` demonstrates an XBlock with state,
 views, and input handling.
 
 You can provide scenarios for the workbench to display. For an example, see the
-repository ``xblock-thumbs``, or the xblock/problem.py file.  The scenarios are
+repository `xblock-thumbs_`, or the xblock/problem.py file.  The scenarios are
 written in a simple XML language.  Note this is not an XML format we are
 proposing as a standard.
 
 Once you install your XBlock into your virtualenv, the workbench will
 automatically display its scenarios for you to experiment with.
+
+.. _xblock-thumbs: https://github.com/edx/xblock-thumbs
 
 License
 -------
