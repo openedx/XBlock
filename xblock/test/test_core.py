@@ -554,9 +554,9 @@ def test_xblock_save_one():
         # This call should raise an XBlockSaveError
         field_tester.save()
 
-        # Verify that the correct data is getting stored by the error
-        assert_equals(len(save_error.saved_fields), 1)
-        assert_equals(len(save_error.dirty_fields), 1)
+    # Verify that the correct data is getting stored by the error
+    assert_equals(len(save_error.exception.saved_fields), 1)
+    assert_equals(len(save_error.exception.dirty_fields), 1)
 
 
 def test_xblock_save_failure_none():
@@ -578,9 +578,9 @@ def test_xblock_save_failure_none():
         # This call should raise an XBlockSaveError
         field_tester.save()
 
-        # Verify that the correct data is getting stored by the error
-        assert_equals(len(save_error.saved_fields), 0)
-        assert_equals(len(save_error.dirty_fields), 3)
+    # Verify that the correct data is getting stored by the error
+    assert_equals(len(save_error.exception.saved_fields), 0)
+    assert_equals(len(save_error.exception.dirty_fields), 3)
 
 
 def test_xblock_write_then_delete():
