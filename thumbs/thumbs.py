@@ -1,5 +1,4 @@
-"""An XBlock providing thumbs-up/thumbs-down voting.
-"""
+"""An XBlock providing thumbs-up/thumbs-down voting."""
 
 from xblock.core import XBlock, Scope, Integer, Boolean
 from xblock.fragment import Fragment
@@ -25,10 +24,10 @@ class ThumbsBlock(InputBlock):
     downvotes = Integer(help="Number of down votes", default=0, scope=Scope.content)
     voted = Boolean(help="Has this student voted?", default=False, scope=Scope.user_state)
 
-    def student_view(self, context):
+    def student_view(self, _context):
         """
         Create a fragment used to display the XBlock to a student.
-        `context` is a dictionary used to configure the display (unused)
+        `_context` is a dictionary used to configure the display (unused)
 
         Returns a `Fragment` object specifying the HTML, CSS, and JavaScript
         to display.

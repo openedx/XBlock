@@ -1,4 +1,4 @@
-""" Simple View Counting XBlock """
+""" Simple View Counting XBlock"""
 from xblock.core import XBlock, Scope, Integer
 from xblock.fragment import Fragment
 

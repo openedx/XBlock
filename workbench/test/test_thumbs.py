@@ -1,3 +1,5 @@
+"""Tests for the thumbs module"""
+
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from workbench.runtime import MEMORY_KVS, Usage
@@ -6,6 +8,8 @@ from nose.plugins.attrib import attr
 
 @attr('selenium')
 class SeleniumTests(LiveServerTestCase):
+    """Base test class that provides setUpClass and tearDownClass
+    methods necessary for selenium testing."""
 
     @classmethod
     def setUpClass(cls):
@@ -20,6 +24,7 @@ class SeleniumTests(LiveServerTestCase):
 
 
 class ThreeThumbsTest(SeleniumTests):
+    """Test the functionalities of the three thumbs test XBlock."""
 
     def setUp(self):
         # Clear the in-memory key value store
@@ -30,8 +35,8 @@ class ThreeThumbsTest(SeleniumTests):
         self.browser.get(self.live_server_url)
 
         # She knows it's the site by the header
-        h1 = self.browser.find_element_by_css_selector('h1')
-        self.assertEqual(h1.text, 'XBlock scenarios')
+        header1 = self.browser.find_element_by_css_selector('h1')
+        self.assertEqual(header1.text, 'XBlock scenarios')
 
     def tearDown(self):
         pass
@@ -42,8 +47,8 @@ class ThreeThumbsTest(SeleniumTests):
         link.click()
 
         # The header reflects the XBlock
-        h1 = self.browser.find_element_by_css_selector('h1')
-        self.assertEqual(h1.text, 'XBlock: three thumbs at once')
+        header1 = self.browser.find_element_by_css_selector('h1')
+        self.assertEqual(header1.text, 'XBlock: three thumbs at once')
 
         # She sees that there are 3 sets of thumbs
         vertical_css = 'div.student_view > div.xblock > div.vertical'

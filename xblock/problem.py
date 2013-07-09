@@ -32,7 +32,7 @@ A rough sequence diagram::
 
 import inspect
 import random
-import string
+import string  # pylint: disable=W0402
 import time
 
 from .core import XBlock, Integer, Scope, String, Any, Boolean, Dict
@@ -61,13 +61,13 @@ class ProblemBlock(XBlock):
         return usage_factory(node.block_name, kids, node.initial_state, node.def_id)
 
     def set_student_seed(self):
+        """Set a random seed for the student so they each have different but repeatable data."""
         self.seed = int(time.clock() * 10) % 100 + 1
 
     def calc_context(self, context):
-        # If we have a script, run it.
+        """If we have a script, run it, and return the resulting context."""
         if self.script:
-            # Seed the random number for the student so they each have different but
-            # repeatable data.
+            # Seed the random number for the student
             if not self.seed:
                 self.set_student_seed()
             random.seed(self.seed)
@@ -78,11 +78,14 @@ class ProblemBlock(XBlock):
 
     # The content controls how the Inputs attach to Graders
     def student_view(self, context):
+        """Provide the default student view."""
         context = self.calc_context(context)
 
         result = Fragment()
         named_child_frags = []
-        for child_id in self.children:
+        # self.children is an attribute obtained from ChildrenModelMetaclass, so disable the
+        # static pylint checking warning about this.
+        for child_id in self.children:  # pylint: disable=E1101
             child = self.runtime.get_block(child_id)
             frag = self.runtime.render_child(child, context, "problem_view")
             result.add_frag_resources(frag)
@@ -142,11 +145,23 @@ class ProblemBlock(XBlock):
 
     @XBlock.json_handler
     def check(self, submissions):
+        """
+        Processess the `submissions` with each provided Checker.
+
+        First calls the submit() method on each InputBlock. Then, for each Checker,
+        finds the values it needs and passes them to the appropriate `check()` method.
+
+        Returns a dictionary of 'submit_results': {input_name: user_submitted_results},
+        'check_results': {checker_name: results_passed_through_checker}
+
+        """
         self.problem_attempted = True
         context = self.calc_context({})
 
         child_map = {}
-        for child_id in self.children:
+        # self.children is an attribute obtained from ChildrenModelMetaclass, so disable the
+        # static pylint checking warning about this.
+        for child_id in self.children:  # pylint: disable=E1101
             child = self.runtime.get_block(child_id)
             if child.name:
                 child_map[child.name] = child
@@ -188,6 +203,7 @@ class ProblemBlock(XBlock):
 
     @XBlock.json_handler
     def rerandomize(self, unused):
+        """Set a new random seed for the student."""
         self.set_student_seed()
         return {'status': 'ok'}
 
@@ -228,7 +244,9 @@ class ProblemBlock(XBlock):
 
 
 class InputBlock(XBlock):
+    """Base class for blocks that accept inputs.
 
+    """
     def submit(self, submission):
         """
         Called with the result of the javascript Block's submit() function.
@@ -241,11 +259,13 @@ class InputBlock(XBlock):
 
 @XBlock.tag("checker")
 class CheckerBlock(XBlock):
+    """Base class for blocks that check answers.
 
+    """
     arguments = Dict(help="The arguments expected by `check`")
 
     @classmethod
-    def preprocess_input(cls, node, usage_factory):
+    def preprocess_input(cls, node, _usage_factory):
         # Introspect the .check() method, and collect arguments it expects.
         content = node.initial_state
         argspec = inspect.getargspec(cls.check)
@@ -266,15 +286,19 @@ class CheckerBlock(XBlock):
 
 
 class TextInputBlock(InputBlock):
+    """An XBlock that accepts text input."""
 
     input_type = String(help="Type of conversion to attempt on input string")
     student_input = String(help="Last input submitted by the student", default="", scope=Scope.user_state)
 
-    def student_view(self, context):
+    def student_view(self, _context):
+        """Returns default student view."""
         return Fragment(u"<p>I can only appear inside problems.</p>")
 
-    def problem_view(self, context):
-        result = Fragment(u"<input type='text' name='input' value='%s'><span class='message'></span>" % self.student_input)
+    def problem_view(self, _context):
+        """Returns a view of the problem - a javascript text input field."""
+        html = u"<input type='text' name='input' value='{0}'><span class='message'></span>".format(self.student_input)
+        result = Fragment(html)
         result.add_javascript("""
             function TextInputBlock(runtime, element) {
                 return {
@@ -300,6 +324,7 @@ class TextInputBlock(InputBlock):
 
 
 class EqualityCheckerBlock(CheckerBlock):
+    """An XBlock that checks the equality of two student data fields."""
 
     # Content: the problem will hook us up with our data.
     content = String(help="Message describing the equality test", scope=Scope.content, default="Equality test")
@@ -310,6 +335,12 @@ class EqualityCheckerBlock(CheckerBlock):
     attempted = Boolean(scope=Scope.user_state)
 
     def problem_view(self, context):
+        """Renders the problem view.
+
+        The view is specific to whether or not this problem was attempted, and, if so,
+        if it was answered correctly.
+
+        """
         correct = self.left == self.right
 
         # TODO: I originally named this class="data", but that conflicted with
@@ -364,7 +395,7 @@ class EqualityCheckerBlock(CheckerBlock):
         result.initialize_js('EqualityCheckerBlock')
         return result
 
-    def check(self, left, right):
+    def check(self, left, right):  # pylint: disable=W0221
         self.attempted = True
         self.left = left
         self.right = right
@@ -384,7 +415,8 @@ class AttemptsScoreboardBlock(XBlock):
     Show attempts on problems in my nieces.
     """
 
-    def student_view(self, context):
+    def student_view(self, _context):
+        """Provide default student view."""
         # Get the attempts for all problems in my parent.
         if self.parent:
             # these two lines are equivalent, and both work:

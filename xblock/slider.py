@@ -1,3 +1,8 @@
+"""Simple XBlock with a slider interface.
+
+WARNING: This is an experimental module, subject to future change or removal.
+"""
+
 import json
 from webob import Response
 
@@ -6,11 +11,13 @@ from xblock.fragment import Fragment
 
 
 class Slider(XBlock):
+    """Base XBlock with a slider interface."""
     min_value = Integer(help="Minimum value", default=0, scope=Scope.content)
     max_value = Integer(help="Maximum value", default=100, scope=Scope.content)
     value = Integer(help="Student value", default=0, scope=Scope.user_state)
 
-    def student_view(self, context):
+    def student_view(self, _context):
+        """Provide the default student view."""
         html = SLIDER_TEMPLATE.format(min=self.min_value,
                                       max=self.max_value,
                                       val=self.value)
@@ -22,13 +29,16 @@ class Slider(XBlock):
         return frag
 
     def update(self, request):
+        """Update upon request."""
         data = json.loads(request.body)
         self.value = int(data['value'])
         return Response()
 
 
 class ProgressSlider(Slider):
+    """A slider XBlock with fancier styling."""
     def student_view(self, context):
+        """Provide the student view of the slider, with added text."""
         frag = super(ProgressSlider, self).student_view(context)
 
         # TODO: [rocha] non-wrapped ccs will make this global

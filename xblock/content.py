@@ -1,6 +1,6 @@
 """Content-oriented XBlocks."""
 
-from string import Template
+from string import Template  # pylint: disable=W0402
 
 from .core import XBlock, String, Scope
 from .fragment import Fragment
@@ -8,7 +8,8 @@ from .fragment import Fragment
 
 class HelloWorldBlock(XBlock):
     """A simple block: just show some fixed content."""
-    def fallback_view(self, view_name, context):
+    def fallback_view(self, _view_name, _context):
+        """Provide a fallback view handler"""
         return Fragment(u"Hello, world!")
 
 
@@ -22,5 +23,6 @@ class HtmlBlock(XBlock):
 
     content = String(help="The HTML to display", scope=Scope.content, default=u"<b>DEFAULT</b>")
 
-    def fallback_view(self, view_name, context):
+    def fallback_view(self, _view_name, context):
+        """Provide a fallback view handler"""
         return Fragment(Template(self.content).substitute(**context))

@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 
 
 class PluginMissingError(Exception):
+    """Raised when trying to load a plugin from an entry_point that cannot be found."""
     pass
 
 
@@ -24,6 +25,7 @@ class Plugin(object):
     """
 
     _plugin_cache = None
+    entry_point = None  # Should be overwritten by children classes
 
     @classmethod
     def _load_class_entry_point(cls, entry_point):

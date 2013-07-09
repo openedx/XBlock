@@ -3,17 +3,16 @@
 import lxml.html
 
 from django.test.client import Client
-from django.test import TestCase
 
 
 def test_all_scenarios():
-    # Load the home page, get every URL, make a test from it.
-    c = Client()
-    response = c.get("/")
+    """Load the home page, get every URL, make a test from it."""
+    client = Client()
+    response = client.get("/")
     assert response.status_code == 200
     html = lxml.html.fromstring(response.content)
-    for a in html.xpath('//a'):
-        yield try_scenario, a.get('href'), a.text
+    for a_tag in html.xpath('//a'):
+        yield try_scenario, a_tag.get('href'), a_tag.text
 
 
 def try_scenario(url, name):
@@ -24,6 +23,6 @@ def try_scenario(url, name):
     `name`: the name of the scenario, used in error messages.
 
     """
-    c = Client()
-    response = c.get(url, follow=True)
-    assert response.status_code == 200, text
+    client = Client()
+    response = client.get(url, follow=True)
+    assert response.status_code == 200, name

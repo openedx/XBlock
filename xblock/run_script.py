@@ -13,6 +13,6 @@ def run_script(pycode):
 
     # execute it.
     globs = {}
-    exec pycode in globs, globs
+    exec pycode in globs, globs  # pylint: disable=W0122
 
     return globs

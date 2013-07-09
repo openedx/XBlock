@@ -1,3 +1,5 @@
+"""Set up for XBlock thumbs module"""
+
 from setuptools import setup
 
 setup(

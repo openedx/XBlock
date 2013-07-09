@@ -1,4 +1,4 @@
-# Django settings for workbench project.
+"""Django settings for workbench project."""
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Manage.py file for XBlock"""
 import os
 import sys
 
