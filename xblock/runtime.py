@@ -23,6 +23,13 @@ class NoSuchViewError(Exception):
     pass
 
 
+class NoSuchHandlerError(Exception):
+    """
+    Raised to indicate that the requested handler was not found.
+    """
+    pass
+
+
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
 
@@ -159,15 +166,12 @@ class DbModel(MutableMapping):
             fields.extend(field.name for field in getattr(self._block_cls, namespace_name).fields)
         return fields
 
-    def update(self, *args, **kwargs):
+    def update(self, other_dict=None, **kwargs):
         """Update the underlying model with the correct values."""
         updated_dict = {}
-        other_dict = {}
+        other_dict = other_dict or {}
         # Combine all the arguments into a single dict.
-        if args:
-            other_dict = args[0]
-        for key in kwargs:
-            other_dict[key] = kwargs[key]
+        other_dict.update(kwargs)
 
         # Generate a new dict with the correct mappings.
         for (key, value) in other_dict.items():
@@ -252,8 +256,7 @@ class Runtime(object):
             results.append(result)
         return results
 
-    # pylint: disable=W0613
-    def wrap_child(self, block, frag, context):
+    def wrap_child(self, _block, frag, _context):
         """
         Wraps the fragment with any necessary HTML, informed by
         the block and the context. This default implementation
@@ -261,7 +264,6 @@ class Runtime(object):
         """
         # By default, just return the fragment itself.
         return frag
-    # pylint: enable=W0613
 
     def handle(self, block, handler_name, data):
         """
@@ -279,7 +281,7 @@ class Runtime(object):
                 # Cache results of the handler call for later saving
                 results = fallback_handler(handler_name, data)
             else:
-                raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
+                raise NoSuchHandlerError("Couldn't find handler %r for %r" % (handler_name, block))
 
         # Write out dirty fields
         block.save()

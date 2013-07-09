@@ -161,10 +161,14 @@ class MemoryKeyValueStore(KeyValueStore):
 
     def set_many(self, update_dict):
         """
-        Takes in a dictionary of dirty_fields: values, and sets the value
-        of each dirty_field to the specified value using `set`.
+        Sets many fields to new values in one call.
+
+        `update_dict`: A dictionary of keys: values.
+        This method sets the value of each key to the specified new value.
         """
         for key, value in update_dict.items():
+            # We just call `set` directly here, because this is an in-memory representation
+            # thus we don't concern ourselves with bulk writes.
             self.set(key, value)
 
 

@@ -120,17 +120,22 @@ def test_field_access():
         field_c = Integer(scope=Scope.user_state, default='field c')
 
     field_tester = FieldTester(MagicMock(), {'field_a': 5, 'field_x': 15})
-    # verify that the fields have been set
+    # Verify that the fields have been set
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
     assert_equals('field c', field_tester.field_c)
     assert not hasattr(field_tester, 'field_x')
 
-    # set one of the fields
+    # Set one of the fields.
     field_tester.field_a = 20
+    # field_a should be updated in the cache, but /not/ in the underlying db.
+    assert_equals(20, field_tester.field_a)
+    assert_equals(5, field_tester._model_data['field_a'])
     # save the XBlock
     field_tester.save()
     # verify that the fields have been updated correctly
+    assert_equals(20, field_tester.field_a)
+    # Now, field_a should be updated in the underlying db
     assert_equals(20, field_tester._model_data['field_a'])
     assert_equals(10, field_tester.field_b)
     assert_equals('field c', field_tester.field_c)
@@ -215,9 +220,8 @@ class TestNamespace(Namespace):
     field_y = String(scope=Scope.user_state, default="default_value")
 
 
-# pylint: disable=W0613
 @patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)])
-def test_namespace_metaclass(mock_load_classes):
+def test_namespace_metaclass(_mock_load_classes):
     class TestClass(object):
         """Toy class for NamespacesMetaclass testing"""
         __metaclass__ = NamespacesMetaclass
@@ -236,7 +240,7 @@ def test_namespace_metaclass(mock_load_classes):
 
 
 @patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)])
-def test_namespace_field_access(mock_load_classes):
+def test_namespace_field_access(_mock_load_classes):
 
     class FieldTester(XBlock):
         """Test XBlock for field access testing"""
@@ -281,24 +285,24 @@ def test_namespace_field_access(mock_load_classes):
     with assert_raises(AttributeError):
         getattr(field_tester.test, 'field_z')
     assert 'field_z' not in field_tester._model_data
-# pylint: enable=W0613
 
 
 def test_defaults_not_shared():
-    class FieldTester(object):
-        """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
+    class FieldTester(XBlock):
+        """Toy class for field access testing"""
 
         field_a = List(scope=Scope.settings)
 
-        def __init__(self, model_data):
-            self._model_data = model_data
-            self._dirty_fields = set()
-
-    field_tester_a = FieldTester({})
-    field_tester_b = FieldTester({})
+    field_tester_a = FieldTester(MagicMock(), {})
+    field_tester_b = FieldTester(MagicMock(), {})
 
     field_tester_a.field_a.append(1)
+    assert_equals([1], field_tester_a.field_a)
+    assert_equals([], field_tester_b.field_a)
+    # Write out the data
+    field_tester_a.save()
+    # Double check that write didn't do something weird
+    assert_equals([1], field_tester_a.field_a)
     assert_equals([], field_tester_b.field_a)
 
 
@@ -537,18 +541,20 @@ def setup_save_failure(update_method):
 def test_xblock_save_one():
     # Mimics a save failure when we only manage to save one of the values
 
+    # Pylint, please allow this method to accept arguments.
     # pylint: disable=W0613
     def fake_update(*args, **kwargs):
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
         other_dict = args[0]
-        raise KeyValueMultiSaveError(other_dict.keys()[0])
+        raise KeyValueMultiSaveError([other_dict.keys()[0]])
     # pylint: enable=W0613
 
     field_tester = setup_save_failure(fake_update)
 
     field_tester.field_a = 20
     field_tester.field_b = 40
+    field_tester.field_c = 60
 
     with assert_raises(XBlockSaveError) as save_error:
         # This call should raise an XBlockSaveError
@@ -556,12 +562,13 @@ def test_xblock_save_one():
 
     # Verify that the correct data is getting stored by the error
     assert_equals(len(save_error.exception.saved_fields), 1)
-    assert_equals(len(save_error.exception.dirty_fields), 1)
+    assert_equals(len(save_error.exception.dirty_fields), 2)
 
 
 def test_xblock_save_failure_none():
     # Mimics a save failure when we don't manage to save any of the values
 
+    # Pylint, please allow this method to accept arguments.
     # pylint: disable=W0613
     def fake_update(*args, **kwargs):
         """Mock update method that throws a KeyValueMultiSaveError indicating
@@ -593,7 +600,8 @@ def test_xblock_write_then_delete():
         field_b = Integer(scope=Scope.content, default=10)
 
     field_tester = FieldTester(MagicMock(), {'field_a': 5})
-    # verify that the fields have been set
+
+    # Verify that the fields have been set correctly
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
 
@@ -601,27 +609,33 @@ def test_xblock_write_then_delete():
     field_tester.field_a = 20
     field_tester.field_b = 20
 
-    # Additionally assert that in the model data, we cached the value of field_a
-    # (field_b has a default value, so it will not be present in the cache)
-    assert_equals(len(field_tester._model_data), 1)
-    assert_in('field_a', field_tester._model_data)
+    # Assert that we've correctly cached the value of both fields to the newly set values.
+    assert_equals(20, field_tester.field_a)
+    assert_equals(20, field_tester.field_b)
 
-    # Before saving, delete all the fields
+    # Before saving, delete all the fields. Deletes are performed immediately for now,
+    # so the field should immediately not be present in the _model_data after the delete.
+    # However, we copy the default values into the cache, so after the delete we expect the
+    # cached values to be the default values, but the fields to be removed from the _model_data.
     del field_tester.field_a
     del field_tester.field_b
 
-    # Assert that we're now finding the right cached values
+    # Assert that we're now finding the right cached values - these should be the default values
+    # that the fields have from the class since we've performed a delete, and XBlock.__delete__
+    # inserts the default values into the cache as an optimization.
     assert_equals(None, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
 
-    # Additionally assert that in the model data, we don't have any values set
-    assert_equals(len(field_tester._model_data), 0)
     # Perform explicit save
     field_tester.save()
 
-    # Assert that we're now finding the right cached values
+    # Now that we've done the save, double-check that we still have the correct cached values (the defaults)
     assert_equals(None, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
 
-    # Additionally assert that in the model data, we don't have any values set
+    # Additionally assert that in the model data, we don't have any values actually set for these fields.
+    # Basically, we want to ensure that the `save` didn't overwrite anything in the actual _model_data
+    # Note this test directly accessess _model_data and is thus somewhat fragile.
     assert_equals(len(field_tester._model_data), 0)
+    assert_equals(False, 'field_a' in field_tester._model_data)
+    assert_equals(False, 'field_b' in field_tester._model_data)

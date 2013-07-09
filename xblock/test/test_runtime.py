@@ -1,22 +1,13 @@
 """Tests the features of xblock/runtime"""
 # Nose redefines assert_equal and assert_not_equal
-# pylint: disable=E0611
-from nose.tools import assert_equals, assert_false, assert_true, assert_raises
-# pylint: enable=E0611
+from nose.tools import assert_equals, assert_false, assert_true, assert_raises  # pylint: disable=E0611
 from collections import namedtuple
 from mock import patch, Mock
 
-from xblock.core import BlockScope, ChildrenModelMetaclass, ModelMetaclass, \
-    Namespace, NamespacesMetaclass, Scope, String, XBlock
+from xblock.core import BlockScope, Namespace, Scope, String, XBlock
 from xblock.runtime import NoSuchViewError, KeyValueStore, DbModel, Runtime
 from xblock.fragment import Fragment
 from xblock.test import DictKeyValueStore
-
-
-class Metaclass(NamespacesMetaclass, ChildrenModelMetaclass, ModelMetaclass):
-    """Test Metaclass that is comprised of three of the four XBlock metaclasses
-    (does not include TagCombiningMetaclass)"""
-    pass
 
 
 class TestNamespace(Namespace):
@@ -162,74 +153,43 @@ def test_db_model_keys():
         for field in collection.fields:
             assert_true(field.name in db_model)
 
-    print key_store.db_dict
+    def get_key_value(scope, student_id, block_scope_id, field_name):
+        """Gets the value, from `key_store`, of a Key with the given values."""
+        new_key = KeyValueStore.Key(scope, student_id, block_scope_id, field_name)
+        return key_store.db_dict[new_key]
 
     # Examine each value in the database and ensure that keys were constructed correctly
-    assert_equals(
-        'new content',
-        key_store.db_dict[KeyValueStore.Key(Scope.content, None, 'd0', 'content')]
-    )
-    assert_equals(
-        'new settings',
-        key_store.db_dict[KeyValueStore.Key(Scope.settings, None, 'u0', 'settings')]
-    )
-    assert_equals(
-        'new user_state',
-        key_store.db_dict[KeyValueStore.Key(Scope.user_state, 's0', 'u0', 'user_state')]
-    )
-    assert_equals(
-        'new preferences',
-        key_store.db_dict[KeyValueStore.Key(Scope.preferences, 's0', 'TestModel', 'preferences')]
-    )
-    assert_equals(
-        'new user_info',
-        key_store.db_dict[KeyValueStore.Key(Scope.user_info, 's0', None, 'user_info')]
-    )
-    assert_equals(
-        'new by_type',
-        key_store.db_dict[KeyValueStore.Key(Scope(False, BlockScope.TYPE), None, 'TestModel', 'by_type')]
-    )
-    assert_equals(
-        'new for_all',
-        key_store.db_dict[KeyValueStore.Key(Scope(False, BlockScope.ALL), None, None, 'for_all')]
-    )
-    assert_equals(
-        'new user_def',
-        key_store.db_dict[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'user_def')]
-    )
+    assert_equals('new content', get_key_value(Scope.content, None, 'd0', 'content'))
 
-    assert_equals(
-        'new n_content',
-        key_store.db_dict[KeyValueStore.Key(Scope.content, None, 'd0', 'n_content')]
-    )
-    assert_equals(
-        'new n_settings',
-        key_store.db_dict[KeyValueStore.Key(Scope.settings, None, 'u0', 'n_settings')]
-    )
-    assert_equals(
-        'new n_user_state',
-        key_store.db_dict[KeyValueStore.Key(Scope.user_state, 's0', 'u0', 'n_user_state')]
-    )
-    assert_equals(
-        'new n_preferences',
-        key_store.db_dict[KeyValueStore.Key(Scope.preferences, 's0', 'TestModel', 'n_preferences')]
-    )
-    assert_equals(
-        'new n_user_info',
-        key_store.db_dict[KeyValueStore.Key(Scope.user_info, 's0', None, 'n_user_info')]
-    )
-    assert_equals(
-        'new n_by_type',
-        key_store.db_dict[KeyValueStore.Key(Scope(False, BlockScope.TYPE), None, 'TestModel', 'n_by_type')]
-    )
-    assert_equals(
-        'new n_for_all',
-        key_store.db_dict[KeyValueStore.Key(Scope(False, BlockScope.ALL), None, None, 'n_for_all')]
-    )
-    assert_equals(
-        'new n_user_def',
-        key_store.db_dict[KeyValueStore.Key(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'n_user_def')]
-    )
+    assert_equals('new settings', get_key_value(Scope.settings, None, 'u0', 'settings'))
+
+    assert_equals('new user_state', get_key_value(Scope.user_state, 's0', 'u0', 'user_state'))
+
+    assert_equals('new preferences', get_key_value(Scope.preferences, 's0', 'TestModel', 'preferences'))
+
+    assert_equals('new user_info', get_key_value(Scope.user_info, 's0', None, 'user_info'))
+
+    assert_equals('new by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestModel', 'by_type'))
+
+    assert_equals('new for_all', get_key_value(Scope(False, BlockScope.ALL), None, None, 'for_all'))
+
+    assert_equals('new user_def', get_key_value(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'user_def'))
+
+    assert_equals('new n_content', get_key_value(Scope.content, None, 'd0', 'n_content'))
+
+    assert_equals('new n_settings', get_key_value(Scope.settings, None, 'u0', 'n_settings'))
+
+    assert_equals('new n_user_state', get_key_value(Scope.user_state, 's0', 'u0', 'n_user_state'))
+
+    assert_equals('new n_preferences', get_key_value(Scope.preferences, 's0', 'TestModel', 'n_preferences'))
+
+    assert_equals('new n_user_info', get_key_value(Scope.user_info, 's0', None, 'n_user_info'))
+
+    assert_equals('new n_by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestModel', 'n_by_type'))
+
+    assert_equals('new n_for_all', get_key_value(Scope(False, BlockScope.ALL), None, None, 'n_for_all'))
+
+    assert_equals('new n_user_def', get_key_value(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'n_user_def'))
 
 
 class MockRuntimeForQuerying(Runtime):

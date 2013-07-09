@@ -7,13 +7,10 @@ and used by all runtimes.
 import copy
 import functools
 import inspect
-# Disable pylint from catching the ImportError because we handle it.
-# pylint: disable=F0401
 try:
-    import simplesjson as json
+    import simplesjson as json  # pylint: disable=F0401
 except ImportError:
     import json
-# pylint: enable=F0401
 from collections import namedtuple
 from webob import Response
 
@@ -28,7 +25,7 @@ class KeyValueMultiSaveError(Exception):
         """
         Create a new KeyValueMultiSaveError
 
-        `saved_field_names` - an iterable of field names that were
+        `saved_field_names` - an iterable of field names (strings) that were
         successfully saved before the exception occured
         """
         super(KeyValueMultiSaveError, self).__init__()
@@ -71,10 +68,8 @@ class Sentinel(object):
     def __repr__(self):
         return self.name
 
-# Allow this tuple to be named as if it were a class
-# pylint: disable=C0103
-ScopeBase = namedtuple('ScopeBase', 'user block')
-# pylint: enable=C0103
+
+ScopeBase = namedtuple('ScopeBase', 'user block')  # pylint: disable=C0103
 
 
 class Scope(ScopeBase):
@@ -129,18 +124,18 @@ class ModelType(object):
 
     Parameters:
       `help` : documentation of field class, suitable for presenting in a GUI
-               (defaults to None)
+          (defaults to None).
       `default` : static value to default to if not otherwise specified
-                  (defaults to None)
+          (defaults to None).
       `scope` : the scope in which this field class is used (defaults to
-                Scope.content)
+          Scope.content).
       `display_name` : the display name for the field class, suitable for
-                       presenting in a GUI (defaults to name of class)
+          presenting in a GUI (defaults to name of class).
       `values` : for field classes with a known set of valid values, provides
-                 the ability to explicitly specify the valid values. This can
-                 be specified as either a static return value, or a function
-                 that generates the valid values. For example formats, see the
-                 values property definition.
+          the ability to explicitly specify the valid values. This can
+          be specified as either a static return value, or a function
+          that generates the valid values. For example formats, see the
+          values property definition.
     """
 
     # We're OK redefining built-in `help`
@@ -162,10 +157,8 @@ class ModelType(object):
 
     @property
     def name(self):
-        """
-        Returns the `_name` of this object. Set to 'unknown'.
-        Not to be confused with `display_name`.
-        """
+        """Returns the name of this field."""
+        # This is set by ModelMetaclass
         return self._name
 
     @property
@@ -268,7 +261,7 @@ class ModelType(object):
         Deletes `instance` from the underlying data store.
         Deletes are not cached; they are performed immediately.
         """
-        # Allow this method to access the `_model_data_cache` and `_dirty_fields` of `instance`
+        # Allow this method to access the `_model_data` and `_dirty_fields` of `instance`
         # pylint: disable=W0212
 
         # Try to perform the deletion on the model_data, and accept
@@ -484,9 +477,11 @@ class ModelMetaclass(type):
         # Allow this method to access `_name`
         # pylint: disable=W0212
         fields = set()
-        for vname, value in attrs.items() + sum([inspect.getmembers(base) for base in bases], []):
+        for aname, value in attrs.items() + \
+                sum([inspect.getmembers(base) for base in bases], []):
             if isinstance(value, ModelType):
-                value._name = vname
+                # Set the name of this attribute
+                value._name = aname
                 fields.add(value)
 
         attrs['fields'] = list(fields)
@@ -680,54 +675,15 @@ class XBlock(Plugin):
             if tag in class_._class_tags:
                 yield name, class_
 
-    # Ignore unused argument: `usage_factory` complaint.
-    # pylint: disable=W0613
     @classmethod
-    def preprocess_input(cls, node, usage_factory):
+    def preprocess_input(cls, node, _usage_factory):
         """The class can adjust a parsed Usage tree."""
         return node
-    # pylint: enable=W0613
 
-    # Ignore unused argument: `usage_factory` complaint.
-    # pylint: disable=W0613
     @classmethod
-    def postprocess_input(cls, node, usage_factory):
+    def postprocess_input(cls, node, _usage_factory):
         """The class can adjust a parsed Usage tree."""
         return node
-    # pylint: enable=W0613
-
-    def save(self):
-        """Save all dirty fields attached to this XBlock."""
-        if not self._dirty_fields:
-            # nop if _dirty_fields attribute is empty
-            return
-        # `XBlock` obtains the `_model_data_cache` attribute from TODO [sarina/dkh]
-        # Since this is not understood by static analysis, silence this error.
-        # pylint: disable=E1101
-        try:
-            # Create dictionary mapping between dirty fields and data cache values
-            # A `field` is an instance of `ModelType`
-            fields_to_save = {field.name: field.to_json(self._model_data_cache[field.name])
-                              for field in self._dirty_fields}
-            # Throws KeyValueMultiSaveError if things go wrong
-            self._model_data.update(fields_to_save)
-
-        except KeyValueMultiSaveError as save_error:
-            saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
-
-            for field in saved_fields:
-                # should only find one corresponding field
-                self._dirty_fields.remove(field)
-            raise XBlockSaveError(saved_fields, self._dirty_fields)
-
-        # Remove all dirty fields, since the save was successful
-        self._clear_dirty_fields()
-
-    def _clear_dirty_fields(self):
-        """
-        Remove all dirty fields from an XBlock
-        """
-        self._dirty_fields.clear()
 
     def __init__(self, runtime, model_data):
         """
@@ -760,3 +716,33 @@ class XBlock(Plugin):
             id(self) % 0xFFFF,
             ','.join(attrs)
         )
+
+    def save(self):
+        """Save all dirty fields attached to this XBlock."""
+        if not self._dirty_fields:
+            # nop if _dirty_fields attribute is empty
+            return
+        try:
+            # Create dictionary mapping between dirty fields and data cache values
+            # A `field` is an instance of `ModelType`
+
+            fields_to_save = {field.name: field.to_json(self._model_data_cache[field.name])  # pylint: disable=E1101
+                              for field in self._dirty_fields}
+            # Throws KeyValueMultiSaveError if things go wrong
+            self._model_data.update(fields_to_save)
+
+        except KeyValueMultiSaveError as save_error:
+            saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
+            for field in saved_fields:
+                # should only find one corresponding field
+                self._dirty_fields.remove(field)
+            raise XBlockSaveError(saved_fields, self._dirty_fields)
+
+        # Remove all dirty fields, since the save was successful
+        self._clear_dirty_fields()
+
+    def _clear_dirty_fields(self):
+        """
+        Remove all dirty fields from an XBlock
+        """
+        self._dirty_fields.clear()

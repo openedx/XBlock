@@ -16,7 +16,7 @@ class ViewCounter(XBlock):
         Render out the template.
 
         """
-        self.views = self.views + 1
+        self.views += 1
         html = VIEW_COUNTER_TEMPLATE.format(views=self.views)
         frag = Fragment(html)
         return frag

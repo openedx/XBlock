@@ -12,6 +12,7 @@ from workbench import scenarios
 from workbench.runtime import Usage
 from xblock.core import XBlock, String, Scope
 from xblock.fragment import Fragment
+from xblock.runtime import NoSuchHandlerError
 
 
 class TestMultipleViews(TestCase):
@@ -87,13 +88,23 @@ def test_xblock_without_handler_and_student_state(mock_load_class):
     # Test that an XBlock without a handler raises an Exception
     # when we try to hit a handler on it
     c = Client()
-    handler_url = "/handler/usage_175/update_the_data/?student=student_1"
+
+    # Pick a random usage_id from the Usage._usage_index because we
+    # need to ensure the usage is a valid id
+    usage_id = Usage._usage_index.keys()[0]
+    # Plug that usage_id into a mock handler URL
+    # /handler/[usage_id]/[handler_name]
+    handler_url = "/handler/" + usage_id + "/does_not_exist/?student=student_doesntexist"
 
     # The default XBlock implementation doesn't provide
     # a handler, so this call should raise an exception
     # (from xblock.runtime.Runtime.handle)
-    with assert_raises(Exception):
-        c.post(handler_url, '{}', 'text/json')
+    with assert_raises(NoSuchHandlerError):
+        result = c.post(handler_url, '{}', 'text/json')
+
+# TODO : write a test that handles an invalid usage_id in the handler url
+# TODO : write a test that handles an invalid handler_url (ie one that doesn't match the pattern)
+# For both, assert result.status_code == 404
 
 
 class XBlockWithoutStudentView(XBlock):
