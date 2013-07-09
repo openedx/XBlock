@@ -196,7 +196,7 @@ class ProblemBlock(XBlock):
         """A few canned scenarios for display in the workbench."""
         return [
             ("problem with thumbs and textbox",
-            """\
+             """\
                 <problem>
                     <p>You have three constraints to satisfy:</p>
                     <ol>
@@ -223,7 +223,7 @@ class ProblemBlock(XBlock):
                         Number of upvotes is $numvotes
                     </equality>
                 </problem>
-            """),
+             """),
         ]
 
 

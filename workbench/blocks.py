@@ -9,6 +9,7 @@ from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
 
+
 class DebuggingChildBlock(XBlock):
     """A simple gray box, to use as a child placeholder."""
     def fallback_view(self, view_name, context):

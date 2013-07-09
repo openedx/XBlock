@@ -50,12 +50,13 @@ class Plugin(object):
             classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
 
             if len(classes) > 1:
-                log.warning("Found multiple classes for {entry_point} with "
-                            "identifier {id}: {classes}. "
-                            "Returning the first one.".format(
-                    entry_point=cls.entry_point,
-                    id=identifier,
-                    classes=", ".join(
+                log.warning(
+                    "Found multiple classes for {entry_point} with "
+                    "identifier {id}: {classes}. "
+                    "Returning the first one.".format(
+                        entry_point=cls.entry_point,
+                        id=identifier,
+                        classes=", ".join(
                             class_.module_name for class_ in classes)))  # TODO: .module_name doesn't exist.
 
             if len(classes) == 0:

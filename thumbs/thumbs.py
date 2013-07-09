@@ -42,7 +42,7 @@ class ThumbsBlock(InputBlock):
         css_str = pkg_resources.resource_string(__name__, "static/css/thumbs.css")
         frag.add_css(unicode(css_str))
 
-        js_str = pkg_resources.resource_string(__name__, 
+        js_str = pkg_resources.resource_string(__name__,
                                                "static/js/src/thumbs.js")
         frag.add_javascript(unicode(js_str))
 
@@ -81,7 +81,7 @@ class ThumbsBlock(InputBlock):
         """A canned scenario for display in the workbench."""
         return [
             ("three thumbs at once",
-            """\
+             """\
                 <vertical>
                     <thumbs/>
                     <thumbs/>

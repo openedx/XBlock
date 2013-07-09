@@ -2,6 +2,7 @@
 
 import webob
 
+
 def webob_to_django_response(webob_response):
     from django.http import HttpResponse
     django_response = HttpResponse(

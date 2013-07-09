@@ -5,6 +5,7 @@ Tests for classes extending ModelType.
 import unittest
 from xblock.core import Any, Boolean, Dict, Float, Integer, List, String
 
+
 class ModelTypeTest(unittest.TestCase):
     """ Base test class for ModelTypes. """
 
