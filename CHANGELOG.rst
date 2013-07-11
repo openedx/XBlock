@@ -8,3 +8,7 @@ or near the top.  Include a label indicating the component affected.
 
 0.2
 ----------
+
+XBlock: Moved `Thumbs`_ out of the XBlock repository.
+
+.. _Thumbs: https://github.com/edx/xblock-thumbs

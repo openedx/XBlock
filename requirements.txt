@@ -23,4 +23,4 @@ sphinx
 # Our own XBlocks
 -e .
 -e workbench
--e thumbs
+-e git+https://github.com/edx/xblock-thumbs.git#egg=xblock-thumbs
