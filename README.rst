@@ -75,11 +75,12 @@ This will run:
     * Integration tests of XBlocks running within the workbench.
 
 You can test XBlocks through a browser using `Selenium`_. We have included an
-example Selenium test for ``thumbs`` that uses Django's `LiveServerTestCase`_.
+example Selenium test for `thumbs`_ that uses Django's `LiveServerTestCase`_.
 It runs as part of the test suite as executed by the above command. You need to
 have Firefox installed for this test case to run successfully.
 
 .. _Selenium: http://docs.seleniumhq.org/
+.. _thumbs: https://github.com/edx/xblock-thumbs
 .. _LiveServerTestCase: https://docs.djangoproject.com/en/1.4/topics/testing/#django.test.LiveServerTestCase
 
 To run the test suite under coverage:
@@ -93,9 +94,6 @@ to execute the tests. Then to view the coverage report:
 See the `coverage.py`_ docs for more info and options.
 
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
-
-You can also run unit tests of the JavaScript used by the `thumbs` example.
-See `thumbs/static/js/README.md` for details.
 
 
 Using the workbench
@@ -145,21 +143,22 @@ clear which layer the code lives in, though sometimes the lines are blurred:
     This code is the least real, in that it might be just stubs, and will be
     done very differently in real code.
 
-4.  **Thumbs** This is a sample XBlock written as a separate installable kit as
-    an example of how third-party XBlocks can be structured.
-
 
 Making your own XBlock
 ----------------------
 
 Making an XBlock can be as simple as creating a Python class with a few
-specific methods.  The ``thumbs`` module demonstrates an XBlock with state,
+specific methods.  The `thumbs`_ module demonstrates an XBlock with state,
 views, and input handling.
 
-You can provide scenarios for the workbench to display, see the thumbs.py
-sample for an example, or the xblock/problem.py file.  The scenarios are
+.. _thumbs: https://github.com/edx/xblock-thumbs
+
+You can provide scenarios for the workbench to display. For an example, see 
+the `thumbs.py`_ sample or the xblock/problem.py file.  The scenarios are
 written in a simple XML language.  Note this is not an XML format we are
 proposing as a standard.
+
+.. _thumbs.py: https://github.com/edx/xblock-thumbs/blob/master/thumbs.py/blobl
 
 Once you install your XBlock into your virtualenv, the workbench will
 automatically display its scenarios for you to experiment with.

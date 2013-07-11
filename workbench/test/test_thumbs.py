@@ -3,6 +3,7 @@ from selenium import webdriver
 from workbench.runtime import MEMORY_KVS, Usage
 from nose.plugins.attrib import attr
 
+
 @attr('selenium')
 class SeleniumTests(LiveServerTestCase):
 
@@ -50,7 +51,6 @@ class ThreeThumbsTest(SeleniumTests):
         # The following will give a NoSuchElementException error
         # if it is not there
         vertical = self.browser.find_element_by_css_selector(vertical_css)
-
 
         # Make sure there are three thumbs blocks
         thumb_css = 'div.xblock[data-block-type="thumbs"]'
