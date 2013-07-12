@@ -100,18 +100,20 @@ See `thumbs/static/js/README.md` for details.
 Style Testing
 -------------
 
-We use two tools - `pylint` and `pep8` - to manage the code quality and style
+We use two tools - ``pylint`` and ``pep8`` - to manage the code quality and style
 of all Python files in this repo. Our goal is to maintain zero reported pylint
 and pep8 violations at all times.
 
 To run these tools on a single file:
 
     $ pylint path/to/file.py
+
     $ pep8 path/to/file.py
 
 To run these tools on the whole project:
 
     $ pylint .
+
     $ pep8 .
 
 We do not abide by all pylint and pep8 violations. You can check out which violations
