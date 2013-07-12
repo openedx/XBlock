@@ -97,6 +97,27 @@ See the `coverage.py`_ docs for more info and options.
 You can also run unit tests of the JavaScript used by the `thumbs` example.
 See `thumbs/static/js/README.md` for details.
 
+Style Testing
+-------------
+
+We use two tools - `pylint` and `pep8` - to manage the code quality and style
+of all Python files in this repo. Our goal is to maintain zero reported pylint
+and pep8 violations at all times.
+
+To run these tools on a single file:
+
+    $ pylint path/to/file.py
+    $ pep8 path/to/file.py
+
+To run these tools on the whole project:
+
+    $ pylint .
+    $ pep8 .
+
+We do not abide by all pylint and pep8 violations. You can check out which violations
+we ignore by viewing the contents of `pylintrc`_ and `.pep8`_. Before making a pull
+request, you should ensure that your branch does not add any new quality violations
+by checking your code with these tools.
 
 Using the workbench
 -------------------
