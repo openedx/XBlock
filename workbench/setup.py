@@ -1,5 +1,5 @@
 """Set up for XBlock Workbench"""
-from distutils.core import setup # pylint: disable=F0401,E0611
+from distutils.core import setup  # pylint: disable=F0401,E0611
 
 setup(
     name='XBlockWorkbench',

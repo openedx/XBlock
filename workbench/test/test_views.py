@@ -6,7 +6,7 @@ from django.test.client import Client
 from django.test import TestCase
 
 from mock import patch
-from nose.tools import assert_raises  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_raises, assert_true  # pylint: disable=E0611
 
 from workbench.runtime import Usage
 from xblock.core import XBlock, String, Scope
@@ -72,20 +72,20 @@ def test_xblock_with_handler(_mock_load_class):
 
     # Initially, the data is the default.
     response = client.get("/view/xblockwithhandlerandstudentstate/")
-    assert "The data: 'def'." in response.content
+    assert_true("The data: 'def'." in response.content)
     parsed = response.content.split(':::')
-    assert len(parsed) == 3
+    assert_equal(len(parsed), 3)
     handler_url = parsed[1]
 
     # Now change the data.
     response = client.post(handler_url, "{}", "text/json")
     the_data = json.loads(response.content)['the_data']
-    assert the_data == "defx"
+    assert_equal(the_data, "defx")
 
     # Change it again.
     response = client.post(handler_url, "{}", "text/json")
     the_data = json.loads(response.content)['the_data']
-    assert the_data == "defxx"
+    assert_equal(the_data, "defxx")
 
 
 @patch('xblock.core.XBlock.load_class', return_value=XBlock)
@@ -107,9 +107,16 @@ def test_xblock_without_handler(_mock_load_class):
     with assert_raises(NoSuchHandlerError):
         client.post(handler_url, '{}', 'text/json')
 
-# TODO : write a test that handles an invalid usage_id in the handler url
-# TODO : write a test that handles an invalid handler_url (ie one that doesn't match the pattern)
-# For both, assert result.status_code == 404
+
+@patch('xblock.core.XBlock.load_class', return_value=XBlock)
+def test_xblock_invalid_handler_url(_mock_load_class):
+    # Test that providing an invalid handler url will give a 404
+    # when we try to hit a handler on it
+    client = Client()
+
+    handler_url = "/handler/obviously/a/fake/handler"
+    result = client.post(handler_url, '{}', 'text/json')
+    assert_equal(result.status_code, 404)
 
 
 class XBlockWithoutStudentView(XBlock):
@@ -126,4 +133,4 @@ def test_xblock_no_student_view(_mock_load_class):
     # indicates there is no view available.
     client = Client()
     response = client.get("/view/xblockwithoutstudentview/")
-    assert 'No such view' in response.content
+    assert_true('No such view' in response.content)
