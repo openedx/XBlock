@@ -8,17 +8,49 @@ import copy
 import functools
 import inspect
 try:
-    import simplesjson as json
+    import simplesjson as json  # pylint: disable=F0401
 except ImportError:
     import json
-
 from collections import namedtuple
 from webob import Response
 
 from .plugin import Plugin
 
 
+class KeyValueMultiSaveError(Exception):
+    """
+    Raised to indicated an error in saving multiple fields in a KeyValueStore
+    """
+    def __init__(self, saved_field_names):
+        """
+        Create a new KeyValueMultiSaveError
+
+        `saved_field_names` - an iterable of field names (strings) that were
+        successfully saved before the exception occured
+        """
+        super(KeyValueMultiSaveError, self).__init__()
+        self.saved_field_names = saved_field_names
+
+
+class XBlockSaveError(Exception):
+    """
+    Raised to indicated an error in saving an XBlock
+    """
+    def __init__(self, saved_fields, dirty_fields):
+        """
+        Create a new XBlockSaveError
+
+        `saved_fields` - a set of fields that were successfully
+        saved before the error occured
+        `dirty_fields` - a set of fields that were left dirty after the save
+        """
+        super(XBlockSaveError, self).__init__()
+        self.saved_fields = saved_fields
+        self.dirty_fields = dirty_fields
+
+
 class BlockScope(object):
+    """Enumeration defining BlockScopes"""
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
 
@@ -36,39 +68,43 @@ class Sentinel(object):
     def __repr__(self):
         return self.name
 
-ScopeBase = namedtuple('ScopeBase', 'user block')
+
+ScopeBase = namedtuple('ScopeBase', 'user block')  # pylint: disable=C0103
 
 
 class Scope(ScopeBase):
-    # The `content` scope is used to save data for all users, for
-    # one particular block, across all runs of a course. An example
-    # might be an XBlock that wishes to tabulate user "upvotes", 
-    # or HTML content to display literally on the page (this example
-    # being the reason this scope is named `content`)
+    """
+    Defines five types of Scopes to be used: `content`, `settings`,
+    `user_state`, `preferences`, and `user_info`.
+
+    The `content` scope is used to save data for all users, for one particular
+    block, across all runs of a course. An example might be an XBlock that
+    wishes to tabulate user "upvotes", or HTML content ti display literally on
+    the page (this example being the reason this scope is named `content`).
+
+    The `settings` scope is used to save data for all users, for one particular block,
+    for one specific run of a course. This is like the `content` scope, but scoped to
+    one run of a course. An example might be a due date for a problem.
+
+    The `user_state` scope is used to save data for one user, for one block, for one run
+    of a course. An example might be how many points a user scored on one specific problem.
+
+    The `preferences` scope is used to save data for one user, for all instances of one
+    specific TYPE of block, across the entire platform. An example might be that a user
+    can set their preferred default speed for the video player. This default would apply
+    to all instances of the video player, across the whole platform, but only for that student.
+
+    The `user_info` scope is used to save data for one user, across the entire platform. An
+    example might be a user's time zone or language preference.
+
+    """
+
     content = ScopeBase(user=False, block=BlockScope.DEFINITION)
-
-    # The `settings` scope is used to save data for all users, for
-    # one particular block, for one specific run of a course. This is
-    # like the `content` scope, but scoped to one run of a course.
-    # An example might be a due date for a problem.
     settings = ScopeBase(user=False, block=BlockScope.USAGE)
-
-    # The `user_state` scope is used to save data for one user,
-    # for one block, for one run of a course. An example might
-    # be how many points a user scored on one specific problem.
     user_state = ScopeBase(user=True, block=BlockScope.USAGE)
-
-    # The `preferences` scope is used to save data for one user, for
-    # all instances of one specific TYPE of block, across the entire platform.
-    # An example might be that a user can set their preferred default speed
-    # for the video player. This default would apply to all instances of
-    # the video player, across the whole platform, but only for that student.
     preferences = ScopeBase(user=True, block=BlockScope.TYPE)
-
-    # The `user_info` scope is used to save data for one user,
-    # across the entire platform. An example might be a user's
-    # time zone or language preference.
     user_info = ScopeBase(user=True, block=BlockScope.ALL)
+
     children = Sentinel('Scope.children')
     parent = Sentinel('Scope.parent')
 
@@ -79,51 +115,69 @@ NO_CACHE_VALUE = object()
 
 class ModelType(object):
     """
-    A field class that can be used as a class attribute to define what data the class will want
-    to refer to.
+    A field class that can be used as a class attribute to define what data the
+    class will want to refer to.
 
-    When the class is instantiated, it will be available as an instance attribute of the same
-    name, by proxying through to self._model_data on the containing object.
+    When the class is instantiated, it will be available as an instance
+    attribute of the same name, by proxying through to self._model_data on
+    the containing object.
 
     Parameters:
-      `help` : documentation of field class, suitable for presenting in a GUI (defaults to None)
-      `default` : static value to default to if not otherwise specified (defaults to None)
-      `scope` : the scope in which this field class is used (defaults to Scope.content)
-      `display_name` : the display name for the field class, suitable for presenting in a GUI (defaults to name of class)
-      `values` : for field classes with a known set of valid values, provides the ability to explicitly specify the
-               valid values. This can be specified as either a static return value, or a function that generates
-               the valid values. For example formats, see the values property definition.
+      `help` : documentation of field class, suitable for presenting in a GUI
+          (defaults to None).
+      `default` : static value to default to if not otherwise specified
+          (defaults to None).
+      `scope` : the scope in which this field class is used (defaults to
+          Scope.content).
+      `display_name` : the display name for the field class, suitable for
+          presenting in a GUI (defaults to name of class).
+      `values` : for field classes with a known set of valid values, provides
+          the ability to explicitly specify the valid values. This can
+          be specified as either a static return value, or a function
+          that generates the valid values. For example formats, see the
+          values property definition.
     """
 
-    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None,
-                 values=None):
+    # We're OK redefining built-in `help`
+    # pylint: disable=W0622
+    def __init__(self, help=None, default=None, scope=Scope.content,
+                 display_name=None, values=None):
         self._name = "unknown"
         self.help = help
         self._default = default
         self.scope = scope
         self._display_name = display_name
         self._values = values
+    # pylint: enable=W0622
 
     @property
     def default(self):
+        """Returns the static value that this defaults to."""
         return self._default
 
     @property
     def name(self):
+        """Returns the name of this field."""
+        # This is set by ModelMetaclass
         return self._name
 
     @property
     def values(self):
         """
-        Returns the valid values for this class. This is useful for representing possible values in a UI.
+        Returns the valid values for this class. This is useful
+        for representing possible values in a UI.
 
         Example formats:
             `[1, 2, 3]` : a finite set of elements
-            `[{"display_name": "Always", "value": "always"}, {"display_name": "Past Due", "value": "past_due"}]` :
-                a finite set of elements where the display names differ from the values
-            `{"min" : 0 , "max" : 10, "step": .1}` : a range for floating point numbers with increment .1
+            `[{"display_name": "Always", "value": "always"},
+              {"display_name": "Past Due", "value": "past_due"}]` :
+                a finite set of elements where the display names differ from
+                the values
+            `{"min" : 0 , "max" : 10, "step": .1}` :
+                a range for floating point numbers with increment .1
 
-        If this field class does not define a set of valid values, this method will return None.
+        If this field class does not define a set of valid values, this method
+        will return None.
         """
         if callable(self._values):
             return self._values()
@@ -148,16 +202,33 @@ class ModelType(object):
 
     def _set_cached_value(self, instance, value):
         """Store a value in the instance's cache, creating the cache if necessary."""
+        # Allow this method to access the `_model_data_cache` of `instance`
+        # pylint: disable=W0212
         if not hasattr(instance, '_model_data_cache'):
             instance._model_data_cache = {}
         instance._model_data_cache[self.name] = value
 
     def _del_cached_value(self, instance):
         """Remove a value from the instance's cache, if the cache exists."""
+        # Allow this method to access the `_model_data_cache` of `instance`
+        # pylint: disable=W0212
         if hasattr(instance, '_model_data_cache') and self.name in instance._model_data_cache:
             del instance._model_data_cache[self.name]
 
+    def _mark_dirty(self, instance):
+        """Set this field to dirty on the instance."""
+        # Allow this method to access the `_dirty_fields` of `instance`
+        # pylint: disable=W0212
+        instance._dirty_fields.add(self)
+
     def __get__(self, instance, owner):
+        """
+        Gets the value of this instance. Prioritizes the cached value over
+        obtaining the value from the _model_data. Thus if a cached value
+        exists, that is the value that will be returned.
+        """
+        # Allow this method to access the `_model_data_cache` of `instance`
+        # pylint: disable=W0212
         if instance is None:
             return self
 
@@ -175,16 +246,37 @@ class ModelType(object):
         return value
 
     def __set__(self, instance, value):
-        # Update both the persistent store and the cache:
-        instance._model_data[self.name] = self.to_json(value)
+        """
+        Sets the `instance` to the given `value`.
+        Setting a value does not update the underlying data store; the
+        new value is kept in the cache and the instance is marked as
+        dirty until `save` is explicitly called.
+        """
+        # Mark the field as dirty and update the cache:
+        self._mark_dirty(instance)
         self._set_cached_value(instance, value)
 
     def __delete__(self, instance):
+        """
+        Deletes `instance` from the underlying data store.
+        Deletes are not cached; they are performed immediately.
+        """
+        # Allow this method to access the `_model_data` and `_dirty_fields` of `instance`
+        # pylint: disable=W0212
+
         # Try to perform the deletion on the model_data, and accept
         # that it's okay if the key is not present.  (It may never
         # have been persisted at all.)
         try:
             del instance._model_data[self.name]
+        except KeyError:
+            pass
+
+        # We also need to clear this item from the dirty fields, to prevent
+        # an erroneous write of its value on implicit save. OK if it was
+        # not in the dirty fields to begin with.
+        try:
+            instance._dirty_fields.remove(self)
         except KeyError:
             pass
 
@@ -293,9 +385,13 @@ class Boolean(ModelType):
 
     This class has the 'values' property defined.
     """
+    # We're OK redefining built-in `help`
+    # pylint: disable=W0622
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
         super(Boolean, self).__init__(help, default, scope, display_name,
-            values=({'display_name': "True", "value": True}, {'display_name': "False", "value": False}))
+                                      values=({'display_name': "True", "value": True},
+                                              {'display_name': "False", "value": False}))
+    # pylint: enable=W0622
 
     def from_json(self, value):
         if isinstance(value, basestring):
@@ -358,6 +454,11 @@ class String(ModelType):
 
 
 class Any(ModelType):
+    """
+    A field class for representing any piece of data; type is not enforced.
+
+    All methods are inherited directly from `ModelType`.
+    """
     pass
 
 
@@ -372,15 +473,19 @@ class ModelMetaclass(type):
     Additionally, any namespaces registered in the `xblock.namespace` will be added to
     the instance.
     """
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
+        # Allow this method to access `_name`
+        # pylint: disable=W0212
         fields = set()
-        for n, v in attrs.items() + sum([inspect.getmembers(base) for base in bases], []):
-            if isinstance(v, ModelType):
-                v._name = n
-                fields.add(v)
+        for aname, value in attrs.items() + \
+                sum([inspect.getmembers(base) for base in bases], []):
+            if isinstance(value, ModelType):
+                # Set the name of this attribute
+                value._name = aname
+                fields.add(value)
 
         attrs['fields'] = list(fields)
-        return super(ModelMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super(ModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
 class NamespacesMetaclass(type):
@@ -391,7 +496,7 @@ class NamespacesMetaclass(type):
     Any namespaces registered in the `xblock.namespace` will be added to
     the instance
     """
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
         namespaces = []
         for ns_name, namespace in Namespace.load_classes():
             if issubclass(namespace, Namespace):
@@ -399,7 +504,7 @@ class NamespacesMetaclass(type):
                 namespaces.append(ns_name)
         attrs['namespaces'] = namespaces
 
-        return super(NamespacesMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super(NamespacesMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
 class ChildrenModelMetaclass(type):
@@ -407,17 +512,22 @@ class ChildrenModelMetaclass(type):
     A ModelMetaclass that transforms the attribute `has_children = True`
     into a List field with an empty scope.
     """
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
         if (attrs.get('has_children', False) or
-            any(getattr(base, 'has_children', False) for base in bases)):
-            attrs['children'] = List(help='The ids of the children of this XBlock', scope=Scope.children)
+                any(getattr(base, 'has_children', False) for base in bases)):
+            attrs['children'] = List(help='The ids of the children of this XBlock',
+                                     scope=Scope.children)
         else:
             attrs['has_children'] = False
 
-        return super(ChildrenModelMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
 class NamespaceDescriptor(object):
+    """
+    Holds the descriptor for namespaces. Used by `NamespacesMetaclass` to
+    define new namespaces.
+    """
     def __init__(self, namespace):
         self._namespace = namespace
 
@@ -471,7 +581,13 @@ class Namespace(Plugin):
 
 
 class TagCombiningMetaclass(type):
-    def __new__(cls, name, bases, attrs):
+    """
+    Collects and combines `._class_tags` from all base classes and
+    puts them together in one `.class_tags` attribute.
+    """
+    def __new__(mcs, name, bases, attrs):
+        # Allow this method to access the `_class_tags`
+        # pylint: disable=W0212
         class_tags = set([])
         # Collect the tags from all base classes.
         for base in bases:
@@ -481,15 +597,22 @@ class TagCombiningMetaclass(type):
                 # Base classes may have no ._class_tags, that's ok.
                 pass
         attrs['_class_tags'] = class_tags
-        return super(TagCombiningMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super(TagCombiningMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
 class XBlockMetaclass(
-    ChildrenModelMetaclass,
-    NamespacesMetaclass,
-    ModelMetaclass,
-    TagCombiningMetaclass,
-    ):
+        ChildrenModelMetaclass,
+        NamespacesMetaclass,
+        ModelMetaclass,
+        TagCombiningMetaclass,
+):
+    """
+    Metaclass that combines the four base XBlock metaclasses:
+    * `ChildrenModelMetaclass`
+    * `NamespacesMetaclass`
+    * `ModelMetaclass`
+    * `TagCombiningMetaclass`
+    """
     pass
 
 
@@ -517,7 +640,7 @@ class XBlock(Plugin):
     _class_tags = set()
 
     @classmethod
-    def json_handler(cls, fn):
+    def json_handler(cls, func):
         """Wrap a handler to consume and produce JSON.
 
         Rather than a Request object, the method will now be passed the
@@ -525,17 +648,19 @@ class XBlock(Plugin):
         will be JSON-encoded and returned as the response.
 
         """
-        @functools.wraps(fn)
+        @functools.wraps(func)
         def wrapper(self, request):
+            """The wrapper function `json_handler` returns."""
             request_json = json.loads(request.body)
-            response_json = json.dumps(fn(self, request_json))
+            response_json = json.dumps(func(self, request_json))
             return Response(response_json, content_type='application/json')
         return wrapper
 
     @classmethod
     def tag(cls, tags):
-        """Add the words in `tags` as class tags to this class."""
+        """Returns a function that adds the words in `tags` as class tags to this class."""
         def dec(cls):
+            """Add the words in `tags` as class tags to this class."""
             # Add in this class's tags
             cls._class_tags.update(tags.replace(",", " ").split())
             return cls
@@ -544,23 +669,24 @@ class XBlock(Plugin):
     @classmethod
     def load_tagged_classes(cls, tag):
         """Produce a sequence of all XBlock classes tagged with `tag`."""
+        # Allow this method to access the `_class_tags`
+        # pylint: disable=W0212
         for name, class_ in cls.load_classes():
             if tag in class_._class_tags:
                 yield name, class_
 
     @classmethod
-    def preprocess_input(cls, node, usage_factory):
+    def preprocess_input(cls, node, _usage_factory):
         """The class can adjust a parsed Usage tree."""
         return node
 
     @classmethod
-    def postprocess_input(cls, node, usage_factory):
+    def postprocess_input(cls, node, _usage_factory):
         """The class can adjust a parsed Usage tree."""
         return node
 
     def __init__(self, runtime, model_data):
         """
-
         `runtime` is an instance of :class:`xblock.core.Runtime`. Use it to
         access the environment.  It is available in XBlock code as
         ``self.runtime``.
@@ -571,8 +697,12 @@ class XBlock(Plugin):
         """
         self.runtime = runtime
         self._model_data = model_data
+        self._dirty_fields = set()
 
     def __repr__(self):
+        # `XBlock` obtains the `fields` attribute from the `ModelMetaclass`.
+        # Since this is not understood by static analysis, silence this error.
+        # pylint: disable=E1101
         attrs = []
         for field in self.fields:
             value = getattr(self, field.name)
@@ -586,3 +716,33 @@ class XBlock(Plugin):
             id(self) % 0xFFFF,
             ','.join(attrs)
         )
+
+    def save(self):
+        """Save all dirty fields attached to this XBlock."""
+        if not self._dirty_fields:
+            # nop if _dirty_fields attribute is empty
+            return
+        try:
+            # Create dictionary mapping between dirty fields and data cache values
+            # A `field` is an instance of `ModelType`
+
+            fields_to_save = {field.name: field.to_json(self._model_data_cache[field.name])  # pylint: disable=E1101
+                              for field in self._dirty_fields}
+            # Throws KeyValueMultiSaveError if things go wrong
+            self._model_data.update(fields_to_save)
+
+        except KeyValueMultiSaveError as save_error:
+            saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
+            for field in saved_fields:
+                # should only find one corresponding field
+                self._dirty_fields.remove(field)
+            raise XBlockSaveError(saved_fields, self._dirty_fields)
+
+        # Remove all dirty fields, since the save was successful
+        self._clear_dirty_fields()
+
+    def _clear_dirty_fields(self):
+        """
+        Remove all dirty fields from an XBlock
+        """
+        self._dirty_fields.clear()

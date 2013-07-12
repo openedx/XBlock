@@ -4,7 +4,6 @@ Code in this file is a mix of Runtime layer and Workbench layer.
 
 """
 
-import functools
 import itertools
 
 try:
@@ -14,10 +13,11 @@ except ImportError:
 
 import logging
 
-from django.template import loader as django_template_loader, Context as DjangoContext
+from django.template import loader as django_template_loader,\
+    Context as DjangoContext
 
 from xblock.core import XBlock, Scope, ModelType
-from xblock.runtime import DbModel, KeyValueStore, Runtime
+from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
@@ -92,6 +92,9 @@ class Usage(object):
         # We've initialized this instance, keep track.
         self._inited.add(self.id)
 
+        # Explicitly save all of the initial state we've just written
+        block.save()
+
         # Also do this recursively down the tree.
         for child in self.children:
             child.store_initial_state()
@@ -102,7 +105,6 @@ class Usage(object):
     @classmethod
     def find_usage(cls, usage_id):
         return cls._usage_index[usage_id]
-
 
     @classmethod
     def reinitialize_all(cls):
@@ -143,6 +145,7 @@ class MemoryKeyValueStore(KeyValueStore):
         return self.d[self.actual_key(key)][key.field_name]
 
     def set(self, key, value):
+        """Sets the key to the new value"""
         self.d.setdefault(self.actual_key(key), {})[key.field_name] = value
 
     def delete(self, key):
@@ -155,6 +158,18 @@ class MemoryKeyValueStore(KeyValueStore):
         """Just for our Workbench!"""
         html = json.dumps(self.d, sort_keys=True, indent=4)
         return make_safe_for_html(html)
+
+    def set_many(self, update_dict):
+        """
+        Sets many fields to new values in one call.
+
+        `update_dict`: A dictionary of keys: values.
+        This method sets the value of each key to the specified new value.
+        """
+        for key, value in update_dict.items():
+            # We just call `set` directly here, because this is an in-memory representation
+            # thus we don't concern ourselves with bulk writes.
+            self.set(key, value)
 
 
 MEMORY_KVS = MemoryKeyValueStore({})
@@ -182,24 +197,17 @@ class WorkbenchRuntime(Runtime):
         self.usage = usage
 
     def render(self, block, context, view_name):
-        self._view_name = view_name
-
-        view_fn = getattr(block, view_name, None)
-        if view_fn is None:
-            view_fn = getattr(block, "fallback_view", None)
-            if view_fn is None:
-                return Fragment(u"<i>No such view: %s on %s</i>" % (view_name, make_safe_for_html(repr(block))))
-            view_fn = functools.partial(view_fn, view_name)
-
-        frag = view_fn(context)
-
-        self._view_name = None
-        return self.wrap_child(block, frag, context)
+        try:
+            return super(WorkbenchRuntime, self).render(block, context, view_name)
+        except NoSuchViewError:
+            return Fragment(u"<i>No such view: %s on %s</i>"
+                            % (view_name, make_safe_for_html(repr(block))))
 
     # TODO: [rocha] runtime should not provide this, each xblock
     # should use whatever they want
     def render_template(self, template_name, **kwargs):
-        return django_template_loader.get_template(template_name).render(DjangoContext(kwargs))
+        template = django_template_loader.get_template(template_name)
+        return template.render(DjangoContext(kwargs))
 
     def wrap_child(self, block, frag, context):
         wrapped = Fragment()
@@ -227,7 +235,11 @@ class WorkbenchRuntime(Runtime):
         return wrapped
 
     def handler_url(self, url):
-        return "/handler/%s/%s/?student=%s" % (self.usage.id, url, self.student_id)
+        return "/handler/{0}/{1}/?student={2}".format(
+            self.usage.id,
+            url,
+            self.student_id
+        )
 
     def get_block(self, block_id):
         return create_xblock(Usage.find_usage(block_id), self.student_id)
@@ -239,7 +251,12 @@ class WorkbenchRuntime(Runtime):
     def collect(self, key, block=None):
         block_cls = block.__class__ if block else self.block_cls
 
-        data_model = AnalyticsDbModel(MEMORY_KVS, block_cls, self.student_id, self.usage)
+        data_model = AnalyticsDbModel(
+            MEMORY_KVS,
+            block_cls,
+            self.student_id,
+            self.usage
+        )
         value = data_model.get(key)
         children = []
         for child_id in data_model.get('children', []):
@@ -256,7 +273,12 @@ class WorkbenchRuntime(Runtime):
 
     # TODO: [rocha] other name options: scatter, share
     def publish(self, key, value):
-        data = AnalyticsDbModel(MEMORY_KVS, self.block_cls, self.student_id, self.usage)
+        data = AnalyticsDbModel(
+            MEMORY_KVS,
+            self.block_cls,
+            self.student_id,
+            self.usage
+        )
         data[key] = value
 
 
@@ -286,6 +308,7 @@ class _BlockSet(object):
 
     def descendants(self):
         them = set()
+
         def recur(block):
             for child_id in getattr(block, "children", ()):
                 child = self.runtime.get_block(child_id)

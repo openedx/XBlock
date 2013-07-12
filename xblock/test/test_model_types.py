@@ -3,40 +3,42 @@ Tests for classes extending ModelType.
 """
 
 import unittest
-from xblock.core import *
-
+from xblock.core import Any, Boolean, Dict, Float, Integer, List, String
 
 class ModelTypeTest(unittest.TestCase):
     """ Base test class for ModelTypes. """
-    
+
+    def field_totest(self):
+        """Child classes should override this with the type of field
+        the test is testing."""
+        return None
+
     def assertJSONEquals(self, expected, arg):
         """
         Asserts the result of field.from_json.
         """
-        self.assertEqual(expected, self.test_field().from_json(arg))
-    
-    
+        self.assertEqual(expected, self.field_totest().from_json(arg))
+
     def assertJSONValueError(self, arg):
         """
         Asserts that field.from_json throws a ValueError for the supplied value.
         """
         with self.assertRaises(ValueError):
-            self.test_field().from_json(arg)
-    
-    
+            self.field_totest().from_json(arg)
+
     def assertJSONTypeError(self, arg):
         """
         Asserts that field.from_json throws a TypeError for the supplied value.
         """
         with self.assertRaises(TypeError):
-            self.test_field().from_json(arg)
-    
-    
+            self.field_totest().from_json(arg)
+
+
 class IntegerTest(ModelTypeTest):
     """
     Tests the Integer ModelType.
     """
-    test_field = Integer
+    field_totest = Integer
 
     def test_integer(self):
         self.assertJSONEquals(5, '5')
@@ -67,7 +69,7 @@ class FloatTest(ModelTypeTest):
     """
     Tests the Float ModelType.
     """
-    test_field = Float
+    field_totest = Float
 
     def test_float(self):
         self.assertJSONEquals(.23, '.23')
@@ -96,7 +98,7 @@ class BooleanTest(ModelTypeTest):
     """
     Tests the Boolean ModelType.
     """
-    test_field = Boolean
+    field_totest = Boolean
 
     def test_false(self):
         self.assertJSONEquals(False, "false")
@@ -123,7 +125,7 @@ class StringTest(ModelTypeTest):
     """
     Tests the String ModelType.
     """
-    test_field = String
+    field_totest = String
 
     def test_json_equals(self):
         self.assertJSONEquals("false", "false")
@@ -147,7 +149,7 @@ class AnyTest(ModelTypeTest):
     """
     Tests the Any ModelType.
     """
-    test_field = Any
+    field_totest = Any
 
     def test_json_equals(self):
         self.assertJSONEquals({'bar'}, {'bar'})
@@ -165,7 +167,7 @@ class ListTest(ModelTypeTest):
     """
     Tests the List ModelType.
     """
-    test_field = List
+    field_totest = List
 
     def test_json_equals(self):
         self.assertJSONEquals([], [])
@@ -189,11 +191,11 @@ class DictTest(ModelTypeTest):
     """
     Tests the Dict ModelType.
     """
-    test_field = Dict
+    field_totest = Dict
 
     def test_json_equals(self):
         self.assertJSONEquals({}, {})
-        self.assertJSONEquals({'a' : 'b', 'c' : 3}, {'a' : 'b', 'c' : 3})
+        self.assertJSONEquals({'a': 'b', 'c': 3}, {'a': 'b', 'c': 3})
 
     def test_none(self):
         self.assertJSONEquals(None, None)

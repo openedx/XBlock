@@ -22,6 +22,7 @@ from .request import webob_to_django_response, django_to_webob_request
 
 LOG_STREAM = None
 
+
 def setup_logging():
     global LOG_STREAM
     LOG_STREAM = StringIO()
@@ -61,7 +62,7 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
     try:
         scenario = SCENARIOS[scenario_id]
     except KeyError:
-        # Hmm, someone wants a class sceanario auto-generated.
+        # Hmm, someone wants a class scenario auto-generated.
         description = "Auto-generated for %s" % scenario_id
         usage = Usage(scenario_id, [])
         scenario = Scenario(description, usage)
