@@ -3,6 +3,7 @@ Machinery to make the common case easy when building new runtimes
 """
 
 import re
+import functools
 
 from collections import namedtuple, MutableMapping
 from .core import ModelType, BlockScope, Scope
@@ -11,6 +12,20 @@ from .core import ModelType, BlockScope, Scope
 class InvalidScopeError(Exception):
     """
     Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
+    """
+    pass
+
+
+class NoSuchViewError(Exception):
+    """
+    Raised to indicate that the view requested was not found.
+    """
+    pass
+
+
+class NoSuchHandlerError(Exception):
+    """
+    Raised to indicate that the requested handler was not found.
     """
     pass
 
@@ -24,15 +39,24 @@ class KeyValueStore(object):
     Key = namedtuple("Key", "scope, student_id, block_scope_id, field_name")
 
     def get(self, key):
+        """Abstract get method. Implementations should return the value of the given `key`."""
         pass
 
     def set(self, key, value):
+        """Abstract set method. Implementations should set `key` equal to `value`."""
         pass
 
     def delete(self, key):
+        """Abstract delete method. Implementations should remove the `key`."""
         pass
 
     def has(self, key):
+        """Abstract has method. Implementations should return Boolean, whether or not `key` is present."""
+        pass
+
+    def set_many(self, update_dict):
+        """Abstract set_many method. Implementations should accept an `update_dict` of
+        key-value pairs, and set all the `keys` to the given `value`s."""
         pass
 
 
@@ -49,6 +73,11 @@ class DbModel(MutableMapping):
         return "<{0.__class__.__name__} {0._block_cls!r}>".format(self)
 
     def _getfield(self, name):
+        """
+        Return the field with the given `name`.
+        If no field with `name` exists in any namespace, raises a KeyError.
+        """
+
         # First, get the field from the class, if defined
         block_field = getattr(self._block_cls, name, None)
         if block_field is not None and isinstance(block_field, ModelType):
@@ -71,6 +100,16 @@ class DbModel(MutableMapping):
         raise KeyError(name)
 
     def _key(self, name):
+        """
+        Resolves `name` to a key, in the following form:
+
+        KeyValueStore.Key(
+            scope=field.scope,
+            student_id=student_id,
+            block_scope_id=block_id,
+            field_name=name
+        )
+        """
         field = self._getfield(name)
         if field.scope in (Scope.children, Scope.parent):
             block_id = self._usage.id
@@ -97,7 +136,7 @@ class DbModel(MutableMapping):
             student_id=student_id,
             block_scope_id=block_id,
             field_name=name
-            )
+        )
         return key
 
     def __getitem__(self, name):
@@ -127,9 +166,23 @@ class DbModel(MutableMapping):
             fields.extend(field.name for field in getattr(self._block_cls, namespace_name).fields)
         return fields
 
+    def update(self, other_dict=None, **kwargs):
+        """Update the underlying model with the correct values."""
+        updated_dict = {}
+        other_dict = other_dict or {}
+        # Combine all the arguments into a single dict.
+        other_dict.update(kwargs)
+
+        # Generate a new dict with the correct mappings.
+        for (key, value) in other_dict.items():
+            updated_dict[self._key(key)] = value
+
+        self._kvs.set_many(updated_dict)
+
 
 class Runtime(object):
-    """Access to the runtime environment for XBlocks.
+    """
+    Access to the runtime environment for XBlocks.
 
     A pre-configured instance of this class will be available to XBlocks as
     `self.runtime`.
@@ -139,7 +192,8 @@ class Runtime(object):
         self._view_name = None
 
     def render(self, block, context, view_name):
-        """Render a block by invoking its view.
+        """
+        Render a block by invoking its view.
 
         Finds the view named `view_name` on `block`.  The default view will be
         used if a specific view hasn't be registered.  If there is no default
@@ -150,7 +204,21 @@ class Runtime(object):
         integrate it into a larger whole.
 
         """
-        raise NotImplementedError("Runtime needs to provide render()")
+        self._view_name = view_name
+
+        view_fn = getattr(block, view_name, None)
+        if view_fn is None:
+            view_fn = getattr(block, "fallback_view", None)
+            if view_fn is None:
+                raise NoSuchViewError()
+            view_fn = functools.partial(view_fn, view_name)
+
+        frag = view_fn(context)
+
+        # Explicitly save because render action may have changed state
+        block.save()
+        self._view_name = None
+        return self.wrap_child(block, frag, context)
 
     def get_block(self, block_id):
         """Get a block by ID.
@@ -188,17 +256,36 @@ class Runtime(object):
             results.append(result)
         return results
 
-    def wrap_child(self, block, frag, context):
+    def wrap_child(self, _block, frag, _context):
+        """
+        Wraps the fragment with any necessary HTML, informed by
+        the block and the context. This default implementation
+        simply returns the fragment.
+        """
+        # By default, just return the fragment itself.
         return frag
 
     def handle(self, block, handler_name, data):
+        """
+        Handles any calls to the specified `handler_name`.
+
+        Provides a fallback handler if the specified handler isn't found.
+        """
         handler = getattr(block, handler_name, None)
         if handler:
-            return handler(data)
-        handler = getattr(block, "fallback_handler", None)
-        if handler:
-            return handler(handler_name, data)
-        raise Exception("Couldn't find handler %r for %r" % (handler_name, block))
+            # Cache results of the handler call for later saving
+            results = handler(data)
+        else:
+            fallback_handler = getattr(block, "fallback_handler", None)
+            if fallback_handler:
+                # Cache results of the handler call for later saving
+                results = fallback_handler(handler_name, data)
+            else:
+                raise NoSuchHandlerError("Couldn't find handler %r for %r" % (handler_name, block))
+
+        # Write out dirty fields
+        block.save()
+        return results
 
     def handler_url(self, url):
         """Get the actual URL to invoke a handler.
@@ -224,7 +311,9 @@ class Runtime(object):
     def querypath(self, block, path):
         """An XPath-like interface to `query`."""
         class BadPath(Exception):
+            """Bad path exception thrown when path cannot be found."""
             pass
+        # pylint: disable=C0103
         q = self.query(block)
         ROOT, SEP, WORD, FINAL = range(4)
         state = ROOT
@@ -293,6 +382,7 @@ class RegexLexer(object):
         self.regex = re.compile("|".join(parts))
 
     def lex(self, text):
+        """Iterator that tokenizes `text` and yields up tokens as they are found"""
         for match in self.regex.finditer(text):
             name = match.lastgroup
             yield (name, match.group(name))
