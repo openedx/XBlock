@@ -2,7 +2,7 @@ language: python
 python:
   - "2.7"
 before_install:
-  - "export DISPLAY=:99."
+  - "export DISPLAY=:99"
   - "sh -e /etc/init.d/xvfb start"
 install: pip install -r requirements.txt
 script:  python manage.py test
