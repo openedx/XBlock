@@ -12,7 +12,7 @@ from .runtime import Usage
 
 # Build the scenarios, which are named trees of usages.
 
-Scenario = namedtuple("Scenario", "description usage")
+Scenario = namedtuple("Scenario", "description usage")  # pylint: disable=C0103
 
 SCENARIOS = {}
 
