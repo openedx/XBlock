@@ -6,7 +6,7 @@ This code is in the Runtime layer.
 
 from collections import namedtuple
 
-_FragmentResource = namedtuple("_FragmentResource", "kind, data, mimetype, placement")
+_FragmentResource = namedtuple("_FragmentResource", "kind, data, mimetype, placement")  # pylint: disable=C0103
 
 
 class Fragment(object):
@@ -33,14 +33,24 @@ class Fragment(object):
             self.add_content(content)
 
     def to_pods(self):
+        """Returns the data in a dictionary.
+
+        'pods' = Plain Old Data Structure."""
         return {
             'content': self.content,
-            'resources': [r._asdict() for r in self.resources],
+            'resources': [r._asdict() for r in self.resources],  # pylint: disable=W0212
             'js_init': self.js_init
         }
 
     @classmethod
     def from_pods(cls, pods):
+        """
+        Returns a new Fragment from a `pods`.
+
+        `pods` is a Plain Old Data Structure, a Python dictionary with
+        keys `content`, `resources`, and `js_init`
+
+        """
         frag = cls()
         frag.content = pods['content']
         frag.resources = [_FragmentResource(**d) for d in pods['resources']]
@@ -147,8 +157,8 @@ class Fragment(object):
         together the content into this Fragment's content.
 
         """
-        for w in frags:
-            self.add_frag_resources(w)
+        for resource in frags:
+            self.add_frag_resources(resource)
 
     def initialize_js(self, js_func):
         """Register a Javascript function to initialize the Javascript resources.

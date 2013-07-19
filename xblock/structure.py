@@ -5,14 +5,21 @@ from .fragment import Fragment
 
 
 class Sequence(XBlock):
+    """
+    XBlock that models edx-platform style sequentials.
+
+    WARNING: This is an experimental module, subject to future change or removal.
+    """
     has_children = True
 
     def student_view(self, context):
+        """Provide default student view."""
         frag = Fragment()
         child_frags = self.runtime.render_children(self, context)
         frag.add_frags_resources(child_frags)
 
-        progress_per_child = [self.runtime.collect('progress', self.runtime.get_block(child_id)) for child_id in self.children]
+        progress_per_child = [self.runtime.collect('progress', self.runtime.get_block(child_id))
+                              for child_id in self.children]  # pylint: disable=E1101
 
         # TODO: [rocha] calculate total progress per child
         from pprint import pprint
@@ -38,6 +45,7 @@ class VerticalBlock(XBlock):
     has_children = True
 
     def student_view(self, context):
+        """Provide default student view."""
         result = Fragment()
         child_frags = self.runtime.render_children(self, context)
         result.add_frags_resources(child_frags)
@@ -55,6 +63,7 @@ class SidebarBlock(XBlock):
     has_children = True
 
     def student_view(self, context):
+        """Provide default student view."""
         result = Fragment()
         child_frags = self.runtime.render_children(self, context)
         result.add_frags_resources(child_frags)
@@ -67,8 +76,8 @@ class SidebarBlock(XBlock):
             """)
         html = []
         html.append(u"<div class='sidebar'>")
-        for cw in child_frags:
-            html.append(cw.body_html())
+        for child in child_frags:
+            html.append(child.body_html())
         html.append(u"</div>")
         result.add_content("".join(html))
         return result

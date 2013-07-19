@@ -89,9 +89,7 @@ with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestName
         user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
 # Allow this tuple to be named as if it were a class
-# pylint: disable=C0103
-TestUsage = namedtuple('TestUsage', 'id, def_id')
-# pylint: enable=C0103
+TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
 
 
 def check_field(collection, field):

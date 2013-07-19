@@ -18,20 +18,21 @@ from .scenarios import SCENARIOS, Scenario
 from .request import webob_to_django_response, django_to_webob_request
 
 
-# --- Set up an in-memory logger
-
 LOG_STREAM = None
 
 
 def setup_logging():
+    """Sets up an in-memory logger."""
+    # Allow us to use `global` within this function.
+    # pylint: disable=W0603
     global LOG_STREAM
     LOG_STREAM = StringIO()
 
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
-    handler = logging.StreamHandler(LOG_STREAM)
-    handler.setFormatter(logging.Formatter("<p>%(asctime)s %(name)s %(levelname)s: %(message)s</p>"))
-    root_logger.addHandler(handler)
+    log_handler = logging.StreamHandler(LOG_STREAM)
+    log_handler.setFormatter(logging.Formatter("<p>%(asctime)s %(name)s %(levelname)s: %(message)s</p>"))
+    root_logger.addHandler(log_handler)
 
 setup_logging()
 
@@ -41,13 +42,15 @@ log = logging.getLogger(__name__)
 # We don't really have authentication and multiple students, just accept their
 # id on the URL.
 def get_student_id(request):
+    """Get the student_id from the given request."""
     student_id = request.GET.get('student', 'student_1')
     return student_id
 
 
 #---- Views -----
 
-def index(request):
+def index(_request):
+    """Render `index.html`"""
     the_scenarios = sorted(SCENARIOS.items())
     return render_to_response('index.html', {
         'scenarios': [(desc, scenario.description) for desc, scenario in the_scenarios]
@@ -56,6 +59,13 @@ def index(request):
 
 @ensure_csrf_cookie
 def show_scenario(request, scenario_id, view_name='student_view', template='block.html'):
+    """
+    Render the given `scenario_id` for the given `view_name`, on the provided `template`.
+
+    `view_name` defaults to 'student_view'.
+    `template` defaults to 'block.html'.
+
+    """
     student_id = get_student_id(request)
     log.info("Start show_scenario %r for student %s", scenario_id, student_id)
 
@@ -87,6 +97,7 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
 
 
 def handler(request, usage_id, handler_slug):
+    """Provide a handler for the request."""
     student_id = get_student_id(request)
     log.info("Start handler %s/%s for student %s", usage_id, handler_slug, student_id)
     usage = Usage.find_usage(usage_id)
@@ -99,7 +110,11 @@ def handler(request, usage_id, handler_slug):
     return webob_to_django_response(result)
 
 
-def package_resource(request, package, resource):
+def package_resource(_request, package, resource):
+    """
+    Wrapper for `pkg_resources` that tries to access a resource and, if it
+    is not found, raises an Http404 error.
+    """
     if ".." in resource:
         raise Http404
     try:

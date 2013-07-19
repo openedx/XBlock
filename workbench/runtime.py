@@ -13,7 +13,7 @@ except ImportError:
 
 import logging
 
-from django.template import loader as django_template_loader,\
+from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
 from xblock.core import XBlock, Scope, ModelType
@@ -45,7 +45,7 @@ class Usage(object):
     _inited = set()
 
     def __init__(self, block_name, children=None, initial_state=None, def_id=None):
-        self.id = "usage_%d" % next(self._ids)
+        self.id = "usage_%d" % next(self._ids)  # pylint: disable=C0103
         self.parent = None
         self.block_name = block_name
         self.def_id = def_id or ("def_%d" % next(self._ids))
@@ -104,6 +104,7 @@ class Usage(object):
 
     @classmethod
     def find_usage(cls, usage_id):
+        """Looks up the `usage_id` from our global index of all usages."""
         return cls._usage_index[usage_id]
 
     @classmethod
@@ -119,44 +120,50 @@ class Usage(object):
 
 class MemoryKeyValueStore(KeyValueStore):
     """Use a simple in-memory database for a key-value store."""
-    def __init__(self, d):
-        self.d = d
+    def __init__(self, db_dict):
+        self.db_dict = db_dict
 
     def clear(self):
         """Clear all data from the store."""
-        self.d.clear()
+        self.db_dict.clear()
 
     def actual_key(self, key):
-        k = []
+        """
+        Constructs the full key name from the given `key`.
+
+        The actual key consists of the scope, block scope id, and student_id.
+
+        """
+        key_list = []
         if key.scope == Scope.children:
-            k.append('children')
+            key_list.append('children')
         elif key.scope == Scope.parent:
-            k.append('parent')
+            key_list.append('parent')
         else:
-            k.append(["usage", "definition", "type", "all"][key.scope.block])
+            key_list.append(["usage", "definition", "type", "all"][key.scope.block])
 
         if key.block_scope_id is not None:
-            k.append(key.block_scope_id)
+            key_list.append(key.block_scope_id)
         if key.student_id:
-            k.append(key.student_id)
-        return ".".join(k)
+            key_list.append(key.student_id)
+        return ".".join(key_list)
 
     def get(self, key):
-        return self.d[self.actual_key(key)][key.field_name]
+        return self.db_dict[self.actual_key(key)][key.field_name]
 
     def set(self, key, value):
         """Sets the key to the new value"""
-        self.d.setdefault(self.actual_key(key), {})[key.field_name] = value
+        self.db_dict.setdefault(self.actual_key(key), {})[key.field_name] = value
 
     def delete(self, key):
-        del self.d[self.actual_key(key)][key.field_name]
+        del self.db_dict[self.actual_key(key)][key.field_name]
 
     def has(self, key):
-        return key.field_name in self.d[self.actual_key(key)]
+        return key.field_name in self.db_dict[self.actual_key(key)]
 
     def as_html(self):
         """Just for our Workbench!"""
-        html = json.dumps(self.d, sort_keys=True, indent=4)
+        html = json.dumps(self.db_dict, sort_keys=True, indent=4)
         return make_safe_for_html(html)
 
     def set_many(self, update_dict):
@@ -189,6 +196,13 @@ def create_xblock(usage, student_id=None):
 
 
 class WorkbenchRuntime(Runtime):
+    """
+    Access to the workbench runtime environment for XBlocks.
+
+    A pre-configured instance of this class will be available to XBlocks as
+    `self.runtime`.
+
+    """
     def __init__(self, block_cls, student_id, usage):
         super(WorkbenchRuntime, self).__init__()
 
@@ -206,19 +220,20 @@ class WorkbenchRuntime(Runtime):
     # TODO: [rocha] runtime should not provide this, each xblock
     # should use whatever they want
     def render_template(self, template_name, **kwargs):
+        """Loads the django template for `template_name`"""
         template = django_template_loader.get_template(template_name)
         return template.render(DjangoContext(kwargs))
 
-    def wrap_child(self, block, frag, context):
+    def wrap_child(self, block, frag, _context):
         wrapped = Fragment()
         wrapped.add_javascript_url("/static/js/vendor/jquery.min.js")
         wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")
 
         data = {}
         if frag.js_init:
-            fn, version = frag.js_init
+            func, version = frag.js_init
             wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
-            data['init'] = fn
+            data['init'] = func
             data['runtime-version'] = version
             data['usage'] = self.usage.id
             data['block-type'] = self.block_cls.plugin_name
@@ -247,8 +262,8 @@ class WorkbenchRuntime(Runtime):
     def query(self, block):
         return _BlockSet(self, [block])
 
-    # TODO: [rocha] other name options: gather
     def collect(self, key, block=None):
+        """WARNING: This is an experimental function, subject to future change or removal."""
         block_cls = block.__class__ if block else self.block_cls
 
         data_model = AnalyticsDbModel(
@@ -271,8 +286,8 @@ class WorkbenchRuntime(Runtime):
 
         return result
 
-    # TODO: [rocha] other name options: scatter, share
     def publish(self, key, value):
+        """WARNING: This is an experimental function, subject to future change or removal."""
         data = AnalyticsDbModel(
             MEMORY_KVS,
             self.block_cls,
@@ -321,6 +336,8 @@ class _BlockSet(object):
         return _BlockSet(self.runtime, them)
 
     def tagged(self, tag):
+        # Allow this method to access _class_tags for each block
+        # pylint: disable=W0212
         them = set()
         for block in self.blocks:
             if block.name == tag:
@@ -338,9 +355,28 @@ class _BlockSet(object):
 
 
 class AnalyticsDbModel(DbModel):
+    """
+    A dictionary-like interface to the fields on a block,
+    provided specifically for analytics.
+
+    WARNING: This is an experimental class, subject to future change or removal.
+    """
     def _key(self, name):
+        """
+        Resolves `name` to a key, in the following form:
+
+        KeyValueStore.Key(
+            scope=field.scope,
+            student_id=student_id,
+            block_scope_id=block_id,
+            field_name=analytics.name
+        )
+        """
         key = super(AnalyticsDbModel, self)._key('analytics.{0}'.format(name))
         return key
 
-    def _getfield(self, name):
+    def _getfield(self, _name):
+        """
+        Returns a new field with a scope of `Scope.user_state`.
+        """
         return ModelType(scope=Scope.user_state)
