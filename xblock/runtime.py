@@ -55,9 +55,15 @@ class KeyValueStore(object):
         pass
 
     def set_many(self, update_dict):
-        """Abstract set_many method. Implementations should accept an `update_dict` of
-        key-value pairs, and set all the `keys` to the given `value`s."""
-        pass
+        """
+        Bulk update of the kvs. 
+        This implementation brute force updates field by field through set which may be inefficient
+        for any runtimes doing persistence operations on each set. Such implementations will want to
+        override this method.
+        :update_dict: field_name, field_value pairs for all cached changes
+        """
+        for key, value in update_dict.iteritems():
+            self.set(key, value)
 
 
 class DbModel(MutableMapping):
