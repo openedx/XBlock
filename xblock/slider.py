@@ -16,7 +16,7 @@ class Slider(XBlock):
     max_value = Integer(help="Maximum value", default=100, scope=Scope.content)
     value = Integer(help="Student value", default=0, scope=Scope.user_state)
 
-    def student_view(self, _context):
+    def student_view(self, context):  # pylint: disable=W0613
         """Provide the default student view."""
         html = SLIDER_TEMPLATE.format(min=self.min_value,
                                       max=self.max_value,
