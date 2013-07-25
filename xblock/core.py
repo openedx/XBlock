@@ -600,18 +600,30 @@ class TagCombiningMetaclass(type):
         return super(TagCombiningMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+class InitialSaveMetaclass(type):
+    """
+    Forces a `save` call after object is initialized.
+    """
+    def __call__(cls, *args, **kwargs):
+        # Call the base constructor, then after that completes, explicitly save
+        obj = type.__call__(cls, *args, **kwargs)
+        obj.save()
+        return obj
+
 class XBlockMetaclass(
         ChildrenModelMetaclass,
         NamespacesMetaclass,
         ModelMetaclass,
         TagCombiningMetaclass,
+        InitialSaveMetaclass,
 ):
     """
-    Metaclass that combines the four base XBlock metaclasses:
+    Metaclass that combines the five base XBlock metaclasses:
     * `ChildrenModelMetaclass`
     * `NamespacesMetaclass`
     * `ModelMetaclass`
     * `TagCombiningMetaclass`
+    * `InitialSaveMetaclass`
     """
     pass
 
