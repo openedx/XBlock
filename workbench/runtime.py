@@ -224,7 +224,7 @@ class WorkbenchRuntime(Runtime):
         template = django_template_loader.get_template(template_name)
         return template.render(DjangoContext(kwargs))
 
-    def wrap_child(self, block, frag, _context):
+    def wrap_child(self, block, frag, context):  # pylint: disable=W0613
         wrapped = Fragment()
         wrapped.add_javascript_url("/static/js/vendor/jquery.min.js")
         wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")

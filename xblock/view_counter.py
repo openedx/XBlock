@@ -11,7 +11,7 @@ class ViewCounter(XBlock):
                     default=0,
                     scope=Scope.content)
 
-    def student_view(self, _context):
+    def student_view(self, context):  # pylint: disable=W0613
         """
         Render out the template.
 

@@ -8,7 +8,7 @@ from .fragment import Fragment
 
 class HelloWorldBlock(XBlock):
     """A simple block: just show some fixed content."""
-    def fallback_view(self, _view_name, _context):
+    def fallback_view(self, _view_name, context):  # pylint: disable=W0613
         """Provide a fallback view handler"""
         return Fragment(u"Hello, world!")
 
