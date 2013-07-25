@@ -262,7 +262,7 @@ class Runtime(object):
             results.append(result)
         return results
 
-    def wrap_child(self, _block, frag, _context):
+    def wrap_child(self, block, frag, context):  # pylint: disable=W0613
         """
         Wraps the fragment with any necessary HTML, informed by
         the block and the context. This default implementation

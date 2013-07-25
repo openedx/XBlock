@@ -24,10 +24,10 @@ class ThumbsBlock(InputBlock):
     downvotes = Integer(help="Number of down votes", default=0, scope=Scope.content)
     voted = Boolean(help="Has this student voted?", default=False, scope=Scope.user_state)
 
-    def student_view(self, _context):
+    def student_view(self, context):  # pylint: disable=W0613
         """
         Create a fragment used to display the XBlock to a student.
-        `_context` is a dictionary used to configure the display (unused)
+        `context` is a dictionary used to configure the display (unused)
 
         Returns a `Fragment` object specifying the HTML, CSS, and JavaScript
         to display.

@@ -291,11 +291,11 @@ class TextInputBlock(InputBlock):
     input_type = String(help="Type of conversion to attempt on input string")
     student_input = String(help="Last input submitted by the student", default="", scope=Scope.user_state)
 
-    def student_view(self, _context):
+    def student_view(self, context):  # pylint: disable=W0613
         """Returns default student view."""
         return Fragment(u"<p>I can only appear inside problems.</p>")
 
-    def problem_view(self, _context):
+    def problem_view(self, context):  # pylint: disable=W0613
         """Returns a view of the problem - a javascript text input field."""
         html = u"<input type='text' name='input' value='{0}'><span class='message'></span>".format(self.student_input)
         result = Fragment(html)
@@ -415,7 +415,7 @@ class AttemptsScoreboardBlock(XBlock):
     Show attempts on problems in my nieces.
     """
 
-    def student_view(self, _context):
+    def student_view(self, context):  # pylint: disable=W0613
         """Provide default student view."""
         # Get the attempts for all problems in my parent.
         if self.parent:
