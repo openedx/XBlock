@@ -161,6 +161,7 @@ def test_field_access():
     assert_equals("Not Present", field_tester._model_data.get('field_a', "Not Present"))
     assert_equals("Not Present", field_tester._model_data.get('float_a', "Not Present"))
 
+
 def test_list_field_access():
     # Check that lists are correctly saved when not directly set
     class FieldTester(XBlock):
@@ -208,7 +209,6 @@ def test_list_field_access():
     assert_equals([1], field_tester.field_d)
     # Now, the fields should be updated in the underlying kvstore
 
-    print "TODO [sarina]: Currently, this is expected to fail as save isn't working with mutable types."
     assert_equals([200, 1], field_tester._model_data['field_a'])
     assert_equals([11, 12, 13, 14], field_tester._model_data['field_b'])
     assert_equals([4, 5, 6, 7], field_tester._model_data['field_c'])
@@ -260,8 +260,6 @@ def test_dict_field_access():
     assert_equals({'new': 'value'}, field_tester.field_d)
 
     # Now, the fields should be updated in the underlying kvstore
-
-    print "TODO [sarina]: Currently, this is expected to fail as save isn't working with mutable types."
     assert_equals({'a': 250}, field_tester._model_data['field_a'])
     assert_equals({'a': 11, 'b': 12, 'c': 13, 'd': 14}, field_tester._model_data['field_b'])
     assert_equals({'a': 0, 'b': 5, 'c': 6}, field_tester._model_data['field_c'])
@@ -314,6 +312,7 @@ def test_default_values():
     assert_equals([1, 2, 3], field_tester.list2)
     for fname in ['dic1', 'dic2', 'list1', 'list2']:
         assert_not_in(fname, field_tester._model_data)
+
 
 def test_json_field_access():
     # Check that values are correctly converted to and from json in accessors.
@@ -427,7 +426,6 @@ def test_namespace_field_access(_mock_load_classes):
     field_tester.save()
     # After save, new values should be reflected in the _model_data
     assert_equals(['A', 'a', 'b'], field_tester._model_data['field_x'])
-    print "TODO [sarina]: Currently, this is expected to fail as save isn't working with mutable types."
     assert_equals(['new', 'elt'], field_tester._model_data['field_w'])
 
     # Test deleting namespaced fields

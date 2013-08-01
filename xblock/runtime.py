@@ -56,7 +56,7 @@ class KeyValueStore(object):
 
     def set_many(self, update_dict):
         """
-        Bulk update of the kvs. 
+        Bulk update of the kvs.
         This implementation brute force updates field by field through set which may be inefficient
         for any runtimes doing persistence operations on each set. Such implementations will want to
         override this method.
