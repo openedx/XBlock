@@ -137,6 +137,7 @@ class ModelType(object):
           that generates the valid values. For example formats, see the
           values property definition.
     """
+    MUTABLE = True
 
     # We're OK redefining built-in `help`
     # pylint: disable=W0622
@@ -236,12 +237,21 @@ class ModelType(object):
         if value is NO_CACHE_VALUE:
             try:
                 value = self.from_json(instance._model_data[self.name])
-                self._set_cached_value(instance, value)
             except KeyError:
-                # Defaults are always copied, in case the provided default value
-                # is mutable (e.g list or dict).  Defaults are also cached.
-                value = copy.deepcopy(self.default)
+                # Cache default value
+                value = self.default
+            finally:
+                if self.MUTABLE:
+                    # Make a copy of mutable types to place into the cache, but don't
+                    # waste resources running copy.deepcopy on types known to be immutable.
+                    value = copy.deepcopy(value)
+
                 self._set_cached_value(instance, value)
+
+        # If this is a mutable type, mark it as dirty, since mutations can occur without an
+        # explicit call to __set__ (but they do require a call to __get__)
+        if self.MUTABLE:
+            self._mark_dirty(instance)
 
         return value
 
@@ -348,6 +358,8 @@ class Integer(ModelType):
     Note that a floating point value will convert to an integer, but a string containing a floating point
     number ('3.48') will throw an Error.
     """
+    MUTABLE = False
+
     def from_json(self, value):
         if value is None or value == '':
             return None
@@ -361,6 +373,8 @@ class Float(ModelType):
     The value, as stored, can be None, '' (which will be treated as None), a Python float,
     or a value that will parse as an float, ie., something for which float(value) does not throw an Error.
     """
+    MUTABLE = False
+
     def from_json(self, value):
         if value is None or value == '':
             return None
@@ -385,6 +399,8 @@ class Boolean(ModelType):
 
     This class has the 'values' property defined.
     """
+    MUTABLE = False
+
     # We're OK redefining built-in `help`
     # pylint: disable=W0622
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
@@ -446,6 +462,8 @@ class String(ModelType):
 
     The stored value can either be None or a basestring instance.
     """
+    MUTABLE = False
+
     def from_json(self, value):
         if value is None or isinstance(value, basestring):
             return value
@@ -726,8 +744,14 @@ class XBlock(Plugin):
             # Create dictionary mapping between dirty fields and data cache values
             # A `field` is an instance of `ModelType`
 
-            fields_to_save = {field.name: field.to_json(self._model_data_cache[field.name])  # pylint: disable=E1101
-                              for field in self._dirty_fields}
+            # pylint: disable=E1101
+            fields_to_save = {
+                field.name: field.to_json(self._model_data_cache[field.name])
+                for field in self._dirty_fields
+                if self._model_data_cache[field.name] != self._model_data.get(field.name, None)
+            }
+            # pylint: enable=E1101
+
             # Throws KeyValueMultiSaveError if things go wrong
             self._model_data.update(fields_to_save)
 
