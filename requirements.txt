@@ -15,7 +15,7 @@ pylint
 selenium
 rednose
 pep8
-diff-cover
+diff-cover >= 0.2
 
 # For docs
 sphinx
