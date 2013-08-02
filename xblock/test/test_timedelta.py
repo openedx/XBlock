@@ -10,6 +10,7 @@ from nose.tools import assert_equals, assert_not_equals, assert_not_in  # pylint
 
 import re
 from xblock.core import ModelType, Scope, XBlock
+from xblock.test.test_core import DictModel
 import datetime
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
@@ -60,7 +61,7 @@ def test_timedelta_field_access():
         graceperiod = Timedelta(scope=Scope.settings)
 
     original_json_date = '2 days 5 hours 10 minutes 59 seconds'
-    field_tester = FieldTester(MagicMock(), {'graceperiod': original_json_date})
+    field_tester = FieldTester(MagicMock(), DictModel({'graceperiod': original_json_date}))
 
     # Access the Timedelta field without modifying it
 

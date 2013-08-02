@@ -49,6 +49,46 @@ class XBlockSaveError(Exception):
         self.dirty_fields = dirty_fields
 
 
+UNSET = object()
+
+
+class ModelData(object):
+    """
+    An interface allowing access to field values indexed by field names
+    """
+    def get(self, name, default=UNSET):
+        """
+        Retrieve the value for the field named `name`.
+
+        If a value is provided for `default`, then it will be
+        returned if no value is set
+        """
+        raise NotImplementedError
+
+    def set(self, name, value):
+        """
+        Set the value of the field named `name`
+        """
+        raise NotImplementedError
+
+    def delete(self, name):
+        """
+        Reset the value of the field named `name` to the default
+        """
+        raise NotImplementedError
+
+    def has(self, name):
+        """
+        Return whether or not the field named `name` has a non-default value
+        """
+        raise NotImplementedError
+
+    def set_many(self, update_dict):
+        """Update the underlying model with the correct values."""
+        for key, value in update_dict.items():
+            self.set(key, value)
+
+
 class BlockScope(object):
     """Enumeration defining BlockScopes"""
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
@@ -236,7 +276,7 @@ class ModelType(object):
         value = self._get_cached_value(instance)
         if value is NO_CACHE_VALUE:
             try:
-                value = self.from_json(instance._model_data[self.name])
+                value = self.from_json(instance._model_data.get(self.name))
                 # If this is a mutable type, mark it as dirty, since mutations can occur without an
                 # explicit call to __set__ (but they do require a call to __get__)
                 if self.MUTABLE:
@@ -284,7 +324,7 @@ class ModelType(object):
         # that it's okay if the key is not present.  (It may never
         # have been persisted at all.)
         try:
-            del instance._model_data[self.name]
+            instance._model_data.delete(self.name)
         except KeyError:
             pass
 
@@ -715,9 +755,8 @@ class XBlock(Plugin):
         access the environment.  It is available in XBlock code as
         ``self.runtime``.
 
-        `model_data` is a dictionary-like interface to runtime storage.
-        XBlock uses it to implement your storage fields.
-
+        `model_data` is an instance of :class:`xblock.core.ModelData`. It is
+        used by the XBlock fields to access their data from wherever it is persisted
         """
         self.runtime = runtime
         self._model_data = model_data
@@ -750,7 +789,7 @@ class XBlock(Plugin):
         try:
             fields_to_save = self._get_fields_to_save()
             # Throws KeyValueMultiSaveError if things go wrong
-            self._model_data.update(fields_to_save)
+            self._model_data.set_many(fields_to_save)
 
         except KeyValueMultiSaveError as save_error:
             saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
@@ -771,8 +810,8 @@ class XBlock(Plugin):
         for field in self._dirty_fields:
             # If the field isn't in the model data, or the cached value doesn't equal what
             # is already in the model data, then we know we need to write this value out.
-            if field.name not in self._model_data or \
-               self._model_data_cache[field.name] != field.from_json(self._model_data[field.name]):
+            if not self._model_data.has(field.name) or \
+               self._model_data_cache[field.name] != field.from_json(self._model_data.get(field.name)):
                 fields_to_save[field.name] = field.to_json(self._model_data_cache[field.name])
         return fields_to_save
 

@@ -272,7 +272,7 @@ class WorkbenchRuntime(Runtime):
             self.student_id,
             self.usage
         )
-        value = data_model.get(key)
+        value = data_model.get(key, None)
         children = []
         for child_id in data_model.get('children', []):
             child = self.get_block(child_id)
@@ -294,7 +294,7 @@ class WorkbenchRuntime(Runtime):
             self.student_id,
             self.usage
         )
-        data[key] = value
+        data.set(key, value)
 
 
 class _BlockSet(object):

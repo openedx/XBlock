@@ -6,7 +6,7 @@ import re
 import functools
 
 from collections import namedtuple, MutableMapping
-from .core import ModelType, BlockScope, Scope
+from .core import ModelType, BlockScope, Scope, ModelData, UNSET
 
 
 class InvalidScopeError(Exception):
@@ -66,8 +66,11 @@ class KeyValueStore(object):
             self.set(key, value)
 
 
-class DbModel(MutableMapping):
-    """A dictionary-like interface to the fields on a block."""
+class DbModel(ModelData):
+    """
+    An interface mapping value access that uses field names to one
+    that uses the correct scoped keys for the underlying KeyValueStore
+    """
 
     def __init__(self, kvs, block_cls, student_id, usage):
         self._kvs = kvs
@@ -145,42 +148,48 @@ class DbModel(MutableMapping):
         )
         return key
 
-    def __getitem__(self, name):
-        return self._kvs.get(self._key(name))
+    def get(self, name, default=UNSET):
+        """
+        Retrieve the value for the field named `name`.
 
-    def __setitem__(self, name, value):
+        If a value is provided for `default`, then it will be
+        returned if no value is set
+        """
+        try:
+            return self._kvs.get(self._key(name))
+        except KeyError:
+            if default is UNSET:
+                raise
+            else:
+                return default
+
+    def set(self, name, value):
+        """
+        Set the value of the field named `name`
+        """
         self._kvs.set(self._key(name), value)
 
-    def __delitem__(self, name):
+    def delete(self, name):
+        """
+        Reset the value of the field named `name` to the default
+        """
         self._kvs.delete(self._key(name))
 
-    def __iter__(self):
-        return iter(self.keys())
-
-    def __len__(self):
-        return len(self.keys())
-
-    def __contains__(self, name):
+    def has(self, name):
+        """
+        Return whether or not the field named `name` has a non-default value
+        """
         try:
             return self._kvs.has(self._key(name))
         except KeyError:
             return False
 
-    def keys(self):
-        fields = [field.name for field in self._block_cls.fields]
-        for namespace_name in self._block_cls.namespaces:
-            fields.extend(field.name for field in getattr(self._block_cls, namespace_name).fields)
-        return fields
-
-    def update(self, other_dict=None, **kwargs):
+    def set_many(self, update_dict):
         """Update the underlying model with the correct values."""
         updated_dict = {}
-        other_dict = other_dict or {}
-        # Combine all the arguments into a single dict.
-        other_dict.update(kwargs)
 
         # Generate a new dict with the correct mappings.
-        for (key, value) in other_dict.items():
+        for (key, value) in update_dict.items():
             updated_dict[self._key(key)] = value
 
         self._kvs.set_many(updated_dict)
