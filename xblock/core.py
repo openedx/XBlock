@@ -744,12 +744,12 @@ class XBlock(Plugin):
             # Create dictionary mapping between dirty fields and data cache values
             # A `field` is an instance of `ModelType`
 
+            fields_to_save = {}
             # pylint: disable=E1101
-            fields_to_save = {
-                field.name: field.to_json(self._model_data_cache[field.name])
-                for field in self._dirty_fields
-                if self._model_data_cache[field.name] != self._model_data.get(field.name, None)
-            }
+            for field in self._dirty_fields:
+                md_field = self._model_data.get(field.name, None)
+                if md_field is None or self._model_data_cache[field.name] != field.from_json(md_field):
+                    fields_to_save[field.name] = field.to_json(self._model_data_cache[field.name])
             # pylint: enable=E1101
 
             # Throws KeyValueMultiSaveError if things go wrong
@@ -758,7 +758,7 @@ class XBlock(Plugin):
         except KeyValueMultiSaveError as save_error:
             saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
             for field in saved_fields:
-                # should only find one corresponding field
+                # Should only find one corresponding field
                 self._dirty_fields.remove(field)
             raise XBlockSaveError(saved_fields, self._dirty_fields)
 
