@@ -741,16 +741,7 @@ class XBlock(Plugin):
             # nop if _dirty_fields attribute is empty
             return
         try:
-            # Create dictionary mapping between dirty fields and data cache values
-            # A `field` is an instance of `ModelType`
-
-            # pylint: disable=E1101
-            fields_to_save = {
-                field.name: field.to_json(self._model_data_cache[field.name])
-                for field in self._dirty_fields
-                if self._model_data_cache[field.name] != self._model_data.get(field.name, None)
-            }
-            # pylint: enable=E1101
+            fields_to_save = self._get_fields_to_save()
 
             # Throws KeyValueMultiSaveError if things go wrong
             self._model_data.update(fields_to_save)
@@ -764,6 +755,21 @@ class XBlock(Plugin):
 
         # Remove all dirty fields, since the save was successful
         self._clear_dirty_fields()
+
+    def _get_fields_to_save(self):
+        """
+        Create dictionary mapping between dirty fields and data cache values.
+        A `field` is an instance of `ModelType`.
+        """
+
+        fields_to_save = {}
+        # pylint: disable=E1101
+        for field in self._dirty_fields:
+            md_field = self._model_data.get(field.name, None)
+            if md_field is None or self._model_data_cache[field.name] != field.from_json(md_field):
+                fields_to_save[field.name] = field.to_json(self._model_data_cache[field.name])
+        # pylint: enable=E1101
+        return fields_to_save
 
     def _clear_dirty_fields(self):
         """
