@@ -715,6 +715,7 @@ class XBlock(Plugin):
         """
         self.runtime = runtime
         self._model_data = model_data
+        self._model_data_cache = {}
         self._dirty_fields = set()
 
     def __repr__(self):
@@ -742,7 +743,6 @@ class XBlock(Plugin):
             return
         try:
             fields_to_save = self._get_fields_to_save()
-
             # Throws KeyValueMultiSaveError if things go wrong
             self._model_data.update(fields_to_save)
 
@@ -761,14 +761,13 @@ class XBlock(Plugin):
         Create dictionary mapping between dirty fields and data cache values.
         A `field` is an instance of `ModelType`.
         """
-
         fields_to_save = {}
-        # pylint: disable=E1101
         for field in self._dirty_fields:
-            md_field = self._model_data.get(field.name, None)
-            if md_field is None or self._model_data_cache[field.name] != field.from_json(md_field):
+            # If the field isn't in the model data, or the cached value doesn't equal what
+            # is already in the model data, then we know we need to write this value out.
+            if field.name not in self._model_data or \
+               self._model_data_cache[field.name] != field.from_json(self._model_data[field.name]):
                 fields_to_save[field.name] = field.to_json(self._model_data_cache[field.name])
-        # pylint: enable=E1101
         return fields_to_save
 
     def _clear_dirty_fields(self):
