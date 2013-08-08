@@ -215,6 +215,35 @@ def test_list_field_access():
     assert_equals([1], field_tester._model_data['field_d'])
 
 
+def test_mutable_none_values():
+    # Check that fields with values intentionally set to None
+    # save properly.
+    class FieldTester(XBlock):
+        """Test XBlock for field access testing"""
+        field_a = List(scope=Scope.settings)
+        field_b = List(scope=Scope.settings)
+        field_c = List(scope=Scope.content, default=None)
+
+    field_tester = FieldTester(MagicMock(), {'field_a': None})
+    # Set fields b & c to None
+    field_tester.field_b = None
+    field_tester.field_c = None
+    # Save our changes
+    field_tester.save()
+
+    # Access the fields without modifying them. Want to call `__get__`, not `__set__`,
+    # because `__get__` marks only mutable fields as dirty.
+    _test_get = field_tester.field_a
+    _test_get = field_tester.field_b
+    _test_get = field_tester.field_c
+
+    # The previous accesses will mark the fields as dirty (via __get__)
+    assert_equals(len(field_tester._dirty_fields), 3)  # pylint: disable=W0212
+
+    # However, the fields should not ACTUALLY be marked as fields that need to be saved.
+    assert_equals(len(field_tester._get_fields_to_save()), 0)  # pylint: disable=W0212
+
+
 def test_dict_field_access():
     # Check that dicts are correctly saved when not directly set
     class FieldTester(XBlock):
