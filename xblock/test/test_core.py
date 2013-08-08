@@ -826,3 +826,29 @@ def test_xblock_write_then_delete():
     assert_equals(len(field_tester._model_data), 0)
     assert_equals(False, 'field_a' in field_tester._model_data)
     assert_equals(False, 'field_b' in field_tester._model_data)
+
+
+def test_get_mutable_mark_dirty():
+    """
+    Ensure that accessing a mutable field type does not mark it dirty
+    if the field has never been set. If the field has been set, ensure
+    that it is set to dirty.
+    """
+    class MutableTester(XBlock):
+        """Test class with mutable fields."""
+        list_field = List(default=[])
+
+    mutable_test = MutableTester(MagicMock(), {})
+
+    # Test get/set with a default value.
+    assert_equals(len(mutable_test._dirty_fields), 0)
+    _test_get = mutable_test.list_field
+    assert_equals(len(mutable_test._dirty_fields), 0)
+    mutable_test.list_field = []
+    assert_equals(len(mutable_test._dirty_fields), 1)
+
+    # Now test after having explicitly set the field.
+    mutable_test.save()
+    assert_equals(len(mutable_test._dirty_fields), 0)
+    _test_get = mutable_test.list_field
+    assert_equals(len(mutable_test._dirty_fields), 1)
