@@ -237,6 +237,10 @@ class ModelType(object):
         if value is NO_CACHE_VALUE:
             try:
                 value = self.from_json(instance._model_data[self.name])
+                # If this is a mutable type, mark it as dirty, since mutations can occur without an
+                # explicit call to __set__ (but they do require a call to __get__)
+                if self.MUTABLE:
+                    self._mark_dirty(instance)
             except KeyError:
                 # Cache default value
                 value = self.default
@@ -244,13 +248,15 @@ class ModelType(object):
                 if self.MUTABLE:
                     # Make a copy of mutable types to place into the cache, but don't
                     # waste resources running copy.deepcopy on types known to be immutable.
+                    #
+                    # Don't mark the value as dirty here -- we should
+                    # only do that if we're returning a non-default
+                    # value
                     value = copy.deepcopy(value)
 
                 self._set_cached_value(instance, value)
 
-        # If this is a mutable type, mark it as dirty, since mutations can occur without an
-        # explicit call to __set__ (but they do require a call to __get__)
-        if self.MUTABLE:
+        elif self.MUTABLE:
             self._mark_dirty(instance)
 
         return value
