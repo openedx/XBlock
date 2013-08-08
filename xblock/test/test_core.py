@@ -802,8 +802,8 @@ def test_xblock_write_then_delete():
 def test_get_mutable_mark_dirty():
     """
     Ensure that accessing a mutable field type does not mark it dirty
-    if the field returns its default value. If the field does not
-    return its default, ensure that it's set to dirty.
+    if the field has never been set. If the field has been set, ensure
+    that it is set to dirty.
     """
     class MutableTester(XBlock):
         """Test class with mutable fields."""
@@ -818,7 +818,7 @@ def test_get_mutable_mark_dirty():
     mutable_test.list_field = []
     assert_equals(len(mutable_test._dirty_fields), 1)
 
-    # Now test with a non-default value.
+    # Now test after having explicitly set the field.
     mutable_test.save()
     assert_equals(len(mutable_test._dirty_fields), 0)
     _test_get = mutable_test.list_field
