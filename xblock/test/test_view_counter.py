@@ -11,8 +11,8 @@ TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
 
 def test_view_counter_state():
     key_store = DictKeyValueStore()
-    db_model = DbModel(key_store, ViewCounter, 's0', TestUsage('u0', 'd0'))
-    tester = ViewCounter(Mock(), db_model)
+    db_model = DbModel(key_store)
+    tester = ViewCounter(Mock(), db_model, Mock())
 
     assert_equals(tester.views, 0)
 

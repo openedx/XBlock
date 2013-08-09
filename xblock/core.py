@@ -56,37 +56,37 @@ class ModelData(object):
     """
     An interface allowing access to field values indexed by field names
     """
-    def get(self, name, default=UNSET):
+    def get(self, block, name, default=UNSET):
         """
-        Retrieve the value for the field named `name`.
+        Retrieve the value for the field named `name` for the XBlock `block`.
 
         If a value is provided for `default`, then it will be
         returned if no value is set
         """
         raise NotImplementedError
 
-    def set(self, name, value):
+    def set(self, block, name, value):
         """
-        Set the value of the field named `name`
-        """
-        raise NotImplementedError
-
-    def delete(self, name):
-        """
-        Reset the value of the field named `name` to the default
+        Set the value of the field named `name` for XBlock `block`.
         """
         raise NotImplementedError
 
-    def has(self, name):
+    def delete(self, block, name):
         """
-        Return whether or not the field named `name` has a non-default value
+        Reset the value of the field named `name` to the default for XBlock `block`.
         """
         raise NotImplementedError
 
-    def set_many(self, update_dict):
+    def has(self, block, name):
+        """
+        Return whether or not the field named `name` has a non-default value for the XBlock `block`
+        """
+        raise NotImplementedError
+
+    def set_many(self, block, update_dict):
         """Update the underlying model with the correct values."""
         for key, value in update_dict.items():
-            self.set(key, value)
+            self.set(block, key, value)
 
 
 class BlockScope(object):
@@ -147,6 +147,10 @@ class Scope(ScopeBase):
 
     children = Sentinel('Scope.children')
     parent = Sentinel('Scope.parent')
+
+
+ScopeKeys = namedtuple('ScopeKeys', 'student_id block_type def_id usage_id')
+
 
 # define a placeholder ('nil') value to indicate when nothing has been stored
 # in the cache ("None" may be a valid value in the cache, so we cannot use it).
@@ -276,7 +280,7 @@ class ModelType(object):
         value = self._get_cached_value(instance)
         if value is NO_CACHE_VALUE:
             try:
-                value = self.from_json(instance._model_data.get(self.name))
+                value = self.from_json(instance._model_data.get(instance, self.name))
                 # If this is a mutable type, mark it as dirty, since mutations can occur without an
                 # explicit call to __set__ (but they do require a call to __get__)
                 if self.MUTABLE:
@@ -324,7 +328,7 @@ class ModelType(object):
         # that it's okay if the key is not present.  (It may never
         # have been persisted at all.)
         try:
-            instance._model_data.delete(self.name)
+            instance._model_data.delete(instance, self.name)
         except KeyError:
             pass
 
@@ -749,7 +753,7 @@ class XBlock(Plugin):
         """The class can adjust a parsed Usage tree."""
         return node
 
-    def __init__(self, runtime, model_data):
+    def __init__(self, runtime, model_data, scope_ids):
         """
         `runtime` is an instance of :class:`xblock.core.Runtime`. Use it to
         access the environment.  It is available in XBlock code as
@@ -762,6 +766,7 @@ class XBlock(Plugin):
         self._model_data = model_data
         self._model_data_cache = {}
         self._dirty_fields = set()
+        self.scope_ids = scope_ids
 
     def __repr__(self):
         # `XBlock` obtains the `fields` attribute from the `ModelMetaclass`.
@@ -794,7 +799,7 @@ class XBlock(Plugin):
         try:
             fields_to_save = self._get_fields_to_save()
             # Throws KeyValueMultiSaveError if things go wrong
-            self._model_data.set_many(fields_to_save)
+            self._model_data.set_many(self, fields_to_save)
 
         except KeyValueMultiSaveError as save_error:
             saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
@@ -815,8 +820,8 @@ class XBlock(Plugin):
         for field in self._dirty_fields:
             # If the field isn't in the model data, or the cached value doesn't equal what
             # is already in the model data, then we know we need to write this value out.
-            if not self._model_data.has(field.name) or \
-               self._model_data_cache[field.name] != field.from_json(self._model_data.get(field.name)):
+            if not self._model_data.has(self, field.name) or \
+               self._model_data_cache[field.name] != field.from_json(self._model_data.get(self, field.name)):
                 fields_to_save[field.name] = field.to_json(self._model_data_cache[field.name])
         return fields_to_save
 
