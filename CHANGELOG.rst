@@ -8,6 +8,10 @@ or near the top.  Include a label indicating the component affected.
 
 0.3
 ----------
+* Changed the interface for `Runtime` and `ModelData` so that they function
+  as single objects that manage large numbers of `XBlocks`. Any method that
+  operates on a block now takes that block as the first argument. Blocks, in
+  turn, are responsible for storing the key values used by their field scopes.
 
 * Changed the interface for `model_data` objects passed to `XBlocks` from
   dict-like to the being cache-like (as was already used by `KeyValueStore`).

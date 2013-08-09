@@ -18,7 +18,7 @@ class Sequence(XBlock):
         child_frags = self.runtime.render_children(self, context)
         frag.add_frags_resources(child_frags)
 
-        progress_per_child = [self.runtime.collect('progress', self.runtime.get_block(child_id))
+        progress_per_child = [self.runtime.collect(self.runtime.get_block(child_id), 'progress')
                               for child_id in self.children]  # pylint: disable=E1101
 
         # TODO: [rocha] calculate total progress per child
