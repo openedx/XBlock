@@ -170,7 +170,9 @@ class ProblemBlock(XBlock):
         # input data.
         submit_results = {}
         for input_name, submission in submissions.items():
-            submit_results[input_name] = child_map[input_name].submit(submission)
+            child = child_map[input_name]
+            submit_results[input_name] = child.submit(submission)
+            child.save()
 
         # For each Checker, find the values it wants, and pass them to its
         # check() method.
@@ -289,7 +291,7 @@ class TextInputBlock(InputBlock):
     """An XBlock that accepts text input."""
 
     input_type = String(help="Type of conversion to attempt on input string")
-    student_input = String(help="Last input submitted by the student", default="", scope=Scope.user_state)
+    student_input = Any(help="Last input submitted by the student", default="", scope=Scope.user_state)
 
     def student_view(self, context):  # pylint: disable=W0613
         """Returns default student view."""
