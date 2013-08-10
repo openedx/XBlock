@@ -732,7 +732,8 @@ class XBlock(Plugin):
         for field in self.fields:
             try:
                 value = getattr(self, field.name)
-            except Exception:
+            except Exception:  # pylint: disable=W0703
+                # Ensure we return a string, even if unanticipated exceptions.
                 attrs.append(" %s=???" % (field.name,))
             else:
                 if isinstance(value, basestring):
