@@ -730,12 +730,16 @@ class XBlock(Plugin):
         # pylint: disable=E1101
         attrs = []
         for field in self.fields:
-            value = getattr(self, field.name)
-            if isinstance(value, basestring):
-                value = value.strip()
-                if len(value) > 40:
-                    value = value[:37] + "..."
-            attrs.append(" %s=%r" % (field.name, value))
+            try:
+                value = getattr(self, field.name)
+            except Exception:
+                attrs.append(" %s=???" % (field.name,))
+            else:
+                if isinstance(value, basestring):
+                    value = value.strip()
+                    if len(value) > 40:
+                        value = value[:37] + "..."
+                attrs.append(" %s=%r" % (field.name, value))
         return "<%s @%04X%s>" % (
             self.__class__.__name__,
             id(self) % 0xFFFF,
