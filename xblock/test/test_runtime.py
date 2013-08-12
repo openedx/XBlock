@@ -131,7 +131,7 @@ def test_db_model_keys():
     db_model = DbModel(key_store, TestModel, 's0', TestUsage('u0', 'd0'))
     tester = TestModel(Mock(), db_model)
 
-    assert_false('not a field' in db_model)
+    assert_false(db_model.has('not a field'))
 
     # `test` is a namespace provided by the patch when TestModel is defined, which ultimately
     # comes from the NamespacesMetaclass. Since this is not understood by static
@@ -140,7 +140,7 @@ def test_db_model_keys():
     for collection in (tester, tester.test):
         for field in collection.fields:
             new_value = 'new ' + field.name
-            assert_false(field.name in db_model)
+            assert_false(db_model.has(field.name))
             setattr(collection, field.name, new_value)
 
     # Write out the values
@@ -149,7 +149,7 @@ def test_db_model_keys():
     # Make sure everything saved correctly
     for collection in (tester, tester.test):
         for field in collection.fields:
-            assert_true(field.name in db_model)
+            assert_true(db_model.has(field.name))
 
     def get_key_value(scope, student_id, block_scope_id, field_name):
         """Gets the value, from `key_store`, of a Key with the given values."""
