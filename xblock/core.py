@@ -187,7 +187,7 @@ class XBlock(Plugin):
     def _get_fields_to_save(self):
         """
         Create dictionary mapping between dirty fields and data cache values.
-        A `field` is an instance of `ModelType`.
+        A `field` is an instance of `Field`.
         """
         fields_to_save = {}
         for field in self._dirty_fields:

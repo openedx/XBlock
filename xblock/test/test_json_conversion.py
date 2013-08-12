@@ -8,11 +8,11 @@ from nose.tools import assert_equals, assert_is_instance
 from mock import Mock
 
 from xblock.core import XBlock
-from xblock.fields import ModelType, Scope
+from xblock.fields import Field, Scope
 from xblock.test.test_core import DictModel
 
 
-class TestJSONConversionField(ModelType):
+class TestJSONConversionField(Field):
     """Field for testing json conversion"""
     def from_json(self, value):
         assert_equals('set', value['$type'])

@@ -1,5 +1,5 @@
 """
-The Timedelta ModelType of edx-platform has an issue where the
+The Timedelta Field of edx-platform has an issue where the
 json -> native -> json roundtrip doesn't give back the same json value.
 This seems to be due to how Timedeltas internally store things - they
 only have a days and seconds attributes, whereas we also recognize hours and minutes.
@@ -10,16 +10,16 @@ from nose.tools import assert_equals, assert_not_equals, assert_not_in  # pylint
 
 import re
 from xblock.core import XBlock
-from xblock.fields import ModelType, Scope
+from xblock.fields import Field, Scope
 from xblock.test.tools import DictModel
 import datetime
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
 
-class Timedelta(ModelType):
+class Timedelta(Field):
     """
-    A modeltype that contains a Timedelta.
+    A Field that contains a Timedelta.
 
     From edx-platform/common/lib/xmodule/xmodule/fields.py
     """

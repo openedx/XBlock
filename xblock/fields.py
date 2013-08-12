@@ -158,7 +158,7 @@ ScopeIds = namedtuple('ScopeIds', 'student_id block_type def_id usage_id')  # py
 NO_CACHE_VALUE = object()
 
 
-class ModelType(object):
+class Field(object):
     """
     A field class that can be used as a class attribute to define what data the
     class will want to refer to.
@@ -402,7 +402,7 @@ class ModelType(object):
         return self.name == other.name
 
 
-class Integer(ModelType):
+class Integer(Field):
     """
     A model type that contains an integer.
 
@@ -420,7 +420,7 @@ class Integer(ModelType):
         return int(value)
 
 
-class Float(ModelType):
+class Float(Field):
     """
     A model type that contains a float.
 
@@ -435,7 +435,7 @@ class Float(ModelType):
         return float(value)
 
 
-class Boolean(ModelType):
+class Boolean(Field):
     """
     A field class for representing a boolean.
 
@@ -470,7 +470,7 @@ class Boolean(ModelType):
             return bool(value)
 
 
-class Dict(ModelType):
+class Dict(Field):
     """
     A field class for representing a Python dict.
 
@@ -490,7 +490,7 @@ class Dict(ModelType):
             raise TypeError('Value stored in a Dict must be None or a dict.')
 
 
-class List(ModelType):
+class List(Field):
     """
     A field class for representing a list.
 
@@ -510,7 +510,7 @@ class List(ModelType):
             raise TypeError('Value stored in an Object must be None or a list.')
 
 
-class String(ModelType):
+class String(Field):
     """
     A field class for representing a string.
 
@@ -525,21 +525,21 @@ class String(ModelType):
             raise TypeError('Value stored in a String must be None or a String.')
 
 
-class Any(ModelType):
+class Any(Field):
     """
     A field class for representing any piece of data; type is not enforced.
 
-    All methods are inherited directly from `ModelType`.
+    All methods are inherited directly from `Field`.
     """
     pass
 
 
 class ModelMetaclass(type):
     """
-    A metaclass to be used for classes that want to use ModelTypes as class attributes
+    A metaclass to be used for classes that want to use Fields as class attributes
     to define data access.
 
-    All class attributes that are ModelTypes will be added to the 'fields' attribute on
+    All class attributes that are Fields will be added to the 'fields' attribute on
     the instance.
 
     Additionally, any namespaces registered in the `xblock.namespace` will be added to
@@ -551,7 +551,7 @@ class ModelMetaclass(type):
         fields = set()
         for aname, value in attrs.items() + \
                 sum([inspect.getmembers(base) for base in bases], []):
-            if isinstance(value, ModelType):
+            if isinstance(value, Field):
                 # Set the name of this attribute
                 value._name = aname
                 fields.add(value)

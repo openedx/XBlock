@@ -29,7 +29,7 @@ class TestNamespace(Namespace):
 with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
     class TestModel(XBlock):
         """
-        Set up a class that contains ModelTypes as fields.
+        Set up a class that contains Fields as fields.
         """
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')
@@ -43,7 +43,7 @@ with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', Te
 with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
     class TestXBlock(XBlock):
         """
-        Set up a class that contains ModelTypes as fields.
+        Set up a class that contains Fields as fields.
         """
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')
@@ -79,7 +79,7 @@ with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', Te
 with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
     class TestXBlockNoFallback(XBlock):
         """
-        Set up a class that contains ModelTypes as fields.
+        Set up a class that contains Fields as fields.
         """
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')

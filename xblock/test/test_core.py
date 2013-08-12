@@ -13,7 +13,7 @@ from datetime import datetime
 from xblock.core import XBlock
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
 from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
-    Integer, List, ModelMetaclass, ModelType, \
+    Integer, List, ModelMetaclass, Field, \
     Scope
 from xblock.fields import ModelData
 from xblock.test.tools import DictModel
@@ -357,7 +357,7 @@ def test_default_values():
 def test_json_field_access():
     # Check that values are correctly converted to and from json in accessors.
 
-    class Date(ModelType):
+    class Date(Field):
         """Date needs to convert between JSON-compatible persistence and a datetime object"""
         def from_json(self, field):
             """Convert a string representation of a date to a datetime object"""
@@ -480,10 +480,10 @@ def test_caching_is_per_instance():
 
 
 def test_field_serialization():
-    # Some ModelTypes can define their own serialization mechanisms.
+    # Some Fields can define their own serialization mechanisms.
     # This test ensures that we are using them properly.
 
-    class CustomField(ModelType):
+    class CustomField(Field):
         """
         Specifiy a custom field that defines its own serialization
         """

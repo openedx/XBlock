@@ -1,5 +1,5 @@
 """
-Tests for classes extending ModelType.
+Tests for classes extending Field.
 """
 
 # Allow accessing protected members for testing purposes
@@ -14,8 +14,8 @@ from xblock.core import XBlock
 from xblock.fields import Any, Boolean, Dict, Float, Integer, List, String
 
 
-class ModelTypeTest(unittest.TestCase):
-    """ Base test class for ModelTypes. """
+class FieldTest(unittest.TestCase):
+    """ Base test class for Fields. """
 
     def field_totest(self):
         """Child classes should override this with the type of field
@@ -43,9 +43,9 @@ class ModelTypeTest(unittest.TestCase):
             self.field_totest().from_json(arg)
 
 
-class IntegerTest(ModelTypeTest):
+class IntegerTest(FieldTest):
     """
-    Tests the Integer ModelType.
+    Tests the Integer Field.
     """
     field_totest = Integer
 
@@ -74,9 +74,9 @@ class IntegerTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class FloatTest(ModelTypeTest):
+class FloatTest(FieldTest):
     """
-    Tests the Float ModelType.
+    Tests the Float Field.
     """
     field_totest = Float
 
@@ -103,9 +103,9 @@ class FloatTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class BooleanTest(ModelTypeTest):
+class BooleanTest(FieldTest):
     """
-    Tests the Boolean ModelType.
+    Tests the Boolean Field.
     """
     field_totest = Boolean
 
@@ -130,9 +130,9 @@ class BooleanTest(ModelTypeTest):
         self.assertJSONEquals(False, [])
 
 
-class StringTest(ModelTypeTest):
+class StringTest(FieldTest):
     """
-    Tests the String ModelType.
+    Tests the String Field.
     """
     field_totest = String
 
@@ -154,9 +154,9 @@ class StringTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class AnyTest(ModelTypeTest):
+class AnyTest(FieldTest):
     """
-    Tests the Any ModelType.
+    Tests the Any Field.
     """
     field_totest = Any
 
@@ -172,9 +172,9 @@ class AnyTest(ModelTypeTest):
         self.assertJSONEquals(None, None)
 
 
-class ListTest(ModelTypeTest):
+class ListTest(FieldTest):
     """
-    Tests the List ModelType.
+    Tests the List Field.
     """
     field_totest = List
 
@@ -196,9 +196,9 @@ class ListTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class DictTest(ModelTypeTest):
+class DictTest(FieldTest):
     """
-    Tests the Dict ModelType.
+    Tests the Dict Field.
     """
     field_totest = Dict
 

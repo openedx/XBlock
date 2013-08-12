@@ -4,7 +4,7 @@ the XBlocks that they instantiate
 """
 
 from xblock.plugin import Plugin
-from xblock.fields import ModelMetaclass, ModelType
+from xblock.fields import ModelMetaclass, Field
 
 
 class NamespacesMetaclass(type):
@@ -40,7 +40,7 @@ class NamespaceDescriptor(object):
 
 class Namespace(Plugin):
     """
-    A baseclass that sets up machinery for ModelType fields that makes those fields be called
+    A baseclass that sets up machinery for Field fields that makes those fields be called
     with the container as the field instance
     """
     __metaclass__ = ModelMetaclass
@@ -54,7 +54,7 @@ class Namespace(Plugin):
         container = super(Namespace, self).__getattribute__('_container')
         namespace_attr = getattr(type(self), name, None)
 
-        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
+        if namespace_attr is None or not isinstance(namespace_attr, Field):
             return super(Namespace, self).__getattribute__(name)
 
         return namespace_attr.__get__(container, type(container))
@@ -68,7 +68,7 @@ class Namespace(Plugin):
 
         namespace_attr = getattr(type(self), name, None)
 
-        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
+        if namespace_attr is None or not isinstance(namespace_attr, Field):
             return super(Namespace, self).__setattr__(name, value)
 
         return namespace_attr.__set__(container, value)
@@ -77,7 +77,7 @@ class Namespace(Plugin):
         container = super(Namespace, self).__getattribute__('_container')
         namespace_attr = getattr(type(self), name, None)
 
-        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
+        if namespace_attr is None or not isinstance(namespace_attr, Field):
             return super(Namespace, self).__detattr__(name)
 
         return namespace_attr.__delete__(container)

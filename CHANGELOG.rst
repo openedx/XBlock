@@ -8,6 +8,8 @@ or near the top.  Include a label indicating the component affected.
 
 0.3
 ----------
+* Rename ModelType to Field
+
 * Split xblock.core into a number of smaller modules:
   xblock.core: Defines XBlock
   xblock.fields: Defines ModelType and subclasses, ModelData, and metaclasses
