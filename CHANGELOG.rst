@@ -8,6 +8,13 @@ or near the top.  Include a label indicating the component affected.
 
 0.3
 ----------
+* Split xblock.core into a number of smaller modules:
+  xblock.core: Defines XBlock
+  xblock.fields: Defines ModelType and subclasses, ModelData, and metaclasses
+                 for classes with fields
+  xblock.namespaces: Code for XBlock Namespaces only
+  xblock.exceptions: Exceptions used by all parts of the xblock project
+
 * Changed the interface for `Runtime` and `ModelData` so that they function
   as single objects that manage large numbers of `XBlocks`. Any method that
   operates on a block now takes that block as the first argument. Blocks, in

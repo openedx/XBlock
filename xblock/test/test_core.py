@@ -6,42 +6,17 @@ from mock import patch, MagicMock, Mock
 # Nose redefines assert_equal and assert_not_equal
 # pylint: disable=E0611
 from nose.tools import assert_in, assert_equals, assert_raises, \
-    assert_not_equals, assert_not_in, assert_false
+    assert_not_equals, assert_false
 # pylint: enable=E0611
 from datetime import datetime
 
-from xblock.core import Boolean, ChildrenModelMetaclass, Dict, Float, \
-    Integer, KeyValueMultiSaveError, List, ModelMetaclass, ModelType, \
-    Namespace, NamespacesMetaclass, Scope, String, XBlock, XBlockSaveError, ModelData
-
-UNSET = object()
-class DictModel(ModelData):
-    """
-    A model_data that just uses a single supplied dictionary to store fields by name
-    """
-    def __init__(self, data):
-        self._data = data
-
-    def get(self, block, name, default=UNSET):
-        if default is UNSET:
-            return self._data[name]
-        else:
-            return self._data.get(name, default)
-
-    def set(self, block, name, value):
-        self._data[name] = value
-
-    def delete(self, block, name):
-        del self._data[name]
-
-    def has(self, block, name):
-        return name in self._data
-
-    def set_many(self, block, update_dict):
-        self._data.update(update_dict)
-
-    def default(self, block, name):
-        raise KeyError
+from xblock.core import XBlock
+from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
+from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
+    Integer, List, ModelMetaclass, ModelType, \
+    Scope
+from xblock.fields import ModelData
+from xblock.test.tools import DictModel
 
 
 def test_model_metaclass():
@@ -422,95 +397,6 @@ def test_json_field_access():
     assert_equals(datetime(2013, 4, 1), field_tester.field_b)
 
 
-class TestNamespace(Namespace):
-    """Toy class for namespace testing"""
-    field_w = List(scope=Scope.content)
-    field_x = List(scope=Scope.content)
-    field_y = String(scope=Scope.user_state, default="default_value")
-
-
-@patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)])
-def test_namespace_metaclass(_mock_load_classes):
-    class TestClass(object):
-        """Toy class for NamespacesMetaclass testing"""
-        __metaclass__ = NamespacesMetaclass
-
-    # `TestNamespace` obtains the `fields` attribute from the `NamespacesMetaclass`. Since this
-    # is not understood by static analysis, silence this error for the duration of this test.
-    # pylint: disable=E1101
-
-    assert hasattr(TestClass, 'test')
-    assert hasattr(TestClass.test, 'field_x')
-    assert hasattr(TestClass.test, 'field_y')
-
-    assert_in(TestNamespace.field_x, TestClass.test.fields)
-    assert_in(TestNamespace.field_y, TestClass.test.fields)
-    assert isinstance(TestClass.test, Namespace)
-
-
-@patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)])
-def test_namespace_field_access(_mock_load_classes):
-
-    class FieldTester(XBlock):
-        """Test XBlock for field access testing"""
-        field_a = Integer(scope=Scope.settings)
-        field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.user_state, default='field c')
-
-    field_tester = FieldTester(
-        MagicMock(),
-        DictModel({
-            'field_a': 5,
-            'field_x': [1, 2, 3],
-        }),
-        Mock(),
-    )
-
-    # `test` is a namespace provided by the @patch method above, which ultimately
-    # comes from the NamespacesMetaclass. Since this is not understood by static
-    # analysis, silence this error for the duration of this test.
-    # pylint: disable=E1101
-
-    assert_equals(5, field_tester.field_a)
-    assert_equals(10, field_tester.field_b)
-    assert_equals('field c', field_tester.field_c)
-    assert_equals([1, 2, 3], field_tester.test.field_x)
-    assert_equals('default_value', field_tester.test.field_y)
-    assert_equals([], field_tester.test.field_w)
-
-    # Test setting namespaced fields
-    field_tester.test.field_x = ['a', 'b']
-    field_tester.save()
-    assert_equals(['a', 'b'], field_tester._model_data.get(field_tester, 'field_x'))
-
-    # Test modifying mutable namespaced fields
-    field_tester.test.field_x.insert(0, 'A')
-    field_tester.test.field_w.extend(['new', 'elt'])
-    # Before save, should get correct things out of the cache.
-    assert_equals(['A', 'a', 'b'], field_tester.test.field_x)
-    assert_equals(['new', 'elt'], field_tester.test.field_w)
-    field_tester.save()
-    # After save, new values should be reflected in the _model_data
-    assert_equals(['A', 'a', 'b'], field_tester._model_data.get(field_tester, 'field_x'))
-    assert_equals(['new', 'elt'], field_tester._model_data.get(field_tester, 'field_w'))
-
-    # Test deleting namespaced fields
-    del field_tester.test.field_x
-    assert_equals([], field_tester.test.field_x)
-
-    with assert_raises(AttributeError):
-        getattr(field_tester.test, 'field_z')
-    with assert_raises(AttributeError):
-        delattr(field_tester.test, 'field_z')
-
-    # Namespaces are created on the fly, so setting a new attribute on one
-    # has no long-term effect
-    field_tester.test.field_z = 'foo'
-    with assert_raises(AttributeError):
-        getattr(field_tester.test, 'field_z')
-    assert_false(field_tester._model_data.has(field_tester, 'field_z'))
-
-
 def test_defaults_not_shared():
     class FieldTester(XBlock):
         """Toy class for field access testing"""
@@ -684,62 +570,6 @@ def test_loading_tagged_classes():
     with patch('xblock.core.XBlock.load_classes', return_value=the_classes):
         assert_equals(set(XBlock.load_tagged_classes('thetag')), set(tagged_classes))
 
-
-def test_field_name_defaults():
-    # Tests field display name default values
-    attempts = Integer()
-    attempts._name = "max_problem_attempts"
-    assert_equals('max_problem_attempts', attempts.display_name)
-
-    class NamespaceTestClass(Namespace):
-        """Toy class for Namespace testing"""
-        field_x = List()
-
-    assert_equals("field_x", NamespaceTestClass.field_x.display_name)
-
-
-def test_field_display_name():
-    attempts = Integer(display_name='Maximum Problem Attempts')
-    attempts._name = "max_problem_attempts"
-    assert_equals("Maximum Problem Attempts", attempts.display_name)
-
-    boolean_field = Boolean(display_name="boolean field")
-    assert_equals("boolean field", boolean_field.display_name)
-
-    class NamespaceTestClass(Namespace):
-        """Toy class for Namespace testing"""
-        field_x = List(display_name="Field Known as X")
-
-    assert_equals("Field Known as X", NamespaceTestClass.field_x.display_name)
-
-
-def test_values():
-    # static return value
-    field_values = ['foo', 'bar']
-    test_field = String(values=field_values)
-    assert_equals(field_values, test_field.values)
-
-    # function to generate values
-    test_field = String(values=lambda: [1, 4])
-    assert_equals([1, 4], test_field.values)
-
-    # default if nothing specified
-    assert_equals(None, String().values)
-
-
-def test_values_boolean():
-    # Test Boolean, which has values defined
-    test_field = Boolean()
-    assert_equals(
-        ({'display_name': "True", "value": True}, {'display_name': "False", "value": False}),
-        test_field.values
-    )
-
-
-def test_values_dict():
-    # Test that the format expected for integers is allowed
-    test_field = Integer(values={"min": 1, "max": 100})
-    assert_equals({"min": 1, "max": 100}, test_field.values)
 
 
 def setup_save_failure(set_many):

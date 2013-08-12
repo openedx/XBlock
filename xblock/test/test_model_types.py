@@ -2,8 +2,16 @@
 Tests for classes extending ModelType.
 """
 
+# Allow accessing protected members for testing purposes
+# pylint: disable=W0212
+
 import unittest
-from xblock.core import Any, Boolean, Dict, Float, Integer, List, String
+# pylint: disable=E0611
+from nose.tools import assert_equals
+# pylint: enable=E0611
+
+from xblock.core import XBlock
+from xblock.fields import Any, Boolean, Dict, Float, Integer, List, String
 
 
 class ModelTypeTest(unittest.TestCase):
@@ -209,3 +217,64 @@ class DictTest(ModelTypeTest):
         self.assertJSONTypeError('true')
         self.assertJSONTypeError(3.7)
         self.assertJSONTypeError(True)
+
+
+def test_field_name_defaults():
+    # Tests field display name default values
+    attempts = Integer()
+    attempts._name = "max_problem_attempts"
+    assert_equals('max_problem_attempts', attempts.display_name)
+
+    class TestBlock(XBlock):
+        """
+        Block for testing
+        """
+        field_x = List()
+
+    assert_equals("field_x", TestBlock.field_x.display_name)
+
+
+def test_field_display_name():
+    attempts = Integer(display_name='Maximum Problem Attempts')
+    attempts._name = "max_problem_attempts"
+    assert_equals("Maximum Problem Attempts", attempts.display_name)
+
+    boolean_field = Boolean(display_name="boolean field")
+    assert_equals("boolean field", boolean_field.display_name)
+
+    class TestBlock(XBlock):
+        """
+        Block for testing
+        """
+        field_x = List(display_name="Field Known as X")
+
+    assert_equals("Field Known as X", TestBlock.field_x.display_name)
+
+
+def test_values():
+    # static return value
+    field_values = ['foo', 'bar']
+    test_field = String(values=field_values)
+    assert_equals(field_values, test_field.values)
+
+    # function to generate values
+    test_field = String(values=lambda: [1, 4])
+    assert_equals([1, 4], test_field.values)
+
+    # default if nothing specified
+    assert_equals(None, String().values)
+
+
+def test_values_boolean():
+    # Test Boolean, which has values defined
+    test_field = Boolean()
+    assert_equals(
+        ({'display_name': "True", "value": True}, {'display_name': "False", "value": False}),
+        test_field.values
+    )
+
+
+def test_values_dict():
+    # Test that the format expected for integers is allowed
+    test_field = Integer(values={"min": 1, "max": 100})
+    assert_equals({"min": 1, "max": 100}, test_field.values)

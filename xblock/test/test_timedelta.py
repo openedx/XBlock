@@ -9,8 +9,9 @@ from mock import MagicMock, Mock
 from nose.tools import assert_equals, assert_not_equals, assert_not_in  # pylint: disable=E0611
 
 import re
-from xblock.core import ModelType, Scope, XBlock
-from xblock.test.test_core import DictModel
+from xblock.core import XBlock
+from xblock.fields import ModelType, Scope
+from xblock.test.tools import DictModel
 import datetime
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')

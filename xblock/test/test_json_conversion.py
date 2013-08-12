@@ -7,7 +7,8 @@ with ModelDatas
 from nose.tools import assert_equals, assert_is_instance
 from mock import Mock
 
-from xblock.core import XBlock, ModelType, Scope
+from xblock.core import XBlock
+from xblock.fields import ModelType, Scope
 from xblock.test.test_core import DictModel
 
 

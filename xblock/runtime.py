@@ -6,7 +6,7 @@ import re
 import functools
 
 from collections import namedtuple, MutableMapping
-from .core import ModelType, BlockScope, Scope, ModelData, UNSET
+from xblock.fields import ModelType, BlockScope, Scope, ModelData, UNSET
 
 
 class InvalidScopeError(Exception):
@@ -28,6 +28,7 @@ class NoSuchHandlerError(Exception):
     Raised to indicate that the requested handler was not found.
     """
     pass
+
 
 
 class KeyValueStore(object):
