@@ -12,7 +12,7 @@ from collections import namedtuple
 UNSET = object()
 
 
-class ModelData(object):
+class FieldData(object):
     """
     An interface allowing access to an XBlock's field values indexed by field names
     """
@@ -164,7 +164,7 @@ class Field(object):
     class will want to refer to.
 
     When the class is instantiated, it will be available as an instance
-    attribute of the same name, by proxying through to self._model_data on
+    attribute of the same name, by proxying through to self._field_data on
     the containing object.
 
     Parameters:
@@ -244,22 +244,22 @@ class Field(object):
         Return a value from the instance's cache, or a marker value if either the cache
         doesn't exist or the value is not found in the cache.
         """
-        return getattr(instance, '_model_data_cache', {}).get(self.name, NO_CACHE_VALUE)
+        return getattr(instance, '_field_data_cache', {}).get(self.name, NO_CACHE_VALUE)
 
     def _set_cached_value(self, instance, value):
         """Store a value in the instance's cache, creating the cache if necessary."""
-        # Allow this method to access the `_model_data_cache` of `instance`
+        # Allow this method to access the `_field_data_cache` of `instance`
         # pylint: disable=W0212
-        if not hasattr(instance, '_model_data_cache'):
-            instance._model_data_cache = {}
-        instance._model_data_cache[self.name] = value
+        if not hasattr(instance, '_field_data_cache'):
+            instance._field_data_cache = {}
+        instance._field_data_cache[self.name] = value
 
     def _del_cached_value(self, instance):
         """Remove a value from the instance's cache, if the cache exists."""
-        # Allow this method to access the `_model_data_cache` of `instance`
+        # Allow this method to access the `_field_data_cache` of `instance`
         # pylint: disable=W0212
-        if hasattr(instance, '_model_data_cache') and self.name in instance._model_data_cache:
-            del instance._model_data_cache[self.name]
+        if hasattr(instance, '_field_data_cache') and self.name in instance._field_data_cache:
+            del instance._field_data_cache[self.name]
 
     def _mark_dirty(self, instance):
         """Set this field to dirty on the instance."""
@@ -270,10 +270,10 @@ class Field(object):
     def __get__(self, instance, owner):
         """
         Gets the value of this instance. Prioritizes the cached value over
-        obtaining the value from the _model_data. Thus if a cached value
+        obtaining the value from the _field_data. Thus if a cached value
         exists, that is the value that will be returned.
         """
-        # Allow this method to access the `_model_data_cache` of `instance`
+        # Allow this method to access the `_field_data_cache` of `instance`
         # pylint: disable=W0212
         if instance is None:
             return self
@@ -281,7 +281,7 @@ class Field(object):
         value = self._get_cached_value(instance)
         if value is NO_CACHE_VALUE:
             try:
-                value = self.from_json(instance._model_data.get(instance, self.name))
+                value = self.from_json(instance._field_data.get(instance, self.name))
                 # If this is a mutable type, mark it as dirty, since mutations can occur without an
                 # explicit call to __set__ (but they do require a call to __get__)
                 if self.MUTABLE:
@@ -289,7 +289,7 @@ class Field(object):
             except KeyError:
                 # Cache default value
                 try:
-                    value = self.from_json(instance._model_data.default(instance, self.name))
+                    value = self.from_json(instance._field_data.default(instance, self.name))
                 except KeyError:
                     value = self.default
             finally:
@@ -325,14 +325,14 @@ class Field(object):
         Deletes `instance` from the underlying data store.
         Deletes are not cached; they are performed immediately.
         """
-        # Allow this method to access the `_model_data` and `_dirty_fields` of `instance`
+        # Allow this method to access the `_field_data` and `_dirty_fields` of `instance`
         # pylint: disable=W0212
 
-        # Try to perform the deletion on the model_data, and accept
+        # Try to perform the deletion on the field_data, and accept
         # that it's okay if the key is not present.  (It may never
         # have been persisted at all.)
         try:
-            instance._model_data.delete(instance, self.name)
+            instance._field_data.delete(instance, self.name)
         except KeyError:
             pass
 
@@ -344,7 +344,7 @@ class Field(object):
         except KeyError:
             pass
 
-        # Since we know that the model_data no longer contains the value, we can
+        # Since we know that the field_data no longer contains the value, we can
         # avoid the possible database lookup that a future get() call would
         # entail by setting the cached value now to its default value.
         self._set_cached_value(instance, copy.deepcopy(self.default))

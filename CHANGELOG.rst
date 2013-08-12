@@ -8,6 +8,8 @@ or near the top.  Include a label indicating the component affected.
 
 0.3
 ----------
+* Rename ModelData to FieldData
+
 * Rename ModelType to Field
 
 * Split xblock.core into a number of smaller modules:

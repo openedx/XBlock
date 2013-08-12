@@ -48,13 +48,13 @@ def test_namespace_field_access(_mock_load_classes):
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default='field c')
 
-    model_data = DictModel({
+    field_data = DictModel({
         'field_a': 5,
         'field_x': [1, 2, 3],
     })
     field_tester = FieldTester(
         MagicMock(),
-        model_data,
+        field_data,
         Mock(),
     )
 
@@ -74,7 +74,7 @@ def test_namespace_field_access(_mock_load_classes):
     field_tester.test.field_x = ['a', 'b']
     field_tester.save()
 
-    assert_equals(['a', 'b'], model_data.get(field_tester, 'field_x'))
+    assert_equals(['a', 'b'], field_data.get(field_tester, 'field_x'))
 
     # Test modifying mutable namespaced fields
     field_tester.test.field_x.insert(0, 'A')
@@ -83,9 +83,9 @@ def test_namespace_field_access(_mock_load_classes):
     assert_equals(['A', 'a', 'b'], field_tester.test.field_x)
     assert_equals(['new', 'elt'], field_tester.test.field_w)
     field_tester.save()
-    # After save, new values should be reflected in the model_data
-    assert_equals(['A', 'a', 'b'], model_data.get(field_tester, 'field_x'))
-    assert_equals(['new', 'elt'], model_data.get(field_tester, 'field_w'))
+    # After save, new values should be reflected in the field_data
+    assert_equals(['A', 'a', 'b'], field_data.get(field_tester, 'field_x'))
+    assert_equals(['new', 'elt'], field_data.get(field_tester, 'field_w'))
 
     # Test deleting namespaced fields
     del field_tester.test.field_x
@@ -101,4 +101,4 @@ def test_namespace_field_access(_mock_load_classes):
     field_tester.test.field_z = 'foo'
     with assert_raises(AttributeError):
         getattr(field_tester.test, 'field_z')
-    assert_false(model_data.has(field_tester, 'field_z'))
+    assert_false(field_data.has(field_tester, 'field_z'))

@@ -6,7 +6,7 @@ import re
 import functools
 
 from collections import namedtuple, MutableMapping
-from xblock.fields import Field, BlockScope, Scope, ModelData, UNSET
+from xblock.fields import Field, BlockScope, Scope, FieldData, UNSET
 
 
 class InvalidScopeError(Exception):
@@ -74,7 +74,7 @@ class KeyValueStore(object):
             self.set(key, value)
 
 
-class DbModel(ModelData):
+class DbModel(FieldData):
     """
     An interface mapping value access that uses field names to one
     that uses the correct scoped keys for the underlying KeyValueStore

@@ -3,12 +3,12 @@ Tools for testing XBlocks
 """
 
 from xblock.fields import UNSET
-from xblock.runtime import ModelData
+from xblock.runtime import FieldData
 
 
-class DictModel(ModelData):
+class DictModel(FieldData):
     """
-    A model_data that just uses a single supplied dictionary to store fields by name
+    A field_data that just uses a single supplied dictionary to store fields by name
     """
     def __init__(self, data):
         self._data = data

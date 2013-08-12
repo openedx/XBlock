@@ -122,22 +122,22 @@ class XBlock(Plugin):
         """The class can adjust a parsed Usage tree."""
         return node
 
-    def __init__(self, runtime, model_data, scope_ids):
+    def __init__(self, runtime, field_data, scope_ids):
         """
         :param runtime: Use it to access the environment.
             It is available in XBlock code as ``self.runtime``.
         :type runtime: :class:`xblock.core.Runtime`.
 
-        :param model_data: Interface used by the XBlock fields to access their data
+        :param field_data: Interface used by the XBlock fields to access their data
             from wherever it is persisted
-        :type model_data: :class:`xblock.core.ModelData`
+        :type field_data: :class:`xblock.fields.FieldData`
 
         :param scope_ids: Identifiers needed to resolve scopes
         :type scope_ids: `~xblock.fields.ScopeIds`.
         """
         self.runtime = runtime
-        self._model_data = model_data
-        self._model_data_cache = {}
+        self._field_data = field_data
+        self._field_data_cache = {}
         self._dirty_fields = set()
         self.scope_ids = scope_ids
 
@@ -172,7 +172,7 @@ class XBlock(Plugin):
         try:
             fields_to_save = self._get_fields_to_save()
             # Throws KeyValueMultiSaveError if things go wrong
-            self._model_data.set_many(self, fields_to_save)
+            self._field_data.set_many(self, fields_to_save)
 
         except KeyValueMultiSaveError as save_error:
             saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
@@ -193,9 +193,9 @@ class XBlock(Plugin):
         for field in self._dirty_fields:
             # If the field isn't in the model data, or the cached value doesn't equal what
             # is already in the model data, then we know we need to write this value out.
-            if not self._model_data.has(self, field.name) or \
-               self._model_data_cache[field.name] != field.from_json(self._model_data.get(self, field.name)):
-                fields_to_save[field.name] = field.to_json(self._model_data_cache[field.name])
+            if not self._field_data.has(self, field.name) or \
+               self._field_data_cache[field.name] != field.from_json(self._field_data.get(self, field.name)):
+                fields_to_save[field.name] = field.to_json(self._field_data_cache[field.name])
         return fields_to_save
 
     def _clear_dirty_fields(self):

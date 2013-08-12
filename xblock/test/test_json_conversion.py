@@ -66,7 +66,7 @@ class TestJsonConversion():
         assert_is_instance(self.block.field_b, set)
         assert_equals(
             {'$type': 'set', '$vals': [5, 6]},
-            self.block._model_data.get(self.block, 'field_b')
+            self.block._field_data.get(self.block, 'field_b')
         )
 
 
