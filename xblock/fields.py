@@ -395,11 +395,24 @@ class Field(object):
         """
         self.__delete__(model)
 
+    @property
+    def _cmp_key(self):
+        """
+        Return a key to be used for comparison of Field objects
+        """
+        return (self._name, self.help, self._default, self.scope, self._display_name, self._values)
+
     def __hash__(self):
         return hash(self.name)
 
     def __eq__(self, other):
-        return self.name == other.name
+        return (
+            self.__class__ == other.__class__
+            and self._cmp_key == other._cmp_key  # pylint: disable=W0212
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 class Integer(Field):
@@ -534,6 +547,58 @@ class Any(Field):
     pass
 
 
+# Shamelessly cribbed from http://docs.python.org/2/howto/descriptor.html
+# and adapted to work only on classes
+class ClassProperty(object):
+    """
+    @property analogy except for class methods
+    """
+    def __init__(self, fget=None, doc=None):
+        self.fget = fget
+        if doc is None and fget is not None:
+            doc = fget.__doc__
+        self.__doc__ = doc
+
+    def __get__(self, instance, owner):
+        if self.fget is None:
+            raise AttributeError("unreadable attribute")
+        return self.fget(owner)
+
+
+classproperty = ClassProperty  # pylint: disable=C0103
+
+
+# This defines a property on the class that uses this metaclass
+@classproperty
+def _fields(cls):
+    """
+    Return a dictionary mapping field names to field values
+    for fields defined in this class and its base classes
+    """
+    fields = {}
+    # Pylint tries to do fancy inspection for class methods/properties, and
+    # in this case, gets it wrong
+
+    # Loop through all of the baseclasses of cls, in
+    # the order that methods are resolved (Method Resolution Order / mro)
+    # and find all of their defined fields.
+    #
+    # Only save the first such defined field (as expected for method resolution)
+    for base_class in cls.mro():  # pylint: disable=E1101
+        # We can't use inspect.getmembers() here, because that would
+        # call the fields property again, and generate an infinite loop.
+        # Instead, we loop through all of the attribute names, exclude the
+        # 'fields' attribute, and then retrieve the value
+        for attr_name in dir(base_class):
+            if attr_name == 'fields':
+                continue
+
+            attr_value = getattr(base_class, attr_name)
+            if isinstance(attr_value, Field):
+                fields.setdefault(attr_name, attr_value)
+    return fields
+
+
 class ModelMetaclass(type):
     """
     A metaclass to be used for classes that want to use Fields as class attributes
@@ -541,22 +606,17 @@ class ModelMetaclass(type):
 
     All class attributes that are Fields will be added to the 'fields' attribute on
     the instance.
-
-    Additionally, any namespaces registered in the `xblock.namespace` will be added to
-    the instance.
     """
     def __new__(mcs, name, bases, attrs):
         # Allow this method to access `_name`
         # pylint: disable=W0212
-        fields = set()
-        for aname, value in attrs.items() + \
-                sum([inspect.getmembers(base) for base in bases], []):
+        for aname, value in attrs.items() + sum([inspect.getmembers(base) for base in bases], []):
             if isinstance(value, Field):
                 # Set the name of this attribute
                 value._name = aname
-                fields.add(value)
 
-        attrs['fields'] = list(fields)
+        attrs['fields'] = _fields
+
         return super(ModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 

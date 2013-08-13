@@ -7,28 +7,8 @@ import functools
 
 from collections import namedtuple, MutableMapping
 from xblock.fields import Field, BlockScope, Scope, FieldData, UNSET
-
-
-class InvalidScopeError(Exception):
-    """
-    Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
-    """
-    pass
-
-
-class NoSuchViewError(Exception):
-    """
-    Raised to indicate that the view requested was not found.
-    """
-    pass
-
-
-class NoSuchHandlerError(Exception):
-    """
-    Raised to indicate that the requested handler was not found.
-    """
-    pass
-
+from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
+from xblock.core import XBlock
 
 
 class KeyValueStore(object):
@@ -103,19 +83,7 @@ class DbModel(FieldData):
         if block_field is not None and isinstance(block_field, Field):
             return block_field
 
-        # If the class doesn't have the field, and it also doesn't have any
-        # namespaces, then the name isn't a field so KeyError
-        if not hasattr(block.__class__, 'namespaces'):
-            raise KeyError(name)
-
-        # Resolve the field name in the first namespace where it's available.
-        for namespace_name in block.__class__.namespaces:
-            namespace = getattr(block.__class__, namespace_name)
-            namespace_field = getattr(type(namespace), name, None)
-            if namespace_field is not None and isinstance(namespace_field, Field):
-                return namespace_field
-
-        # Not in the class or in any of the namespaces, so name
+        # Not in the class, so name
         # really doesn't name a field
         raise KeyError(name)
 
@@ -221,8 +189,58 @@ class Runtime(object):
     Access to the runtime environment for XBlocks.
     """
 
-    def __init__(self):
+    def __init__(self, mixins=()):
+        """
+        :param mixins: Classes that should be mixed in with every :class:`~xblock.core.XBlock`
+            created by this `Runtime`
+        :type mixins: `tuple` of `class`es
+        """
         self._view_name = None
+        self._block_mixins = ()
+
+        # Used to cache the automatically constructed subclasses that contain the
+        # mixins, so that multiple XBlocks constructed from the same base class
+        # also have the same generated class
+        self._generated_classes = {}
+
+        self.block_mixins = tuple(mixins)
+
+    @property
+    def block_mixins(self):
+        """
+        Read the active block mixins
+        """
+        return self._block_mixins
+
+    @block_mixins.setter
+    def block_mixins(self, value):
+        """
+        Update the block mixins. If the active mixins change,
+        reset the cache of generated classes
+        """
+        if tuple(value) != self._block_mixins:
+            self._block_mixins = tuple(value)
+            self._generated_classes.clear()
+
+
+    def construct_block(self, plugin_name, field_data, scope_ids, default_class=None, *args, **kwargs):
+        """
+        Construct a new xblock of the type identified by plugin_name,
+        passing *args and **kwargs into __init__
+        """
+        block_class = XBlock.load_class(plugin_name, default_class)
+        return self.construct_block_from_class(block_class, field_data, scope_ids, *args, **kwargs)
+
+    def construct_block_from_class(self, cls, field_data, scope_keys, *args, **kwargs):
+        """
+        Construct a new xblock of type cls, mixing in the mixins
+        defined for this application
+        """
+        if cls not in self._generated_classes:
+            self._generated_classes[cls] = type(cls.__name__ + 'WithMixins', (cls, ) + self.block_mixins, {})
+
+        mixin_class = self._generated_classes[cls]
+        return mixin_class(self, field_data, scope_keys, *args, **kwargs)
 
     def render(self, block, context, view_name):
         """
@@ -263,7 +281,6 @@ class Runtime(object):
         """Get a block by ID.
 
         Returns the block identified by `block_id`, or raises an exception.
-
         """
         raise NotImplementedError("Runtime needs to provide get_block()")
 

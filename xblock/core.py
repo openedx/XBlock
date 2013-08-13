@@ -13,7 +13,6 @@ from webob import Response
 
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
 from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope
-from xblock.namespaces import NamespacesMetaclass
 from xblock.plugin import Plugin
 
 
@@ -39,14 +38,12 @@ class TagCombiningMetaclass(type):
 
 class XBlockMetaclass(
         ChildrenModelMetaclass,
-        NamespacesMetaclass,
         ModelMetaclass,
         TagCombiningMetaclass,
 ):
     """
-    Metaclass that combines the four base XBlock metaclasses:
+    Metaclass that combines the three base XBlock metaclasses:
     * `ChildrenModelMetaclass`
-    * `NamespacesMetaclass`
     * `ModelMetaclass`
     * `TagCombiningMetaclass`
     """
@@ -146,7 +143,7 @@ class XBlock(Plugin):
         # Since this is not understood by static analysis, silence this error.
         # pylint: disable=E1101
         attrs = []
-        for field in self.fields:
+        for field in self.fields.values():
             try:
                 value = getattr(self, field.name)
             except Exception:  # pylint: disable=W0703

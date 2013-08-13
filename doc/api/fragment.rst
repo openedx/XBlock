@@ -2,6 +2,5 @@
 Fragment
 ========
 
-.. module:: xblock.fragment
-.. autoclass:: Fragment
+.. automodule:: xblock.fragment
     :members:

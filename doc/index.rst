@@ -31,6 +31,7 @@ Contents:
 
     concepts
     guide/xblock
+    guide/runtimes
     guide/fragment
 
 
