@@ -15,7 +15,7 @@ from mock import Mock
 from xblock.core import XBlock
 from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List, UserScope
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
-from xblock.runtime import KeyValueStore, DbModel, Runtime
+from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator
 from xblock.fragment import Fragment
 from xblock.test import DictKeyValueStore
 from xblock.test.tools import DictModel
@@ -349,3 +349,51 @@ def test_only_generate_classes_once():
         runtime.construct_block_from_class(FieldTester, Mock(), Mock()).__class__,
         runtime.construct_block_from_class(TestXBlock, Mock(), Mock()).__class__,
     )
+
+
+class Dynamic(object):
+    """
+    Object for testing that sets attrs based on __init__ kwargs
+    """
+    def __init__(self, **kwargs):
+        for name, value in kwargs.items():
+            setattr(self, name, value)
+
+
+class TestObjectAggregator(object):
+    """
+    Test that the ObjectAggregator behaves correctly
+    """
+    def setUp(self):
+        # Create some objects that only have single attributes
+        self.first = Dynamic(first=1)
+        self.second = Dynamic(second=2)
+        self.agg = ObjectAggregator(self.first, self.second)
+
+    def test_get(self):
+        assert_equals(1, self.agg.first)
+        assert_equals(2, self.agg.second)
+        assert_false(hasattr(self.agg, 'other'))
+        with assert_raises(AttributeError):
+            self.agg.other  # pylint: disable=W0104
+
+    def test_set(self):
+        assert_equals(1, self.agg.first)
+        self.agg.first = 10
+        assert_equals(10, self.agg.first)
+        assert_equals(10, self.first.first)  # pylint: disable=E1101
+
+        with assert_raises(AttributeError):
+            self.agg.other = 99
+        assert_false(hasattr(self.first, 'other'))
+        assert_false(hasattr(self.second, 'other'))
+
+    def test_delete(self):
+        assert_equals(1, self.agg.first)
+        del self.agg.first
+        assert_false(hasattr(self.first, 'first'))
+        with assert_raises(AttributeError):
+            self.agg.first  # pylint: disable=W0104
+
+        with assert_raises(AttributeError):
+            del self.agg.other
