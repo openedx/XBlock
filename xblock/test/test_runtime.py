@@ -4,7 +4,7 @@ from nose.tools import assert_equals, assert_false, assert_true, assert_raises  
 from collections import namedtuple
 from mock import patch, Mock
 
-from xblock.core import BlockScope, Namespace, Scope, String, XBlock
+from xblock.core import BlockScope, Namespace, Scope, String, XBlock, Integer
 from xblock.runtime import NoSuchViewError, KeyValueStore, DbModel, Runtime
 from xblock.fragment import Fragment
 from xblock.test import DictKeyValueStore
@@ -261,3 +261,41 @@ def test_runtime_render():
     tester = TestXBlockNoFallback(Mock(), db_model)
     with assert_raises(NoSuchViewError):
         runtime.render(tester, [update_string], 'test_nonexistant_view')
+
+class SerialDefaultKVS(DictKeyValueStore):
+    """
+    A kvs which gives each call to default the next int (nonsensical but for testing default fn)
+    """
+    def __init__(self, *args, **kwargs):
+        super(SerialDefaultKVS, self).__init__(*args, **kwargs)
+        self.default_counter = 0
+
+    def default(self, _key):
+        self.default_counter += 1
+        return self.default_counter
+
+class TestIntegerXblock(XBlock):
+    counter = Integer(scope=Scope.content)
+
+def test_default_fn():
+    key_store = SerialDefaultKVS()
+    db_model = DbModel(key_store, TestIntegerXblock, 's0', TestUsage('u0', 'd0'))
+    tester = TestIntegerXblock(Mock(), db_model)
+    db_model2 = DbModel(key_store, TestIntegerXblock, 's0', TestUsage('u1', 'd0'))
+    tester2 = TestIntegerXblock(Mock(), db_model2)
+
+    # ensure value is not in tester before any actions
+    assert_false(db_model.has('counter'))
+    # ensure value is same over successive calls for same DbModel
+    first_call = tester.counter
+    assert_equals(first_call, 1)
+    assert_equals(first_call, tester.counter)
+    # ensure the value is not saved in the object
+    assert_false(db_model.has('counter'))
+    # ensure save does not save the computed default back to the object
+    tester.save()
+    assert_false(db_model.has('counter'))
+
+    # ensure second object gets another value
+    second_call = tester2.counter
+    assert_equals(second_call, 2)
