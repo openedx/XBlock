@@ -40,6 +40,9 @@ class DictModel(ModelData):
     def set_many(self, update_dict):
         self._data.update(update_dict)
 
+    def default(self, name):
+        raise KeyError
+
 
 def test_model_metaclass():
     class ModelMetaclassTester(object):
@@ -535,7 +538,7 @@ def test_object_identity():
     # each time it's actually queried, so that the caching is
     # doing the work to maintain object identity.
     model_data = MagicMock(spec=ModelData)
-    model_data.get = lambda name, default=None: [name]
+    model_data.get = lambda name, default = None: [name]
     field_tester = FieldTester(model_data)
 
     value = field_tester.field_a
@@ -568,7 +571,7 @@ def test_caching_is_per_instance():
             self._dirty_fields = set()
 
     model_data = MagicMock(spec=ModelData)
-    model_data.get = lambda name, default=None: [name]
+    model_data.get = lambda name, default = None: [name]
 
     # Same model_data used in different objects should result
     # in separately-cached values, so that changing a value
@@ -735,7 +738,7 @@ def setup_save_failure(set_many):
     Set up tests for when there's a save error in the underlying KeyValueStore
     """
     model_data = MagicMock(spec=ModelData)
-    model_data.get = lambda name, default=None: 99
+    model_data.get = lambda name, default = None: 99
 
     model_data.set_many = set_many
 

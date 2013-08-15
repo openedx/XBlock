@@ -54,7 +54,7 @@ UNSET = object()
 
 class ModelData(object):
     """
-    An interface allowing access to field values indexed by field names
+    An interface allowing access to an XBlock's field values indexed by field names
     """
     def get(self, name, default=UNSET):
         """
@@ -88,6 +88,14 @@ class ModelData(object):
         for key, value in update_dict.items():
             self.set(key, value)
 
+    def default(self, name):
+        """
+        Get the default value for this field which may depend on context or may just be the field's global
+        default. The default behavior is to raise KeyError which will cause the caller to return the field's
+        global default.
+        :param _name: the field's name
+        """
+        raise NotImplementedError
 
 class BlockScope(object):
     """Enumeration defining BlockScopes"""
@@ -283,7 +291,10 @@ class ModelType(object):
                     self._mark_dirty(instance)
             except KeyError:
                 # Cache default value
-                value = self.default
+                try:
+                    value = instance._model_data.default(self.name)
+                except KeyError:
+                    value = self.default
             finally:
                 if self.MUTABLE:
                     # Make a copy of mutable types to place into the cache, but don't

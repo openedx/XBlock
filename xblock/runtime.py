@@ -54,6 +54,13 @@ class KeyValueStore(object):
         """Abstract has method. Implementations should return Boolean, whether or not `key` is present."""
         pass
 
+    def default(self, _key):
+        """
+        Abstract default method. Implementations should return the context relevant default of the given `key`
+        or raise KeyError which will result in the field's global default.
+        """
+        raise KeyError
+
     def set_many(self, update_dict):
         """
         Bulk update of the kvs.
@@ -193,6 +200,13 @@ class DbModel(ModelData):
             updated_dict[self._key(key)] = value
 
         self._kvs.set_many(updated_dict)
+
+    def default(self, name):
+        """
+        Ask the kvs for the default (default implementation which other classes may override).
+        :param name:
+        """
+        return self._kvs.default(self._key(name))
 
 
 class Runtime(object):
