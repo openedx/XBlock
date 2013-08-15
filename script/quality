@@ -1,0 +1,11 @@
+# Compute quality
+if [ "$1" == "html" ]; then
+   echo "Generating diff_quality_pep8.html"
+   diff-quality --violations=pep8 --html-report diff_quality_pep8.html
+   echo "Generating diff_quality_pylint.html"
+   diff-quality --violations=pylint --html-report diff_quality_pylint.html
+else
+   diff-quality --violations=pep8
+   echo
+   diff-quality --violations=pylint
+fi
