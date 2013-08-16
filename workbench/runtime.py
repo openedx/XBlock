@@ -16,7 +16,7 @@ import logging
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
-from xblock.core import XBlock, Scope, ModelType, ScopeIds
+from xblock.core import XBlock, Scope, ScopeIds
 from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
 from xblock.fragment import Fragment
 
@@ -244,34 +244,6 @@ class WorkbenchRuntime(Runtime):
     def query(self, block):
         return _BlockSet(self, [block])
 
-    def collect(self, block, key):
-        """WARNING: This is an experimental function, subject to future change or removal."""
-        block_cls = block.__class__
-
-        data_model = AnalyticsDbModel(
-            MEMORY_KVS,
-        )
-        value = data_model.get(block, key, None)
-        children = []
-        for child_id in data_model.get(block, 'children', []):
-            child = self.get_block(child_id)
-            children.append(child.runtime.collect(child, key))
-
-        result = {
-            'class': block_cls.__name__,
-            'value': value,
-            'children': children,
-        }
-
-        return result
-
-    def publish(self, block, key, value):
-        """WARNING: This is an experimental function, subject to future change or removal."""
-        data = AnalyticsDbModel(
-            MEMORY_KVS,
-        )
-        data.set(block, key, value)
-
 
 class _BlockSet(object):
     def __init__(self, runtime, blocks):
@@ -345,30 +317,3 @@ def create_xblock(usage, student_id=None):
     keys = ScopeIds(student_id, usage.block_name, usage.def_id, usage.id)
     block = block_cls(RUNTIME, MODEL, keys)
     return block
-
-class AnalyticsDbModel(DbModel):
-    """
-    A dictionary-like interface to the fields on a block,
-    provided specifically for analytics.
-
-    WARNING: This is an experimental class, subject to future change or removal.
-    """
-    def _key(self, block, name):
-        """
-        Resolves `name` to a key, in the following form:
-
-        KeyValueStore.Key(
-            scope=field.scope,
-            student_id=student_id,
-            block_scope_id=block_id,
-            field_name=analytics.name
-        )
-        """
-        key = super(AnalyticsDbModel, self)._key(block, 'analytics.{0}'.format(name))
-        return key
-
-    def _getfield(self, block, _name):
-        """
-        Returns a new field with a scope of `Scope.user_state`.
-        """
-        return ModelType(scope=Scope.user_state)

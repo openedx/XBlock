@@ -18,13 +18,6 @@ class Sequence(XBlock):
         child_frags = self.runtime.render_children(self, context)
         frag.add_frags_resources(child_frags)
 
-        progress_per_child = [self.runtime.collect(self.runtime.get_block(child_id), 'progress')
-                              for child_id in self.children]  # pylint: disable=E1101
-
-        # TODO: [rocha] calculate total progress per child
-        from pprint import pprint
-        pprint(progress_per_child)
-
         frag.add_content(self.runtime.render_template("sequence.html", children=child_frags))
 
         frag.add_css_url('http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css')
