@@ -262,6 +262,7 @@ def test_runtime_render():
     with assert_raises(NoSuchViewError):
         runtime.render(tester, [update_string], 'test_nonexistant_view')
 
+
 class SerialDefaultKVS(DictKeyValueStore):
     """
     A kvs which gives each call to default the next int (nonsensical but for testing default fn)
@@ -274,8 +275,10 @@ class SerialDefaultKVS(DictKeyValueStore):
         self.default_counter += 1
         return self.default_counter
 
+
 class TestIntegerXblock(XBlock):
     counter = Integer(scope=Scope.content)
+
 
 def test_default_fn():
     key_store = SerialDefaultKVS()
