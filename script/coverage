@@ -1,0 +1,10 @@
+# Compute coverage
+coverage run manage.py test
+coverage html
+coverage xml -o coverage.xml
+if [ "$1" == "html" ]; then
+   echo "Generating diff_cover.html"
+   diff-cover coverage.xml --html-report diff_cover.html
+else
+   diff-cover coverage.xml
+fi
