@@ -88,14 +88,14 @@ class ModelData(object):
         for key, value in update_dict.items():
             self.set(key, value)
 
-    def default(self, _name):
+    def default(self, name):
         """
         Get the default value for this field which may depend on context or may just be the field's global
         default. The default behavior is to raise KeyError which will cause the caller to return the field's
         global default.
-        :param _name: the field's name
+        :param name: the field's name
         """
-        raise KeyError
+        raise KeyError(name)
 
 class BlockScope(object):
     """Enumeration defining BlockScopes"""

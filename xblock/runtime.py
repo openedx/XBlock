@@ -54,12 +54,12 @@ class KeyValueStore(object):
         """Abstract has method. Implementations should return Boolean, whether or not `key` is present."""
         pass
 
-    def default(self, _key):
+    def default(self, key):
         """
         Abstract default method. Implementations should return the context relevant default of the given `key`
         or raise KeyError which will result in the field's global default.
         """
-        raise KeyError
+        raise KeyError(repr(key))
 
     def set_many(self, update_dict):
         """
