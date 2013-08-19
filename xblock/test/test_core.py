@@ -40,6 +40,9 @@ class DictModel(ModelData):
     def set_many(self, update_dict):
         self._data.update(update_dict)
 
+    def default(self, name):
+        raise KeyError
+
 
 def test_model_metaclass():
     class ModelMetaclassTester(object):
