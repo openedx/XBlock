@@ -6,7 +6,7 @@ import re
 import functools
 
 from collections import namedtuple, MutableMapping
-from xblock.fields import Field, BlockScope, Scope, FieldData, UNSET
+from xblock.fields import Field, BlockScope, Scope, FieldData, UNSET, UserScope
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.core import XBlock
 
@@ -114,7 +114,7 @@ class DbModel(FieldData):
             elif block_scope == BlockScope.TYPE:
                 block_id = block.scope_ids.block_type
 
-            if field.scope.user:
+            if field.scope.user == UserScope.ONE:
                 student_id = block.scope_ids.student_id
             else:
                 student_id = None
