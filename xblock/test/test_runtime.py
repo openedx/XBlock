@@ -273,7 +273,7 @@ class SerialDefaultKVS(DictKeyValueStore):
 
     def default(self, _key):
         self.default_counter += 1
-        return self.default_counter
+        return str(self.default_counter)  # str to force the from_json to do something
 
 
 class TestIntegerXblock(XBlock):
