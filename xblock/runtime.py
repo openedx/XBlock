@@ -222,7 +222,6 @@ class Runtime(object):
             self._block_mixins = tuple(value)
             self._generated_classes.clear()
 
-
     def construct_block(self, plugin_name, field_data, scope_ids, default_class=None, *args, **kwargs):
         """
         Construct a new xblock of the type identified by plugin_name,
