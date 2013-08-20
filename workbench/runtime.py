@@ -16,7 +16,8 @@ import logging
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
-from xblock.core import XBlock, Scope, ScopeIds
+from xblock.core import XBlock
+from xblock.fields import Scope, ScopeIds
 from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
 from xblock.fragment import Fragment
 

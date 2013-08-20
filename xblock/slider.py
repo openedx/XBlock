@@ -6,7 +6,8 @@ WARNING: This is an experimental module, subject to future change or removal.
 import json
 from webob import Response
 
-from xblock.core import XBlock, Scope, Integer
+from xblock.core import XBlock
+from xblock.fields import Scope, Integer
 from xblock.fragment import Fragment
 
 

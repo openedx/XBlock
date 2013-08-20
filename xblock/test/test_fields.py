@@ -1,13 +1,21 @@
 """
-Tests for classes extending ModelType.
+Tests for classes extending Field.
 """
 
+# Allow accessing protected members for testing purposes
+# pylint: disable=W0212
+
 import unittest
-from xblock.core import Any, Boolean, Dict, Float, Integer, List, String
+# pylint: disable=E0611
+from nose.tools import assert_equals
+# pylint: enable=E0611
+
+from xblock.core import XBlock
+from xblock.fields import Any, Boolean, Dict, Float, Integer, List, String
 
 
-class ModelTypeTest(unittest.TestCase):
-    """ Base test class for ModelTypes. """
+class FieldTest(unittest.TestCase):
+    """ Base test class for Fields. """
 
     def field_totest(self):
         """Child classes should override this with the type of field
@@ -35,9 +43,9 @@ class ModelTypeTest(unittest.TestCase):
             self.field_totest().from_json(arg)
 
 
-class IntegerTest(ModelTypeTest):
+class IntegerTest(FieldTest):
     """
-    Tests the Integer ModelType.
+    Tests the Integer Field.
     """
     field_totest = Integer
 
@@ -66,9 +74,9 @@ class IntegerTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class FloatTest(ModelTypeTest):
+class FloatTest(FieldTest):
     """
-    Tests the Float ModelType.
+    Tests the Float Field.
     """
     field_totest = Float
 
@@ -95,9 +103,9 @@ class FloatTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class BooleanTest(ModelTypeTest):
+class BooleanTest(FieldTest):
     """
-    Tests the Boolean ModelType.
+    Tests the Boolean Field.
     """
     field_totest = Boolean
 
@@ -122,9 +130,9 @@ class BooleanTest(ModelTypeTest):
         self.assertJSONEquals(False, [])
 
 
-class StringTest(ModelTypeTest):
+class StringTest(FieldTest):
     """
-    Tests the String ModelType.
+    Tests the String Field.
     """
     field_totest = String
 
@@ -146,9 +154,9 @@ class StringTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class AnyTest(ModelTypeTest):
+class AnyTest(FieldTest):
     """
-    Tests the Any ModelType.
+    Tests the Any Field.
     """
     field_totest = Any
 
@@ -164,9 +172,9 @@ class AnyTest(ModelTypeTest):
         self.assertJSONEquals(None, None)
 
 
-class ListTest(ModelTypeTest):
+class ListTest(FieldTest):
     """
-    Tests the List ModelType.
+    Tests the List Field.
     """
     field_totest = List
 
@@ -188,9 +196,9 @@ class ListTest(ModelTypeTest):
         self.assertJSONTypeError({})
 
 
-class DictTest(ModelTypeTest):
+class DictTest(FieldTest):
     """
-    Tests the Dict ModelType.
+    Tests the Dict Field.
     """
     field_totest = Dict
 
@@ -209,3 +217,64 @@ class DictTest(ModelTypeTest):
         self.assertJSONTypeError('true')
         self.assertJSONTypeError(3.7)
         self.assertJSONTypeError(True)
+
+
+def test_field_name_defaults():
+    # Tests field display name default values
+    attempts = Integer()
+    attempts._name = "max_problem_attempts"
+    assert_equals('max_problem_attempts', attempts.display_name)
+
+    class TestBlock(XBlock):
+        """
+        Block for testing
+        """
+        field_x = List()
+
+    assert_equals("field_x", TestBlock.field_x.display_name)
+
+
+def test_field_display_name():
+    attempts = Integer(display_name='Maximum Problem Attempts')
+    attempts._name = "max_problem_attempts"
+    assert_equals("Maximum Problem Attempts", attempts.display_name)
+
+    boolean_field = Boolean(display_name="boolean field")
+    assert_equals("boolean field", boolean_field.display_name)
+
+    class TestBlock(XBlock):
+        """
+        Block for testing
+        """
+        field_x = List(display_name="Field Known as X")
+
+    assert_equals("Field Known as X", TestBlock.field_x.display_name)
+
+
+def test_values():
+    # static return value
+    field_values = ['foo', 'bar']
+    test_field = String(values=field_values)
+    assert_equals(field_values, test_field.values)
+
+    # function to generate values
+    test_field = String(values=lambda: [1, 4])
+    assert_equals([1, 4], test_field.values)
+
+    # default if nothing specified
+    assert_equals(None, String().values)
+
+
+def test_values_boolean():
+    # Test Boolean, which has values defined
+    test_field = Boolean()
+    assert_equals(
+        ({'display_name': "True", "value": True}, {'display_name': "False", "value": False}),
+        test_field.values
+    )
+
+
+def test_values_dict():
+    # Test that the format expected for integers is allowed
+    test_field = Integer(values={"min": 1, "max": 100})
+    assert_equals({"min": 1, "max": 100}, test_field.values)
