@@ -35,29 +35,6 @@ class Slider(XBlock):
         return Response()
 
 
-class ProgressSlider(Slider):
-    """A slider XBlock with fancier styling."""
-    def student_view(self, context):
-        """Provide the student view of the slider, with added text."""
-        frag = super(ProgressSlider, self).student_view(context)
-
-        # TODO: [rocha] non-wrapped ccs will make this global
-        #               not what we want
-        #
-        # frag.add_css("input[type=range] + span { color: red; }")
-
-        # TODO: [rocha] initial progress - could on in constructor or initializer
-        self.runtime.publish('progress', (self.value, self.max_value))
-
-        frag.add_javascript(P_SLIDER_JS)
-        frag.initialize_js('ProgressSlider')
-        return frag
-
-    def update(self, request):
-        response = super(ProgressSlider, self).update(request)
-        self.runtime.publish('progress', (self.value, self.max_value))
-        return response
-
 SLIDER_TEMPLATE = u"""
 <input type="range" min="{min}" max="{max}" value="{val}"/> <span> {val} </span>
 """
@@ -89,22 +66,4 @@ Slider.prototype.submit = function() {
 
 Slider.prototype.handle_submit = function(result) {
 };
-"""
-
-P_SLIDER_JS = """
-function ProgressSlider(runtime, element) {
-  if (!(this instanceof ProgressSlider)) {
-    return new ProgressSlider(runtime, element);
-  }
-
-  Slider.call(this, runtime, element);
-
-  $(element).css('color','red');
-
-  this.input.on('mouseup', function() {
-    console.log('updating progress');
-  });
-}
-
-ProgressSlider.prototype = Object.create(Slider.prototype);
 """

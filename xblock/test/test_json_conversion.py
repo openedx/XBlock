@@ -32,7 +32,7 @@ class TestBlock(XBlock):
 
 class TestModel(DictModel):
     """ModelData for testing json conversion"""
-    def default(self, name):
+    def default(self, block, name):
         return {'$type': 'set', '$vals': [0, 1]}
 
 
@@ -48,7 +48,8 @@ class TestJsonConversion():
             Mock(),
             TestModel({
                 'field_a': {'$type': 'set', '$vals': [1, 2, 3]}
-            })
+            }),
+            Mock()
         )
 
     def test_get(self):
@@ -64,7 +65,7 @@ class TestJsonConversion():
         assert_is_instance(self.block.field_b, set)
         assert_equals(
             {'$type': 'set', '$vals': [5, 6]},
-            self.block._model_data.get('field_b')
+            self.block._model_data.get(self.block, 'field_b')
         )
 
 

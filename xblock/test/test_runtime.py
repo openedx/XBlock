@@ -4,7 +4,7 @@ from nose.tools import assert_equals, assert_false, assert_true, assert_raises  
 from collections import namedtuple
 from mock import patch, Mock
 
-from xblock.core import BlockScope, Namespace, Scope, String, XBlock, Integer
+from xblock.core import BlockScope, Namespace, Scope, String, XBlock, ScopeIds, Integer
 from xblock.runtime import NoSuchViewError, KeyValueStore, DbModel, Runtime
 from xblock.fragment import Fragment
 from xblock.test import DictKeyValueStore
@@ -114,7 +114,7 @@ def check_field(collection, field):
 
 
 def test_namespace_actions():
-    tester = TestModel(Mock(), DbModel(DictKeyValueStore(), TestModel, 's0', TestUsage('u0', 'd0')))
+    tester = TestModel(Mock(), DbModel(DictKeyValueStore()), Mock())
     # `test` is a namespace provided by the patch when TestModel is defined, which ultimately
     # comes from the NamespacesMetaclass. Since this is not understood by static
     # analysis, silence this error for the duration of this test.
@@ -128,10 +128,10 @@ def test_db_model_keys():
     # Tests that updates to fields are properly recorded in the KeyValueStore,
     # and that the keys have been constructed correctly
     key_store = DictKeyValueStore()
-    db_model = DbModel(key_store, TestModel, 's0', TestUsage('u0', 'd0'))
-    tester = TestModel(Mock(), db_model)
+    db_model = DbModel(key_store)
+    tester = TestModel(Mock(), db_model, ScopeIds('s0', 'TestModel', 'd0', 'u0'))
 
-    assert_false(db_model.has('not a field'))
+    assert_false(db_model.has(tester, 'not a field'))
 
     # `test` is a namespace provided by the patch when TestModel is defined, which ultimately
     # comes from the NamespacesMetaclass. Since this is not understood by static
@@ -140,7 +140,7 @@ def test_db_model_keys():
     for collection in (tester, tester.test):
         for field in collection.fields:
             new_value = 'new ' + field.name
-            assert_false(db_model.has(field.name))
+            assert_false(db_model.has(tester, field.name))
             setattr(collection, field.name, new_value)
 
     # Write out the values
@@ -149,7 +149,7 @@ def test_db_model_keys():
     # Make sure everything saved correctly
     for collection in (tester, tester.test):
         for field in collection.fields:
-            assert_true(db_model.has(field.name))
+            assert_true(db_model.has(tester, field.name))
 
     def get_key_value(scope, student_id, block_scope_id, field_name):
         """Gets the value, from `key_store`, of a Key with the given values."""
@@ -195,6 +195,7 @@ class MockRuntimeForQuerying(Runtime):
     # OK for this mock class to not override abstract methods or call base __init__
     # pylint: disable=W0223, W0231
     def __init__(self):
+        super(MockRuntimeForQuerying, self).__init__()
         self.mock_query = Mock()
 
     def query(self, block):
@@ -215,8 +216,8 @@ def test_runtime_handle():
     # Test a simple handler and a fallback handler
 
     key_store = DictKeyValueStore()
-    db_model = DbModel(key_store, TestXBlock, 's0', TestUsage('u0', 'd0'))
-    tester = TestXBlock(Mock(), db_model)
+    db_model = DbModel(key_store)
+    tester = TestXBlock(Mock(), db_model, Mock())
     runtime = MockRuntimeForQuerying()
     # string we want to update using the handler
     update_string = "user state update"
@@ -231,7 +232,7 @@ def test_runtime_handle():
     assert_equals(tester.user_state, new_update_string)
 
     # handler can't be found & no fallback handler supplied, should throw an exception
-    tester = TestXBlockNoFallback(Mock(), db_model)
+    tester = TestXBlockNoFallback(Mock(), db_model, Mock())
     ultimate_string = "ultimate update"
     with assert_raises(Exception):
         runtime.handle(tester, 'test_nonexistant_fallback_handler', ultimate_string)
@@ -239,8 +240,8 @@ def test_runtime_handle():
 
 def test_runtime_render():
     key_store = DictKeyValueStore()
-    db_model = DbModel(key_store, TestXBlock, 's0', TestUsage('u0', 'd0'))
-    tester = TestXBlock(Mock(), db_model)
+    db_model = DbModel(key_store)
+    tester = TestXBlock(Mock(), db_model, Mock())
     runtime = MockRuntimeForQuerying()
     # string we want to update using the handler
     update_string = u"user state update"
@@ -258,7 +259,7 @@ def test_runtime_render():
 
     # test against the no-fallback XBlock
     update_string = u"ultimate update"
-    tester = TestXBlockNoFallback(Mock(), db_model)
+    tester = TestXBlockNoFallback(Mock(), db_model, Mock())
     with assert_raises(NoSuchViewError):
         runtime.render(tester, [update_string], 'test_nonexistant_view')
 
@@ -282,22 +283,21 @@ class TestIntegerXblock(XBlock):
 
 def test_default_fn():
     key_store = SerialDefaultKVS()
-    db_model = DbModel(key_store, TestIntegerXblock, 's0', TestUsage('u0', 'd0'))
-    tester = TestIntegerXblock(Mock(), db_model)
-    db_model2 = DbModel(key_store, TestIntegerXblock, 's0', TestUsage('u1', 'd0'))
-    tester2 = TestIntegerXblock(Mock(), db_model2)
+    db_model = DbModel(key_store)
+    tester = TestIntegerXblock(Mock(), db_model, Mock())
+    tester2 = TestIntegerXblock(Mock(), db_model, Mock())
 
     # ensure value is not in tester before any actions
-    assert_false(db_model.has('counter'))
+    assert_false(db_model.has(tester, 'counter'))
     # ensure value is same over successive calls for same DbModel
     first_call = tester.counter
     assert_equals(first_call, 1)
     assert_equals(first_call, tester.counter)
     # ensure the value is not saved in the object
-    assert_false(db_model.has('counter'))
+    assert_false(db_model.has(tester, 'counter'))
     # ensure save does not save the computed default back to the object
     tester.save()
-    assert_false(db_model.has('counter'))
+    assert_false(db_model.has(tester, 'counter'))
 
     # ensure second object gets another value
     second_call = tester2.counter

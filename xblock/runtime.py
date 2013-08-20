@@ -79,34 +79,37 @@ class DbModel(ModelData):
     that uses the correct scoped keys for the underlying KeyValueStore
     """
 
-    def __init__(self, kvs, block_cls, student_id, usage):
+    def __init__(self, kvs):
         self._kvs = kvs
-        self._student_id = student_id
-        self._block_cls = block_cls
-        self._usage = usage
 
     def __repr__(self):
-        return "<{0.__class__.__name__} {0._block_cls!r}>".format(self)
+        return "<{0.__class__.__name__} {0._kvs!r}>".format(self)
 
-    def _getfield(self, name):
+    def _getfield(self, block, name):
         """
-        Return the field with the given `name`.
+        Return the field with the given `name` from `block`.
         If no field with `name` exists in any namespace, raises a KeyError.
+
+        :param block: xblock to retrieve the field from
+        :type block: :class:`~xblock.core.XBlock`
+        :param name: name of the field to retrieve
+        :type name: str
+        :raises KeyError: when no field with `name` exists in any namespace
         """
 
         # First, get the field from the class, if defined
-        block_field = getattr(self._block_cls, name, None)
+        block_field = getattr(block.__class__, name, None)
         if block_field is not None and isinstance(block_field, ModelType):
             return block_field
 
         # If the class doesn't have the field, and it also doesn't have any
         # namespaces, then the name isn't a field so KeyError
-        if not hasattr(self._block_cls, 'namespaces'):
+        if not hasattr(block.__class__, 'namespaces'):
             raise KeyError(name)
 
         # Resolve the field name in the first namespace where it's available.
-        for namespace_name in self._block_cls.namespaces:
-            namespace = getattr(self._block_cls, namespace_name)
+        for namespace_name in block.__class__.namespaces:
+            namespace = getattr(block.__class__, namespace_name)
             namespace_field = getattr(type(namespace), name, None)
             if namespace_field is not None and isinstance(namespace_field, ModelType):
                 return namespace_field
@@ -115,7 +118,7 @@ class DbModel(ModelData):
         # really doesn't name a field
         raise KeyError(name)
 
-    def _key(self, name):
+    def _key(self, block, name):
         """
         Resolves `name` to a key, in the following form:
 
@@ -126,24 +129,24 @@ class DbModel(ModelData):
             field_name=name
         )
         """
-        field = self._getfield(name)
+        field = self._getfield(block, name)
         if field.scope in (Scope.children, Scope.parent):
-            block_id = self._usage.id
+            block_id = block.scope_ids.usage_id
             student_id = None
         else:
-            block = field.scope.block
+            block_scope = field.scope.block
 
-            if block == BlockScope.ALL:
+            if block_scope == BlockScope.ALL:
                 block_id = None
-            elif block == BlockScope.USAGE:
-                block_id = self._usage.id
-            elif block == BlockScope.DEFINITION:
-                block_id = self._usage.def_id
-            elif block == BlockScope.TYPE:
-                block_id = self._block_cls.__name__
+            elif block_scope == BlockScope.USAGE:
+                block_id = block.scope_ids.usage_id
+            elif block_scope == BlockScope.DEFINITION:
+                block_id = block.scope_ids.def_id
+            elif block_scope == BlockScope.TYPE:
+                block_id = block.scope_ids.block_type
 
             if field.scope.user:
-                student_id = self._student_id
+                student_id = block.scope_ids.student_id
             else:
                 student_id = None
 
@@ -155,7 +158,7 @@ class DbModel(ModelData):
         )
         return key
 
-    def get(self, name, default=UNSET):
+    def get(self, block, name, default=UNSET):
         """
         Retrieve the value for the field named `name`.
 
@@ -163,60 +166,60 @@ class DbModel(ModelData):
         returned if no value is set
         """
         try:
-            return self._kvs.get(self._key(name))
+            return self._kvs.get(self._key(block, name))
         except KeyError:
             if default is UNSET:
                 raise
             else:
                 return default
 
-    def set(self, name, value):
+    def set(self, block, name, value):
         """
         Set the value of the field named `name`
         """
-        self._kvs.set(self._key(name), value)
+        self._kvs.set(self._key(block, name), value)
 
-    def delete(self, name):
+    def delete(self, block, name):
         """
         Reset the value of the field named `name` to the default
         """
-        self._kvs.delete(self._key(name))
+        self._kvs.delete(self._key(block, name))
 
-    def has(self, name):
+    def has(self, block, name):
         """
         Return whether or not the field named `name` has a non-default value
         """
         try:
-            return self._kvs.has(self._key(name))
+            return self._kvs.has(self._key(block, name))
         except KeyError:
             return False
 
-    def set_many(self, update_dict):
+    def set_many(self, block, update_dict):
         """Update the underlying model with the correct values."""
         updated_dict = {}
 
         # Generate a new dict with the correct mappings.
         for (key, value) in update_dict.items():
-            updated_dict[self._key(key)] = value
+            updated_dict[self._key(block, key)] = value
 
         self._kvs.set_many(updated_dict)
 
-    def default(self, name):
+    def default(self, block, name):
         """
         Ask the kvs for the default (default implementation which other classes may override).
-        :param name:
+
+        :param block: block containing field to default
+        :type block: :class:`~xblock.core.XBlock`
+        :param name: name of the field to default
         """
-        return self._kvs.default(self._key(name))
+        return self._kvs.default(self._key(block, name))
 
 
 class Runtime(object):
     """
     Access to the runtime environment for XBlocks.
-
-    A pre-configured instance of this class will be available to XBlocks as
-    `self.runtime`.
-
     """
+
     def __init__(self):
         self._view_name = None
 
@@ -233,21 +236,27 @@ class Runtime(object):
         integrate it into a larger whole.
 
         """
+        # Set the active view so that :function:`render_child` can use it
+        # as a default
+        old_view_name = self._view_name
         self._view_name = view_name
+        try:
 
-        view_fn = getattr(block, view_name, None)
-        if view_fn is None:
-            view_fn = getattr(block, "fallback_view", None)
+            view_fn = getattr(block, view_name, None)
             if view_fn is None:
-                raise NoSuchViewError()
-            view_fn = functools.partial(view_fn, view_name)
+                view_fn = getattr(block, "fallback_view", None)
+                if view_fn is None:
+                    raise NoSuchViewError()
+                view_fn = functools.partial(view_fn, view_name)
 
-        frag = view_fn(context)
+            frag = view_fn(context)
 
-        # Explicitly save because render action may have changed state
-        block.save()
-        self._view_name = None
-        return self.wrap_child(block, frag, context)
+            # Explicitly save because render action may have changed state
+            block.save()
+            return self.wrap_child(block, frag, context)
+        finally:
+            # Reset the active view to what it was before entering this method
+            self._view_name = old_view_name
 
     def get_block(self, block_id):
         """Get a block by ID.
@@ -316,7 +325,7 @@ class Runtime(object):
         block.save()
         return results
 
-    def handler_url(self, url):
+    def handler_url(self, block, url):
         """Get the actual URL to invoke a handler.
 
         `url` is the abstract URL to your handler.  It should start with the

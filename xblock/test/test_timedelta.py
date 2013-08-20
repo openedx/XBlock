@@ -5,7 +5,7 @@ This seems to be due to how Timedeltas internally store things - they
 only have a days and seconds attributes, whereas we also recognize hours and minutes.
 """
 
-from mock import MagicMock
+from mock import MagicMock, Mock
 from nose.tools import assert_equals, assert_not_equals, assert_not_in  # pylint: disable=E0611
 
 import re
@@ -61,7 +61,7 @@ def test_timedelta_field_access():
         graceperiod = Timedelta(scope=Scope.settings)
 
     original_json_date = '2 days 5 hours 10 minutes 59 seconds'
-    field_tester = FieldTester(MagicMock(), DictModel({'graceperiod': original_json_date}))
+    field_tester = FieldTester(MagicMock(), DictModel({'graceperiod': original_json_date}), Mock())
 
     # Access the Timedelta field without modifying it
 

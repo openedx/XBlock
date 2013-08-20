@@ -51,7 +51,7 @@ class XBlockWithHandlerAndStudentState(XBlock):
     def student_view(self, context):  # pylint: disable=W0613
         """Provide the default view."""
         body = u"The data: %r." % self.the_data
-        body += u":::%s:::" % self.runtime.handler_url("update_the_data")
+        body += u":::%s:::" % self.runtime.handler_url(self, "update_the_data")
         return Fragment(body)
 
     @XBlock.json_handler
