@@ -16,7 +16,7 @@ import logging
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
-from xblock.core import XBlock, Scope, ModelType
+from xblock.core import XBlock, Scope, ScopeIds
 from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
 from xblock.fragment import Fragment
 
@@ -179,22 +179,6 @@ class MemoryKeyValueStore(KeyValueStore):
             self.set(key, value)
 
 
-MEMORY_KVS = MemoryKeyValueStore({})
-
-
-def create_xblock(usage, student_id=None):
-    """Create an XBlock instance.
-
-    This will be invoked to create new instances for every request.
-
-    """
-    block_cls = XBlock.load_class(usage.block_name)
-    runtime = WorkbenchRuntime(block_cls, student_id, usage)
-    model = DbModel(MEMORY_KVS, block_cls, student_id, usage)
-    block = block_cls(runtime, model)
-    return block
-
-
 class WorkbenchRuntime(Runtime):
     """
     Access to the workbench runtime environment for XBlocks.
@@ -203,12 +187,10 @@ class WorkbenchRuntime(Runtime):
     `self.runtime`.
 
     """
-    def __init__(self, block_cls, student_id, usage):
-        super(WorkbenchRuntime, self).__init__()
 
-        self.block_cls = block_cls
+    def __init__(self, student_id):
+        super(WorkbenchRuntime, self).__init__()
         self.student_id = student_id
-        self.usage = usage
 
     def render(self, block, context, view_name):
         try:
@@ -235,8 +217,8 @@ class WorkbenchRuntime(Runtime):
             wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
             data['init'] = func
             data['runtime-version'] = version
-            data['usage'] = self.usage.id
-            data['block-type'] = self.block_cls.plugin_name
+            data['usage'] = block.scope_ids.usage_id
+            data['block-type'] = block.scope_ids.block_type
 
         if block.name:
             data['name'] = block.name
@@ -249,11 +231,11 @@ class WorkbenchRuntime(Runtime):
         wrapped.add_frag_resources(frag)
         return wrapped
 
-    def handler_url(self, url):
+    def handler_url(self, block, url):
         return "/handler/{0}/{1}/?student={2}".format(
-            self.usage.id,
+            block.scope_ids.usage_id,
             url,
-            self.student_id
+            block.scope_ids.student_id
         )
 
     def get_block(self, block_id):
@@ -261,40 +243,6 @@ class WorkbenchRuntime(Runtime):
 
     def query(self, block):
         return _BlockSet(self, [block])
-
-    def collect(self, key, block=None):
-        """WARNING: This is an experimental function, subject to future change or removal."""
-        block_cls = block.__class__ if block else self.block_cls
-
-        data_model = AnalyticsDbModel(
-            MEMORY_KVS,
-            block_cls,
-            self.student_id,
-            self.usage
-        )
-        value = data_model.get(key, None)
-        children = []
-        for child_id in data_model.get('children', []):
-            child = self.get_block(child_id)
-            children.append(child.runtime.collect(key, child))
-
-        result = {
-            'class': block_cls.__name__,
-            'value': value,
-            'children': children,
-        }
-
-        return result
-
-    def publish(self, key, value):
-        """WARNING: This is an experimental function, subject to future change or removal."""
-        data = AnalyticsDbModel(
-            MEMORY_KVS,
-            self.block_cls,
-            self.student_id,
-            self.usage
-        )
-        data.set(key, value)
 
 
 class _BlockSet(object):
@@ -354,29 +302,18 @@ class _BlockSet(object):
                 yield getattr(block, attr_name)
 
 
-class AnalyticsDbModel(DbModel):
+MEMORY_KVS = MemoryKeyValueStore({})
+RUNTIME = WorkbenchRuntime('s0')
+MODEL = DbModel(MEMORY_KVS)
+
+
+def create_xblock(usage, student_id=None):
+    """Create an XBlock instance.
+
+    This will be invoked to create new instances for every request.
+
     """
-    A dictionary-like interface to the fields on a block,
-    provided specifically for analytics.
-
-    WARNING: This is an experimental class, subject to future change or removal.
-    """
-    def _key(self, name):
-        """
-        Resolves `name` to a key, in the following form:
-
-        KeyValueStore.Key(
-            scope=field.scope,
-            student_id=student_id,
-            block_scope_id=block_id,
-            field_name=analytics.name
-        )
-        """
-        key = super(AnalyticsDbModel, self)._key('analytics.{0}'.format(name))
-        return key
-
-    def _getfield(self, _name):
-        """
-        Returns a new field with a scope of `Scope.user_state`.
-        """
-        return ModelType(scope=Scope.user_state)
+    block_cls = XBlock.load_class(usage.block_name)
+    keys = ScopeIds(student_id, usage.block_name, usage.def_id, usage.id)
+    block = block_cls(RUNTIME, MODEL, keys)
+    return block

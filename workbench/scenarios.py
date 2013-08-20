@@ -75,28 +75,6 @@ SCENARIOS.update({
         ]),
     ),
 
-    'seq_progress': Scenario(
-        "sequence with progress_sliders",
-        Usage("sequence", [
-            Usage("vertical", [
-                Usage("slider"),
-                Usage("progress_slider"),
-            ]),
-            Usage("vertical", [
-                Usage("thumbs"),
-                Usage("slider"),
-                Usage("progress_slider"),
-            ]),
-            Usage("vertical", [
-                Usage("thumbs"),
-                Usage("slider"),
-                Usage("progress_slider"),
-                Usage("progress_slider"),
-                Usage("progress_slider"),
-            ]),
-        ]),
-    ),
-
     'three_problems': Scenario(
         "three problems",
         Usage("vertical", [
