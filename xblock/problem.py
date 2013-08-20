@@ -35,9 +35,10 @@ import random
 import string  # pylint: disable=W0402
 import time
 
-from .core import XBlock, Integer, Scope, String, Any, Boolean, Dict
-from .run_script import run_script
-from .fragment import Fragment
+from xblock.core import XBlock
+from xblock.fields import Integer, Scope, String, Any, Boolean, Dict
+from xblock.run_script import run_script
+from xblock.fragment import Fragment
 
 
 class ProblemBlock(XBlock):

@@ -6,7 +6,7 @@ import re
 import functools
 
 from collections import namedtuple, MutableMapping
-from .core import ModelType, BlockScope, Scope, ModelData, UNSET
+from xblock.fields import Field, BlockScope, Scope, FieldData, UNSET
 
 
 class InvalidScopeError(Exception):
@@ -28,6 +28,7 @@ class NoSuchHandlerError(Exception):
     Raised to indicate that the requested handler was not found.
     """
     pass
+
 
 
 class KeyValueStore(object):
@@ -73,7 +74,7 @@ class KeyValueStore(object):
             self.set(key, value)
 
 
-class DbModel(ModelData):
+class DbModel(FieldData):
     """
     An interface mapping value access that uses field names to one
     that uses the correct scoped keys for the underlying KeyValueStore
@@ -99,7 +100,7 @@ class DbModel(ModelData):
 
         # First, get the field from the class, if defined
         block_field = getattr(block.__class__, name, None)
-        if block_field is not None and isinstance(block_field, ModelType):
+        if block_field is not None and isinstance(block_field, Field):
             return block_field
 
         # If the class doesn't have the field, and it also doesn't have any
@@ -111,7 +112,7 @@ class DbModel(ModelData):
         for namespace_name in block.__class__.namespaces:
             namespace = getattr(block.__class__, namespace_name)
             namespace_field = getattr(type(namespace), name, None)
-            if namespace_field is not None and isinstance(namespace_field, ModelType):
+            if namespace_field is not None and isinstance(namespace_field, Field):
                 return namespace_field
 
         # Not in the class or in any of the namespaces, so name

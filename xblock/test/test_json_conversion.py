@@ -7,11 +7,12 @@ with ModelDatas
 from nose.tools import assert_equals, assert_is_instance
 from mock import Mock
 
-from xblock.core import XBlock, ModelType, Scope
+from xblock.core import XBlock
+from xblock.fields import Field, Scope
 from xblock.test.test_core import DictModel
 
 
-class TestJSONConversionField(ModelType):
+class TestJSONConversionField(Field):
     """Field for testing json conversion"""
     def from_json(self, value):
         assert_equals('set', value['$type'])
@@ -65,7 +66,7 @@ class TestJsonConversion():
         assert_is_instance(self.block.field_b, set)
         assert_equals(
             {'$type': 'set', '$vals': [5, 6]},
-            self.block._model_data.get(self.block, 'field_b')
+            self.block._field_data.get(self.block, 'field_b')
         )
 
 

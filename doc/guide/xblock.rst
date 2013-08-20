@@ -66,7 +66,7 @@ In XBlock code, state is accessed as attributes on self. In our example above,
 the data is available as ``self.upvotes``, ``self.downvotes``, and
 ``self.voted``.  The data is automatically scoped for the current user and
 block.  Modifications to the attributes are stored in memory, and persisted to
-underlying ``ModelData`` instance when ``save()`` is called on the ``XBlock``.
+underlying ``FieldData`` instance when ``save()`` is called on the ``XBlock``.
 Runtimes should call ``save()`` after an ``XBlock`` is constructed, and after
 every invocation of a handler, view, or method on an XBlock. (The base ``Runtime`` class
 in ``xblock.runtime`` automatically calls ``save()`` after invoking views or handlers.)

@@ -4,7 +4,9 @@ from nose.tools import assert_equals, assert_false, assert_true, assert_raises  
 from collections import namedtuple
 from mock import patch, Mock
 
-from xblock.core import BlockScope, Namespace, Scope, String, XBlock, ScopeIds, Integer
+from xblock.core import XBlock
+from xblock.namespaces import Namespace
+from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer
 from xblock.runtime import NoSuchViewError, KeyValueStore, DbModel, Runtime
 from xblock.fragment import Fragment
 from xblock.test import DictKeyValueStore
@@ -24,10 +26,10 @@ class TestNamespace(Namespace):
     n_user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='nsd')
 
 
-with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)]):
+with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
     class TestModel(XBlock):
         """
-        Set up a class that contains ModelTypes as fields.
+        Set up a class that contains Fields as fields.
         """
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')
@@ -38,10 +40,10 @@ with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestName
         for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
         user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
-with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)]):
+with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
     class TestXBlock(XBlock):
         """
-        Set up a class that contains ModelTypes as fields.
+        Set up a class that contains Fields as fields.
         """
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')
@@ -74,10 +76,10 @@ with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestName
             if view_name == 'test_fallback_view':
                 return Fragment(self.preferences)
 
-with patch('xblock.core.Namespace.load_classes', return_value=[('test', TestNamespace)]):
+with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
     class TestXBlockNoFallback(XBlock):
         """
-        Set up a class that contains ModelTypes as fields.
+        Set up a class that contains Fields as fields.
         """
         content = String(scope=Scope.content, default='c')
         settings = String(scope=Scope.settings, default='s')
