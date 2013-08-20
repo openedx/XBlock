@@ -292,7 +292,7 @@ class ModelType(object):
             except KeyError:
                 # Cache default value
                 try:
-                    value = instance._model_data.default(self.name)
+                    value = self.from_json(instance._model_data.default(self.name))
                 except KeyError:
                     value = self.default
             finally:

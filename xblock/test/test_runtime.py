@@ -302,3 +302,4 @@ def test_default_fn():
     # ensure second object gets another value
     second_call = tester2.counter
     assert_equals(second_call, 2)
+
