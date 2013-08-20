@@ -5,8 +5,8 @@ metaclassing, field access, caching, serialization, and bulk saves."""
 from mock import patch, MagicMock, Mock
 # Nose redefines assert_equal and assert_not_equal
 # pylint: disable=E0611
-from nose.tools import assert_in, assert_equals, assert_raises, \
-    assert_not_equals, assert_false
+from nose.tools import assert_equals, assert_raises, \
+    assert_not_equals, assert_false, assert_is
 # pylint: enable=E0611
 from datetime import datetime
 
@@ -41,14 +41,14 @@ def test_model_metaclass():
     assert hasattr(ModelMetaclassTester, 'field_a')
     assert hasattr(ModelMetaclassTester, 'field_b')
 
-    assert_in(ModelMetaclassTester.field_a, ModelMetaclassTester.fields)
-    assert_in(ModelMetaclassTester.field_b, ModelMetaclassTester.fields)
+    assert_is(ModelMetaclassTester.field_a, ModelMetaclassTester.fields['field_a'])
+    assert_is(ModelMetaclassTester.field_b, ModelMetaclassTester.fields['field_b'])
 
     assert hasattr(ChildClass, 'field_a')
     assert hasattr(ChildClass, 'field_b')
 
-    assert_in(ChildClass.field_a, ChildClass.fields)
-    assert_in(ChildClass.field_b, ChildClass.fields)
+    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
+    assert_is(ChildClass.field_b, ChildClass.fields['field_b'])
 
 
 def test_with_mixins():
@@ -75,10 +75,10 @@ def test_with_mixins():
     # pylint: disable=E1101
 
     assert hasattr(ChildClass, 'field_a')
-    assert_in(ChildClass.field_a, ChildClass.fields)
+    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
 
     assert hasattr(GrandchildClass, 'field_a')
-    assert_in(GrandchildClass.field_a, GrandchildClass.fields)
+    assert_is(GrandchildClass.field_a, GrandchildClass.fields['field_a'])
 
 
 def test_children_metaclass():
@@ -397,6 +397,8 @@ def test_json_field_access():
     assert_equals(datetime(2013, 4, 1), field_tester.field_b)
 
 
+
+
 def test_defaults_not_shared():
     class FieldTester(XBlock):
         """Toy class for field access testing"""
@@ -569,7 +571,6 @@ def test_loading_tagged_classes():
     tagged_classes = [('hastag1', HasTag1), ('hastag2', HasTag2)]
     with patch('xblock.core.XBlock.load_classes', return_value=the_classes):
         assert_equals(set(XBlock.load_tagged_classes('thetag')), set(tagged_classes))
-
 
 
 def setup_save_failure(set_many):

@@ -2,6 +2,7 @@
 Module for all xblock exception classes
 """
 
+
 class XBlockSaveError(Exception):
     """
     Raised to indicated an error in saving an XBlock
@@ -36,3 +37,24 @@ class KeyValueMultiSaveError(Exception):
         Exception.__init__(self)
 
         self.saved_field_names = saved_field_names
+
+
+class InvalidScopeError(Exception):
+    """
+    Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
+    """
+    pass
+
+
+class NoSuchViewError(Exception):
+    """
+    Raised to indicate that the view requested was not found.
+    """
+    pass
+
+
+class NoSuchHandlerError(Exception):
+    """
+    Raised to indicate that the requested handler was not found.
+    """
+    pass

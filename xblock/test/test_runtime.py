@@ -1,94 +1,80 @@
 """Tests the features of xblock/runtime"""
+# Allow tests to access private members of classes
+# pylint: disable=W0212
+
 # Nose redefines assert_equal and assert_not_equal
-from nose.tools import assert_equals, assert_false, assert_true, assert_raises  # pylint: disable=E0611
+# pylint: disable=E0611
+from nose.tools import (
+    assert_equals, assert_false, assert_true, assert_raises,
+    assert_is, assert_is_not
+)
+# pylint: enable=E0611
 from collections import namedtuple
-from mock import patch, Mock
+from mock import Mock
 
 from xblock.core import XBlock
-from xblock.namespaces import Namespace
-from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer
-from xblock.runtime import NoSuchViewError, KeyValueStore, DbModel, Runtime
+from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List
+from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
+from xblock.runtime import KeyValueStore, DbModel, Runtime
 from xblock.fragment import Fragment
 from xblock.test import DictKeyValueStore
+from xblock.test.tools import DictModel
 
 
-class TestNamespace(Namespace):
+class TestMixin(object):
     """
     Set up namespaces for each scope to use.
     """
-    n_content = String(scope=Scope.content, default='nc')
-    n_settings = String(scope=Scope.settings, default='ns')
-    n_user_state = String(scope=Scope.user_state, default='nss')
-    n_preferences = String(scope=Scope.preferences, default='nsp')
-    n_user_info = String(scope=Scope.user_info, default='nsi')
-    n_by_type = String(scope=Scope(False, BlockScope.TYPE), default='nbt')
-    n_for_all = String(scope=Scope(False, BlockScope.ALL), default='nfa')
-    n_user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='nsd')
+    mixin_content = String(scope=Scope.content, default='mixin_c')
+    mixin_settings = String(scope=Scope.settings, default='mixin_s')
+    mixin_user_state = String(scope=Scope.user_state, default='mixin_ss')
+    mixin_preferences = String(scope=Scope.preferences, default='mixin_sp')
+    mixin_user_info = String(scope=Scope.user_info, default='mixin_si')
+    mixin_by_type = String(scope=Scope(False, BlockScope.TYPE), default='mixin_bt')
+    mixin_for_all = String(scope=Scope(False, BlockScope.ALL), default='mixin_fa')
+    mixin_user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='mixin_sd')
 
 
-with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
-    class TestModel(XBlock):
-        """
-        Set up a class that contains Fields as fields.
-        """
-        content = String(scope=Scope.content, default='c')
-        settings = String(scope=Scope.settings, default='s')
-        user_state = String(scope=Scope.user_state, default='ss')
-        preferences = String(scope=Scope.preferences, default='sp')
-        user_info = String(scope=Scope.user_info, default='si')
-        by_type = String(scope=Scope(False, BlockScope.TYPE), default='bt')
-        for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
-        user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
+class TestXBlockNoFallback(XBlock):
+    """
+    Set up a class that contains ModelTypes as fields, but no views or handlers
+    """
+    content = String(scope=Scope.content, default='c')
+    settings = String(scope=Scope.settings, default='s')
+    user_state = String(scope=Scope.user_state, default='ss')
+    preferences = String(scope=Scope.preferences, default='sp')
+    user_info = String(scope=Scope.user_info, default='si')
+    by_type = String(scope=Scope(False, BlockScope.TYPE), default='bt')
+    for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
+    user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
-with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
-    class TestXBlock(XBlock):
-        """
-        Set up a class that contains Fields as fields.
-        """
-        content = String(scope=Scope.content, default='c')
-        settings = String(scope=Scope.settings, default='s')
-        user_state = String(scope=Scope.user_state, default='ss')
-        preferences = String(scope=Scope.preferences, default='sp')
-        user_info = String(scope=Scope.user_info, default='si')
-        by_type = String(scope=Scope(False, BlockScope.TYPE), default='bt')
-        for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
-        user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
-        def existing_handler(self, data):
-            """ an existing handler to be used """
-            self.user_state = data
-            return "I am the existing test handler"
+class TestXBlock(TestXBlockNoFallback):
+    """
+    Test xblock class with fallbock methods
+    """
+    def existing_handler(self, data):
+        """ an existing handler to be used """
+        self.user_state = data
+        return "I am the existing test handler"
 
-        def fallback_handler(self, handler_name, data):
-            """ test fallback handler """
-            self.user_state = data
-            if handler_name == 'test_fallback_handler':
-                return "I have been handled"
+    def fallback_handler(self, handler_name, data):
+        """ test fallback handler """
+        self.user_state = data
+        if handler_name == 'test_fallback_handler':
+            return "I have been handled"
 
-        def student_view(self, context):
-            """ an existing view to be used """
-            self.preferences = context[0]
+    def student_view(self, context):
+        """ an existing view to be used """
+        self.preferences = context[0]
+        return Fragment(self.preferences)
+
+    def fallback_view(self, view_name, context):
+        """ test fallback view """
+        self.preferences = context[0]
+        if view_name == 'test_fallback_view':
             return Fragment(self.preferences)
 
-        def fallback_view(self, view_name, context):
-            """ test fallback view """
-            self.preferences = context[0]
-            if view_name == 'test_fallback_view':
-                return Fragment(self.preferences)
-
-with patch('xblock.namespaces.Namespace.load_classes', return_value=[('test', TestNamespace)]):
-    class TestXBlockNoFallback(XBlock):
-        """
-        Set up a class that contains Fields as fields.
-        """
-        content = String(scope=Scope.content, default='c')
-        settings = String(scope=Scope.settings, default='s')
-        user_state = String(scope=Scope.user_state, default='ss')
-        preferences = String(scope=Scope.preferences, default='sp')
-        user_info = String(scope=Scope.user_info, default='si')
-        by_type = String(scope=Scope(False, BlockScope.TYPE), default='bt')
-        for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
-        user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
 
 # Allow this tuple to be named as if it were a class
 TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
@@ -115,43 +101,27 @@ def check_field(collection, field):
     assert_equals(field.default, getattr(collection, field.name))
 
 
-def test_namespace_actions():
-    tester = TestModel(Mock(), DbModel(DictKeyValueStore()), Mock())
-    # `test` is a namespace provided by the patch when TestModel is defined, which ultimately
-    # comes from the NamespacesMetaclass. Since this is not understood by static
-    # analysis, silence this error for the duration of this test.
-    # pylint: disable=E1101, E1103
-    for collection in (tester, tester.test):
-        for field in collection.fields:
-            yield check_field, collection, field
-
-
 def test_db_model_keys():
     # Tests that updates to fields are properly recorded in the KeyValueStore,
     # and that the keys have been constructed correctly
     key_store = DictKeyValueStore()
     db_model = DbModel(key_store)
-    tester = TestModel(Mock(), db_model, ScopeIds('s0', 'TestModel', 'd0', 'u0'))
+    runtime = Runtime([TestMixin])
+    tester = runtime.construct_block_from_class(TestXBlock, db_model, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
 
     assert_false(db_model.has(tester, 'not a field'))
 
-    # `test` is a namespace provided by the patch when TestModel is defined, which ultimately
-    # comes from the NamespacesMetaclass. Since this is not understood by static
-    # analysis, silence this error for the duration of this test.
-    # pylint: disable=E1101, E1103
-    for collection in (tester, tester.test):
-        for field in collection.fields:
-            new_value = 'new ' + field.name
-            assert_false(db_model.has(tester, field.name))
-            setattr(collection, field.name, new_value)
+    for field in tester.fields.values():
+        new_value = 'new ' + field.name
+        assert_false(db_model.has(tester, field.name))
+        setattr(tester, field.name, new_value)
 
     # Write out the values
     tester.save()
 
     # Make sure everything saved correctly
-    for collection in (tester, tester.test):
-        for field in collection.fields:
-            assert_true(db_model.has(tester, field.name))
+    for field in tester.fields.values():
+        assert_true(db_model.has(tester, field.name))
 
     def get_key_value(scope, student_id, block_scope_id, field_name):
         """Gets the value, from `key_store`, of a Key with the given values."""
@@ -160,36 +130,21 @@ def test_db_model_keys():
 
     # Examine each value in the database and ensure that keys were constructed correctly
     assert_equals('new content', get_key_value(Scope.content, None, 'd0', 'content'))
-
     assert_equals('new settings', get_key_value(Scope.settings, None, 'u0', 'settings'))
-
     assert_equals('new user_state', get_key_value(Scope.user_state, 's0', 'u0', 'user_state'))
-
-    assert_equals('new preferences', get_key_value(Scope.preferences, 's0', 'TestModel', 'preferences'))
-
+    assert_equals('new preferences', get_key_value(Scope.preferences, 's0', 'TestXBlock', 'preferences'))
     assert_equals('new user_info', get_key_value(Scope.user_info, 's0', None, 'user_info'))
-
-    assert_equals('new by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestModel', 'by_type'))
-
+    assert_equals('new by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestXBlock', 'by_type'))
     assert_equals('new for_all', get_key_value(Scope(False, BlockScope.ALL), None, None, 'for_all'))
-
     assert_equals('new user_def', get_key_value(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'user_def'))
-
-    assert_equals('new n_content', get_key_value(Scope.content, None, 'd0', 'n_content'))
-
-    assert_equals('new n_settings', get_key_value(Scope.settings, None, 'u0', 'n_settings'))
-
-    assert_equals('new n_user_state', get_key_value(Scope.user_state, 's0', 'u0', 'n_user_state'))
-
-    assert_equals('new n_preferences', get_key_value(Scope.preferences, 's0', 'TestModel', 'n_preferences'))
-
-    assert_equals('new n_user_info', get_key_value(Scope.user_info, 's0', None, 'n_user_info'))
-
-    assert_equals('new n_by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestModel', 'n_by_type'))
-
-    assert_equals('new n_for_all', get_key_value(Scope(False, BlockScope.ALL), None, None, 'n_for_all'))
-
-    assert_equals('new n_user_def', get_key_value(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'n_user_def'))
+    assert_equals('new mixin_content', get_key_value(Scope.content, None, 'd0', 'mixin_content'))
+    assert_equals('new mixin_settings', get_key_value(Scope.settings, None, 'u0', 'mixin_settings'))
+    assert_equals('new mixin_user_state', get_key_value(Scope.user_state, 's0', 'u0', 'mixin_user_state'))
+    assert_equals('new mixin_preferences', get_key_value(Scope.preferences, 's0', 'TestXBlock', 'mixin_preferences'))
+    assert_equals('new mixin_user_info', get_key_value(Scope.user_info, 's0', None, 'mixin_user_info'))
+    assert_equals('new mixin_by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestXBlock', 'mixin_by_type'))
+    assert_equals('new mixin_for_all', get_key_value(Scope(False, BlockScope.ALL), None, None, 'mixin_for_all'))
+    assert_equals('new mixin_user_def', get_key_value(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'mixin_user_def'))
 
 
 class MockRuntimeForQuerying(Runtime):
@@ -236,7 +191,7 @@ def test_runtime_handle():
     # handler can't be found & no fallback handler supplied, should throw an exception
     tester = TestXBlockNoFallback(Mock(), db_model, Mock())
     ultimate_string = "ultimate update"
-    with assert_raises(Exception):
+    with assert_raises(NoSuchHandlerError):
         runtime.handle(tester, 'test_nonexistant_fallback_handler', ultimate_string)
 
 
@@ -305,3 +260,75 @@ def test_default_fn():
     second_call = tester2.counter
     assert_equals(second_call, 2)
 
+
+class TestSimpleMixin(object):
+    """Toy class for mixin testing"""
+    field_x = List(scope=Scope.content)
+    field_y = String(scope=Scope.user_state, default="default_value")
+
+    @property
+    def field_x_with_default(self):
+        """
+        Test method for generating programmatic default values for fields
+        """
+        return self.field_x or [1, 2, 3]
+
+
+class FieldTester(XBlock):
+    """Test XBlock for field access testing"""
+    field_a = Integer(scope=Scope.settings)
+    field_b = Integer(scope=Scope.content, default=10)
+    field_c = Integer(scope=Scope.user_state, default='field c')
+
+
+# Test that access to fields from mixins works as expected
+def test_mixin_field_access():
+    runtime = Runtime([TestSimpleMixin])
+
+    field_tester = runtime.construct_block_from_class(
+        FieldTester,
+        DictModel({
+            'field_a': 5,
+            'field_x': [1, 2, 3],
+        }),
+        Mock(),
+    )
+
+    assert_equals(5, field_tester.field_a)
+    assert_equals(10, field_tester.field_b)
+    assert_equals('field c', field_tester.field_c)
+    assert_equals([1, 2, 3], field_tester.field_x)
+    assert_equals('default_value', field_tester.field_y)
+
+    field_tester.field_x = ['a', 'b']
+    field_tester.save()
+    assert_equals(['a', 'b'], field_tester._field_data.get(field_tester, 'field_x'))
+
+    del field_tester.field_x
+    assert_equals([], field_tester.field_x)
+    assert_equals([1, 2, 3], field_tester.field_x_with_default)
+
+    with assert_raises(AttributeError):
+        getattr(field_tester, 'field_z')
+    with assert_raises(AttributeError):
+        delattr(field_tester, 'field_z')
+
+    field_tester.field_z = 'foo'
+    assert_equals('foo', field_tester.field_z)
+    assert_false(field_tester._field_data.has(field_tester, 'field_z'))
+
+
+# Test that the classes generated via the mixin process are cached
+# (and only generated once)
+def test_only_generate_classes_once():
+    runtime = Runtime([TestSimpleMixin])
+
+    assert_is(
+        runtime.construct_block_from_class(FieldTester, Mock(), Mock()).__class__,
+        runtime.construct_block_from_class(FieldTester, Mock(), Mock()).__class__,
+    )
+
+    assert_is_not(
+        runtime.construct_block_from_class(FieldTester, Mock(), Mock()).__class__,
+        runtime.construct_block_from_class(TestXBlock, Mock(), Mock()).__class__,
+    )
