@@ -13,7 +13,7 @@ from collections import namedtuple
 from mock import Mock
 
 from xblock.core import XBlock
-from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List
+from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List, UserScope
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.runtime import KeyValueStore, DbModel, Runtime
 from xblock.fragment import Fragment
@@ -30,9 +30,13 @@ class TestMixin(object):
     mixin_user_state = String(scope=Scope.user_state, default='mixin_ss')
     mixin_preferences = String(scope=Scope.preferences, default='mixin_sp')
     mixin_user_info = String(scope=Scope.user_info, default='mixin_si')
-    mixin_by_type = String(scope=Scope(False, BlockScope.TYPE), default='mixin_bt')
-    mixin_for_all = String(scope=Scope(False, BlockScope.ALL), default='mixin_fa')
-    mixin_user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='mixin_sd')
+    mixin_by_type = String(scope=Scope(UserScope.NONE, BlockScope.TYPE), default='mixin_bt')
+    mixin_for_all = String(scope=Scope(UserScope.NONE, BlockScope.ALL), default='mixin_fa')
+    mixin_user_def = String(scope=Scope(UserScope.ONE, BlockScope.DEFINITION), default='mixin_sd')
+    mixin_agg_global = String(scope=Scope(UserScope.ALL, BlockScope.ALL), default='mixin_ag')
+    mixin_agg_type = String(scope=Scope(UserScope.ALL, BlockScope.TYPE), default='mixin_at')
+    mixin_agg_def = String(scope=Scope(UserScope.ALL, BlockScope.DEFINITION), default='mixin_ad')
+    mixin_agg_usage = String(scope=Scope.user_state_summary, default='mixin_au')
 
 
 class TestXBlockNoFallback(XBlock):
@@ -44,9 +48,14 @@ class TestXBlockNoFallback(XBlock):
     user_state = String(scope=Scope.user_state, default='ss')
     preferences = String(scope=Scope.preferences, default='sp')
     user_info = String(scope=Scope.user_info, default='si')
-    by_type = String(scope=Scope(False, BlockScope.TYPE), default='bt')
-    for_all = String(scope=Scope(False, BlockScope.ALL), default='fa')
-    user_def = String(scope=Scope(True, BlockScope.DEFINITION), default='sd')
+    by_type = String(scope=Scope(UserScope.NONE, BlockScope.TYPE), default='bt')
+    for_all = String(scope=Scope(UserScope.NONE, BlockScope.ALL), default='fa')
+    user_def = String(scope=Scope(UserScope.ONE, BlockScope.DEFINITION), default='sd')
+    agg_global = String(scope=Scope(UserScope.ALL, BlockScope.ALL), default='ag')
+    agg_type = String(scope=Scope(UserScope.ALL, BlockScope.TYPE), default='at')
+    agg_def = String(scope=Scope(UserScope.ALL, BlockScope.DEFINITION), default='ad')
+    agg_usage = String(scope=Scope.user_state_summary, default='au')
+
 
 
 class TestXBlock(TestXBlockNoFallback):
@@ -134,17 +143,25 @@ def test_db_model_keys():
     assert_equals('new user_state', get_key_value(Scope.user_state, 's0', 'u0', 'user_state'))
     assert_equals('new preferences', get_key_value(Scope.preferences, 's0', 'TestXBlock', 'preferences'))
     assert_equals('new user_info', get_key_value(Scope.user_info, 's0', None, 'user_info'))
-    assert_equals('new by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestXBlock', 'by_type'))
-    assert_equals('new for_all', get_key_value(Scope(False, BlockScope.ALL), None, None, 'for_all'))
-    assert_equals('new user_def', get_key_value(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'user_def'))
+    assert_equals('new by_type', get_key_value(Scope(UserScope.NONE, BlockScope.TYPE), None, 'TestXBlock', 'by_type'))
+    assert_equals('new for_all', get_key_value(Scope(UserScope.NONE, BlockScope.ALL), None, None, 'for_all'))
+    assert_equals('new user_def', get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', 'd0', 'user_def'))
+    assert_equals('new agg_global', get_key_value(Scope(UserScope.ALL, BlockScope.ALL), None, None, 'agg_global'))
+    assert_equals('new agg_type', get_key_value(Scope(UserScope.ALL, BlockScope.TYPE), None, 'TestXBlock', 'agg_type'))
+    assert_equals('new agg_def', get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, 'd0', 'agg_def'))
+    assert_equals('new agg_usage', get_key_value(Scope.user_state_summary, None, 'u0', 'agg_usage'))
     assert_equals('new mixin_content', get_key_value(Scope.content, None, 'd0', 'mixin_content'))
     assert_equals('new mixin_settings', get_key_value(Scope.settings, None, 'u0', 'mixin_settings'))
     assert_equals('new mixin_user_state', get_key_value(Scope.user_state, 's0', 'u0', 'mixin_user_state'))
     assert_equals('new mixin_preferences', get_key_value(Scope.preferences, 's0', 'TestXBlock', 'mixin_preferences'))
     assert_equals('new mixin_user_info', get_key_value(Scope.user_info, 's0', None, 'mixin_user_info'))
-    assert_equals('new mixin_by_type', get_key_value(Scope(False, BlockScope.TYPE), None, 'TestXBlock', 'mixin_by_type'))
-    assert_equals('new mixin_for_all', get_key_value(Scope(False, BlockScope.ALL), None, None, 'mixin_for_all'))
-    assert_equals('new mixin_user_def', get_key_value(Scope(True, BlockScope.DEFINITION), 's0', 'd0', 'mixin_user_def'))
+    assert_equals('new mixin_by_type', get_key_value(Scope(UserScope.NONE, BlockScope.TYPE), None, 'TestXBlock', 'mixin_by_type'))
+    assert_equals('new mixin_for_all', get_key_value(Scope(UserScope.NONE, BlockScope.ALL), None, None, 'mixin_for_all'))
+    assert_equals('new mixin_user_def', get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', 'd0', 'mixin_user_def'))
+    assert_equals('new mixin_agg_global', get_key_value(Scope(UserScope.ALL, BlockScope.ALL), None, None, 'mixin_agg_global'))
+    assert_equals('new mixin_agg_type', get_key_value(Scope(UserScope.ALL, BlockScope.TYPE), None, 'TestXBlock', 'mixin_agg_type'))
+    assert_equals('new mixin_agg_def', get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, 'd0', 'mixin_agg_def'))
+    assert_equals('new mixin_agg_usage', get_key_value(Scope.user_state_summary, None, 'u0', 'mixin_agg_usage'))
 
 
 class MockRuntimeForQuerying(Runtime):
