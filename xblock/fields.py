@@ -95,6 +95,21 @@ class BlockScope(object):
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
 
+class UserScope(object):
+    """
+    Enumeration of valid UserScopes
+
+    NONE: This scope identifies data agnostic to the user of the xblock
+        For instance, the definition of a randomized problem
+    ONE: This scope identifies data supplied by a single user of the xblock
+        For instance, a students answer to a randomized problem
+    ALL: This scope identifies data aggregated while the block is used
+        by many users.
+        For instance, a histogram of the answers submitted by all students
+    """
+    NONE, ONE, ALL = xrange(3)
+
+
 class Sentinel(object):
     """
     Class for implementing sentinel objects (only equal to themselves).
@@ -115,8 +130,8 @@ ScopeBase = namedtuple('ScopeBase', 'user block')  # pylint: disable=C0103
 
 class Scope(ScopeBase):
     """
-    Defines five types of Scopes to be used: `content`, `settings`,
-    `user_state`, `preferences`, and `user_info`.
+    Defines six types of Scopes to be used: `content`, `settings`,
+    `user_state`, `preferences`, `user_info`, and `user_state_summary`.
 
     The `content` scope is used to save data for all users, for one particular
     block, across all runs of a course. An example might be an XBlock that
@@ -138,13 +153,18 @@ class Scope(ScopeBase):
     The `user_info` scope is used to save data for one user, across the entire platform. An
     example might be a user's time zone or language preference.
 
+    The `user_state_summary` scope is used to save data aggregated across many users of a
+    single block. For example, a block might store a histogram of the points scored by all
+    users attempting a problem.
+
     """
 
-    content = ScopeBase(user=False, block=BlockScope.DEFINITION)
-    settings = ScopeBase(user=False, block=BlockScope.USAGE)
-    user_state = ScopeBase(user=True, block=BlockScope.USAGE)
-    preferences = ScopeBase(user=True, block=BlockScope.TYPE)
-    user_info = ScopeBase(user=True, block=BlockScope.ALL)
+    content = ScopeBase(user=UserScope.NONE, block=BlockScope.DEFINITION)
+    settings = ScopeBase(user=UserScope.NONE, block=BlockScope.USAGE)
+    user_state = ScopeBase(user=UserScope.ONE, block=BlockScope.USAGE)
+    preferences = ScopeBase(user=UserScope.ONE, block=BlockScope.TYPE)
+    user_info = ScopeBase(user=UserScope.ONE, block=BlockScope.ALL)
+    user_state_summary = ScopeBase(user=UserScope.ALL, block=BlockScope.USAGE)
 
     children = Sentinel('Scope.children')
     parent = Sentinel('Scope.parent')

@@ -8,6 +8,10 @@ or near the top.  Include a label indicating the component affected.
 
 0.3
 ----------
+* Change the user field of Scopes to be three valued, rather than two.
+  False is now UserScope.NONE, True is UserScope.ONE, and UserScope.ALL is new,
+  and represents data that is computed based on input from many users.
+
 * Rename ModelData to FieldData
 
 * Rename ModelType to Field
