@@ -236,7 +236,7 @@ class Runtime(object):
         defined for this application
         """
         if cls not in self._generated_classes:
-            self._generated_classes[cls] = type(cls.__name__ + 'WithMixins', (cls, ) + self.block_mixins, {})
+            self._generated_classes[cls] = type(cls.__name__ + 'WithMixins', (cls, ) + self.block_mixins, {'xblock_generated_class': True})
 
         mixin_class = self._generated_classes[cls]
         return mixin_class(self, field_data, scope_ids, *args, **kwargs)
