@@ -91,6 +91,26 @@ class XBlock(Plugin):
         return wrapper
 
     @classmethod
+    def query_handler(cls, func):
+        """
+        Wrap a handler to get query parameters and produce JSON.
+        e.g. if the request URL is "http://example.com?sailing=smooth",
+        rather than a Request object, the method will now be passed
+        the dictionary {'sailing':'smooth'}. Any data returned by the
+        function will be JSON-encoded and returned as the response.
+        """
+        @functools.wraps(func)
+        def wrapper(self, request):
+            """
+            The wrapper function `query_handler` returns.
+            """
+            query_parameters = request.GET
+            # the contents of query_parameters are not url encoded.
+            response_json = json.dumps(func(self, query_parameters))
+            return Response(response_json, content_type='application/json')
+        return wrapper
+
+    @classmethod
     def tag(cls, tags):
         """Returns a function that adds the words in `tags` as class tags to this class."""
         def dec(cls):
