@@ -230,7 +230,7 @@ class Runtime(object):
         block_class = XBlock.load_class(plugin_name, default_class)
         return self.construct_block_from_class(block_class, field_data, scope_ids, *args, **kwargs)
 
-    def construct_block_from_class(self, cls, field_data, scope_keys, *args, **kwargs):
+    def construct_block_from_class(self, cls, field_data, scope_ids, *args, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application
@@ -239,7 +239,7 @@ class Runtime(object):
             self._generated_classes[cls] = type(cls.__name__ + 'WithMixins', (cls, ) + self.block_mixins, {})
 
         mixin_class = self._generated_classes[cls]
-        return mixin_class(self, field_data, scope_keys, *args, **kwargs)
+        return mixin_class(self, field_data, scope_ids, *args, **kwargs)
 
     def render(self, block, context, view_name):
         """
