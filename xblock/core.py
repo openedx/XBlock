@@ -12,7 +12,7 @@ except ImportError:
 from webob import Response
 
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
-from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope
+from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope, EXPLICITLY_SET
 from xblock.plugin import Plugin
 
 
@@ -135,7 +135,7 @@ class XBlock(Plugin):
         self.runtime = runtime
         self._field_data = field_data
         self._field_data_cache = {}
-        self._dirty_fields = set()
+        self._dirty_fields = {}
         self.scope_ids = scope_ids
 
     def __repr__(self):
@@ -175,8 +175,8 @@ class XBlock(Plugin):
             saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
             for field in saved_fields:
                 # should only find one corresponding field
-                self._dirty_fields.remove(field)
-            raise XBlockSaveError(saved_fields, self._dirty_fields)
+                del self._dirty_fields[field]
+            raise XBlockSaveError(saved_fields, self._dirty_fields.keys())
 
         # Remove all dirty fields, since the save was successful
         self._clear_dirty_fields()
@@ -187,11 +187,10 @@ class XBlock(Plugin):
         A `field` is an instance of `Field`.
         """
         fields_to_save = {}
-        for field in self._dirty_fields:
-            # If the field isn't in the model data, or the cached value doesn't equal what
-            # is already in the model data, then we know we need to write this value out.
-            if not self._field_data.has(self, field.name) or \
-               self._field_data_cache[field.name] != field.from_json(self._field_data.get(self, field.name)):
+        for field, baseline in self._dirty_fields.items():
+            # If the field value isn't the same as the baseline we recorded
+            # when it was read, then save it
+            if baseline is EXPLICITLY_SET or self._field_data_cache[field.name] != baseline:
                 fields_to_save[field.name] = field.to_json(self._field_data_cache[field.name])
         return fields_to_save
 
