@@ -243,6 +243,50 @@ class ProblemBlock(XBlock):
                     </equality>
                 </problem>
              """),
+
+            ("three problems 2",
+             """
+                <vertical>
+                    <attempts_scoreboard/>
+                    <problem>
+                        <p>What is $a+$b?</p>
+                        <textinput name="sum_input" input_type="int" />
+                        <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
+                        <script>
+                            import random
+                            a = random.randint(2, 5)
+                            b = random.randint(1, 4)
+                            c = a + b
+                        </script>
+                    </problem>
+
+                    <sidebar>
+                        <problem>
+                            <p>What is $a &#215; $b?</p>
+                            <textinput name="sum_input" input_type="int" />
+                            <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
+                            <script>
+                                import random
+                                a = random.randint(2, 6)
+                                b = random.randint(3, 7)
+                                c = a * b
+                            </script>
+                        </problem>
+                    </sidebar>
+
+                    <problem>
+                        <p>What is $a+$b?</p>
+                        <textinput name="sum_input" input_type="int" />
+                        <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
+                        <script>
+                            import random
+                            a = random.randint(3, 5)
+                            b = random.randint(2, 6)
+                            c = a + b
+                        </script>
+                    </problem>
+                </vertical>
+             """),
         ]
 
 
