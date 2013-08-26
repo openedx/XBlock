@@ -31,7 +31,7 @@ def parse_xml_string(xml, usage_factory):
     """
     return parse_xml(StringIO(xml), usage_factory)
 
-HTML_TAGS = set("p ol ul div span b i".split())
+HTML_TAGS = set("p ol ul div span b i h1 h2 h3 h4 h5 h6".split())
 
 
 def _usage_from_node(node, usage_factory):
