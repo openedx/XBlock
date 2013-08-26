@@ -1,6 +1,7 @@
 """
 Tools for testing XBlocks
 """
+import copy
 
 from xblock.fields import UNSET
 from xblock.runtime import FieldData
@@ -15,12 +16,12 @@ class DictModel(FieldData):
 
     def get(self, block, name, default=UNSET):
         if default is UNSET:
-            return self._data[name]
+            return copy.deepcopy(self._data[name])
         else:
-            return self._data.get(name, default)
+            return copy.deepcopy(self._data.get(name, default))
 
     def set(self, block, name, value):
-        self._data[name] = value
+        self._data[name] = copy.deepcopy(value)
 
     def delete(self, block, name):
         del self._data[name]
@@ -29,7 +30,7 @@ class DictModel(FieldData):
         return name in self._data
 
     def set_many(self, block, update_dict):
-        self._data.update(update_dict)
+        self._data.update(copy.deepcopy(update_dict))
 
     def default(self, block, name):
         raise KeyError
