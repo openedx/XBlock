@@ -376,7 +376,7 @@ def test_json_field_access():
 
         def __init__(self, field_data):
             self._field_data = field_data
-            self._dirty_fields = set()
+            self._dirty_fields = {}
 
     field_tester = FieldTester(DictModel({}))
 
@@ -395,8 +395,6 @@ def test_json_field_access():
     assert_equals(datetime(2013, 1, 2), field_tester.field_b)
     del field_tester.field_b
     assert_equals(datetime(2013, 4, 1), field_tester.field_b)
-
-
 
 
 def test_defaults_not_shared():
@@ -428,7 +426,7 @@ def test_object_identity():
 
         def __init__(self, field_data):
             self._field_data = field_data
-            self._dirty_fields = set()
+            self._dirty_fields = {}
 
     # Make sure that field_data always returns a different object
     # each time it's actually queried, so that the caching is
@@ -464,7 +462,7 @@ def test_caching_is_per_instance():
 
         def __init__(self, field_data):
             self._field_data = field_data
-            self._dirty_fields = set()
+            self._dirty_fields = {}
 
     field_data = MagicMock(spec=FieldData)
     field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
@@ -710,7 +708,8 @@ def test_get_mutable_mark_dirty():
     # Test get/set with a default value.
     assert_equals(len(mutable_test._dirty_fields), 0)
     _test_get = mutable_test.list_field
-    assert_equals(len(mutable_test._dirty_fields), 0)
+    assert_equals(len(mutable_test._dirty_fields), 1)
+
     mutable_test.list_field = []
     assert_equals(len(mutable_test._dirty_fields), 1)
 
@@ -719,3 +718,30 @@ def test_get_mutable_mark_dirty():
     assert_equals(len(mutable_test._dirty_fields), 0)
     _test_get = mutable_test.list_field
     assert_equals(len(mutable_test._dirty_fields), 1)
+
+
+def test_change_mutable_default():
+    """
+    Ensure that mutating the default value for a field causes
+    the changes to be saved, and doesn't corrupt other instances
+    """
+
+    class MutableTester(XBlock):
+        """Test class with mutable fields."""
+        list_field = List()
+
+    mutable_test_a = MutableTester(MagicMock(), DictModel({}), Mock())
+    mutable_test_b = MutableTester(MagicMock(), DictModel({}), Mock())
+
+    # Saving without changing the default value shouldn't write to _field_data
+    mutable_test_a.list_field  # pylint: disable=W0104
+    mutable_test_a.save()
+    with assert_raises(KeyError):
+        mutable_test_a._field_data.get(mutable_test_a, 'list_field')
+
+    mutable_test_a.list_field.append(1)
+    mutable_test_a.save()
+
+    assert_equals([1], mutable_test_a._field_data.get(mutable_test_a, 'list_field'))
+    with assert_raises(KeyError):
+        mutable_test_b._field_data.get(mutable_test_b, 'list_field')

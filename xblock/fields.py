@@ -23,6 +23,8 @@ class FieldData(object):
         If a value is provided for `default`, then it will be
         returned if no value is set
 
+        The value returned may be mutated without modifying the backing store
+
         :param block: block to inspect
         :type block: :class:`~xblock.core.XBlock`
         :param name: field name to look up
@@ -33,6 +35,8 @@ class FieldData(object):
     def set(self, block, name, value):
         """
         Set the value of the field named `name` for XBlock `block`.
+
+        `value` may be mutated after this call without affecting the backing store
 
         :param block: block to modify
         :type block: :class:`~xblock.core.XBlock`
@@ -177,6 +181,10 @@ ScopeIds = namedtuple('ScopeIds', 'student_id block_type def_id usage_id')  # py
 # in the cache ("None" may be a valid value in the cache, so we cannot use it).
 NO_CACHE_VALUE = object()
 
+# define a placeholder value that indicates that a value is explicitly dirty,
+# because it was explicitly set
+EXPLICITLY_SET = object()
+
 
 class Field(object):
     """
@@ -203,14 +211,16 @@ class Field(object):
           values property definition.
     """
     MUTABLE = True
+    _default = None
 
     # We're OK redefining built-in `help`
     # pylint: disable=W0622
-    def __init__(self, help=None, default=None, scope=Scope.content,
+    def __init__(self, help=None, default=UNSET, scope=Scope.content,
                  display_name=None, values=None):
         self._name = "unknown"
         self.help = help
-        self._default = default
+        if default is not UNSET:
+            self._default = default
         self.scope = scope
         self._display_name = display_name
         self._values = values
@@ -219,7 +229,10 @@ class Field(object):
     @property
     def default(self):
         """Returns the static value that this defaults to."""
-        return self._default
+        if self.MUTABLE:
+            return copy.deepcopy(self._default)
+        else:
+            return self._default
 
     @property
     def name(self):
@@ -281,11 +294,15 @@ class Field(object):
         if hasattr(instance, '_field_data_cache') and self.name in instance._field_data_cache:
             del instance._field_data_cache[self.name]
 
-    def _mark_dirty(self, instance):
+    def _mark_dirty(self, instance, value):
         """Set this field to dirty on the instance."""
         # Allow this method to access the `_dirty_fields` of `instance`
         # pylint: disable=W0212
-        instance._dirty_fields.add(self)
+
+        # Deep copy the value being marked as dirty, so that there
+        # is a baseline to check against when saving later
+        if self not in instance._dirty_fields:
+            instance._dirty_fields[self] = copy.deepcopy(value)
 
     def __get__(self, instance, owner):
         """
@@ -302,10 +319,6 @@ class Field(object):
         if value is NO_CACHE_VALUE:
             try:
                 value = self.from_json(instance._field_data.get(instance, self.name))
-                # If this is a mutable type, mark it as dirty, since mutations can occur without an
-                # explicit call to __set__ (but they do require a call to __get__)
-                if self.MUTABLE:
-                    self._mark_dirty(instance)
             except KeyError:
                 # Cache default value
                 try:
@@ -313,19 +326,12 @@ class Field(object):
                 except KeyError:
                     value = self.default
             finally:
-                if self.MUTABLE:
-                    # Make a copy of mutable types to place into the cache, but don't
-                    # waste resources running copy.deepcopy on types known to be immutable.
-                    #
-                    # Don't mark the value as dirty here -- we should
-                    # only do that if we're returning a non-default
-                    # value
-                    value = copy.deepcopy(value)
-
                 self._set_cached_value(instance, value)
 
-        elif self.MUTABLE:
-            self._mark_dirty(instance)
+        # If this is a mutable type, mark it as dirty, since mutations can occur without an
+        # explicit call to __set__ (but they do require a call to __get__)
+        if self.MUTABLE:
+            self._mark_dirty(instance, value)
 
         return value
 
@@ -337,7 +343,7 @@ class Field(object):
         dirty until `save` is explicitly called.
         """
         # Mark the field as dirty and update the cache:
-        self._mark_dirty(instance)
+        self._mark_dirty(instance, EXPLICITLY_SET)
         self._set_cached_value(instance, value)
 
     def __delete__(self, instance):
@@ -360,7 +366,7 @@ class Field(object):
         # an erroneous write of its value on implicit save. OK if it was
         # not in the dirty fields to begin with.
         try:
-            instance._dirty_fields.remove(self)
+            del instance._dirty_fields[self]
         except KeyError:
             pass
 
@@ -493,12 +499,7 @@ class Dict(Field):
 
     The stored value must be either be None or a dict.
     """
-    @property
-    def default(self):
-        if self._default is None:
-            return {}
-        else:
-            return self._default
+    _default = {}
 
     def from_json(self, value):
         if value is None or isinstance(value, dict):
@@ -513,12 +514,7 @@ class List(Field):
 
     The stored value can either be None or a list.
     """
-    @property
-    def default(self):
-        if self._default is None:
-            return []
-        else:
-            return self._default
+    _default = []
 
     def from_json(self, value):
         if value is None or isinstance(value, list):
