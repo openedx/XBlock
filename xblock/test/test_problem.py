@@ -9,8 +9,7 @@ import webob
 from nose.tools import assert_equals  # pylint: disable=E0611
 
 from xblock.parse import parse_xml_string
-from xblock.runtime import Runtime
-from workbench.runtime import Usage, create_xblock
+from workbench.runtime import Usage, WorkbenchRuntime
 
 
 def make_request(body):
@@ -39,8 +38,8 @@ def test_problem_submission():
         </problem>
     """, Usage)
     problem_usage.store_initial_state()
-    problem = create_xblock(problem_usage)
-    runtime = Runtime()
+    runtime = WorkbenchRuntime()
+    problem = runtime.create_block(problem_usage)
     json_data = json.dumps({"vote_count": [{"name": "input", "value": "4"}]})
     resp = runtime.handle(problem, 'check', make_request(json_data))
     resp_data = json.loads(text_of_response(resp))

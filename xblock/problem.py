@@ -63,7 +63,8 @@ class ProblemBlock(XBlock):
 
     def set_student_seed(self):
         """Set a random seed for the student so they each have different but repeatable data."""
-        self.seed = int(time.clock() * 10) % 100 + 1
+        # Don't return zero, that's the default, and the sign that we should make a new seed.
+        self.seed = int(time.time() * 1000) % 100 + 1
 
     def calc_context(self, context):
         """If we have a script, run it, and return the resulting context."""
