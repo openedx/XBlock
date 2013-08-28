@@ -1,35 +1,13 @@
 """Tests for the thumbs module"""
 
-from django.test import LiveServerTestCase
-from selenium import webdriver
-from workbench.runtime import MEMORY_KVS, Usage
-from nose.plugins.attrib import attr
+from workbench.test.selenium_test import SeleniumTest
 
 
-@attr('selenium')
-class SeleniumTests(LiveServerTestCase):
-    """Base test class that provides setUpClass and tearDownClass
-    methods necessary for selenium testing."""
-
-    @classmethod
-    def setUpClass(cls):
-        cls.browser = webdriver.Firefox()
-        cls.browser.implicitly_wait(1)
-        super(SeleniumTests, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.browser.quit()
-        super(SeleniumTests, cls).tearDownClass()
-
-
-class ThreeThumbsTest(SeleniumTests):
+class ThreeThumbsTest(SeleniumTest):
     """Test the functionalities of the three thumbs test XBlock."""
 
     def setUp(self):
-        # Clear the in-memory key value store
-        MEMORY_KVS.clear()
-        Usage.reinitialize_all()
+        super(ThreeThumbsTest, self).setUp()
 
         # Suzy opens the browser to visit the workbench
         self.browser.get(self.live_server_url)
@@ -37,9 +15,6 @@ class ThreeThumbsTest(SeleniumTests):
         # She knows it's the site by the header
         header1 = self.browser.find_element_by_css_selector('h1')
         self.assertEqual(header1.text, 'XBlock scenarios')
-
-    def tearDown(self):
-        pass
 
     def test_three_thumbs_initial_state(self):
         # She clicks on the three thumbs at once scenario
