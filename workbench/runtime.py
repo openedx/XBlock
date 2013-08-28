@@ -81,7 +81,7 @@ class Usage(object):
         # block saves its attributes, that's how the initial state will be
         # saved.
         runtime_initial = WorkbenchRuntime()
-        block = runtime_initial.create_xblock(self)
+        block = runtime_initial.create_block(self)
         if self.initial_state:
             for name, value in self.initial_state.items():
                 setattr(block, name, value)
@@ -193,7 +193,7 @@ class WorkbenchRuntime(Runtime):
         super(WorkbenchRuntime, self).__init__()
         self.student_id = student_id
 
-    def create_xblock(self, usage):
+    def create_block(self, usage):
         """
         Create an XBlock instance in this runtime.
 
@@ -251,7 +251,7 @@ class WorkbenchRuntime(Runtime):
         )
 
     def get_block(self, block_id):
-        return self.create_xblock(Usage.find_usage(block_id))
+        return self.create_block(Usage.find_usage(block_id))
 
     def query(self, block):
         return _BlockSet(self, [block])

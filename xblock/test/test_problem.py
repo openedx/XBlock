@@ -39,7 +39,7 @@ def test_problem_submission():
     """, Usage)
     problem_usage.store_initial_state()
     runtime = WorkbenchRuntime()
-    problem = runtime.create_xblock(problem_usage)
+    problem = runtime.create_block(problem_usage)
     json_data = json.dumps({"vote_count": [{"name": "input", "value": "4"}]})
     resp = runtime.handle(problem, 'check', make_request(json_data))
     resp_data = json.loads(text_of_response(resp))
