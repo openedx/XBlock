@@ -53,16 +53,19 @@ class ProblemInteractionTest(SeleniumTest):
             # Before answering, the indicator says Not Attempted.
             self.assertIn("Not attempted", right_wrongs[i].text)
 
-            # Answer right.
             answer = sum(num_pairs[i])
-            text_ctrls[i].send_keys(str(answer))
-            check_btns[i].click()
-            img = right_wrongs[i].find_element_by_css_selector("img")
-            self.assertIn("/correct-icon.png", img.get_attribute("src"))
 
-            # Answer wrong.
-            text_ctrls[i].clear()
-            text_ctrls[i].send_keys(str(answer + 1))
-            check_btns[i].click()
-            img = right_wrongs[i].find_element_by_css_selector("img")
-            self.assertIn("/incorrect-icon.png", img.get_attribute("src"))
+            for _ in range(2):
+                # Answer right.
+                text_ctrls[i].clear()
+                text_ctrls[i].send_keys(str(answer))
+                check_btns[i].click()
+                img = right_wrongs[i].find_element_by_css_selector("img")
+                self.assertIn("/correct-icon.png", img.get_attribute("src"))
+
+                # Answer wrong.
+                text_ctrls[i].clear()
+                text_ctrls[i].send_keys(str(answer + 1))
+                check_btns[i].click()
+                img = right_wrongs[i].find_element_by_css_selector("img")
+                self.assertIn("/incorrect-icon.png", img.get_attribute("src"))
