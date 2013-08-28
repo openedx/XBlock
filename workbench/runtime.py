@@ -16,7 +16,6 @@ import logging
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
-from xblock.core import XBlock
 from xblock.fields import Scope, ScopeIds
 from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
 from xblock.fragment import Fragment
@@ -201,9 +200,8 @@ class WorkbenchRuntime(Runtime):
         The `usage` is used to find the XBlock class and data.
 
         """
-        block_cls = XBlock.load_class(usage.block_name)
         keys = ScopeIds(self.student_id, usage.block_name, usage.def_id, usage.id)
-        block = block_cls(self, MODEL, keys)
+        block = self.construct_block(usage.block_name, MODEL, keys)
         return block
 
     def render(self, block, context, view_name):
