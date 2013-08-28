@@ -81,7 +81,8 @@ class Usage(object):
         # fields. This isolates us from the storage mechanism: however the
         # block saves its attributes, that's how the initial state will be
         # saved.
-        block = create_xblock(self)
+        runtime_initial = WorkbenchRuntime()
+        block = runtime_initial.create_xblock(self)
         if self.initial_state:
             for name, value in self.initial_state.items():
                 setattr(block, name, value)
@@ -189,9 +190,21 @@ class WorkbenchRuntime(Runtime):
 
     """
 
-    def __init__(self, student_id):
+    def __init__(self, student_id=None):
         super(WorkbenchRuntime, self).__init__()
         self.student_id = student_id
+
+    def create_xblock(self, usage):
+        """
+        Create an XBlock instance in this runtime.
+
+        The `usage` is used to find the XBlock class and data.
+
+        """
+        block_cls = XBlock.load_class(usage.block_name)
+        keys = ScopeIds(self.student_id, usage.block_name, usage.def_id, usage.id)
+        block = block_cls(self, MODEL, keys)
+        return block
 
     def render(self, block, context, view_name):
         try:
@@ -240,7 +253,7 @@ class WorkbenchRuntime(Runtime):
         )
 
     def get_block(self, block_id):
-        return create_xblock(Usage.find_usage(block_id), self.student_id)
+        return self.create_xblock(Usage.find_usage(block_id))
 
     def query(self, block):
         return _BlockSet(self, [block])
@@ -303,18 +316,6 @@ class _BlockSet(object):
                 yield getattr(block, attr_name)
 
 
+# Our global state (the "database").
 MEMORY_KVS = MemoryKeyValueStore({})
-RUNTIME = WorkbenchRuntime('s0')
 MODEL = DbModel(MEMORY_KVS)
-
-
-def create_xblock(usage, student_id=None):
-    """Create an XBlock instance.
-
-    This will be invoked to create new instances for every request.
-
-    """
-    block_cls = XBlock.load_class(usage.block_name)
-    keys = ScopeIds(student_id, usage.block_name, usage.def_id, usage.id)
-    block = block_cls(RUNTIME, MODEL, keys)
-    return block
