@@ -428,6 +428,41 @@ class Runtime(object):
         return q
 
 
+class ObjectAggregator(object):
+    """
+    Provides a single object interface that combines many smaller objects.
+
+    Attribute access on the aggregate object acts on the first sub-object
+    that has that attribute.
+    """
+
+    def __init__(self, *objects):
+        self.__dict__['_objects'] = objects
+
+    def _object_with_attr(self, name):
+        """
+        Generate a list of objects that have the attribute `name`
+
+        :param name: the attribute to filter by
+        :type name: `str`
+        :raises AttributeError: when no object has the named attribute
+        """
+        for obj in self._objects:
+            if hasattr(obj, name):
+                return obj
+
+        raise AttributeError("No object has attribute {!r}".format(name))
+
+    def __getattr__(self, name):
+        return getattr(self._object_with_attr(name), name)
+
+    def __setattr__(self, name, value):
+        setattr(self._object_with_attr(name), name, value)
+
+    def __delattr__(self, name):
+        delattr(self._object_with_attr(name), name)
+
+
 class RegexLexer(object):
     """Split text into lexical tokens based on regexes."""
     def __init__(self, *toks):
