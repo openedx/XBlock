@@ -228,7 +228,7 @@ class Runtime(object):
         passing *args and **kwargs into __init__
         """
         block_class = XBlock.load_class(plugin_name, default_class)
-        return self.construct_block_from_class(block_class, field_data, scope_ids, *args, **kwargs)
+        return self.construct_block_from_class(cls=block_class, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
 
     def construct_block_from_class(self, cls, field_data, scope_ids, *args, **kwargs):
         """
@@ -239,7 +239,7 @@ class Runtime(object):
             self._generated_classes[cls] = type(cls.__name__ + 'WithMixins', (cls, ) + self.block_mixins, {'xblock_generated_class': True})
 
         mixin_class = self._generated_classes[cls]
-        return mixin_class(self, field_data, scope_ids, *args, **kwargs)
+        return mixin_class(runtime=self, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
 
     def render(self, block, context, view_name):
         """
