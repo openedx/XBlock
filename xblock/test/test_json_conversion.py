@@ -9,7 +9,7 @@ from mock import Mock
 
 from xblock.core import XBlock
 from xblock.fields import Field, Scope
-from xblock.test.test_core import DictModel
+from xblock.test.tools import DictModel
 
 
 class TestJSONConversionField(Field):
