@@ -196,31 +196,7 @@ class Runtime(object):
         :type mixins: `tuple` of `class`es
         """
         self._view_name = None
-        self._block_mixins = ()
-
-        # Used to cache the automatically constructed subclasses that contain the
-        # mixins, so that multiple XBlocks constructed from the same base class
-        # also have the same generated class
-        self._generated_classes = {}
-
-        self.block_mixins = tuple(mixins)
-
-    @property
-    def block_mixins(self):
-        """
-        Read the active block mixins
-        """
-        return self._block_mixins
-
-    @block_mixins.setter
-    def block_mixins(self, value):
-        """
-        Update the block mixins. If the active mixins change,
-        reset the cache of generated classes
-        """
-        if tuple(value) != self._block_mixins:
-            self._block_mixins = tuple(value)
-            self._generated_classes.clear()
+        self.mixologist = Mixologist(mixins)
 
     def construct_block(self, plugin_name, field_data, scope_ids, default_class=None, *args, **kwargs):
         """
@@ -235,11 +211,7 @@ class Runtime(object):
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application
         """
-        if cls not in self._generated_classes:
-            self._generated_classes[cls] = type(cls.__name__ + 'WithMixins', (cls, ) + self.block_mixins, {'xblock_generated_class': True})
-
-        mixin_class = self._generated_classes[cls]
-        return mixin_class(runtime=self, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
+        return self.mixologist.mix(cls)(runtime=self, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
 
     def render(self, block, context, view_name):
         """
@@ -461,6 +433,37 @@ class ObjectAggregator(object):
 
     def __delattr__(self, name):
         delattr(self._object_with_attr(name), name)
+
+
+class Mixologist(object):
+    """
+    Provides a facility to dynamically generate classes with additional mixins.
+    """
+    def __init__(self, mixins):
+        """
+        :param mixins: Classes to mixin
+        :type mixins: `iterable` of `class`
+        """
+        self._mixins = tuple(mixins)
+        # Cache of generated classes
+        self._generated_classes = {}
+
+    def mix(self, cls):
+        """
+        Returns a subclass of `cls` mixed with `self.mixins`.
+
+        :param cls: The base class to mix into
+        :type cls: `class`
+        """
+
+        if cls not in self._generated_classes:
+            self._generated_classes[cls] = type(
+                cls.__name__ + 'WithMixins',
+                (cls, ) + self._mixins,
+                {'mixed_class': True}
+            )
+
+        return self._generated_classes[cls]
 
 
 class RegexLexer(object):
