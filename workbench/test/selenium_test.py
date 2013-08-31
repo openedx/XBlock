@@ -5,7 +5,7 @@ from selenium import webdriver
 
 from nose.plugins.attrib import attr
 
-from workbench.runtime import MEMORY_KVS, Usage
+from workbench.runtime import MEMORY_KVS
 
 
 @attr('selenium')
@@ -29,4 +29,3 @@ class SeleniumTest(LiveServerTestCase):
 
         # Clear the in-memory key value store
         MEMORY_KVS.clear()
-        Usage.reinitialize_all()

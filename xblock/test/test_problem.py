@@ -8,8 +8,7 @@ import webob
 
 from nose.tools import assert_equals  # pylint: disable=E0611
 
-from xblock.parse import parse_xml_string
-from workbench.runtime import Usage, WorkbenchRuntime
+from workbench.runtime import WorkbenchRuntime
 
 
 def make_request(body):
@@ -25,7 +24,8 @@ def text_of_response(response):
 
 
 def test_problem_submission():
-    problem_usage = parse_xml_string("""
+    runtime = WorkbenchRuntime()
+    problem_usage_id = runtime.parse_xml_string("""
         <problem>
             <textinput name='vote_count' input_type='int'/>
 
@@ -36,10 +36,8 @@ def test_problem_submission():
                 Number of upvotes matches entered string
             </equality>
         </problem>
-    """, Usage)
-    problem_usage.store_initial_state()
-    runtime = WorkbenchRuntime()
-    problem = runtime.create_block(problem_usage)
+    """)
+    problem = runtime.create_block(problem_usage_id)
     json_data = json.dumps({"vote_count": [{"name": "input", "value": "4"}]})
     resp = runtime.handle(problem, 'check', make_request(json_data))
     resp_data = json.loads(text_of_response(resp))

@@ -1,5 +1,6 @@
 """Tests for the thumbs module"""
 
+from workbench import scenarios
 from workbench.test.selenium_test import SeleniumTest
 
 
@@ -8,6 +9,12 @@ class ThreeThumbsTest(SeleniumTest):
 
     def setUp(self):
         super(ThreeThumbsTest, self).setUp()
+
+        scenarios.add_xml_scenario(
+            "test_three_thumbs", "three thumbs test",
+            """<vertical><thumbs/><thumbs/><thumbs/></vertical>"""
+        )
+        self.addCleanup(scenarios.remove_scenario, "test_three_thumbs")
 
         # Suzy opens the browser to visit the workbench
         self.browser.get(self.live_server_url)
@@ -18,12 +25,12 @@ class ThreeThumbsTest(SeleniumTest):
 
     def test_three_thumbs_initial_state(self):
         # She clicks on the three thumbs at once scenario
-        link = self.browser.find_element_by_link_text('three thumbs at once')
+        link = self.browser.find_element_by_link_text('three thumbs test')
         link.click()
 
         # The header reflects the XBlock
         header1 = self.browser.find_element_by_css_selector('h1')
-        self.assertEqual(header1.text, 'XBlock: three thumbs at once')
+        self.assertEqual(header1.text, 'XBlock: three thumbs test')
 
         # She sees that there are 3 sets of thumbs
         vertical_css = 'div.student_view > div.xblock > div.vertical'
@@ -49,7 +56,7 @@ class ThreeThumbsTest(SeleniumTest):
 
     def test_three_upvoting(self):
         # She clicks on the three thumbs at once scenario
-        link = self.browser.find_element_by_link_text('three thumbs at once')
+        link = self.browser.find_element_by_link_text('three thumbs test')
         link.click()
 
         # The vertical that contains the thumbs
@@ -79,7 +86,7 @@ class ThreeThumbsTest(SeleniumTest):
 
     def test_three_downvoting(self):
         # She clicks on the three thumbs at once scenario
-        link = self.browser.find_element_by_link_text('three thumbs at once')
+        link = self.browser.find_element_by_link_text('three thumbs test')
         link.click()
 
         # The vertical that contains the thumbs

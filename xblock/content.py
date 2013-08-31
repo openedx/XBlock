@@ -2,6 +2,8 @@
 
 from string import Template  # pylint: disable=W0402
 
+from lxml import etree
+
 from .core import XBlock, String, Scope
 from .fragment import Fragment
 
@@ -26,6 +28,16 @@ class HtmlBlock(XBlock):
     def fallback_view(self, _view_name, context):
         """Provide a fallback view handler"""
         return Fragment(Template(self.content).substitute(**context))
+
+    def parse_xml(self, node):
+        """
+        Parse the XML for an HTML block.
+
+        The entire subtree under `node` is re-serialized, and set as the
+        content of the XBlock.
+
+        """
+        self.content = etree.tostring(node, encoding='unicode')
 
     @staticmethod
     def workbench_scenarios():

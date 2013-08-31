@@ -109,16 +109,6 @@ class XBlock(Plugin):
             if tag in class_._class_tags:
                 yield name, class_
 
-    @classmethod
-    def preprocess_input(cls, node, _usage_factory):
-        """The class can adjust a parsed Usage tree."""
-        return node
-
-    @classmethod
-    def postprocess_input(cls, node, _usage_factory):
-        """The class can adjust a parsed Usage tree."""
-        return node
-
     def __init__(self, runtime, field_data, scope_ids):
         """
         :param runtime: Use it to access the environment.
@@ -199,3 +189,24 @@ class XBlock(Plugin):
         Remove all dirty fields from an XBlock
         """
         self._dirty_fields.clear()
+
+    def parse_xml(self, node):
+        """
+        Use `node` to set our content.
+        """
+        # The base implementation: child nodes become child blocks.
+        for child in node:
+            self.runtime.add_node_as_child(self, child)
+
+        # Attributes become fields.
+        for name, value in node.items():
+            if name in self.fields:
+                setattr(self, name, value)
+
+        # Text content becomes "content", if such a field exists.
+        if "content" in self.fields and self.fields["content"].scope == Scope.content:
+            text = node.text
+            if text:
+                text = text.strip()
+                if text:
+                    self.content = text
