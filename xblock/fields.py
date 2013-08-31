@@ -565,15 +565,6 @@ class classproperty(object):  # pylint: disable=C0103
         return self.fget(owner)
 
 
-# This defines a property on the class that uses this metaclass
-@classproperty
-def _fields(cls):
-    """
-    Return a dictionary mapping field names to field values
-    for fields defined in this class and its base classes
-    """
-
-
 class ModelMetaclass(type):
     """
     A metaclass to be used for classes that want to use Fields as class attributes
