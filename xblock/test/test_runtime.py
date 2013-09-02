@@ -17,8 +17,7 @@ from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List, Us
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
 from xblock.fragment import Fragment
-from xblock.test import DictKeyValueStore
-from xblock.test.tools import DictModel
+from xblock.test.tools import DictModel, DictKeyValueStore
 
 
 class TestMixin(object):
