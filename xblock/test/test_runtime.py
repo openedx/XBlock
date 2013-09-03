@@ -17,7 +17,8 @@ from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List, Us
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
 from xblock.fragment import Fragment
-from xblock.test.tools import DictModel, DictKeyValueStore
+from xblock.field_data import DictFieldData
+from xblock.test.tools import DictKeyValueStore
 
 
 class TestMixin(object):
@@ -303,7 +304,7 @@ def test_mixin_field_access():
 
     field_tester = runtime.construct_block_from_class(
         FieldTester,
-        DictModel({
+        DictFieldData({
             'field_a': 5,
             'field_x': [1, 2, 3],
         }),

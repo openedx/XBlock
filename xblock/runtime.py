@@ -6,7 +6,8 @@ import re
 import functools
 
 from collections import namedtuple
-from xblock.fields import Field, BlockScope, Scope, FieldData, UNSET, UserScope
+from xblock.fields import Field, BlockScope, Scope, UserScope
+from xblock.field_data import FieldData, UNSET
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.core import XBlock
 

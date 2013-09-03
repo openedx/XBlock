@@ -9,7 +9,7 @@ from mock import Mock
 
 from xblock.core import XBlock
 from xblock.fields import Field, Scope
-from xblock.test.tools import DictModel
+from xblock.field_data import DictFieldData
 
 
 class TestJSONConversionField(Field):
@@ -31,7 +31,7 @@ class TestBlock(XBlock):
     field_b = TestJSONConversionField(scope=Scope.content)
 
 
-class TestModel(DictModel):
+class TestModel(DictFieldData):
     """ModelData for testing json conversion"""
     def default(self, block, name):
         return {'$type': 'set', '$vals': [0, 1]}
