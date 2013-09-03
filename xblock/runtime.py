@@ -460,7 +460,7 @@ class Mixologist(object):
             self._generated_classes[cls] = type(
                 cls.__name__ + 'WithMixins',
                 (cls, ) + self._mixins,
-                {'mixed_class': True}
+                {'unmixed_class': cls}
             )
 
         return self._generated_classes[cls]
