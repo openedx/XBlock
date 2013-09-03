@@ -5,7 +5,7 @@ Machinery to make the common case easy when building new runtimes
 import re
 import functools
 
-from collections import namedtuple, MutableMapping
+from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, FieldData, UNSET, UserScope
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.core import XBlock

@@ -6,7 +6,6 @@ storage mechanism is.
 """
 
 import copy
-import inspect
 from collections import namedtuple
 
 UNSET = object()
