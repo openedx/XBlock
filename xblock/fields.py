@@ -519,7 +519,7 @@ class List(Field):
         if value is None or isinstance(value, list):
             return value
         else:
-            raise TypeError('Value stored in an Object must be None or a list.')
+            raise TypeError('Value stored in an List must be None or a list.')
 
 
 class String(Field):
@@ -534,7 +534,7 @@ class String(Field):
         if value is None or isinstance(value, basestring):
             return value
         else:
-            raise TypeError('Value stored in a String must be None or a String.')
+            raise TypeError('Value stored in a String must be None or a string.')
 
 
 class Any(Field):
