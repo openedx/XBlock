@@ -1,10 +1,14 @@
 """ Simple test for the view counter that verifies that it is updating properly """
+
+from collections import namedtuple
+
 from nose.tools import assert_in, assert_equals  # pylint: disable=E0611
 from mock import Mock
-from xblock.view_counter import ViewCounter
+
 from xblock.runtime import DbModel
-from xblock.test import DictKeyValueStore
-from collections import namedtuple
+from xblock.test.tools import DictKeyValueStore
+from xblock.view_counter import ViewCounter
+
 
 TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
 

@@ -1,10 +1,11 @@
 """
 Tools for testing XBlocks
 """
+
 import copy
 
 from xblock.fields import UNSET
-from xblock.runtime import FieldData
+from xblock.runtime import FieldData, KeyValueStore
 
 
 class DictModel(FieldData):
@@ -34,3 +35,26 @@ class DictModel(FieldData):
 
     def default(self, block, name):
         raise KeyError
+
+
+class DictKeyValueStore(KeyValueStore):
+    """
+    Mock key value store backed by a dictionary.
+    """
+    def __init__(self):
+        self.db_dict = {}
+
+    def get(self, key):
+        return self.db_dict[key]
+
+    def set(self, key, value):
+        self.db_dict[key] = value
+
+    def set_many(self, other_dict):
+        self.db_dict.update(other_dict)
+
+    def delete(self, key):
+        del self.db_dict[key]
+
+    def has(self, key):
+        return key in self.db_dict
