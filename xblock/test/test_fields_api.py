@@ -32,7 +32,7 @@ from nose.tools import assert_is, assert_is_not, assert_raises, assert_equals, a
 
 from xblock.core import XBlock
 from xblock.fields import Integer, List
-from xblock.test.tools import DictModel
+from xblock.field_data import DictFieldData
 
 # Ignore statements that 'have no effect', since the effect is to read
 # from the descriptor
@@ -136,8 +136,8 @@ class InitialValueProperties(object):
         self.field_data  # The field_data used by self.block
     """
     def get_field_data(self):
-        """Return a new :class:`~xblock.fields.FieldData` for testing"""
-        return DictModel({'field': copy.deepcopy(self.initial_value)})
+        """Return a new :class:`~xblock.field_data.FieldData` for testing"""
+        return DictFieldData({'field': copy.deepcopy(self.initial_value)})
 
     def test_get_gets_initial_value(self):
         assert_equals(self.field_data.get(self.block, 'field'), self.block.field)
@@ -282,7 +282,7 @@ class UniversalTestCases(UniversalProperties):
     Requires from subclasses:
         self.field_class  # The class of the field to test
         self.field_default  # The static default value for the field
-        self.get_field_data()  # A function that returns a new :class:`~xblock.fields.FieldData` instance
+        self.get_field_data()  # A function that returns a new :class:`~xblock.field_data.FieldData` instance
     """
     def setUp(self):
         class TestBlock(XBlock):
@@ -293,10 +293,10 @@ class UniversalTestCases(UniversalProperties):
         self.block = TestBlock(Mock(), self.field_data, Mock())
 
 
-class DictModelWithSequentialDefault(DictModel):
-    """:class:`~xblock.test.tools.DictModel` that generates a sequence of default values"""
+class DictFieldDataWithSequentialDefault(DictFieldData):
+    """:class:`~xblock.test.tools.DictFieldData` that generates a sequence of default values"""
     def __init__(self, storage, sequence):
-        super(DictModelWithSequentialDefault, self).__init__(storage)
+        super(DictFieldDataWithSequentialDefault, self).__init__(storage)
         self._sequence = sequence
 
     def default(self, block, name):
@@ -306,15 +306,15 @@ class DictModelWithSequentialDefault(DictModel):
 class StaticDefaultTestCases(UniversalTestCases, DefaultValueProperties):
     """Set up tests of static default values"""
     def get_field_data(self):
-        """Return a new :class:`~xblock.fields.FieldData` for testing"""
-        return DictModel({})
+        """Return a new :class:`~xblock.field_data.FieldData` for testing"""
+        return DictFieldData({})
 
 
 class ComputedDefaultTestCases(UniversalTestCases, DefaultValueProperties):
     """Set up tests of computed default values"""
     def get_field_data(self):
-        """Return a new :class:`~xblock.fields.FieldData` for testing"""
-        return DictModelWithSequentialDefault({}, self.default_iterator)
+        """Return a new :class:`~xblock.field_data.FieldData` for testing"""
+        return DictFieldDataWithSequentialDefault({}, self.default_iterator)
 
 
 class ImmutableTestCases(UniversalTestCases):

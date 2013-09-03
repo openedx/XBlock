@@ -15,8 +15,7 @@ from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
 from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
     Integer, List, ModelMetaclass, Field, \
     Scope
-from xblock.fields import FieldData
-from xblock.test.tools import DictModel
+from xblock.field_data import FieldData, DictFieldData
 
 
 def test_model_metaclass():
@@ -125,7 +124,7 @@ def test_field_access():
         float_a = Float(scope=Scope.settings, default=5.8)
         float_b = Float(scope=Scope.settings)
 
-    field_tester = FieldTester(MagicMock(), DictModel({'field_a': 5, 'float_a': 6.1, 'field_x': 15}), Mock())
+    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': 5, 'float_a': 6.1, 'field_x': 15}), Mock())
     # Verify that the fields have been set
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
@@ -175,7 +174,7 @@ def test_list_field_access():
         field_c = List(scope=Scope.content, default=[4, 5, 6])
         field_d = List(scope=Scope.settings)
 
-    field_tester = FieldTester(MagicMock(), DictModel({'field_a': [200], 'field_b': [11, 12, 13]}), Mock())
+    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]}), Mock())
 
     # Check initial values have been set properly
     assert_equals([200], field_tester.field_a)
@@ -228,7 +227,7 @@ def test_mutable_none_values():
         field_b = List(scope=Scope.settings)
         field_c = List(scope=Scope.content, default=None)
 
-    field_tester = FieldTester(MagicMock(), DictModel({'field_a': None}), Mock())
+    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': None}), Mock())
     # Set fields b & c to None
     field_tester.field_b = None
     field_tester.field_c = None
@@ -259,7 +258,7 @@ def test_dict_field_access():
 
     field_tester = FieldTester(
         MagicMock(),
-        DictModel({
+        DictFieldData({
             'field_a': {'a': 200},
             'field_b': {'a': 11, 'b': 12, 'c': 13}
         }),
@@ -315,7 +314,7 @@ def test_default_values():
         list1 = List(scope=Scope.settings)
         list2 = List(scope=Scope.content, default=[1, 2, 3])
 
-    field_tester = FieldTester(MagicMock(), DictModel({'dic1': {'a': 200}, 'list1': ['a', 'b']}), Mock())
+    field_tester = FieldTester(MagicMock(), DictFieldData({'dic1': {'a': 200}, 'list1': ['a', 'b']}), Mock())
     assert_equals({'a': 200}, field_tester.dic1)
     assert_equals({'a': 1, 'b': 2, 'c': 3}, field_tester.dic2)
     assert_equals(['a', 'b'], field_tester.list1)
@@ -378,7 +377,7 @@ def test_json_field_access():
             self._field_data = field_data
             self._dirty_fields = {}
 
-    field_tester = FieldTester(DictModel({}))
+    field_tester = FieldTester(DictFieldData({}))
 
     # Check initial values
     assert_equals(None, field_tester.field_a)
@@ -403,8 +402,8 @@ def test_defaults_not_shared():
 
         field_a = List(scope=Scope.settings)
 
-    field_tester_a = FieldTester(MagicMock(), DictModel({}), Mock())
-    field_tester_b = FieldTester(MagicMock(), DictModel({}), Mock())
+    field_tester_a = FieldTester(MagicMock(), DictFieldData({}), Mock())
+    field_tester_b = FieldTester(MagicMock(), DictFieldData({}), Mock())
 
     field_tester_a.field_a.append(1)
     assert_equals([1], field_tester_a.field_a)
@@ -499,7 +498,7 @@ def test_field_serialization():
 
     field_tester = FieldTester(
         MagicMock(),
-        DictModel({
+        DictFieldData({
             'field': {'value': 4}
         }),
         Mock(),
@@ -652,7 +651,7 @@ def test_xblock_write_then_delete():
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
 
-    field_tester = FieldTester(MagicMock(), DictModel({'field_a': 5}), Mock())
+    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': 5}), Mock())
 
     # Verify that the fields have been set correctly
     assert_equals(5, field_tester.field_a)
@@ -703,7 +702,7 @@ def test_get_mutable_mark_dirty():
         """Test class with mutable fields."""
         list_field = List(default=[])
 
-    mutable_test = MutableTester(MagicMock(), DictModel({}), Mock())
+    mutable_test = MutableTester(MagicMock(), DictFieldData({}), Mock())
 
     # Test get/set with a default value.
     assert_equals(len(mutable_test._dirty_fields), 0)
@@ -730,8 +729,8 @@ def test_change_mutable_default():
         """Test class with mutable fields."""
         list_field = List()
 
-    mutable_test_a = MutableTester(MagicMock(), DictModel({}), Mock())
-    mutable_test_b = MutableTester(MagicMock(), DictModel({}), Mock())
+    mutable_test_a = MutableTester(MagicMock(), DictFieldData({}), Mock())
+    mutable_test_b = MutableTester(MagicMock(), DictFieldData({}), Mock())
 
     # Saving without changing the default value shouldn't write to _field_data
     mutable_test_a.list_field  # pylint: disable=W0104
