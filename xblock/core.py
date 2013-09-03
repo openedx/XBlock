@@ -127,7 +127,7 @@ class XBlock(Plugin):
 
         :param field_data: Interface used by the XBlock fields to access their data
             from wherever it is persisted
-        :type field_data: :class:`xblock.fields.FieldData`
+        :type field_data: :class:`xblock.field_data.FieldData`
 
         :param scope_ids: Identifiers needed to resolve scopes
         :type scope_ids: `~xblock.fields.ScopeIds`.
