@@ -413,3 +413,6 @@ class TestMixologist(object):
     # Test that mixins are applied in order
     def test_mixin_order(self):
         assert_is(1, self.mixologist.mix(FieldTester).number)
+
+    def test_unmixed_class(self):
+        assert_is(FieldTester, self.mixologist.mix(FieldTester).unmixed_class)
