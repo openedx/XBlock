@@ -343,7 +343,7 @@ class Field(object):
 
 class Integer(Field):
     """
-    A model type that contains an integer.
+    A field that contains an integer.
 
     The value, as stored, can be None, '' (which will be treated as None), a Python integer,
     or a value that will parse as an integer, ie., something for which int(value) does not throw an Error.
@@ -361,7 +361,7 @@ class Integer(Field):
 
 class Float(Field):
     """
-    A model type that contains a float.
+    A field that contains a float.
 
     The value, as stored, can be None, '' (which will be treated as None), a Python float,
     or a value that will parse as an float, ie., something for which float(value) does not throw an Error.
@@ -461,24 +461,6 @@ class Any(Field):
     All methods are inherited directly from `Field`.
     """
     pass
-
-
-# Shamelessly cribbed from http://docs.python.org/2/howto/descriptor.html
-# and adapted to work only on classes
-class classproperty(object):  # pylint: disable=C0103
-    """
-    @property analogy except for class methods
-    """
-    def __init__(self, fget=None, doc=None):
-        self.fget = fget
-        if doc is None and fget is not None:
-            doc = fget.__doc__
-        self.__doc__ = doc
-
-    def __get__(self, instance, owner):
-        if self.fget is None:
-            raise AttributeError("unreadable attribute")
-        return self.fget(owner)
 
 
 class ModelMetaclass(type):
