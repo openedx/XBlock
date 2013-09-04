@@ -221,6 +221,16 @@ class Field(object):
         if self not in instance._dirty_fields:
             instance._dirty_fields[self] = copy.deepcopy(value)
 
+    def _is_dirty(self, instance):
+        """
+        Return whether this field should be saved when instance.save() is called
+        """
+        if self not in instance._dirty_fields:
+            return False
+
+        baseline = instance._dirty_fields[self]
+        return baseline is EXPLICITLY_SET or instance._field_data_cache[self.name] != baseline
+
     def __get__(self, instance, owner):
         """
         Gets the value of this instance. Prioritizes the cached value over
@@ -337,6 +347,12 @@ class Field(object):
         Delete the value for this field from the supplied model object
         """
         self.__delete__(model)
+
+    def is_set_on(self, model):
+        """
+        Return whether this field has a non-default value on the supplied model object
+        """
+        return self._is_dirty(model) or model._field_data.has(model, self.name)
 
     def __hash__(self):
         return hash(self.name)
