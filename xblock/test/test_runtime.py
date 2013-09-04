@@ -13,7 +13,7 @@ from collections import namedtuple
 from mock import Mock
 
 from xblock.core import XBlock
-from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List, UserScope
+from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List, UserScope, XBlockMixin, Integer
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
 from xblock.fragment import Fragment
@@ -383,14 +383,16 @@ class TestObjectAggregator(object):
             del self.agg.other
 
 
-class FirstMixin(object):
+class FirstMixin(XBlockMixin):
     """Test class for mixin ordering."""
     number = 1
+    field = Integer(default=1)
 
 
-class SecondMixin(object):
+class SecondMixin(XBlockMixin):
     """Test class for mixin ordering."""
     number = 2
+    field = Integer(default=2)
 
 
 class TestMixologist(object):
@@ -414,6 +416,16 @@ class TestMixologist(object):
     # Test that mixins are applied in order
     def test_mixin_order(self):
         assert_is(1, self.mixologist.mix(FieldTester).number)
+        assert_is(1, self.mixologist.mix(FieldTester).fields['field'].default)
 
     def test_unmixed_class(self):
         assert_is(FieldTester, self.mixologist.mix(FieldTester).unmixed_class)
+
+    def test_mixin_fields(self):
+        assert_is(FirstMixin.fields['field'], FirstMixin.field)
+
+    def test_mixed_fields(self):
+        mixed = self.mixologist.mix(FieldTester)
+        assert_is(mixed.fields['field'], FirstMixin.field)
+        assert_is(mixed.fields['field_a'], FieldTester.field_a)
+
