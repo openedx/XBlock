@@ -201,7 +201,7 @@ class WorkbenchRuntime(Runtime):
 
         """
         keys = ScopeIds(self.student_id, usage.block_name, usage.def_id, usage.id)
-        block = self.construct_block(usage.block_name, MODEL, keys)
+        block = self.construct_xblock(usage.block_name, MODEL, keys)
         return block
 
     def render(self, block, context, view_name):

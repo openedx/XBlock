@@ -199,15 +199,15 @@ class Runtime(object):
         self._view_name = None
         self.mixologist = Mixologist(mixins)
 
-    def construct_block(self, plugin_name, field_data, scope_ids, default_class=None, *args, **kwargs):
+    def construct_xblock(self, plugin_name, field_data, scope_ids, default_class=None, *args, **kwargs):
         """
         Construct a new xblock of the type identified by plugin_name,
         passing *args and **kwargs into __init__
         """
         block_class = XBlock.load_class(plugin_name, default_class)
-        return self.construct_block_from_class(cls=block_class, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
+        return self.construct_xblock_from_class(cls=block_class, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
 
-    def construct_block_from_class(self, cls, field_data, scope_ids, *args, **kwargs):
+    def construct_xblock_from_class(self, cls, field_data, scope_ids, *args, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application
