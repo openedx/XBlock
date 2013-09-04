@@ -37,7 +37,7 @@ def test_problem_submission():
             </equality>
         </problem>
     """)
-    problem = runtime.create_block(problem_usage_id)
+    problem = runtime.get_block(problem_usage_id)
     json_data = json.dumps({"vote_count": [{"name": "input", "value": "4"}]})
     resp = runtime.handle(problem, 'check', make_request(json_data))
     resp_data = json.loads(text_of_response(resp))

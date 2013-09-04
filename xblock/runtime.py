@@ -3,7 +3,6 @@ Machinery to make the common case easy when building new runtimes
 """
 
 import functools
-import itertools
 import re
 import threading
 
@@ -185,19 +184,39 @@ class DbModel(FieldData):
 
 
 class UsageStore(object):
-    """TOTAL CONFUSED HACK."""
-    def __init__(self):
-        self._ids = itertools.count()
-        self._all = {}
+    """An abstract object that stores usages and definitions."""
 
-    def next_id(self):
-        return str(next(self._ids))
+    def create_usage(self, def_id):
+        """Make a usage, storing its definition id.
 
-    def set(self, usage_id, block_type, def_id):
-        self._all[usage_id] = (block_type, def_id)
+        Returns the newly-created usage id.
 
-    def get(self, usage_id):
-        return self._all[usage_id]
+        """
+        pass
+
+    def get_definition_id(self, usage_id):
+        """Get a usage.
+
+        Returns the definition id stored as the usage.
+
+        """
+        pass
+
+    def create_definition(self, block_type):
+        """Make a definition, storing its block type.
+
+        Returns the newly-created definition id.
+
+        """
+        pass
+
+    def get_block_type(self, def_id):
+        """Get a definition.
+
+        Returns the block_type stored as the definition.
+
+        """
+        pass
 
 
 class Runtime(object):
@@ -232,10 +251,10 @@ class Runtime(object):
         """
         return self.mixologist.mix(cls)(runtime=self, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
 
-    def get_block(self, block_id):
-        """Get a block by ID.
+    def get_block(self, usage_id):
+        """Get a block by usage id.
 
-        Returns the block identified by `block_id`, or raises an exception.
+        Returns the block identified by `usage_id`, or raises an exception.
         """
         raise NotImplementedError("Runtime needs to provide get_block()")
 
@@ -262,13 +281,12 @@ class Runtime(object):
         else:
             block_type = node.tag
         # TODO: a way for this node to be a usage to an existing definition?
-        usage_id = self.usage_store.next_id()
-        def_id = self.usage_store.next_id()
-        keys = ScopeIds(UserScope.NONE, block_type, str(def_id), str(usage_id))
+        def_id = self.usage_store.create_definition(block_type)
+        usage_id = self.usage_store.create_usage(def_id)
+        keys = ScopeIds(UserScope.NONE, block_type, def_id, usage_id)
         block = self.construct_xblock(block_type, self.field_data, keys)
         block.parse_xml(node)
         block.save()
-        self.usage_store.set(usage_id, block_type, def_id)
         return usage_id
 
     def add_node_as_child(self, block, node):

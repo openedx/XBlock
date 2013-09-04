@@ -4,12 +4,13 @@ Code in this file is a mix of Runtime layer and Workbench layer.
 
 """
 
+import itertools
+import logging
+
 try:
     import simplejson as json
 except ImportError:
     import json
-
-import logging
 
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
@@ -84,6 +85,39 @@ class MemoryKeyValueStore(KeyValueStore):
             self.set(key, value)
 
 
+class MemoryUsageStore(UsageStore):
+    """A simple dict-based implementation of UsageStore."""
+
+    def __init__(self):
+        self._ids = itertools.count()
+        self._usages = {}
+        self._definitions = {}
+
+    def _next_id(self):
+        """Generate a new id."""
+        return str(next(self._ids))
+
+    def create_usage(self, def_id):
+        """Make a usage, storing its definition id."""
+        usage_id = self._next_id()
+        self._usages[usage_id] = def_id
+        return usage_id
+
+    def get_definition_id(self, usage_id):
+        """Get a definition_id by its usage id."""
+        return self._usages[usage_id]
+
+    def create_definition(self, block_type):
+        """Make a definition, storing its block type."""
+        def_id = self._next_id()
+        self._definitions[def_id] = block_type
+        return def_id
+
+    def get_block_type(self, def_id):
+        """Get a block_type by its definition id."""
+        return self._definitions[def_id]
+
+
 class WorkbenchRuntime(Runtime):
     """
     Access to the workbench runtime environment for XBlocks.
@@ -99,14 +133,15 @@ class WorkbenchRuntime(Runtime):
         self.field_data = DbModel(MEMORY_KVS)
         self.usage_store = USAGE_STORE
 
-    def create_block(self, usage_id):
+    def get_block(self, usage_id):
         """
         Create an XBlock instance in this runtime.
 
         The `usage_id` is used to find the XBlock class and data.
 
         """
-        block_type, def_id = self.usage_store.get(usage_id)
+        def_id = self.usage_store.get_definition_id(usage_id)
+        block_type = self.usage_store.get_block_type(def_id)
         keys = ScopeIds(self.student_id, block_type, def_id, usage_id)
         block = self.construct_xblock(block_type, self.field_data, keys)
         return block
@@ -156,9 +191,6 @@ class WorkbenchRuntime(Runtime):
             url,
             block.scope_ids.user_id
         )
-
-    def get_block(self, block_id):
-        return self.create_block(block_id)
 
     def query(self, block):
         return _BlockSet(self, [block])
@@ -225,4 +257,4 @@ class _BlockSet(object):
 MEMORY_KVS = MemoryKeyValueStore({})
 
 # Our global usage store
-USAGE_STORE = UsageStore()
+USAGE_STORE = MemoryUsageStore()

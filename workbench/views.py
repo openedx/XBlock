@@ -76,7 +76,7 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
 
     usage_id = scenario.usage_id
     runtime = WorkbenchRuntime(student_id)
-    block = runtime.create_block(usage_id)
+    block = runtime.get_block(usage_id)
     frag = block.runtime.render(block, {}, view_name)
     log.info("End show_scenario %s", scenario_id)
     return render_to_response(template, {
@@ -96,7 +96,7 @@ def handler(request, usage_id, handler_slug):
     student_id = get_student_id(request)
     log.info("Start handler %s/%s for student %s", usage_id, handler_slug, student_id)
     runtime = WorkbenchRuntime(student_id)
-    block = runtime.create_block(usage_id)
+    block = runtime.get_block(usage_id)
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()

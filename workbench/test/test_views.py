@@ -111,8 +111,9 @@ def test_xblock_without_handler():
     client = Client()
 
     # Pick a random usage_id from the USAGE_STORE because we
-    # need to ensure the usage is a valid id
-    usage_id = USAGE_STORE._all.keys()[0]
+    # need to ensure the usage is a valid id.
+    # TODO: Make a usage in this test instead.
+    usage_id = USAGE_STORE._usages.keys()[0]
     # Plug that usage_id into a mock handler URL
     # /handler/[usage_id]/[handler_name]
     handler_url = "/handler/" + usage_id + "/does_not_exist/?student=student_doesntexist"
