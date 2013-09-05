@@ -161,8 +161,12 @@ def test_field_access():
     assert_equals(None, field_tester.field_a)
     assert_equals(5.8, field_tester.float_a)
     # But the fields should not actually be present in the underlying kvstore
-    assert_equals("Not Present", field_tester._field_data.get(field_tester, 'field_a', "Not Present"))
-    assert_equals("Not Present", field_tester._field_data.get(field_tester, 'float_a', "Not Present"))
+    with assert_raises(KeyError):
+        field_tester._field_data.get(field_tester, 'field_a')
+    assert_false(field_tester._field_data.has(field_tester, 'field_a'))
+    with assert_raises(KeyError):
+        field_tester._field_data.get(field_tester, 'float_a')
+    assert_false(field_tester._field_data.has(field_tester, 'float_a'))
 
 
 def test_list_field_access():

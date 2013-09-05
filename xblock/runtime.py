@@ -7,7 +7,7 @@ import functools
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, UserScope
-from xblock.field_data import FieldData, UNSET
+from xblock.field_data import FieldData
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.core import XBlock
 
@@ -128,20 +128,14 @@ class DbModel(FieldData):
         )
         return key
 
-    def get(self, block, name, default=UNSET):
+    def get(self, block, name):
         """
         Retrieve the value for the field named `name`.
 
         If a value is provided for `default`, then it will be
         returned if no value is set
         """
-        try:
-            return self._kvs.get(self._key(block, name))
-        except KeyError:
-            if default is UNSET:
-                raise
-            else:
-                return default
+        return self._kvs.get(self._key(block, name))
 
     def set(self, block, name, value):
         """
