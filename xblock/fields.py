@@ -233,16 +233,16 @@ class Field(object):
 
         value = self._get_cached_value(instance)
         if value is NO_CACHE_VALUE:
-            try:
+            if instance._field_data.has(instance, self.name):
                 value = self.from_json(instance._field_data.get(instance, self.name))
-            except KeyError:
+            else:
                 # Cache default value
                 try:
                     value = self.from_json(instance._field_data.default(instance, self.name))
                 except KeyError:
                     value = self.default
-            finally:
-                self._set_cached_value(instance, value)
+
+            self._set_cached_value(instance, value)
 
         # If this is a mutable type, mark it as dirty, since mutations can occur without an
         # explicit call to __set__ (but they do require a call to __get__)

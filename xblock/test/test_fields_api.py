@@ -27,7 +27,7 @@ from mock import Mock
 
 # Nose dynamically defines assert_* functions
 # pylint: disable=E0611
-from nose.tools import assert_is, assert_is_not, assert_raises, assert_equals, assert_not_equals
+from nose.tools import assert_is, assert_is_not, assert_equals, assert_not_equals, assert_false
 # pylint: enable=E0611
 
 from xblock.core import XBlock
@@ -88,14 +88,12 @@ class UniversalProperties(object):
 
     def test_delete_without_save_writes(self):
         del self.block.field
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
     def test_delete_with_save_writes(self):
         del self.block.field
         self.block.save()
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
 
 class MutationProperties(object):
@@ -168,34 +166,28 @@ class DefaultValueProperties(object):
         self.field_data  # The field_data used by self.block
     """
     def test_get_with_save_doesnt_write(self):
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
         self.block.field
         self.block.save()
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
     def test_set_with_save_writes(self):
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
         self.block.field = self.new_value
         self.block.save()
         assert_equals(self.new_value, self.field_data.get(self.block, 'field'))
 
     def test_delete_without_save_succeeds(self):
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
         del self.block.field
 
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
     def test_delete_with_save_succeeds(self):
         del self.block.field
         self.block.save()
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
 
 class DefaultValueMutationProperties(object):
@@ -208,18 +200,15 @@ class DefaultValueMutationProperties(object):
         self.field_data  # The field_data used by self.block
     """
     def test_mutation_without_save_doesnt_write(self):
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
         mutable = self.block.field
         self.mutate(mutable)
 
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
     def test_mutation_with_save_writes(self):
-        with assert_raises(KeyError):
-            self.field_data.get(self.block, 'field')
+        assert_false(self.field_data.has(self.block, 'field'))
 
         mutable = self.block.field
         reference_copy = copy.deepcopy(mutable)
