@@ -7,7 +7,8 @@ storage mechanism is.
 
 import copy
 from collections import namedtuple
-from xblock.field_data import UNSET
+
+UNSET = object()
 
 
 class BlockScope(object):
