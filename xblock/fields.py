@@ -189,103 +189,103 @@ class Field(object):
         """
         return self._display_name if self._display_name is not None else self.name
 
-    def _get_cached_value(self, instance):
+    def _get_cached_value(self, xblock):
         """
-        Return a value from the instance's cache, or a marker value if either the cache
+        Return a value from the xblock's cache, or a marker value if either the cache
         doesn't exist or the value is not found in the cache.
         """
-        return getattr(instance, '_field_data_cache', {}).get(self.name, NO_CACHE_VALUE)
+        return getattr(xblock, '_field_data_cache', {}).get(self.name, NO_CACHE_VALUE)
 
-    def _set_cached_value(self, instance, value):
-        """Store a value in the instance's cache, creating the cache if necessary."""
-        # Allow this method to access the `_field_data_cache` of `instance`
+    def _set_cached_value(self, xblock, value):
+        """Store a value in the xblock's cache, creating the cache if necessary."""
+        # Allow this method to access the `_field_data_cache` of `xblock`
         # pylint: disable=W0212
-        if not hasattr(instance, '_field_data_cache'):
-            instance._field_data_cache = {}
-        instance._field_data_cache[self.name] = value
+        if not hasattr(xblock, '_field_data_cache'):
+            xblock._field_data_cache = {}
+        xblock._field_data_cache[self.name] = value
 
-    def _del_cached_value(self, instance):
-        """Remove a value from the instance's cache, if the cache exists."""
-        # Allow this method to access the `_field_data_cache` of `instance`
+    def _del_cached_value(self, xblock):
+        """Remove a value from the xblock's cache, if the cache exists."""
+        # Allow this method to access the `_field_data_cache` of `xblock`
         # pylint: disable=W0212
-        if hasattr(instance, '_field_data_cache') and self.name in instance._field_data_cache:
-            del instance._field_data_cache[self.name]
+        if hasattr(xblock, '_field_data_cache') and self.name in xblock._field_data_cache:
+            del xblock._field_data_cache[self.name]
 
-    def _mark_dirty(self, instance, value):
-        """Set this field to dirty on the instance."""
-        # Allow this method to access the `_dirty_fields` of `instance`
+    def _mark_dirty(self, xblock, value):
+        """Set this field to dirty on the xblock."""
+        # Allow this method to access the `_dirty_fields` of `xblock`
         # pylint: disable=W0212
 
         # Deep copy the value being marked as dirty, so that there
         # is a baseline to check against when saving later
-        if self not in instance._dirty_fields:
-            instance._dirty_fields[self] = copy.deepcopy(value)
+        if self not in xblock._dirty_fields:
+            xblock._dirty_fields[self] = copy.deepcopy(value)
 
-    def _is_dirty(self, instance):
+    def _is_dirty(self, xblock):
         """
-        Return whether this field should be saved when instance.save() is called
+        Return whether this field should be saved when xblock.save() is called
         """
-        if self not in instance._dirty_fields:
+        if self not in xblock._dirty_fields:
             return False
 
-        baseline = instance._dirty_fields[self]
-        return baseline is EXPLICITLY_SET or instance._field_data_cache[self.name] != baseline
+        baseline = xblock._dirty_fields[self]
+        return baseline is EXPLICITLY_SET or xblock._field_data_cache[self.name] != baseline
 
-    def __get__(self, instance, owner):
+    def __get__(self, xblock, xblock_class):
         """
-        Gets the value of this instance. Prioritizes the cached value over
+        Gets the value of this xblock. Prioritizes the cached value over
         obtaining the value from the _field_data. Thus if a cached value
         exists, that is the value that will be returned.
         """
-        # Allow this method to access the `_field_data_cache` of `instance`
+        # Allow this method to access the `_field_data_cache` of `xblock`
         # pylint: disable=W0212
-        if instance is None:
+        if xblock is None:
             return self
 
-        value = self._get_cached_value(instance)
+        value = self._get_cached_value(xblock)
         if value is NO_CACHE_VALUE:
-            if instance._field_data.has(instance, self.name):
-                value = self.from_json(instance._field_data.get(instance, self.name))
+            if xblock._field_data.has(xblock, self.name):
+                value = self.from_json(xblock._field_data.get(xblock, self.name))
             else:
                 # Cache default value
                 try:
-                    value = self.from_json(instance._field_data.default(instance, self.name))
+                    value = self.from_json(xblock._field_data.default(xblock, self.name))
                 except KeyError:
                     value = self.default
 
-            self._set_cached_value(instance, value)
+            self._set_cached_value(xblock, value)
 
         # If this is a mutable type, mark it as dirty, since mutations can occur without an
         # explicit call to __set__ (but they do require a call to __get__)
         if self.MUTABLE:
-            self._mark_dirty(instance, value)
+            self._mark_dirty(xblock, value)
 
         return value
 
-    def __set__(self, instance, value):
+    def __set__(self, xblock, value):
         """
-        Sets the `instance` to the given `value`.
+        Sets the `xblock` to the given `value`.
         Setting a value does not update the underlying data store; the
-        new value is kept in the cache and the instance is marked as
+        new value is kept in the cache and the xblock is marked as
         dirty until `save` is explicitly called.
         """
         # Mark the field as dirty and update the cache:
-        self._mark_dirty(instance, EXPLICITLY_SET)
-        self._set_cached_value(instance, value)
+        self._mark_dirty(xblock, EXPLICITLY_SET)
+        self._set_cached_value(xblock, value)
 
-    def __delete__(self, instance):
+    def __delete__(self, xblock):
         """
-        Deletes `instance` from the underlying data store.
+        Deletes `xblock` from the underlying data store.
         Deletes are not cached; they are performed immediately.
         """
-        # Allow this method to access the `_field_data` and `_dirty_fields` of `instance`
+        # Allow this method to access the `_field_data` and `_dirty_fields` of `xblock`
         # pylint: disable=W0212
 
         # Try to perform the deletion on the field_data, and accept
         # that it's okay if the key is not present.  (It may never
         # have been persisted at all.)
         try:
-            instance._field_data.delete(instance, self.name)
+            xblock._field_data.delete(xblock, self.name)
         except KeyError:
             pass
 
@@ -293,14 +293,14 @@ class Field(object):
         # an erroneous write of its value on implicit save. OK if it was
         # not in the dirty fields to begin with.
         try:
-            del instance._dirty_fields[self]
+            del xblock._dirty_fields[self]
         except KeyError:
             pass
 
         # Since we know that the field_data no longer contains the value, we can
         # avoid the possible database lookup that a future get() call would
         # entail by setting the cached value now to its default value.
-        self._set_cached_value(instance, copy.deepcopy(self.default))
+        self._set_cached_value(xblock, copy.deepcopy(self.default))
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0._name}>".format(self)
