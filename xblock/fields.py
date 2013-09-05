@@ -533,3 +533,14 @@ class ChildrenModelMetaclass(type):
             attrs['has_children'] = False
 
         return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
+
+
+class XBlockMixin(object):
+    """
+    Base class for XBlock Mixin classes. These classes can add new fields
+    and new properties to all XBlocks created by a particular runtime.
+
+    This doesn't use the ChildrenModelMetaclass, because it doesn't seem sensible
+    to add children to a module not written to use them.
+    """
+    __metaclass__ = ModelMetaclass
