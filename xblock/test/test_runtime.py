@@ -116,7 +116,7 @@ def test_db_model_keys():
     key_store = DictKeyValueStore()
     db_model = DbModel(key_store)
     runtime = Runtime([TestMixin])
-    tester = runtime.construct_block_from_class(TestXBlock, db_model, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
+    tester = runtime.construct_xblock_from_class(TestXBlock, db_model, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
 
     assert_false(db_model.has(tester, 'not a field'))
 
@@ -302,7 +302,7 @@ class FieldTester(XBlock):
 def test_mixin_field_access():
     runtime = Runtime([TestSimpleMixin])
 
-    field_tester = runtime.construct_block_from_class(
+    field_tester = runtime.construct_xblock_from_class(
         FieldTester,
         DictFieldData({
             'field_a': 5,
