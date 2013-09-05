@@ -324,35 +324,35 @@ class Field(object):
         """
         return value
 
-    def read_from(self, model):
+    def read_from(self, xblock):
         """
-        Retrieve the value for this field from the specified model object
+        Retrieve the value for this field from the specified xblock
         """
-        return self.__get__(model, model.__class__)
+        return self.__get__(xblock, xblock.__class__)
 
-    def read_json(self, model):
+    def read_json(self, xblock):
         """
-        Retrieve the serialized value for this field from the specified model object
+        Retrieve the serialized value for this field from the specified xblock
         """
-        return self.to_json(self.read_from(model))
+        return self.to_json(self.read_from(xblock))
 
-    def write_to(self, model, value):
+    def write_to(self, xblock, value):
         """
-        Set the value for this field to value on the supplied model object
+        Set the value for this field to value on the supplied xblock
         """
-        self.__set__(model, value)
+        self.__set__(xblock, value)
 
-    def delete_from(self, model):
+    def delete_from(self, xblock):
         """
-        Delete the value for this field from the supplied model object
+        Delete the value for this field from the supplied xblock
         """
-        self.__delete__(model)
+        self.__delete__(xblock)
 
-    def is_set_on(self, model):
+    def is_set_on(self, xblock):
         """
-        Return whether this field has a non-default value on the supplied model object
+        Return whether this field has a non-default value on the supplied xblock
         """
-        return self._is_dirty(model) or model._field_data.has(model, self.name)
+        return self._is_dirty(xblock) or xblock._field_data.has(xblock, self.name)
 
     def __hash__(self):
         return hash(self.name)
