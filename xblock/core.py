@@ -12,7 +12,7 @@ except ImportError:
 from webob import Response
 
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
-from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope, EXPLICITLY_SET
+from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope
 from xblock.plugin import Plugin
 
 
@@ -187,10 +187,10 @@ class XBlock(Plugin):
         A `field` is an instance of `Field`.
         """
         fields_to_save = {}
-        for field, baseline in self._dirty_fields.items():
+        for field in self._dirty_fields.keys():
             # If the field value isn't the same as the baseline we recorded
             # when it was read, then save it
-            if baseline is EXPLICITLY_SET or self._field_data_cache[field.name] != baseline:
+            if field._is_dirty(self):
                 fields_to_save[field.name] = field.to_json(self._field_data_cache[field.name])
         return fields_to_save
 

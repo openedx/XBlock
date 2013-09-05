@@ -31,7 +31,7 @@ from mock import Mock
 # pylint: disable=E0611
 from nose.tools import (
     assert_is, assert_is_not, assert_equals,
-    assert_not_equals, assert_false
+    assert_not_equals, assert_true, assert_false
 )
 # pylint: enable=E0611
 
@@ -70,7 +70,7 @@ class BlockFirstOperations(object):
 
     def is_default(self):
         """Return if the field is set on the block"""
-        return self.block.__class__.field.is_set_on(self.block)
+        return not self.block.__class__.field.is_set_on(self.block)
 
 
 class FieldFirstOperations(object):
@@ -95,7 +95,7 @@ class FieldFirstOperations(object):
 
     def is_default(self):
         """Return if the field is set on the block"""
-        return self.block.__class__.field.is_set_on(self.block)
+        return not self.block.__class__.field.is_set_on(self.block)
 
 
 # ~~~~~~~~~~~~~ Classes defining test properties ~~~~~~~~~~~~~~~~~~~~~~
@@ -141,14 +141,25 @@ class UniversalProperties(object):
         assert_is(self.new_value, second_get)
         assert_is_not(first_get, second_get)
 
+    def test_set_with_save_makes_non_default(self):
+        self.set(self.new_value)
+        self.block.save()
+        assert_false(self.is_default())
+
+    def test_set_without_save_makes_non_default(self):
+        self.set(self.new_value)
+        assert_false(self.is_default())
+
     def test_delete_without_save_writes(self):
         self.delete()
         assert_false(self.field_data.has(self.block, 'field'))
+        assert_true(self.is_default())
 
     def test_delete_with_save_writes(self):
         self.delete()
         self.block.save()
         assert_false(self.field_data.has(self.block, 'field'))
+        assert_true(self.is_default())
 
 
 class MutationProperties(object):
@@ -176,6 +187,15 @@ class MutationProperties(object):
         self.block.save()
         final_value = self.field_data.get(self.block, 'field')
         assert_equals(reference_value, final_value)
+
+    def test_mutation_with_save_makes_non_default(self):
+        self.mutate(self.get())
+        self.block.save()
+        assert_false(self.is_default())
+
+    def test_mutation_without_save_makes_non_default(self):
+        self.mutate(self.get())
+        assert_false(self.is_default())
 
 
 class InitialValueProperties(object):
