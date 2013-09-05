@@ -7,19 +7,16 @@ simple.
 
 import copy
 
-UNSET = object()
-
 
 class FieldData(object):
     """
     An interface allowing access to an XBlock's field values indexed by field names
     """
-    def get(self, block, name, default=UNSET):
+    def get(self, block, name):
         """
         Retrieve the value for the field named `name` for the XBlock `block`.
 
-        If a value is provided for `default`, then it will be
-        returned if no value is set
+        If no value is set, raise a `KeyError`
 
         The value returned may be mutated without modifying the backing store
 
@@ -99,11 +96,8 @@ class DictFieldData(FieldData):
     def __init__(self, data):
         self._data = data
 
-    def get(self, block, name, default=UNSET):
-        if default is UNSET:
-            return copy.deepcopy(self._data[name])
-        else:
-            return copy.deepcopy(self._data.get(name, default))
+    def get(self, block, name):
+        return copy.deepcopy(self._data[name])
 
     def set(self, block, name, value):
         self._data[name] = copy.deepcopy(value)
