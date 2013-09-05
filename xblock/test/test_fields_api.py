@@ -10,6 +10,8 @@ orthogonal attributes that affect the behaviour of xblock fields.
         i) The default is statically defined on the field
         ii) The default is computed by the field_data
     b) The field has a stored value
+3) Whether we are using the block first vs field first versions of the
+   accessors (block.field vs field.read_from(block))
 
 In addition, all of the test cases should behave the same in the
 presence of certain preceding noop operations (such as reading the
@@ -27,7 +29,10 @@ from mock import Mock
 
 # Nose dynamically defines assert_* functions
 # pylint: disable=E0611
-from nose.tools import assert_is, assert_is_not, assert_equals, assert_not_equals, assert_false
+from nose.tools import (
+    assert_is, assert_is_not, assert_equals,
+    assert_not_equals, assert_false
+)
 # pylint: enable=E0611
 
 from xblock.core import XBlock
@@ -39,11 +44,61 @@ from xblock.field_data import DictFieldData
 # pylint: disable=W0104
 
 
-# ~~~~~~~~~~~~~ Classes defining test properties ~~~~~~~~~~~~~~~~~~~~~~
-
 # Allow base classes to leave out class attributes and that they access
 # without pylint complaining
 # pylint: disable=E1101
+# ~~~~~~~~~~~~~ Classes defining test operations ~~~~~~~~~~~~~~~~~~~~~~
+class BlockFirstOperations(object):
+    """
+    Defines operations using the block-first implementations
+
+    Requires from subclasses:
+        self.block  # An xblock to operate on, which has a field `field`
+    """
+
+    def get(self):
+        """Retrieve the field from the block"""
+        return self.block.field
+
+    def set(self, value):
+        """Set the field on the block"""
+        self.block.field = value
+
+    def delete(self):
+        """Unset the field from the block"""
+        del self.block.field
+
+    def is_default(self):
+        """Return if the field is set on the block"""
+        return self.block.__class__.field.is_set_on(self.block)
+
+
+class FieldFirstOperations(object):
+    """
+    Defines operations using the field-first implementations
+
+    Requires from subclasses:
+        self.block  # An xblock to operate on, which has a field `field`
+    """
+
+    def get(self):
+        """Retrieve the field from the block"""
+        return self.block.__class__.field.read_from(self.block)
+
+    def set(self, value):
+        """Set the field on the block"""
+        self.block.__class__.field.write_to(self.block, value)
+
+    def delete(self):
+        """Unset the field from the block"""
+        self.block.__class__.field.delete_from(self.block)
+
+    def is_default(self):
+        """Return if the field is set on the block"""
+        return self.block.__class__.field.is_set_on(self.block)
+
+
+# ~~~~~~~~~~~~~ Classes defining test properties ~~~~~~~~~~~~~~~~~~~~~~
 class UniversalProperties(object):
     """
     Properties that can be tested without knowing whether a field
@@ -56,42 +111,42 @@ class UniversalProperties(object):
     """
 
     def test_get_preserves_identity(self):
-        first_get = self.block.field
-        second_get = self.block.field
+        first_get = self.get()
+        second_get = self.get()
 
         assert_is(first_get, second_get)
 
     def test_get_with_save_preserves_identity(self):
-        first_get = self.block.field
+        first_get = self.get()
         self.block.save()
-        second_get = self.block.field
+        second_get = self.get()
 
         assert_is(first_get, second_get)
 
     def test_set_preserves_identity(self):
-        first_get = self.block.field
+        first_get = self.get()
         assert_is_not(self.new_value, first_get)
-        self.block.field = self.new_value
-        second_get = self.block.field
+        self.set(self.new_value)
+        second_get = self.get()
 
         assert_is(self.new_value, second_get)
         assert_is_not(first_get, second_get)
 
     def test_set_with_save_preserves_identity(self):
-        first_get = self.block.field
-        self.block.field = self.new_value
+        first_get = self.get()
+        self.set(self.new_value)
         self.block.save()
-        second_get = self.block.field
+        second_get = self.get()
 
         assert_is(self.new_value, second_get)
         assert_is_not(first_get, second_get)
 
     def test_delete_without_save_writes(self):
-        del self.block.field
+        self.delete()
         assert_false(self.field_data.has(self.block, 'field'))
 
     def test_delete_with_save_writes(self):
-        del self.block.field
+        self.delete()
         self.block.save()
         assert_false(self.field_data.has(self.block, 'field'))
 
@@ -115,9 +170,9 @@ class MutationProperties(object):
         # Verify that the test isn't vacuously true
         assert_not_equals(self.new_value, reference_value)
 
-        self.block.field = copy.deepcopy(self.new_value)
+        self.set(copy.deepcopy(self.new_value))
         self.block.save()
-        self.mutate(self.block.field)
+        self.mutate(self.get())
         self.block.save()
         final_value = self.field_data.get(self.block, 'field')
         assert_equals(reference_value, final_value)
@@ -138,11 +193,11 @@ class InitialValueProperties(object):
         return DictFieldData({'field': copy.deepcopy(self.initial_value)})
 
     def test_get_gets_initial_value(self):
-        assert_equals(self.field_data.get(self.block, 'field'), self.block.field)
+        assert_equals(self.field_data.get(self.block, 'field'), self.get())
 
     def test_get_with_save_doesnt_write(self):
         initial_value = self.field_data.get(self.block, 'field')
-        self.block.field
+        self.get()
         self.block.save()
         final_value = self.field_data.get(self.block, 'field')
 
@@ -151,7 +206,7 @@ class InitialValueProperties(object):
     def test_set_with_save_writes(self):
         initial_value = self.field_data.get(self.block, 'field')
         assert_is_not(self.new_value, initial_value)
-        self.block.field = self.new_value
+        self.set(self.new_value)
         self.block.save()
         assert_equals(self.new_value, self.field_data.get(self.block, 'field'))
 
@@ -167,25 +222,25 @@ class DefaultValueProperties(object):
     """
     def test_get_with_save_doesnt_write(self):
         assert_false(self.field_data.has(self.block, 'field'))
-        self.block.field
+        self.get()
         self.block.save()
         assert_false(self.field_data.has(self.block, 'field'))
 
     def test_set_with_save_writes(self):
         assert_false(self.field_data.has(self.block, 'field'))
-        self.block.field = self.new_value
+        self.set(self.new_value)
         self.block.save()
         assert_equals(self.new_value, self.field_data.get(self.block, 'field'))
 
     def test_delete_without_save_succeeds(self):
         assert_false(self.field_data.has(self.block, 'field'))
 
-        del self.block.field
+        self.delete()
 
         assert_false(self.field_data.has(self.block, 'field'))
 
     def test_delete_with_save_succeeds(self):
-        del self.block.field
+        self.delete()
         self.block.save()
         assert_false(self.field_data.has(self.block, 'field'))
 
@@ -202,7 +257,7 @@ class DefaultValueMutationProperties(object):
     def test_mutation_without_save_doesnt_write(self):
         assert_false(self.field_data.has(self.block, 'field'))
 
-        mutable = self.block.field
+        mutable = self.get()
         self.mutate(mutable)
 
         assert_false(self.field_data.has(self.block, 'field'))
@@ -210,7 +265,7 @@ class DefaultValueMutationProperties(object):
     def test_mutation_with_save_writes(self):
         assert_false(self.field_data.has(self.block, 'field'))
 
-        mutable = self.block.field
+        mutable = self.get()
         reference_copy = copy.deepcopy(mutable)
         self.mutate(reference_copy)
 
@@ -237,7 +292,7 @@ class InitialValueMutationProperties(object):
         initial_value = self.field_data.get(self.block, 'field')
         reference_copy = copy.deepcopy(initial_value)
 
-        mutable = self.block.field
+        mutable = self.get()
         self.mutate(mutable)
 
         # Verify that the test isn't vacuously true
@@ -255,7 +310,7 @@ class InitialValueMutationProperties(object):
         # verify that the test isn't vacuously true
         assert_not_equals(initial_value, reference_copy)
 
-        mutable = self.block.field
+        mutable = self.get()
         self.mutate(mutable)
         self.block.save()
 
@@ -327,28 +382,34 @@ class MutableTestCases(UniversalTestCases, MutationProperties):
 
 # pylint: disable=C0111
 class TestImmutableWithStaticDefault(ImmutableTestCases, StaticDefaultTestCases):
-    pass
+    __test__ = False
 
 
 class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):
+    __test__ = False
     initial_value = 75
 
 
 class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCases):
+    __test__ = False
+
     @property
     def default_iterator(self):
         return iter(xrange(1000))
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
-    pass
+    __test__ = False
 
 
 class TestMutableWithInitialValue(MutableTestCases, InitialValueProperties, InitialValueMutationProperties):
+    __test__ = False
     initial_value = [1, 2, 3]
 
 
 class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases, DefaultValueMutationProperties):
+    __test__ = False
+
     @property
     def default_iterator(self):
         return ([None] * i for i in xrange(1000))
@@ -370,7 +431,7 @@ class GetNoopPrefix(object):
     """
     def setUp(self):
         super(GetNoopPrefix, self).setUp()
-        self.block.field
+        self.get()
 
 
 class GetSaveNoopPrefix(object):
@@ -384,7 +445,7 @@ class GetSaveNoopPrefix(object):
     """
     def setUp(self):
         super(GetSaveNoopPrefix, self).setUp()
-        self.block.field
+        self.get()
         self.block.save()
 
 
@@ -402,17 +463,24 @@ class SaveNoopPrefix(object):
         self.block.save()
 # pylint: enable=E1101
 
+for operation_backend in (BlockFirstOperations, FieldFirstOperations):
+    for noop_prefix in (None, GetNoopPrefix, GetSaveNoopPrefix, SaveNoopPrefix):
+        for base_test_case in (
+            TestImmutableWithComputedDefault, TestImmutableWithInitialValue, TestImmutableWithStaticDefault,
+            TestMutableWithComputedDefault, TestMutableWithInitialValue, TestMutableWithStaticDefault
+        ):
 
-for noop_prefix in (GetNoopPrefix, GetSaveNoopPrefix, SaveNoopPrefix):
-    for base_test_case in (
-        TestImmutableWithComputedDefault, TestImmutableWithInitialValue, TestImmutableWithStaticDefault,
-        TestMutableWithComputedDefault, TestMutableWithInitialValue, TestMutableWithStaticDefault
-    ):
-        test_name = base_test_case.__name__ + "And" + noop_prefix.__name__
-        vars()[test_name] = type(test_name, (noop_prefix, base_test_case), {})
+            test_name = base_test_case.__name__ + "With" + operation_backend.__name__
+            test_classes = (operation_backend, base_test_case)
+            if noop_prefix is not None:
+                test_name += "And" + noop_prefix.__name__
+                test_classes = (noop_prefix, ) + test_classes
+
+            vars()[test_name] = type(test_name, test_classes, {'__test__': True})
 
 # If we don't delete the loop variables, then they leak into the global namespace
 # and cause the last class looped through to be tested twice. Surprise!
 # pylint: disable=W0631
+del operation_backend
 del noop_prefix
 del base_test_case
