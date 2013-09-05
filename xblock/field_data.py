@@ -6,19 +6,21 @@ simple.
 """
 
 import copy
+from collections import defaultdict
+from xblock.exceptions import InvalidScopeError
 
 
 class FieldData(object):
     """
-    An interface allowing access to an XBlock's field values indexed by field names
+    An interface allowing access to an XBlock's field values indexed by field names.
     """
     def get(self, block, name):
         """
         Retrieve the value for the field named `name` for the XBlock `block`.
 
-        If no value is set, raise a `KeyError`
+        If no value is set, raise a `KeyError`.
 
-        The value returned may be mutated without modifying the backing store
+        The value returned may be mutated without modifying the backing store.
 
         :param block: block to inspect
         :type block: :class:`~xblock.core.XBlock`
@@ -31,7 +33,7 @@ class FieldData(object):
         """
         Set the value of the field named `name` for XBlock `block`.
 
-        `value` may be mutated after this call without affecting the backing store
+        `value` may be mutated after this call without affecting the backing store.
 
         :param block: block to modify
         :type block: :class:`~xblock.core.XBlock`
@@ -54,7 +56,7 @@ class FieldData(object):
 
     def has(self, block, name):
         """
-        Return whether or not the field named `name` has a non-default value for the XBlock `block`
+        Return whether or not the field named `name` has a non-default value for the XBlock `block`.
 
         :param block: block to check
         :type block: :class:`~xblock.core.XBlock`
@@ -95,7 +97,7 @@ class FieldData(object):
 
 class DictFieldData(FieldData):
     """
-    A field_data that just uses a single supplied dictionary to store fields by name
+    A FieldData that uses a single supplied dictionary to store fields by name.
     """
     def __init__(self, data):
         self._data = data
@@ -115,3 +117,75 @@ class DictFieldData(FieldData):
     def set_many(self, block, update_dict):
         self._data.update(copy.deepcopy(update_dict))
 
+
+class SplitFieldData(FieldData):
+    """
+    A FieldData that uses divides particular scopes between
+    several backing FieldData objects.
+    """
+
+    def __init__(self, scope_mappings):
+        """
+        `scope_mappings` defines :class:`~xblock.field_data.FieldData` objects to use
+        for each scope. If a scope is not a key in `scope_mappings`, then using
+        a field of that scope will raise an :class:`~xblock.exceptions.InvalidScopeError`.
+
+        :param scope_mappings: A map from Scopes to backing FieldData instances
+        :type scope_mappings: `dict` of :class:`~xblock.fields.Scope` to :class:`~xblock.field_data.FieldData`
+        """
+        self._scope_mappings = scope_mappings
+
+    def _field_data(self, block, name):
+        """Return the field data for the field `name` on the :class:`~xblock.core.XBlock` `block`"""
+        scope = block.fields[name].scope
+
+        if scope not in self._scope_mappings:
+            raise InvalidScopeError(scope)
+
+        return self._scope_mappings[scope]
+
+    def get(self, block, name):
+        return self._field_data(block, name).get(block, name)
+
+    def set(self, block, name, value):
+        self._field_data(block, name).set(block, name, value)
+
+    def set_many(self, block, update_dict):
+        update_dicts = defaultdict(dict)
+        for key, value in update_dict.items():
+            update_dicts[self._field_data(block, key)][key] = value
+        for field_data, update_dict in update_dicts.items():
+            field_data.set_many(block, update_dict)
+
+    def delete(self, block, name):
+        self._field_data(block, name).delete(block, name)
+
+    def has(self, block, name):
+        return self._field_data(block, name).has(block, name)
+
+    def default(self, block, name):
+        return self._field_data(block, name).default(block, name)
+
+
+class ReadOnlyFieldData(FieldData):
+    """
+    A FieldData that wraps another FieldData an makes all calls to set and delete
+    raise :class:`~xblock.exceptions.InvalidScopeError`s.
+    """
+    def __init__(self, source):
+        self._source = source
+
+    def get(self, block, name):
+        return self._source.get(block, name)
+
+    def set(self, block, name, value):
+        raise InvalidScopeError("{block}.{name} is read-only, cannot set".format(block=block, name=name))
+
+    def delete(self, block, name):
+        raise InvalidScopeError("{block}.{name} is read-only, cannot delete".format(block=block, name=name))
+
+    def has(self, block, name):
+        return self._source.has(block, name)
+
+    def default(self, block, name):
+        return self._source.default(block, name)
