@@ -64,7 +64,11 @@ class FieldData(object):
         :param name: field name
         :type name: str
         """
-        raise NotImplementedError
+        try:
+            self.get(block, name)
+            return True
+        except KeyError:
+            return False
 
     def set_many(self, block, update_dict):
         """
@@ -89,7 +93,7 @@ class FieldData(object):
         :param name: the field's name
         :type name: `str`
         """
-        raise KeyError(name)
+        raise KeyError(repr(name))
 
 
 class DictFieldData(FieldData):
@@ -116,7 +120,4 @@ class DictFieldData(FieldData):
 
     def set_many(self, block, update_dict):
         self._data.update(copy.deepcopy(update_dict))
-
-    def default(self, block, name):
-        raise KeyError
 
