@@ -5,7 +5,6 @@ import json
 
 from django.test.client import Client
 
-from mock import patch
 from nose.tools import assert_equal, assert_in, assert_raises, assert_true  # pylint: disable=E0611
 
 from xblock.core import XBlock, String, Scope
@@ -20,8 +19,8 @@ def temp_scenario(temp_class, scenario_name='test_scenario'):
     """Create a temporary scenario that uses `temp_class`."""
     def _decorator(func):                               # pylint: disable=C0111
         @functools.wraps(func)
-        @patch('xblock.core.XBlock.load_class', return_value=temp_class)
-        def _inner(_mock):                              # pyline: disable=C0111
+        @XBlock.register_temp_plugin(temp_class)
+        def _inner(*args, **kwargs):                    # pylint: disable=C0111
             # Create a scenario, just one tag for our mocked class.
             scenarios.add_xml_scenario(
                 scenario_name, "Temporary scenario",
