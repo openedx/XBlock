@@ -265,12 +265,18 @@ class Runtime(object):
         return self.parse_xml_file(StringIO(xml))
 
     def parse_xml_file(self, fileobj):
-        """Parse an XML file, returning a usage id."""
+        """Parse an open XML file, returning a usage id."""
         root = etree.parse(fileobj).getroot()
         usage_id = self._usage_id_from_node(root)
         return usage_id
 
     def _usage_id_from_node(self, node):
+        """Create a new usage id from an XML dom node.
+
+        :param node: The DOM node to interpret.
+        :type node: `lxml.etree.Element`
+
+        """
         # Tags that introduce HTML content. We only need to include HTML block tags,
         # since others (like <b> and <i>) will appear inside blocks like <p>.
         HTML_TAGS = set("p ol ul div h1 h2 h3 h4 h5 h6".split())
@@ -290,9 +296,29 @@ class Runtime(object):
         return usage_id
 
     def add_node_as_child(self, block, node):
-        """Called by XBlock.parse_xml to treat a child node as a child block."""
+        """
+        Called by XBlock.parse_xml to treat a child node as a child block.
+        """
         usage_id = self._usage_id_from_node(node)
         block.children.append(usage_id)
+
+    # Exporting XML
+
+    def export_to_xml(self, block, xmlfile):
+        """
+        Export the block to XML, writing the XML to `xmlfile`.
+        """
+        root = etree.Element("unknown_root")
+        tree = etree.ElementTree(root)
+        block.export_xml(root)
+        tree.write(xmlfile, xml_declaration=True, encoding="utf8")
+
+    def add_block_as_child_node(self, block, node):
+        """
+        Export `block` as a child node of `node`.
+        """
+        child = etree.SubElement(node, "unknown")
+        block.export_xml(child)
 
     # Rendering
 

@@ -210,3 +210,28 @@ class XBlock(Plugin):
                 text = text.strip()
                 if text:
                     self.content = text
+
+    def export_xml(self, node):
+        """
+        For exporting, set data on `node` from ourselves.
+        """
+        # pylint: disable=E1101
+        # Set node.tag based on our class name.
+        node.tag = self.xml_element_name()
+
+        # Set node attributes based on our fields.
+        for field_name, field in self.fields.items():
+            if field_name in ('children', 'parent'):
+                continue
+            if field.is_set_on(self):
+                node.set(field_name, unicode(field.read_from(self)))
+
+        # Add children for each of our children.
+        if self.has_children:
+            for child_id in self.children:
+                child = self.runtime.get_block(child_id)
+                self.runtime.add_block_as_child_node(child, node)
+
+    def xml_element_name(self):
+        """What XML element name should be used for this block?"""
+        return self.scope_ids.block_type
