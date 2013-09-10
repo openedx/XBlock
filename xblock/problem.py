@@ -215,12 +215,14 @@ class ProblemBlock(XBlock):
             ("problem with thumbs and textbox",
              """\
                 <problem>
-                    <p>You have three constraints to satisfy:</p>
-                    <ol>
-                        <li>The upvotes and downvotes must be equal.</li>
-                        <li>You must enter the number of upvotes into the text field.</li>
-                        <li>The number of upvotes must be $numvotes.</li>
-                    </ol>
+                    <html>
+                        <p>You have three constraints to satisfy:</p>
+                        <ol>
+                            <li>The upvotes and downvotes must be equal.</li>
+                            <li>You must enter the number of upvotes into the text field.</li>
+                            <li>The number of upvotes must be $numvotes.</li>
+                        </ol>
+                    </html>
 
                     <thumbs name='thumb'/>
                     <textinput name='vote_count' input_type='int'/>
@@ -247,7 +249,7 @@ class ProblemBlock(XBlock):
                 <vertical>
                     <attempts_scoreboard/>
                     <problem>
-                        <p>What is $a+$b?</p>
+                        <html><p>What is $a+$b?</p></html>
                         <textinput name="sum_input" input_type="int" />
                         <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
                         <script>
@@ -260,7 +262,7 @@ class ProblemBlock(XBlock):
 
                     <sidebar>
                         <problem>
-                            <p>What is $a &#215; $b?</p>
+                            <html><p>What is $a &#215; $b?</p></html>
                             <textinput name="sum_input" input_type="int" />
                             <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
                             <script>
@@ -273,7 +275,7 @@ class ProblemBlock(XBlock):
                     </sidebar>
 
                     <problem>
-                        <p>What is $a+$b?</p>
+                        <html><p>What is $a+$b?</p></html>
                         <textinput name="sum_input" input_type="int" />
                         <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
                         <script>

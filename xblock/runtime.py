@@ -277,15 +277,7 @@ class Runtime(object):
         :type node: `lxml.etree.Element`
 
         """
-        # Tags that introduce HTML content. We only need to include HTML block tags,
-        # since others (like <b> and <i>) will appear inside blocks like <p>.
-        HTML_TAGS = set("p ol ul div h1 h2 h3 h4 h5 h6".split())
-
-        # TODO: a way to vary the mapping from tag to class name?
-        if node.tag in HTML_TAGS:
-            block_type = "html"
-        else:
-            block_type = node.tag
+        block_type = node.tag
         # TODO: a way for this node to be a usage to an existing definition?
         def_id = self.usage_store.create_definition(block_type)
         usage_id = self.usage_store.create_usage(def_id)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test XML parsing in XBlocks."""
 
+import re
 import StringIO
 import textwrap
 import unittest
@@ -154,3 +155,42 @@ class ExportTest(XmlTest, unittest.TestCase):
         # The important part: exporting then importing a block should give
         # you an equivalent block.
         self.assertTrue(blocks_are_equivalent(block, block_imported))
+
+
+def squish(text):
+    """Turn any run of whitespace into one space."""
+    return re.sub(r"\s+", " ", text)
+
+
+class HtmlInOutTest(XmlTest, unittest.TestCase):
+    """Tests of the implicit HTML block."""
+
+    def test_implicit_html_import(self):
+        # This test is fiddly about where the whitespace goes in the xml...
+        the_xml = """\
+            <?xml version='1.0' encoding='UTF8'?>
+            <html><p>Hello there.</p>
+                <p>This is HTML!</p>
+                <p>ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!</p>
+                <p>1 &lt; 2 &amp; 4 &gt; 3</p>
+            </html>
+            """.strip()
+        block = self.parse_xml_to_block(the_xml)
+        new_xml = self.export_xml_for_block(block)
+        # For now, I'm not sure how to treat the whitespace, so ignore it.
+        self.assertEqual(squish(the_xml), squish(new_xml))
+
+    def test_text_content(self):
+        tests = [
+            "<html>Hello, world!</html>",
+            "<html>Hello, <b>world!</b></html>",
+            "<html><b>Hello</b>, world!</html>",
+            "<html><b>Hello</b>, <b>world!</b></html>",
+            "<html><b>Hello</b>, <b>world!</b> &amp; goodbye.</html>",
+        ]
+
+        for test in tests:
+            block = self.parse_xml_to_block(test)
+            xml = self.export_xml_for_block(block)
+
+            self.assertIn(test, xml)

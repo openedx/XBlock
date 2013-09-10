@@ -221,7 +221,7 @@ class XBlock(Plugin):
 
         # Set node attributes based on our fields.
         for field_name, field in self.fields.items():
-            if field_name in ('children', 'parent'):
+            if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
                 node.set(field_name, unicode(field.read_from(self)))
@@ -232,6 +232,19 @@ class XBlock(Plugin):
                 child = self.runtime.get_block(child_id)
                 self.runtime.add_block_as_child_node(child, node)
 
+        # A content field becomes text content.
+        text = self.xml_text_content()
+        if text is not None:
+            node.text = text
+
     def xml_element_name(self):
         """What XML element name should be used for this block?"""
         return self.scope_ids.block_type
+
+    def xml_text_content(self):
+        """What is the text content for this block's XML node?"""
+        # pylint: disable=E1101
+        if 'content' in self.fields and self.content:
+            return self.content
+        else:
+            return None
