@@ -238,7 +238,7 @@ class Runtime(object):
 
             # Explicitly save because render action may have changed state
             block.save()
-            return self.wrap_child(block, frag, context)
+            return self.wrap_child(block, view_name, frag, context)
         finally:
             # Reset the active view to what it was before entering this method
             self._view_name = old_view_name
@@ -278,10 +278,10 @@ class Runtime(object):
             results.append(result)
         return results
 
-    def wrap_child(self, block, frag, context):  # pylint: disable=W0613
+    def wrap_child(self, block, view, frag, context):  # pylint: disable=W0613
         """
         Wraps the fragment with any necessary HTML, informed by
-        the block and the context. This default implementation
+        the block, view being rendered, and the context. This default implementation
         simply returns the fragment.
         """
         # By default, just return the fragment itself.
