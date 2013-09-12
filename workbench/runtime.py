@@ -128,10 +128,8 @@ class WorkbenchRuntime(Runtime):
     """
 
     def __init__(self, student_id=None):
-        super(WorkbenchRuntime, self).__init__()
+        super(WorkbenchRuntime, self).__init__(USAGE_STORE, DbModel(MEMORY_KVS))
         self.student_id = student_id
-        self.field_data = DbModel(MEMORY_KVS)
-        self.usage_store = USAGE_STORE
 
     def get_block(self, usage_id):
         """
@@ -143,7 +141,7 @@ class WorkbenchRuntime(Runtime):
         def_id = self.usage_store.get_definition_id(usage_id)
         block_type = self.usage_store.get_block_type(def_id)
         keys = ScopeIds(self.student_id, block_type, def_id, usage_id)
-        block = self.construct_xblock(block_type, self.field_data, keys)
+        block = self.construct_xblock(block_type, keys)
         return block
 
     def render(self, block, context, view_name):

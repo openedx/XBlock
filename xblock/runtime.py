@@ -224,7 +224,7 @@ class Runtime(object):
     Access to the runtime environment for XBlocks.
     """
 
-    def __init__(self, mixins=()):
+    def __init__(self, usage_store, field_data, mixins=()):
         """
         :param mixins: Classes that should be mixed in with every :class:`~xblock.core.XBlock`
             created by this `Runtime`
@@ -232,24 +232,30 @@ class Runtime(object):
         """
         self._view_name = None
         self.mixologist = Mixologist(mixins)
-        self.usage_store = None     # subclass had better set this!!
+        self.usage_store = usage_store
+        self.field_data = field_data
 
     # Block operations
 
-    def construct_xblock(self, block_type, field_data, scope_ids, default_class=None, *args, **kwargs):
+    def construct_xblock(self, block_type, scope_ids, default_class=None, *args, **kwargs):
         """
         Construct a new xblock of the type identified by block_type,
         passing *args and **kwargs into __init__
         """
         block_class = XBlock.load_class(block_type, default_class)
-        return self.construct_xblock_from_class(cls=block_class, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
+        return self.construct_xblock_from_class(cls=block_class, scope_ids=scope_ids, *args, **kwargs)
 
-    def construct_xblock_from_class(self, cls, field_data, scope_ids, *args, **kwargs):
+    def construct_xblock_from_class(self, cls, scope_ids, *args, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application
         """
-        return self.mixologist.mix(cls)(runtime=self, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
+        return self.mixologist.mix(cls)(
+            runtime=self,
+            field_data=self.field_data,
+            scope_ids=scope_ids,
+            *args, **kwargs
+        )
 
     def get_block(self, usage_id):
         """Get a block by usage id.
@@ -282,7 +288,7 @@ class Runtime(object):
         def_id = self.usage_store.create_definition(block_type)
         usage_id = self.usage_store.create_usage(def_id)
         keys = ScopeIds(UserScope.NONE, block_type, def_id, usage_id)
-        block = self.construct_xblock(block_type, self.field_data, keys)
+        block = self.construct_xblock(block_type, keys)
         block.parse_xml(node)
         block.save()
         return usage_id

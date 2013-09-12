@@ -115,8 +115,8 @@ def test_db_model_keys():
     # and that the keys have been constructed correctly
     key_store = DictKeyValueStore()
     db_model = DbModel(key_store)
-    runtime = Runtime([TestMixin])
-    tester = runtime.construct_xblock_from_class(TestXBlock, db_model, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
+    runtime = Runtime(Mock(), db_model, [TestMixin])
+    tester = runtime.construct_xblock_from_class(TestXBlock, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
 
     assert_false(db_model.has(tester, 'not a field'))
 
@@ -169,7 +169,7 @@ class MockRuntimeForQuerying(Runtime):
     # OK for this mock class to not override abstract methods or call base __init__
     # pylint: disable=W0223, W0231
     def __init__(self):
-        super(MockRuntimeForQuerying, self).__init__()
+        super(MockRuntimeForQuerying, self).__init__(field_data=Mock(), usage_store=Mock())
         self.mock_query = Mock()
 
     def query(self, block):
@@ -300,16 +300,13 @@ class FieldTester(XBlock):
 
 # Test that access to fields from mixins works as expected
 def test_mixin_field_access():
-    runtime = Runtime([TestSimpleMixin])
+    field_data = DictFieldData({
+        'field_a': 5,
+        'field_x': [1, 2, 3],
+    })
+    runtime = Runtime(Mock(), field_data, [TestSimpleMixin])
 
-    field_tester = runtime.construct_xblock_from_class(
-        FieldTester,
-        DictFieldData({
-            'field_a': 5,
-            'field_x': [1, 2, 3],
-        }),
-        Mock(),
-    )
+    field_tester = runtime.construct_xblock_from_class(FieldTester, Mock())
 
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
