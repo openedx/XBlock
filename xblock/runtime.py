@@ -18,7 +18,7 @@ class KeyValueStore(object):
     # Keys are structured to retain information about the scope of the data.
     # Stores can use this information however they like to store and retrieve
     # data.
-    Key = namedtuple("Key", "scope, student_id, block_scope_id, field_name")
+    Key = namedtuple("Key", "scope, user_id, block_scope_id, field_name")
 
     def get(self, key):
         """Abstract get method. Implementations should return the value of the given `key`."""
@@ -94,7 +94,7 @@ class DbModel(FieldData):
 
         KeyValueStore.Key(
             scope=field.scope,
-            student_id=student_id,
+            user_id=student_id,
             block_scope_id=block_id,
             field_name=name
         )
@@ -102,7 +102,7 @@ class DbModel(FieldData):
         field = self._getfield(block, name)
         if field.scope in (Scope.children, Scope.parent):
             block_id = block.scope_ids.usage_id
-            student_id = None
+            user_id = None
         else:
             block_scope = field.scope.block
 
@@ -116,13 +116,13 @@ class DbModel(FieldData):
                 block_id = block.scope_ids.block_type
 
             if field.scope.user == UserScope.ONE:
-                student_id = block.scope_ids.student_id
+                user_id = block.scope_ids.user_id
             else:
-                student_id = None
+                user_id = None
 
         key = KeyValueStore.Key(
             scope=field.scope,
-            student_id=student_id,
+            user_id=user_id,
             block_scope_id=block_id,
             field_name=name
         )

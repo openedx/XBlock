@@ -91,7 +91,7 @@ class Scope(ScopeBase):
     parent = Sentinel('Scope.parent')
 
 
-ScopeIds = namedtuple('ScopeIds', 'student_id block_type def_id usage_id')  # pylint: disable=C0103
+ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylint: disable=C0103
 
 
 # define a placeholder ('nil') value to indicate when nothing has been stored
