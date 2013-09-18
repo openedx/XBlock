@@ -132,9 +132,9 @@ def test_db_model_keys():
     for field in tester.fields.values():
         assert_true(db_model.has(tester, field.name))
 
-    def get_key_value(scope, student_id, block_scope_id, field_name):
+    def get_key_value(scope, user_id, block_scope_id, field_name):
         """Gets the value, from `key_store`, of a Key with the given values."""
-        new_key = KeyValueStore.Key(scope, student_id, block_scope_id, field_name)
+        new_key = KeyValueStore.Key(scope, user_id, block_scope_id, field_name)
         return key_store.db_dict[new_key]
 
     # Examine each value in the database and ensure that keys were constructed correctly
