@@ -237,22 +237,27 @@ class Runtime(object):
 
     # Block operations
 
-    def construct_xblock(self, block_type, scope_ids, default_class=None, *args, **kwargs):
+    def construct_xblock(self, block_type, scope_ids, field_data=None, default_class=None, *args, **kwargs):
         """
         Construct a new xblock of the type identified by block_type,
         passing *args and **kwargs into __init__
         """
         block_class = XBlock.load_class(block_type, default_class)
-        return self.construct_xblock_from_class(cls=block_class, scope_ids=scope_ids, *args, **kwargs)
+        return self.construct_xblock_from_class(
+            cls=block_class,
+            scope_ids=scope_ids,
+            field_data=field_data,
+            *args, **kwargs
+        )
 
-    def construct_xblock_from_class(self, cls, scope_ids, *args, **kwargs):
+    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application
         """
         return self.mixologist.mix(cls)(
             runtime=self,
-            field_data=self.field_data,
+            field_data=field_data or self.field_data,
             scope_ids=scope_ids,
             *args, **kwargs
         )
