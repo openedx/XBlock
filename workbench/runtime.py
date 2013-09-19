@@ -132,7 +132,7 @@ class MemoryKeyValueStore(KeyValueStore):
         """
         Constructs the full key name from the given `key`.
 
-        The actual key consists of the scope, block scope id, and student_id.
+        The actual key consists of the scope, block scope id, and user_id.
 
         """
         key_list = []
@@ -145,8 +145,8 @@ class MemoryKeyValueStore(KeyValueStore):
 
         if key.block_scope_id is not None:
             key_list.append(key.block_scope_id)
-        if key.student_id:
-            key_list.append(key.student_id)
+        if key.user_id:
+            key_list.append(key.user_id)
         return ".".join(key_list)
 
     def get(self, key):
@@ -247,7 +247,7 @@ class WorkbenchRuntime(Runtime):
         return "/handler/{0}/{1}/?student={2}".format(
             block.scope_ids.usage_id,
             url,
-            block.scope_ids.student_id
+            block.scope_ids.user_id
         )
 
     def get_block(self, block_id):
