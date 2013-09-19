@@ -395,6 +395,11 @@ class SecondMixin(XBlockMixin):
     field = Integer(default=2)
 
 
+class ThirdMixin(XBlockMixin):
+    """Test class for mixin ordering."""
+    field = Integer(default=3)
+
+
 class TestMixologist(object):
     """Test that the Mixologist class behaves correctly."""
     def setUp(self):
@@ -428,4 +433,26 @@ class TestMixologist(object):
         mixed = self.mixologist.mix(FieldTester)
         assert_is(mixed.fields['field'], FirstMixin.field)
         assert_is(mixed.fields['field_a'], FieldTester.field_a)
+
+    def test_duplicate_mixins(self):
+        singly_mixed = self.mixologist.mix(FieldTester)
+        doubly_mixed = self.mixologist.mix(singly_mixed)
+        assert_is(singly_mixed, doubly_mixed)
+        assert_is(FieldTester, singly_mixed.unmixed_class)
+
+    def test_multiply_mixed(self):
+        mixalot = Mixologist([ThirdMixin, FirstMixin])
+
+        pre_mixed = mixalot.mix(self.mixologist.mix(FieldTester))
+        post_mixed = self.mixologist.mix(mixalot.mix(FieldTester))
+
+        assert_is(pre_mixed.fields['field'], FirstMixin.field)
+        assert_is(post_mixed.fields['field'], ThirdMixin.field)
+
+        assert_is(FieldTester, pre_mixed.unmixed_class)
+        assert_is(FieldTester, post_mixed.unmixed_class)
+
+        assert_equals(4, len(pre_mixed.__bases__))  # 1 for the original class + 3 mixin classes
+        assert_equals(4, len(post_mixed.__bases__))
+
 
