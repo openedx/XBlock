@@ -451,14 +451,28 @@ class Mixologist(object):
         :type cls: `class`
         """
 
-        if cls not in self._generated_classes:
-            self._generated_classes[cls] = type(
-                cls.__name__ + 'WithMixins',
-                (cls, ) + self._mixins,
-                {'unmixed_class': cls}
+        if hasattr(cls, 'unmixed_class'):
+            base_class = cls.unmixed_class
+            old_mixins = cls.__bases__[1:]  # Skip the original unmixed class
+            mixins = old_mixins + tuple(
+                mixin
+                for mixin in self._mixins
+                if mixin not in old_mixins
+            )
+        else:
+            base_class = cls
+            mixins = self._mixins
+
+        mixin_key = (base_class, mixins)
+
+        if mixin_key not in self._generated_classes:
+            self._generated_classes[mixin_key] = type(
+                base_class.__name__ + 'WithMixins',
+                (base_class, ) + mixins,
+                {'unmixed_class': base_class}
             )
 
-        return self._generated_classes[cls]
+        return self._generated_classes[mixin_key]
 
 
 class RegexLexer(object):
