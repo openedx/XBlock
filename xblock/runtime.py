@@ -293,8 +293,8 @@ class Runtime(object):
         def_id = self.usage_store.create_definition(block_type)
         usage_id = self.usage_store.create_usage(def_id)
         keys = ScopeIds(UserScope.NONE, block_type, def_id, usage_id)
-        block = self.construct_xblock(block_type, keys)
-        block.parse_xml(node)
+        block_class = self.mixologist.mix(XBlock.load_class(block_type))
+        block = block_class.parse_xml(node, self, keys)
         block.save()
         return usage_id
 

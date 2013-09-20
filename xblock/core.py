@@ -190,26 +190,31 @@ class XBlock(Plugin):
         """
         self._dirty_fields.clear()
 
-    def parse_xml(self, node):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
         """
-        Use `node` to set our content.
+        Use `node` to construct a new block.
         """
+        block = runtime.construct_xblock_from_class(cls, keys)
+
         # The base implementation: child nodes become child blocks.
         for child in node:
-            self.runtime.add_node_as_child(self, child)
+            block.runtime.add_node_as_child(block, child)
 
         # Attributes become fields.
         for name, value in node.items():
-            if name in self.fields:
-                setattr(self, name, value)
+            if name in block.fields:
+                setattr(block, name, value)
 
         # Text content becomes "content", if such a field exists.
-        if "content" in self.fields and self.fields["content"].scope == Scope.content:
+        if "content" in block.fields and block.fields["content"].scope == Scope.content:
             text = node.text
             if text:
                 text = text.strip()
                 if text:
-                    self.content = text
+                    block.content = text
+
+        return block
 
     def export_xml(self, node):
         """

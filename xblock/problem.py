@@ -50,13 +50,18 @@ class ProblemBlock(XBlock):
     problem_attempted = Boolean(help="Has the student attempted this problem?", scope=Scope.user_state, default=False)
     has_children = True
 
-    def parse_xml(self, node):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
+        block = runtime.construct_xblock_from_class(cls, keys)
+
         # Find <script> children, turn them into script content.
         for child in node:
             if child.tag == "script":
-                self.script += child.text
+                block.script += child.text
             else:
-                self.runtime.add_node_as_child(self, child)
+                block.runtime.add_node_as_child(block, child)
+
+        return block
 
     def set_student_seed(self):
         """Set a random seed for the student so they each have different but repeatable data."""
@@ -311,7 +316,7 @@ class CheckerBlock(XBlock):
     """
     arguments = Dict(help="The arguments expected by `check`")
 
-    def _set_arguments_from_xml(self, node):
+    def set_arguments_from_xml(self, node):
         """
         Set the `arguments` field from XML attributes based on `check` arguments.
         """
@@ -322,13 +327,15 @@ class CheckerBlock(XBlock):
             arguments[arg] = node.attrib.pop(arg)
         self.arguments = arguments
 
-    def parse_xml(self, node):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
         """
         Parse the XML for a checker. A few arguments are handled specially,
         then the rest get the usual treatment.
         """
-        self._set_arguments_from_xml(node)
-        super(CheckerBlock, self).parse_xml(node)
+        block = super(CheckerBlock, cls).parse_xml(node, runtime, keys)
+        block.set_arguments_from_xml(node)
+        return block
 
     def check(self, **kwargs):
         """

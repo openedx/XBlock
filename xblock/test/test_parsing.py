@@ -30,10 +30,12 @@ class Specialized(XBlock):
     """A block that wants to do its own XML parsing."""
     num_children = Integer(default=0, scope=Scope.user_state)
 
-    def parse_xml(self, node):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
         """We'll just set num_children to the number of child nodes."""
-        self.num_children = len(node)
-
+        block = runtime.construct_xblock_from_class(cls, keys)
+        block.num_children = len(node)
+        return block
 
 # Helpers
 

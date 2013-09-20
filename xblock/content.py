@@ -29,7 +29,8 @@ class HtmlBlock(XBlock):
         """Provide a fallback view handler"""
         return Fragment(Template(self.content).substitute(**context))
 
-    def parse_xml(self, node):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
         """
         Parse the XML for an HTML block.
 
@@ -37,9 +38,13 @@ class HtmlBlock(XBlock):
         content of the XBlock.
 
         """
-        self.content = node.text or u""
+        block = runtime.construct_xblock_from_class(cls, keys)
+
+        block.content = node.text or u""
         for child in node:
-            self.content += etree.tostring(child, encoding='unicode')
+            block.content += etree.tostring(child, encoding='unicode')
+
+        return block
 
     def export_xml(self, node):
         """
