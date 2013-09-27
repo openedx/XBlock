@@ -4,6 +4,7 @@ Machinery to make the common case easy when building new runtimes
 
 import re
 import functools
+import threading
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, UserScope
@@ -430,6 +431,11 @@ class ObjectAggregator(object):
         delattr(self._object_with_attr(name), name)
 
 
+# Cache of Mixologist generated classes
+_CLASS_CACHE = {}
+_CLASS_CACHE_LOCK = threading.RLock()
+
+
 class Mixologist(object):
     """
     Provides a facility to dynamically generate classes with additional mixins.
@@ -440,8 +446,6 @@ class Mixologist(object):
         :type mixins: `iterable` of `class`
         """
         self._mixins = tuple(mixins)
-        # Cache of generated classes
-        self._generated_classes = {}
 
     def mix(self, cls):
         """
@@ -465,14 +469,19 @@ class Mixologist(object):
 
         mixin_key = (base_class, mixins)
 
-        if mixin_key not in self._generated_classes:
-            self._generated_classes[mixin_key] = type(
-                base_class.__name__ + 'WithMixins',
-                (base_class, ) + mixins,
-                {'unmixed_class': base_class}
-            )
-
-        return self._generated_classes[mixin_key]
+        if mixin_key not in _CLASS_CACHE:
+            # Only lock if we're about to make a new class
+            with _CLASS_CACHE_LOCK:
+                # Use setdefault so that if someone else has already
+                # created a class before we got the lock, we don't
+                # overwrite it
+                return _CLASS_CACHE.setdefault(mixin_key, type(
+                    base_class.__name__ + 'WithMixins',
+                    (base_class, ) + mixins,
+                    {'unmixed_class': base_class}
+                ))
+        else:
+            return _CLASS_CACHE[mixin_key]
 
 
 class RegexLexer(object):
