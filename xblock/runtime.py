@@ -2,12 +2,15 @@
 Machinery to make the common case easy when building new runtimes
 """
 
-import re
 import functools
+import re
 import threading
 
+from lxml import etree
+from cStringIO import StringIO
+
 from collections import namedtuple
-from xblock.fields import Field, BlockScope, Scope, UserScope
+from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.core import XBlock
@@ -180,12 +183,48 @@ class DbModel(FieldData):
         return self._kvs.default(self._key(block, name))
 
 
+class UsageStore(object):
+    """An abstract object that stores usages and definitions."""
+
+    def create_usage(self, def_id):
+        """Make a usage, storing its definition id.
+
+        Returns the newly-created usage id.
+
+        """
+        pass
+
+    def get_definition_id(self, usage_id):
+        """Get a usage.
+
+        Returns the definition id stored as the usage.
+
+        """
+        pass
+
+    def create_definition(self, block_type):
+        """Make a definition, storing its block type.
+
+        Returns the newly-created definition id.
+
+        """
+        pass
+
+    def get_block_type(self, def_id):
+        """Get a definition.
+
+        Returns the block_type stored as the definition.
+
+        """
+        pass
+
+
 class Runtime(object):
     """
     Access to the runtime environment for XBlocks.
     """
 
-    def __init__(self, mixins=()):
+    def __init__(self, usage_store, field_data, mixins=()):
         """
         :param mixins: Classes that should be mixed in with every :class:`~xblock.core.XBlock`
             created by this `Runtime`
@@ -193,21 +232,98 @@ class Runtime(object):
         """
         self._view_name = None
         self.mixologist = Mixologist(mixins)
+        self.usage_store = usage_store
+        self.field_data = field_data
 
-    def construct_xblock(self, plugin_name, field_data, scope_ids, default_class=None, *args, **kwargs):
+    # Block operations
+
+    def construct_xblock(self, block_type, scope_ids, field_data=None, default_class=None, *args, **kwargs):
         """
-        Construct a new xblock of the type identified by plugin_name,
+        Construct a new xblock of the type identified by block_type,
         passing *args and **kwargs into __init__
         """
-        block_class = XBlock.load_class(plugin_name, default_class)
-        return self.construct_xblock_from_class(cls=block_class, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
+        block_class = XBlock.load_class(block_type, default_class)
+        return self.construct_xblock_from_class(
+            cls=block_class,
+            scope_ids=scope_ids,
+            field_data=field_data,
+            *args, **kwargs
+        )
 
-    def construct_xblock_from_class(self, cls, field_data, scope_ids, *args, **kwargs):
+    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application
         """
-        return self.mixologist.mix(cls)(runtime=self, field_data=field_data, scope_ids=scope_ids, *args, **kwargs)
+        return self.mixologist.mix(cls)(
+            runtime=self,
+            field_data=field_data or self.field_data,
+            scope_ids=scope_ids,
+            *args, **kwargs
+        )
+
+    def get_block(self, usage_id):
+        """Get a block by usage id.
+
+        Returns the block identified by `usage_id`, or raises an exception.
+        """
+        raise NotImplementedError("Runtime needs to provide get_block()")
+
+    # Parsing XML
+
+    def parse_xml_string(self, xml):
+        """Parse a string of XML, returning a usage id."""
+        return self.parse_xml_file(StringIO(xml))
+
+    def parse_xml_file(self, fileobj):
+        """Parse an open XML file, returning a usage id."""
+        root = etree.parse(fileobj).getroot()
+        usage_id = self._usage_id_from_node(root)
+        return usage_id
+
+    def _usage_id_from_node(self, node):
+        """Create a new usage id from an XML dom node.
+
+        :param node: The DOM node to interpret.
+        :type node: `lxml.etree.Element`
+
+        """
+        block_type = node.tag
+        # TODO: a way for this node to be a usage to an existing definition?
+        def_id = self.usage_store.create_definition(block_type)
+        usage_id = self.usage_store.create_usage(def_id)
+        keys = ScopeIds(UserScope.NONE, block_type, def_id, usage_id)
+        block_class = self.mixologist.mix(XBlock.load_class(block_type))
+        block = block_class.parse_xml(node, self, keys)
+        block.save()
+        return usage_id
+
+    def add_node_as_child(self, block, node):
+        """
+        Called by XBlock.parse_xml to treat a child node as a child block.
+        """
+        usage_id = self._usage_id_from_node(node)
+        block.children.append(usage_id)
+
+    # Exporting XML
+
+    def export_to_xml(self, block, xmlfile):
+        """
+        Export the block to XML, writing the XML to `xmlfile`.
+        """
+        root = etree.Element("unknown_root")
+        tree = etree.ElementTree(root)
+        block.export_xml(root)
+        tree.write(xmlfile, xml_declaration=True, encoding="utf8")
+
+    def add_block_as_child_node(self, block, node):
+        """
+        Export `block` as a child node of `node`.
+        """
+        child = etree.SubElement(node, "unknown")
+        block.export_xml(child)
+
+    # Rendering
 
     def render(self, block, context, view_name):
         """
@@ -243,13 +359,6 @@ class Runtime(object):
         finally:
             # Reset the active view to what it was before entering this method
             self._view_name = old_view_name
-
-    def get_block(self, block_id):
-        """Get a block by ID.
-
-        Returns the block identified by `block_id`, or raises an exception.
-        """
-        raise NotImplementedError("Runtime needs to provide get_block()")
 
     def render_child(self, child, context, view_name=None):
         """A shortcut to render a child block.
@@ -288,6 +397,8 @@ class Runtime(object):
         # By default, just return the fragment itself.
         return frag
 
+    # Handlers
+
     def handle(self, block, handler_name, data):
         """
         Handles any calls to the specified `handler_name`.
@@ -321,6 +432,8 @@ class Runtime(object):
 
         """
         raise NotImplementedError("Runtime needs to provide handler_url()")
+
+    # Querying
 
     def query(self, block):
         """Query for data in the tree, starting from `block`.

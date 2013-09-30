@@ -5,118 +5,23 @@ Code in this file is a mix of Runtime layer and Workbench layer.
 """
 
 import itertools
+import logging
 
 try:
     import simplejson as json
 except ImportError:
     import json
 
-import logging
-
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
 from xblock.fields import Scope, ScopeIds
-from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError
+from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError, UsageStore
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
 
 log = logging.getLogger(__name__)
-
-
-class Usage(object):
-    """Content usages
-
-    Usages represent uses of content in courses.  They are the basic static
-    building block for course content.
-
-    TODO: Not the real way we'll store usages!
-
-    """
-
-    # An infinite stream of ids, for giving each Usage an id.
-    _ids = itertools.count()
-
-    # Maps ids to Usages, a dict of all instances created, ever.
-    _usage_index = {}
-
-    # The set of Usage ids that have been initialized by store_initial_state.
-    _inited = set()
-
-    def __init__(self, block_name, children=None, initial_state=None, def_id=None):
-        self.id = "usage_%d" % next(self._ids)  # pylint: disable=C0103
-        self.parent = None
-        self.block_name = block_name
-        self.def_id = def_id or ("def_%d" % next(self._ids))
-        self.children = children or []
-        self.initial_state = initial_state or {}
-
-        # Update our global index of all usages.
-        self._usage_index[self.id] = self
-
-        # Create the parent references as we construct children.
-        for child in self.children:
-            child.parent = self
-
-    def store_initial_state(self):
-        """Ensure that the initial state of this Usage is created.
-
-        This method is called before using the Usage.  It will use the
-        `initial_state` argument to the Usage to populate XBlock
-        attributes, and then recursively do the same for its children.
-
-        All this work is only done once for each Usage no matter how often
-        this function is called.
-
-        """
-        # If we've already created the initial state, there's nothing to do.
-        if self.id in self._inited:
-            return
-
-        # Create an XBlock from this usage, and use it to create the initial
-        # state. This block is created just so we can use the block to set
-        # attributes, which will cause the data to be written through the
-        # fields. This isolates us from the storage mechanism: however the
-        # block saves its attributes, that's how the initial state will be
-        # saved.
-        runtime_initial = WorkbenchRuntime()
-        block = runtime_initial.create_block(self)
-        if self.initial_state:
-            for name, value in self.initial_state.items():
-                setattr(block, name, value)
-
-        block.children = [child.id for child in self.children]
-        if self.parent is not None:
-            block.parent = self.parent.id
-
-        # We've initialized this instance, keep track.
-        self._inited.add(self.id)
-
-        # Explicitly save all of the initial state we've just written
-        block.save()
-
-        # Also do this recursively down the tree.
-        for child in self.children:
-            child.store_initial_state()
-
-    def __repr__(self):
-        return "<{0.__class__.__name__} {0.id} {0.block_name} {0.def_id} {0.children!r}>".format(self)
-
-    @classmethod
-    def find_usage(cls, usage_id):
-        """Looks up the `usage_id` from our global index of all usages."""
-        return cls._usage_index[usage_id]
-
-    @classmethod
-    def reinitialize_all(cls):
-        """
-        Reset all the inited flags, so that Usages will be initialized again.
-
-        Used to isolate tests from each other.
-
-        """
-        cls._inited.clear()
 
 
 class MemoryKeyValueStore(KeyValueStore):
@@ -180,6 +85,39 @@ class MemoryKeyValueStore(KeyValueStore):
             self.set(key, value)
 
 
+class MemoryUsageStore(UsageStore):
+    """A simple dict-based implementation of UsageStore."""
+
+    def __init__(self):
+        self._ids = itertools.count()
+        self._usages = {}
+        self._definitions = {}
+
+    def _next_id(self):
+        """Generate a new id."""
+        return str(next(self._ids))
+
+    def create_usage(self, def_id):
+        """Make a usage, storing its definition id."""
+        usage_id = self._next_id()
+        self._usages[usage_id] = def_id
+        return usage_id
+
+    def get_definition_id(self, usage_id):
+        """Get a definition_id by its usage id."""
+        return self._usages[usage_id]
+
+    def create_definition(self, block_type):
+        """Make a definition, storing its block type."""
+        def_id = self._next_id()
+        self._definitions[def_id] = block_type
+        return def_id
+
+    def get_block_type(self, def_id):
+        """Get a block_type by its definition id."""
+        return self._definitions[def_id]
+
+
 class WorkbenchRuntime(Runtime):
     """
     Access to the workbench runtime environment for XBlocks.
@@ -190,18 +128,20 @@ class WorkbenchRuntime(Runtime):
     """
 
     def __init__(self, student_id=None):
-        super(WorkbenchRuntime, self).__init__()
+        super(WorkbenchRuntime, self).__init__(USAGE_STORE, DbModel(MEMORY_KVS))
         self.student_id = student_id
 
-    def create_block(self, usage):
+    def get_block(self, usage_id):
         """
         Create an XBlock instance in this runtime.
 
-        The `usage` is used to find the XBlock class and data.
+        The `usage_id` is used to find the XBlock class and data.
 
         """
-        keys = ScopeIds(self.student_id, usage.block_name, usage.def_id, usage.id)
-        block = self.construct_xblock(usage.block_name, MODEL, keys)
+        def_id = self.usage_store.get_definition_id(usage_id)
+        block_type = self.usage_store.get_block_type(def_id)
+        keys = ScopeIds(self.student_id, block_type, def_id, usage_id)
+        block = self.construct_xblock(block_type, keys)
         return block
 
     def render(self, block, context, view_name):
@@ -249,9 +189,6 @@ class WorkbenchRuntime(Runtime):
             url,
             block.scope_ids.user_id
         )
-
-    def get_block(self, block_id):
-        return self.create_block(Usage.find_usage(block_id))
 
     def query(self, block):
         return _BlockSet(self, [block])
@@ -316,4 +253,6 @@ class _BlockSet(object):
 
 # Our global state (the "database").
 MEMORY_KVS = MemoryKeyValueStore({})
-MODEL = DbModel(MEMORY_KVS)
+
+# Our global usage store
+USAGE_STORE = MemoryUsageStore()

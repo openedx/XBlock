@@ -1,47 +1,65 @@
 """Test the workbench views."""
 
+import functools
 import json
 
 from django.test.client import Client
-from django.test import TestCase
 
-from mock import patch
-from nose.tools import assert_equal, assert_raises, assert_true  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_in, assert_raises, assert_true  # pylint: disable=E0611
 
-from workbench.runtime import Usage
 from xblock.core import XBlock, String, Scope
 from xblock.fragment import Fragment
 from xblock.runtime import NoSuchHandlerError
 
+from workbench import scenarios
+from workbench.runtime import USAGE_STORE
 
-class TestMultipleViews(TestCase):
-    """Test that we can request multiple views from an XBlock."""
 
-    class MultiViewXBlock(XBlock):
-        """A bare-bone XBlock with two views."""
-        def student_view(self, context):  # pylint: disable=W0613
-            """A view, with the default name."""
-            return Fragment(u"This is student view!")
+def temp_scenario(temp_class, scenario_name='test_scenario'):
+    """Create a temporary scenario that uses `temp_class`."""
+    def _decorator(func):                               # pylint: disable=C0111
+        @functools.wraps(func)
+        @XBlock.register_temp_plugin(temp_class)
+        def _inner(*args, **kwargs):                    # pylint: disable=C0111
+            # Create a scenario, just one tag for our mocked class.
+            scenarios.add_xml_scenario(
+                scenario_name, "Temporary scenario",
+                "<%s/>" % temp_class.__name__
+            )
+            try:
+                return func(*args, **kwargs)
+            finally:
+                scenarios.remove_scenario(scenario_name)
+        return _inner
+    return _decorator
 
-        def another_view(self, context):  # pylint: disable=W0613
-            """A secondary view for this block."""
-            return Fragment(u"This is another view!")
 
-    @patch('xblock.core.XBlock.load_class', return_value=MultiViewXBlock)
-    def test_multiple_views(self, _mock_load_classes):
-        client = Client()
+class MultiViewXBlock(XBlock):
+    """A bare-bone XBlock with two views."""
+    def student_view(self, context):  # pylint: disable=W0613
+        """A view, with the default name."""
+        return Fragment(u"This is student view!")
 
-        # The default view is student_view
-        response = client.get("/view/multiview/")
-        self.assertIn("This is student view!", response.content)
+    def another_view(self, context):  # pylint: disable=W0613
+        """A secondary view for this block."""
+        return Fragment(u"This is another view!")
 
-        # We can ask for student_view directly
-        response = client.get("/view/multiview/student_view/")
-        self.assertIn("This is student view!", response.content)
 
-        # We can also ask for another view.
-        response = client.get("/view/multiview/another_view/")
-        self.assertIn("This is another view!", response.content)
+@temp_scenario(MultiViewXBlock, "multiview")
+def test_multiple_views():
+    client = Client()
+
+    # The default view is student_view
+    response = client.get("/view/multiview/")
+    assert_in("This is student view!", response.content)
+
+    # We can ask for student_view directly
+    response = client.get("/view/multiview/student_view/")
+    assert_in("This is student view!", response.content)
+
+    # We can also ask for another view.
+    response = client.get("/view/multiview/another_view/")
+    assert_in("This is another view!", response.content)
 
 
 class XBlockWithHandlerAndStudentState(XBlock):
@@ -61,17 +79,14 @@ class XBlockWithHandlerAndStudentState(XBlock):
         return {'the_data': self.the_data}
 
 
-@patch(
-    'xblock.core.XBlock.load_class',
-    return_value=XBlockWithHandlerAndStudentState
-)
-def test_xblock_with_handler(_mock_load_class):
+@temp_scenario(XBlockWithHandlerAndStudentState, 'testit')
+def test_xblock_with_handler():
     # Tests an XBlock that provides a handler, and has some simple
     # student state
     client = Client()
 
     # Initially, the data is the default.
-    response = client.get("/view/xblockwithhandlerandstudentstate/")
+    response = client.get("/view/testit/")
     assert_true("The data: 'def'." in response.content)
     parsed = response.content.split(':::')
     assert_equal(len(parsed), 3)
@@ -88,15 +103,16 @@ def test_xblock_with_handler(_mock_load_class):
     assert_equal(the_data, "defxx")
 
 
-@patch('xblock.core.XBlock.load_class', return_value=XBlock)
-def test_xblock_without_handler(_mock_load_class):
+@temp_scenario(XBlock)
+def test_xblock_without_handler():
     # Test that an XBlock without a handler raises an Exception
     # when we try to hit a handler on it
     client = Client()
 
-    # Pick a random usage_id from the Usage._usage_index because we
-    # need to ensure the usage is a valid id
-    usage_id = Usage._usage_index.keys()[0]  # pylint: disable=W0212
+    # Pick a random usage_id from the USAGE_STORE because we
+    # need to ensure the usage is a valid id.
+    # TODO: Make a usage in this test instead.
+    usage_id = USAGE_STORE._usages.keys()[0]
     # Plug that usage_id into a mock handler URL
     # /handler/[usage_id]/[handler_name]
     handler_url = "/handler/" + usage_id + "/does_not_exist/?student=student_doesntexist"
@@ -108,8 +124,8 @@ def test_xblock_without_handler(_mock_load_class):
         client.post(handler_url, '{}', 'text/json')
 
 
-@patch('xblock.core.XBlock.load_class', return_value=XBlock)
-def test_xblock_invalid_handler_url(_mock_load_class):
+@temp_scenario(XBlock)
+def test_xblock_invalid_handler_url():
     # Test that providing an invalid handler url will give a 404
     # when we try to hit a handler on it
     client = Client()
@@ -126,8 +142,8 @@ class XBlockWithoutStudentView(XBlock):
     the_data = String(default="def", scope=Scope.user_state)
 
 
-@patch('xblock.core.XBlock.load_class', return_value=XBlockWithoutStudentView)
-def test_xblock_no_student_view(_mock_load_class):
+@temp_scenario(XBlockWithoutStudentView, 'xblockwithoutstudentview')
+def test_xblock_no_student_view():
     # Try to get a response. Will try to render via WorkbenchRuntime.render;
     # since no view is provided in the XBlock, will return a Fragment that
     # indicates there is no view available.

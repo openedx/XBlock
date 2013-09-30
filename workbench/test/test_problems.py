@@ -14,7 +14,7 @@ class ProblemInteractionTest(SeleniumTest):
 
         one_problem = """
             <problem>
-                <p class="the_numbers">$a $b</p>
+                <html><p class="the_numbers">$a $b</p></html>
                 <textinput name="sum_input" input_type="int" />
                 <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
                 <script>
