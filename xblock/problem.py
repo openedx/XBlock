@@ -51,15 +51,17 @@ class ProblemBlock(XBlock):
     has_children = True
 
     @classmethod
-    def preprocess_input(cls, node, usage_factory):
+    def parse_xml(cls, node, runtime, keys):
+        block = runtime.construct_xblock_from_class(cls, keys)
+
         # Find <script> children, turn them into script content.
-        kids = []
-        for kid in node.children:
-            if kid.block_name == "script":
-                node.initial_state['script'] = kid.initial_state['content']
+        for child in node:
+            if child.tag == "script":
+                block.script += child.text
             else:
-                kids.append(kid)
-        return usage_factory(node.block_name, kids, node.initial_state, node.def_id)
+                block.runtime.add_node_as_child(block, child)
+
+        return block
 
     def set_student_seed(self):
         """Set a random seed for the student so they each have different but repeatable data."""
@@ -218,12 +220,14 @@ class ProblemBlock(XBlock):
             ("problem with thumbs and textbox",
              """\
                 <problem>
-                    <p>You have three constraints to satisfy:</p>
-                    <ol>
-                        <li>The upvotes and downvotes must be equal.</li>
-                        <li>You must enter the number of upvotes into the text field.</li>
-                        <li>The number of upvotes must be $numvotes.</li>
-                    </ol>
+                    <html>
+                        <p>You have three constraints to satisfy:</p>
+                        <ol>
+                            <li>The upvotes and downvotes must be equal.</li>
+                            <li>You must enter the number of upvotes into the text field.</li>
+                            <li>The number of upvotes must be $numvotes.</li>
+                        </ol>
+                    </html>
 
                     <thumbs name='thumb'/>
                     <textinput name='vote_count' input_type='int'/>
@@ -250,7 +254,7 @@ class ProblemBlock(XBlock):
                 <vertical>
                     <attempts_scoreboard/>
                     <problem>
-                        <p>What is $a+$b?</p>
+                        <html><p>What is $a+$b?</p></html>
                         <textinput name="sum_input" input_type="int" />
                         <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
                         <script>
@@ -263,7 +267,7 @@ class ProblemBlock(XBlock):
 
                     <sidebar>
                         <problem>
-                            <p>What is $a &#215; $b?</p>
+                            <html><p>What is $a &#215; $b?</p></html>
                             <textinput name="sum_input" input_type="int" />
                             <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
                             <script>
@@ -276,7 +280,7 @@ class ProblemBlock(XBlock):
                     </sidebar>
 
                     <problem>
-                        <p>What is $a+$b?</p>
+                        <html><p>What is $a+$b?</p></html>
                         <textinput name="sum_input" input_type="int" />
                         <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
                         <script>
@@ -312,16 +316,26 @@ class CheckerBlock(XBlock):
     """
     arguments = Dict(help="The arguments expected by `check`")
 
-    @classmethod
-    def preprocess_input(cls, node, _usage_factory):
+    def set_arguments_from_xml(self, node):
+        """
+        Set the `arguments` field from XML attributes based on `check` arguments.
+        """
         # Introspect the .check() method, and collect arguments it expects.
-        content = node.initial_state
-        argspec = inspect.getargspec(cls.check)
+        argspec = inspect.getargspec(self.check)
         arguments = {}
         for arg in argspec.args[1:]:
-            arguments[arg] = content.pop(arg)
-        content['arguments'] = arguments
-        return node
+            arguments[arg] = node.attrib.pop(arg)
+        self.arguments = arguments
+
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
+        """
+        Parse the XML for a checker. A few arguments are handled specially,
+        then the rest get the usual treatment.
+        """
+        block = super(CheckerBlock, cls).parse_xml(node, runtime, keys)
+        block.set_arguments_from_xml(node)
+        return block
 
     def check(self, **kwargs):
         """
@@ -448,14 +462,6 @@ class EqualityCheckerBlock(CheckerBlock):
         self.left = left
         self.right = right
         return left == right
-
-    @staticmethod
-    def workbench_scenarios():
-        """Provide scenarios to the workbench.
-
-        In this case, there's no point showing this block, so return none.
-        """
-        return []
 
 
 class AttemptsScoreboardBlock(XBlock):

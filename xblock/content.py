@@ -2,6 +2,8 @@
 
 from string import Template  # pylint: disable=W0402
 
+from lxml import etree
+
 from .core import XBlock, String, Scope
 from .fragment import Fragment
 
@@ -27,11 +29,44 @@ class HtmlBlock(XBlock):
         """Provide a fallback view handler"""
         return Fragment(Template(self.content).substitute(**context))
 
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
+        """
+        Parse the XML for an HTML block.
+
+        The entire subtree under `node` is re-serialized, and set as the
+        content of the XBlock.
+
+        """
+        block = runtime.construct_xblock_from_class(cls, keys)
+
+        block.content = node.text or u""
+        for child in node:
+            block.content += etree.tostring(child, encoding='unicode')
+
+        return block
+
+    def export_xml(self, node):
+        """
+        Set attributes and children on `node` to represent ourselves as XML.
+
+        We parse our HTML content, and graft those nodes onto `node`.
+
+        """
+        xml = "<html>" + self.content + "</html>"
+        html_node = etree.fromstring(xml)
+
+        node.tag = html_node.tag
+        node.text = html_node.text
+        for child in html_node:
+            node.append(child)
+
     @staticmethod
     def workbench_scenarios():
         return [
             ("A litte HTML", """
                 <vertical>
+                <html>
                 <h2>Gettysburg Address</h2>
 
                 <p>Four score and seven years ago our fathers brought forth on
@@ -62,6 +97,7 @@ class HtmlBlock(XBlock):
                 under God, shall have a new birth of freedom &#8212; and that
                 government of the people, by the people, for the people, shall not
                 perish from the earth.</p>
+                </html>
                 </vertical>
              """),
         ]

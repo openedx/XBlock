@@ -21,7 +21,7 @@ setup(
             'equality = xblock.problem:EqualityCheckerBlock',
             'attempts_scoreboard = xblock.problem:AttemptsScoreboardBlock',
             'slider = xblock.slider:Slider',
-            'view_counter = xblock.view_counter:ViewCounter'
+            'view_counter = xblock.view_counter:ViewCounter',
         ]
     }
 )
