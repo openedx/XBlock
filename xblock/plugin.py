@@ -17,19 +17,21 @@ class PluginMissingError(Exception):
     pass
 
 
-def select_first_and_warn(entry_points):
+class AmbiguousPluginError(Exception):
+    """Raised when a class name produces more than one entry_point."""
+    def __init__(self, entry_points):
+        classes = (entpt.load() for entpt in entry_points)
+        desc = ", ".join("{0.__module__}.{0.__name__}".format(cls) for cls in classes)
+        msg = "Ambiguous entry points for {}: {}".format(entry_points[0].name, desc)
+        super(AmbiguousPluginError, self).__init__(msg)
+
+
+def raise_ambiguous_exception(entry_points):
     """
-    Select the first entry_point, and log a warning that we're doing so
-    with no additional knowledge
+    Raise an exception when we have ambiguous entry points.
     """
     assert len(entry_points) > 1
-
-    log.warning(
-        "Found multiple entry_points with identifier %s: %s. Returning the first one.",
-        entry_points[0].name,
-        ", ".join(class_.module_name for class_ in entry_points)
-    )
-    return entry_points[0]
+    raise AmbiguousPluginError(entry_points)
 
 
 class Plugin(object):
@@ -81,7 +83,7 @@ class Plugin(object):
         loaded.
         """
         if select is None:
-            select = select_first_and_warn
+            select = raise_ambiguous_exception
 
         if cls._plugin_cache is None:
             cls._plugin_cache = {}
