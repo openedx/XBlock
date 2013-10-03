@@ -5,7 +5,7 @@ import json
 
 from django.test.client import Client
 
-from nose.tools import assert_equal, assert_in, assert_raises, assert_true  # pylint: disable=E0611
+from xblock.test.tools import assert_equals, assert_in, assert_raises, assert_true
 
 from xblock.core import XBlock, String, Scope
 from xblock.fragment import Fragment
@@ -89,18 +89,18 @@ def test_xblock_with_handler():
     response = client.get("/view/testit/")
     assert_true("The data: 'def'." in response.content)
     parsed = response.content.split(':::')
-    assert_equal(len(parsed), 3)
+    assert_equals(len(parsed), 3)
     handler_url = parsed[1]
 
     # Now change the data.
     response = client.post(handler_url, "{}", "text/json")
     the_data = json.loads(response.content)['the_data']
-    assert_equal(the_data, "defx")
+    assert_equals(the_data, "defx")
 
     # Change it again.
     response = client.post(handler_url, "{}", "text/json")
     the_data = json.loads(response.content)['the_data']
-    assert_equal(the_data, "defxx")
+    assert_equals(the_data, "defxx")
 
 
 @temp_scenario(XBlock)
@@ -132,7 +132,7 @@ def test_xblock_invalid_handler_url():
 
     handler_url = "/handler/obviously/a/fake/handler"
     result = client.post(handler_url, '{}', 'text/json')
-    assert_equal(result.status_code, 404)
+    assert_equals(result.status_code, 404)
 
 
 class XBlockWithoutStudentView(XBlock):

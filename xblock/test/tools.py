@@ -4,6 +4,18 @@ Tools for testing XBlocks
 
 from xblock.runtime import KeyValueStore
 
+# nose.tools has convenient assert methods, but it defines them in a clever way
+# that baffles pylint.  Import them all here so we can keep the pylint clutter
+# out of the rest of our files.
+from nose.tools import (                        # pylint: disable=W0611,E0611
+    assert_true, assert_false,
+    assert_equals, assert_not_equals,
+    assert_is, assert_is_not,
+    assert_is_instance,
+    assert_in, assert_not_in,
+    assert_raises, assert_raises_regexp,
+)
+
 
 class DictKeyValueStore(KeyValueStore):
     """
