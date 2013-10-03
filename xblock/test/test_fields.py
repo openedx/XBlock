@@ -6,12 +6,11 @@ Tests for classes extending Field.
 # pylint: disable=W0212
 
 import unittest
-# pylint: disable=E0611
-from nose.tools import assert_equals
-# pylint: enable=E0611
 
 from xblock.core import XBlock
 from xblock.fields import Any, Boolean, Dict, Float, Integer, List, String
+
+from xblock.test.tools import assert_equals
 
 
 class FieldTest(unittest.TestCase):

@@ -2,7 +2,7 @@
 Test xblock/core/plugin.py
 """
 
-from nose.tools import assert_is, assert_raises_regexp  # pylint: disable=E0611
+from xblock.test.tools import assert_is, assert_raises_regexp
 
 from xblock.core import XBlock
 from xblock.plugin import AmbiguousPluginError, PluginMissingError

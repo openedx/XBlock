@@ -6,7 +6,7 @@ import json
 
 import webob
 
-from nose.tools import assert_equals  # pylint: disable=E0611
+from xblock.test.tools import assert_equals
 
 from workbench.runtime import WorkbenchRuntime
 

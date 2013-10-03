@@ -2,13 +2,6 @@
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
-# Nose redefines assert_equal and assert_not_equal
-# pylint: disable=E0611
-from nose.tools import (
-    assert_equals, assert_false, assert_true, assert_raises,
-    assert_is, assert_is_not
-)
-# pylint: enable=E0611
 from collections import namedtuple
 from mock import Mock
 
@@ -18,7 +11,12 @@ from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
 from xblock.fragment import Fragment
 from xblock.field_data import DictFieldData
+
 from xblock.test.tools import DictKeyValueStore
+from xblock.test.tools import (
+    assert_equals, assert_false, assert_true, assert_raises,
+    assert_is, assert_is_not
+)
 
 
 class TestMixin(object):
@@ -55,7 +53,6 @@ class TestXBlockNoFallback(XBlock):
     agg_type = String(scope=Scope(UserScope.ALL, BlockScope.TYPE), default='at')
     agg_def = String(scope=Scope(UserScope.ALL, BlockScope.DEFINITION), default='ad')
     agg_usage = String(scope=Scope.user_state_summary, default='au')
-
 
 
 class TestXBlock(TestXBlockNoFallback):
@@ -451,5 +448,3 @@ class TestMixologist(object):
 
         assert_equals(4, len(pre_mixed.__bases__))  # 1 for the original class + 3 mixin classes
         assert_equals(4, len(post_mixed.__bases__))
-
-

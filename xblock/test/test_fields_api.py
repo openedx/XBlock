@@ -27,17 +27,11 @@ particular combination of initial conditions that we want to test)
 import copy
 from mock import Mock
 
-# Nose dynamically defines assert_* functions
-# pylint: disable=E0611
-from nose.tools import (
-    assert_is, assert_is_not, assert_equals,
-    assert_not_equals, assert_true, assert_false
-)
-# pylint: enable=E0611
-
 from xblock.core import XBlock
 from xblock.fields import Integer, List
 from xblock.field_data import DictFieldData
+
+from xblock.test.tools import assert_is, assert_is_not, assert_equals, assert_not_equals, assert_true, assert_false
 
 # Ignore statements that 'have no effect', since the effect is to read
 # from the descriptor
