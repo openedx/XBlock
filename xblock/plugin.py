@@ -17,19 +17,21 @@ class PluginMissingError(Exception):
     pass
 
 
-def select_first_and_warn(entry_points):
+class AmbiguousPluginError(Exception):
+    """Raised when a class name produces more than one entry_point."""
+    def __init__(self, entry_points):
+        classes = (entpt.load() for entpt in entry_points)
+        desc = ", ".join("{0.__module__}.{0.__name__}".format(cls) for cls in classes)
+        msg = "Ambiguous entry points for {}: {}".format(entry_points[0].name, desc)
+        super(AmbiguousPluginError, self).__init__(msg)
+
+
+def raise_ambiguous_exception(entry_points):
     """
-    Select the first entry_point, and log a warning that we're doing so
-    with no additional knowledge
+    Raise an exception when we have ambiguous entry points.
     """
     assert len(entry_points) > 1
-
-    log.warning(
-        "Found multiple entry_points with identifier %s: %s. Returning the first one.",
-        entry_points[0].name,
-        ", ".join(class_.module_name for class_ in entry_points)
-    )
-    return entry_points[0]
+    raise AmbiguousPluginError(entry_points)
 
 
 class Plugin(object):
@@ -44,10 +46,10 @@ class Plugin(object):
     _plugin_cache = None
     entry_point = None  # Should be overwritten by children classes
 
-    # Temporary entry points, for register_temp_plugin.  This dict maps
-    # identifiers to classes:
-    #   {'test1': Test1XBlock, 'test2': Test2XBlock}
-    extra_entry_points = {}
+    # Temporary entry points, for register_temp_plugin.  A list of pairs,
+    # (identifier, entry_point):
+    #   [('test1', test1_entrypoint), ('test2', test2_entrypoint), ...]
+    extra_entry_points = []
 
     @classmethod
     def _load_class_entry_point(cls, entry_point):
@@ -81,7 +83,7 @@ class Plugin(object):
         loaded.
         """
         if select is None:
-            select = select_first_and_warn
+            select = raise_ambiguous_exception
 
         if cls._plugin_cache is None:
             cls._plugin_cache = {}
@@ -89,8 +91,9 @@ class Plugin(object):
         if identifier not in cls._plugin_cache:
             identifier = identifier.lower()
             entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
-            if identifier in cls.extra_entry_points:
-                entry_points.append(cls.extra_entry_points[identifier])
+            for extra_identifier, extra_entry_point in cls.extra_entry_points:
+                if identifier == extra_identifier:
+                    entry_points.append(extra_entry_point)
 
             if len(entry_points) > 1:
                 entry_point = select(entry_points)
@@ -116,7 +119,7 @@ class Plugin(object):
         """
         all_classes = itertools.chain(
             pkg_resources.iter_entry_points(cls.entry_point),
-            cls.extra_entry_points.values(),
+            (entry_point for identifier, entry_point in cls.extra_entry_points),
         )
         for class_ in all_classes:
             yield (class_.name, cls._load_class_entry_point(class_))
@@ -136,11 +139,11 @@ class Plugin(object):
             identifier = class_.__name__.lower()
         entry_point = _EntryPointStub(class_, identifier)
 
-        def _decorator(func):
+        def _decorator(func):                           # pylint: disable=C0111
             @functools.wraps(func)
-            def _inner(*args, **kwargs):
-                old = cls.extra_entry_points.copy()
-                cls.extra_entry_points[identifier] = entry_point
+            def _inner(*args, **kwargs):                # pylint: disable=C0111
+                old = list(cls.extra_entry_points)
+                cls.extra_entry_points.append((identifier, entry_point))
                 try:
                     return func(*args, **kwargs)
                 finally:
@@ -156,4 +159,7 @@ class _EntryPointStub(object):
         self.name = name
 
     def load(self):
+        """
+        Stub implementation of loading the entry point: just return our class.
+        """
         return self.class_
