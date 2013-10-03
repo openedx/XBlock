@@ -40,7 +40,7 @@ class HtmlBlock(XBlock):
         """
         block = runtime.construct_xblock_from_class(cls, keys)
 
-        block.content = node.text or u""
+        block.content = unicode(node.text or u"")
         for child in node:
             block.content += etree.tostring(child, encoding='unicode')
 
