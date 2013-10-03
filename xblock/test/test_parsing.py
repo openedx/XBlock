@@ -196,3 +196,13 @@ class HtmlInOutTest(XmlTest, unittest.TestCase):
             xml = self.export_xml_for_block(block)
 
             self.assertIn(test, xml)
+
+    def test_text_is_unicode(self):
+        tests = [
+            "<html>Hello, world</html>",
+            "<html>ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!</html>",
+        ]
+
+        for test in tests:
+            block = self.parse_xml_to_block(test)
+            self.assertIsInstance(block.content, unicode)
