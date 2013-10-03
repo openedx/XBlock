@@ -6,7 +6,7 @@ only have a days and seconds attributes, whereas we also recognize hours and min
 """
 
 from mock import MagicMock, Mock
-from nose.tools import assert_equals, assert_not_equals, assert_not_in  # pylint: disable=E0611
+from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
 
 import re
 from xblock.core import XBlock

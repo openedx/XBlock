@@ -2,12 +2,13 @@
 
 from collections import namedtuple
 
-from nose.tools import assert_in, assert_equals  # pylint: disable=E0611
 from mock import Mock
 
 from xblock.runtime import DbModel
 from xblock.test.tools import DictKeyValueStore
 from xblock.view_counter import ViewCounter
+
+from xblock.test.tools import assert_in, assert_equals
 
 
 TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103

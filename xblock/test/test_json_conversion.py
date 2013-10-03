@@ -4,12 +4,13 @@ with ModelDatas
 """
 # Allow inspection of private class members
 # pylint: disable=W0212
-from nose.tools import assert_equals, assert_is_instance
 from mock import Mock
 
 from xblock.core import XBlock
 from xblock.fields import Field, Scope
 from xblock.field_data import DictFieldData
+
+from xblock.test.tools import assert_equals, assert_is_instance
 
 
 class TestJSONConversionField(Field):
@@ -44,7 +45,6 @@ class TestJsonConversion():
     """
 
     def setUp(self):
-
         self.block = TestBlock(
             Mock(),
             TestModel({
@@ -68,5 +68,3 @@ class TestJsonConversion():
             {'$type': 'set', '$vals': [5, 6]},
             self.block._field_data.get(self.block, 'field_b')
         )
-
-

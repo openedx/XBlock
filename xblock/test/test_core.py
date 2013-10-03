@@ -3,11 +3,6 @@ metaclassing, field access, caching, serialization, and bulk saves."""
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
 from mock import patch, MagicMock, Mock
-# Nose redefines assert_equal and assert_not_equal
-# pylint: disable=E0611
-from nose.tools import assert_equals, assert_raises, \
-    assert_not_equals, assert_false, assert_is
-# pylint: enable=E0611
 from datetime import datetime
 
 from xblock.core import XBlock
@@ -16,6 +11,11 @@ from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
     Integer, List, ModelMetaclass, Field, \
     Scope
 from xblock.field_data import FieldData, DictFieldData
+
+from xblock.test.tools import (
+    assert_equals, assert_raises,
+    assert_not_equals, assert_false, assert_is
+)
 
 
 def test_model_metaclass():

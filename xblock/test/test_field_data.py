@@ -3,12 +3,13 @@ Tests of the utility FieldData's defined by xblock
 """
 
 from mock import Mock
-from nose.tools import assert_false, assert_raises, assert_equals
 
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, String
 from xblock.field_data import SplitFieldData, ReadOnlyFieldData
+
+from xblock.test.tools import assert_false, assert_raises, assert_equals
 
 
 class TestingBlock(XBlock):
@@ -64,7 +65,6 @@ class TestSplitFieldData(object):
         self.split.default(self.block, 'content')
         self.content.default.assert_called_once_with(self.block, 'content')
         assert_false(self.settings.default.called)
-
 
 
 class TestReadOnlyFieldData(object):
