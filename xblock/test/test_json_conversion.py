@@ -44,7 +44,6 @@ class TestJsonConversion():
     """
 
     def setUp(self):
-
         self.block = TestBlock(
             Mock(),
             TestModel({
@@ -68,5 +67,3 @@ class TestJsonConversion():
             {'$type': 'set', '$vals': [5, 6]},
             self.block._field_data.get(self.block, 'field_b')
         )
-
-

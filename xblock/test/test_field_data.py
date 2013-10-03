@@ -66,7 +66,6 @@ class TestSplitFieldData(object):
         assert_false(self.settings.default.called)
 
 
-
 class TestReadOnlyFieldData(object):
     def setUp(self):
         self.source = Mock()

@@ -57,7 +57,6 @@ class TestXBlockNoFallback(XBlock):
     agg_usage = String(scope=Scope.user_state_summary, default='au')
 
 
-
 class TestXBlock(TestXBlockNoFallback):
     """
     Test xblock class with fallbock methods
@@ -451,5 +450,3 @@ class TestMixologist(object):
 
         assert_equals(4, len(pre_mixed.__bases__))  # 1 for the original class + 3 mixin classes
         assert_equals(4, len(post_mixed.__bases__))
-
-
