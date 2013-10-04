@@ -371,7 +371,7 @@ class Runtime(object):
         Returns the same value as :func:`render`.
 
         """
-        return child.runtime.render(child, context, view_name or self._view_name)
+        return child.render(context, view_name or self._view_name)
 
     def render_children(self, block, context, view_name=None):
         """Render a block's children, returning a list of results.

@@ -212,8 +212,8 @@ def test_runtime_handle():
 def test_runtime_render():
     key_store = DictKeyValueStore()
     db_model = DbModel(key_store)
-    tester = TestXBlock(Mock(), db_model, Mock())
     runtime = MockRuntimeForQuerying()
+    tester = TestXBlock(runtime, db_model, Mock())
     # string we want to update using the handler
     update_string = u"user state update"
 
@@ -225,6 +225,12 @@ def test_runtime_render():
     # test against the fallback view
     update_string = u"new update"
     frag = runtime.render(tester, [update_string], 'test_fallback_view')
+    assert_equals(frag.body_html(), update_string)
+    assert_equals(tester.preferences, update_string)
+
+    # test block-first
+    update_string = u"penultimate update"
+    frag = tester.render([update_string], 'student_view')
     assert_equals(frag.body_html(), update_string)
     assert_equals(tester.preferences, update_string)
 
