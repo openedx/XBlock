@@ -325,7 +325,7 @@ class Runtime(object):
 
     # Rendering
 
-    def render(self, block, context, view_name):
+    def render(self, block, view_name, context=None):
         """
         Render a block by invoking its view.
 
@@ -360,7 +360,7 @@ class Runtime(object):
             # Reset the active view to what it was before entering this method
             self._view_name = old_view_name
 
-    def render_child(self, child, context, view_name=None):
+    def render_child(self, child, view_name=None, context=None):
         """A shortcut to render a child block.
 
         Use this method to render your children from your own view function.
@@ -371,9 +371,9 @@ class Runtime(object):
         Returns the same value as :func:`render`.
 
         """
-        return child.render(context, view_name or self._view_name)
+        return child.render(view_name or self._view_name, context)
 
-    def render_children(self, block, context, view_name=None):
+    def render_children(self, block, view_name=None, context=None):
         """Render a block's children, returning a list of results.
 
         Each child of `block` will be rendered, just as :func:`render_child` does.
@@ -384,7 +384,7 @@ class Runtime(object):
         results = []
         for child_id in block.children:
             child = self.get_block(child_id)
-            result = self.render_child(child, context, view_name)
+            result = self.render_child(child, view_name, context)
             results.append(result)
         return results
 

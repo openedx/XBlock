@@ -8,6 +8,8 @@ or near the top.  Include a label indicating the component affected.
 
 0.3
 ----------
+* Make context an optional parameter for all views.
+
 * Add shortcut method to make rendering an xblock's view with it's own
   runtime easier.
 

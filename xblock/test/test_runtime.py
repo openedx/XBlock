@@ -218,19 +218,19 @@ def test_runtime_render():
     update_string = u"user state update"
 
     # test against the student view
-    frag = runtime.render(tester, [update_string], 'student_view')
+    frag = runtime.render(tester, 'student_view', [update_string])
     assert_equals(frag.body_html(), update_string)
     assert_equals(tester.preferences, update_string)
 
     # test against the fallback view
     update_string = u"new update"
-    frag = runtime.render(tester, [update_string], 'test_fallback_view')
+    frag = runtime.render(tester, 'test_fallback_view', [update_string])
     assert_equals(frag.body_html(), update_string)
     assert_equals(tester.preferences, update_string)
 
     # test block-first
     update_string = u"penultimate update"
-    frag = tester.render([update_string], 'student_view')
+    frag = tester.render('student_view', [update_string])
     assert_equals(frag.body_html(), update_string)
     assert_equals(tester.preferences, update_string)
 
@@ -238,7 +238,7 @@ def test_runtime_render():
     update_string = u"ultimate update"
     tester = TestXBlockNoFallback(Mock(), db_model, Mock())
     with assert_raises(NoSuchViewError):
-        runtime.render(tester, [update_string], 'test_nonexistant_view')
+        runtime.render(tester, 'test_nonexistant_view', [update_string])
 
 
 class SerialDefaultKVS(DictKeyValueStore):
