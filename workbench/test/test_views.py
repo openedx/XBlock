@@ -36,11 +36,11 @@ def temp_scenario(temp_class, scenario_name='test_scenario'):
 
 class MultiViewXBlock(XBlock):
     """A bare-bone XBlock with two views."""
-    def student_view(self, context):  # pylint: disable=W0613
+    def student_view(self, context=None):  # pylint: disable=W0613
         """A view, with the default name."""
         return Fragment(u"This is student view!")
 
-    def another_view(self, context):  # pylint: disable=W0613
+    def another_view(self, context=None):  # pylint: disable=W0613
         """A secondary view for this block."""
         return Fragment(u"This is another view!")
 
@@ -66,7 +66,7 @@ class XBlockWithHandlerAndStudentState(XBlock):
     """A bare-bone XBlock with one view and one json handler."""
     the_data = String(default="def", scope=Scope.user_state)
 
-    def student_view(self, context):  # pylint: disable=W0613
+    def student_view(self, context=None):  # pylint: disable=W0613
         """Provide the default view."""
         body = u"The data: %r." % self.the_data
         body += u":::%s:::" % self.runtime.handler_url(self, "update_the_data")

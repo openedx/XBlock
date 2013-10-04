@@ -12,7 +12,7 @@ from .util import make_safe_for_html
 
 class DebuggingChildBlock(XBlock):
     """A simple gray box, to use as a child placeholder."""
-    def fallback_view(self, view_name, context):  # pylint: disable=W0613
+    def fallback_view(self, view_name, context=None):  # pylint: disable=W0613
         """Provides a fallback view handler"""
         frag = Fragment(u"<div class='debug_child'>%s<br>%s</div>" % (make_safe_for_html(repr(self)), view_name))
         frag.add_css("""
