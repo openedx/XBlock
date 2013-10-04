@@ -12,5 +12,8 @@ setup(
         'xblock.v1': [
             'thumbs = thumbs:ThumbsBlock',
         ]
-    }
+    },
+    package_data={
+        'thumbs': ['static/*'],
+    },
 )
