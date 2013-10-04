@@ -12,7 +12,7 @@ class Sequence(XBlock):
     """
     has_children = True
 
-    def student_view(self, context):
+    def student_view(self, context=None):
         """Provide default student view."""
         frag = Fragment()
         child_frags = self.runtime.render_children(self, context)
@@ -37,7 +37,7 @@ class VerticalBlock(XBlock):
     """A simple container."""
     has_children = True
 
-    def student_view(self, context):
+    def student_view(self, context=None):
         """Provide default student view."""
         result = Fragment()
         child_frags = self.runtime.render_children(self, context)
@@ -55,7 +55,7 @@ class SidebarBlock(XBlock):
     """A slightly-different vertical."""
     has_children = True
 
-    def student_view(self, context):
+    def student_view(self, context=None):
         """Provide default student view."""
         result = Fragment()
         child_frags = self.runtime.render_children(self, context)

@@ -81,8 +81,11 @@ class ProblemBlock(XBlock):
         return context
 
     # The content controls how the Inputs attach to Graders
-    def student_view(self, context):
+    def student_view(self, context=None):
         """Provide the default student view."""
+        if context is None:
+            context = {}
+
         context = self.calc_context(context)
 
         result = Fragment()
@@ -91,7 +94,7 @@ class ProblemBlock(XBlock):
         # static pylint checking warning about this.
         for child_id in self.children:  # pylint: disable=E1101
             child = self.runtime.get_block(child_id)
-            frag = self.runtime.render_child(child, context, "problem_view")
+            frag = self.runtime.render_child(child, "problem_view", context)
             result.add_frag_resources(frag)
             named_child_frags.append((child.name, frag))
         result.add_css("""
@@ -353,11 +356,11 @@ class TextInputBlock(InputBlock):
     input_type = String(help="Type of conversion to attempt on input string")
     student_input = Any(help="Last input submitted by the student", default="", scope=Scope.user_state)
 
-    def student_view(self, context):  # pylint: disable=W0613
+    def student_view(self, context=None):  # pylint: disable=W0613
         """Returns default student view."""
         return Fragment(u"<p>I can only appear inside problems.</p>")
 
-    def problem_view(self, context):  # pylint: disable=W0613
+    def problem_view(self, context=None):  # pylint: disable=W0613
         """Returns a view of the problem - a javascript text input field."""
         html = u"<input type='text' name='input' value='{0}'><span class='message'></span>".format(self.student_input)
         result = Fragment(html)
@@ -396,7 +399,7 @@ class EqualityCheckerBlock(CheckerBlock):
     right = Any(scope=Scope.user_state)
     attempted = Boolean(scope=Scope.user_state)
 
-    def problem_view(self, context):
+    def problem_view(self, context=None):
         """Renders the problem view.
 
         The view is specific to whether or not this problem was attempted, and, if so,
@@ -469,7 +472,7 @@ class AttemptsScoreboardBlock(XBlock):
     Show attempts on problems in my nieces.
     """
 
-    def student_view(self, context):  # pylint: disable=W0613
+    def student_view(self, context=None):  # pylint: disable=W0613
         """Provide default student view."""
         # Get the attempts for all problems in my parent.
         if self.parent:

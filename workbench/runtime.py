@@ -144,9 +144,9 @@ class WorkbenchRuntime(Runtime):
         block = self.construct_xblock(block_type, keys)
         return block
 
-    def render(self, block, context, view_name):
+    def render(self, block, view_name, context=None):
         try:
-            return super(WorkbenchRuntime, self).render(block, context, view_name)
+            return super(WorkbenchRuntime, self).render(block, view_name, context)
         except NoSuchViewError:
             return Fragment(u"<i>No such view: %s on %s</i>"
                             % (view_name, make_safe_for_html(repr(block))))

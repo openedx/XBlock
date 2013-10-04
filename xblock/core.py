@@ -151,6 +151,10 @@ class XBlock(Plugin):
             ','.join(attrs)
         )
 
+    def render(self, view, context=None):
+        """Render `view` with this block's :class:`Runtime` and the supplied `context`"""
+        return self.runtime.render(self, view, context)
+
     def save(self):
         """Save all dirty fields attached to this XBlock."""
         if not self._dirty_fields:
