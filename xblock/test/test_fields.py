@@ -5,12 +5,14 @@ Tests for classes extending Field.
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
 
+from mock import MagicMock, Mock
 import unittest
 
-from xblock.core import XBlock
-from xblock.fields import Any, Boolean, Dict, Float, Integer, List, String
+from xblock.core import XBlock, Scope
+from xblock.field_data import DictFieldData
+from xblock.fields import Any, Boolean, Dict, Field, Float, Integer, List, String
 
-from xblock.test.tools import assert_equals
+from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
 
 
 class FieldTest(unittest.TestCase):
@@ -277,3 +279,35 @@ def test_values_dict():
     # Test that the format expected for integers is allowed
     test_field = Integer(values={"min": 1, "max": 100})
     assert_equals({"min": 1, "max": 100}, test_field.values)
+
+
+class TwoFacedField(Field):
+    """A field that emits different 'json' than it parses."""
+    def from_json(self, thestr):
+        """Store an int, the length of the string parsed."""
+        return len(thestr)
+
+    def to_json(self, value):
+        """Emit some number of X's."""
+        return "X" * value
+
+
+def test_twofaced_field_access():
+    # Check that a field with different to_json and from_json representations
+    # persists and saves correctly.
+    class FieldTester(XBlock):
+        """Test block for TwoFacedField."""
+        how_many = TwoFacedField(scope=Scope.settings)
+
+    original_json = "YYY"
+    field_tester = FieldTester(MagicMock(), DictFieldData({'how_many': original_json}), Mock())
+
+    # Test that the native value isn't equal to the original json we specified.
+    assert_not_equals(field_tester.how_many, original_json)
+    # Test that the native -> json value isn't equal to the original json we specified.
+    assert_not_equals(TwoFacedField().to_json(field_tester.how_many), original_json)
+
+    # The previous accesses will mark the field as dirty (via __get__)
+    assert_equals(len(field_tester._dirty_fields), 1)
+    # However, the field should not ACTUALLY be marked as a field that is needing to be saved.
+    assert_not_in('how_many', field_tester._get_fields_to_save())   # pylint: disable=W0212
