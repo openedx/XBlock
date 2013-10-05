@@ -592,7 +592,7 @@ class Mixologist(object):
                 # overwrite it
                 return _CLASS_CACHE.setdefault(mixin_key, type(
                     base_class.__name__ + 'WithMixins',
-                    (base_class,) + mixins,
+                    (base_class, ) + mixins,
                     {'unmixed_class': base_class}
                 ))
         else:
