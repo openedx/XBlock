@@ -96,10 +96,12 @@ class ParsingTest(XmlTest, unittest.TestCase):
         child1 = self.runtime.get_block(block.children[0])
         self.assertIsInstance(child1, Leaf)
         self.assertEqual(child1.data1, "child1")
+        self.assertEqual(child1.parent, block.scope_ids.usage_id)
 
         child2 = self.runtime.get_block(block.children[1])
         self.assertIsInstance(child2, Leaf)
         self.assertEqual(child2.data1, "child2")
+        self.assertEqual(child2.parent, block.scope_ids.usage_id)
 
     @XBlock.register_temp_plugin(Leaf)
     @XBlock.register_temp_plugin(Specialized)
