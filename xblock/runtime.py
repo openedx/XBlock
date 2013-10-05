@@ -278,14 +278,15 @@ class Runtime(object):
     def parse_xml_file(self, fileobj):
         """Parse an open XML file, returning a usage id."""
         root = etree.parse(fileobj).getroot()
-        usage_id = self._usage_id_from_node(root)
+        usage_id = self._usage_id_from_node(root, None)
         return usage_id
 
-    def _usage_id_from_node(self, node):
+    def _usage_id_from_node(self, node, parent_id):
         """Create a new usage id from an XML dom node.
 
         :param node: The DOM node to interpret.
         :type node: `lxml.etree.Element`
+        :param parent_id: The usage ID of the parent block.
 
         """
         block_type = node.tag
@@ -295,6 +296,7 @@ class Runtime(object):
         keys = ScopeIds(UserScope.NONE, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(XBlock.load_class(block_type))
         block = block_class.parse_xml(node, self, keys)
+        block.parent = parent_id
         block.save()
         return usage_id
 
@@ -302,7 +304,7 @@ class Runtime(object):
         """
         Called by XBlock.parse_xml to treat a child node as a child block.
         """
-        usage_id = self._usage_id_from_node(node)
+        usage_id = self._usage_id_from_node(node, block.scope_ids.usage_id)
         block.children.append(usage_id)
 
     # Exporting XML
