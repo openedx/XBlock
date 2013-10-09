@@ -164,11 +164,10 @@ class WorkbenchRuntime(Runtime):
         wrapped.add_javascript_url("/static/js/vendor/jquery.cookie.js")
 
         data = {}
-        if frag.js_init:
-            func, version = frag.js_init
-            wrapped.add_javascript_url("/static/js/runtime/%s.js" % version)
-            data['init'] = func
-            data['runtime-version'] = version
+        if frag.js_init_fn:
+            wrapped.add_javascript_url("/static/js/runtime/%s.js" % frag.js_init_version)
+            data['init'] = frag.js_init_fn
+            data['runtime-version'] = frag.js_init_version
             data['usage'] = block.scope_ids.usage_id
             data['block-type'] = block.scope_ids.block_type
 
