@@ -9,11 +9,10 @@ from mock import Mock
 from xblock.core import XBlock
 from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, XBlockMixin, Integer
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError, NoSuchServiceError
-from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
+from xblock.runtime import KeyValueStore, DictKeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
 from xblock.fragment import Fragment
 from xblock.field_data import DictFieldData
 
-from xblock.test.tools import DictKeyValueStore
 from xblock.test.tools import (
     assert_equals, assert_false, assert_true, assert_raises,
     assert_raises_regexp, assert_is, assert_is_not, unabc

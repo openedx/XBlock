@@ -72,6 +72,29 @@ class KeyValueStore(object):
             self.set(key, value)
 
 
+class DictKeyValueStore(KeyValueStore):
+    """
+    A `KeyValueStore` that stores everything into a Python dictionary.
+    """
+    def __init__(self, storage=None):
+        self.db_dict = storage if storage is not None else {}
+
+    def get(self, key):
+        return self.db_dict[key]
+
+    def set(self, key, value):
+        self.db_dict[key] = value
+
+    def set_many(self, other_dict):
+        self.db_dict.update(other_dict)
+
+    def delete(self, key):
+        del self.db_dict[key]
+
+    def has(self, key):
+        return key in self.db_dict
+
+
 class DbModel(FieldData):
     """
     An interface mapping value access that uses field names to one

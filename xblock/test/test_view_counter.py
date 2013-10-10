@@ -4,8 +4,7 @@ from collections import namedtuple
 
 from mock import Mock
 
-from xblock.runtime import DbModel
-from xblock.test.tools import DictKeyValueStore
+from xblock.runtime import DbModel, DictKeyValueStore
 from xblock.view_counter import ViewCounter
 
 from xblock.test.tools import assert_in, assert_equals
