@@ -27,6 +27,7 @@ class HtmlBlock(XBlock):
 
     def fallback_view(self, view_name, context=None):
         """Provide a fallback view handler"""
+        context = context or {}
         return Fragment(Template(self.content).substitute(**context))
 
     @classmethod
