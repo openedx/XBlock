@@ -40,7 +40,7 @@ class VerticalBlock(XBlock):
     def student_view(self, context=None):
         """Provide default student view."""
         result = Fragment()
-        child_frags = self.runtime.render_children(self, context)
+        child_frags = self.runtime.render_children(self, context=context)
         result.add_frags_resources(child_frags)
         result.add_css("""
             .vertical {
