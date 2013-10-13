@@ -95,7 +95,7 @@ class DictKeyValueStore(KeyValueStore):
         return key in self.db_dict
 
 
-class DbModel(FieldData):
+class KvsFieldData(FieldData):
     """
     An interface mapping value access that uses field names to one
     that uses the correct scoped keys for the underlying KeyValueStore
@@ -217,6 +217,10 @@ class DbModel(FieldData):
         :param name: name of the field to default
         """
         return self._kvs.default(self._key(block, name))
+
+
+# The old name for KvsFieldData, to ease transition.
+DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
 class UsageStore(object):

@@ -16,7 +16,7 @@ from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
 from xblock.fields import Scope, ScopeIds
-from xblock.runtime import DbModel, KeyValueStore, Runtime, NoSuchViewError, UsageStore
+from xblock.runtime import KvsFieldData, KeyValueStore, Runtime, NoSuchViewError, UsageStore
 from xblock.fragment import Fragment
 
 from .util import make_safe_for_html
@@ -146,7 +146,7 @@ class WorkbenchRuntime(Runtime):
     """
 
     def __init__(self, student_id=None):
-        super(WorkbenchRuntime, self).__init__(USAGE_STORE, DbModel(WORKBENCH_KVS))
+        super(WorkbenchRuntime, self).__init__(USAGE_STORE, KvsFieldData(WORKBENCH_KVS))
         self.student_id = student_id
 
     def get_block(self, usage_id):

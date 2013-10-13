@@ -4,7 +4,7 @@ from collections import namedtuple
 
 from mock import Mock
 
-from xblock.runtime import DbModel, DictKeyValueStore
+from xblock.runtime import KvsFieldData, DictKeyValueStore
 from xblock.view_counter import ViewCounter
 
 from xblock.test.tools import assert_in, assert_equals
@@ -15,7 +15,7 @@ TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
 
 def test_view_counter_state():
     key_store = DictKeyValueStore()
-    db_model = DbModel(key_store)
+    db_model = KvsFieldData(key_store)
     tester = ViewCounter(Mock(), db_model, Mock())
 
     assert_equals(tester.views, 0)
