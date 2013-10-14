@@ -438,7 +438,7 @@ class Dict(Field):
         if value is None or isinstance(value, dict):
             return value
         else:
-            raise TypeError('Value stored in a Dict must be None or a dict.')
+            raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
 
 
 class List(Field):
@@ -453,7 +453,7 @@ class List(Field):
         if value is None or isinstance(value, list):
             return value
         else:
-            raise TypeError('Value stored in an List must be None or a list.')
+            raise TypeError('Value stored in an List must be None or a list, found %s' % type(value))
 
 
 class String(Field):
@@ -468,7 +468,7 @@ class String(Field):
         if value is None or isinstance(value, basestring):
             return value
         else:
-            raise TypeError('Value stored in a String must be None or a string.')
+            raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
 
 class Any(Field):
