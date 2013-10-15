@@ -8,9 +8,6 @@ storage mechanism is.
 import copy
 from collections import namedtuple
 
-UNSET = object()
-
-
 class BlockScope(object):
     """Enumeration defining BlockScopes"""
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
@@ -44,6 +41,9 @@ class Sentinel(object):
 
     def __repr__(self):
         return self.name
+
+
+UNSET = Sentinel("fields.UNSET")
 
 
 ScopeBase = namedtuple('ScopeBase', 'user block')  # pylint: disable=C0103
@@ -96,11 +96,11 @@ ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylin
 
 # define a placeholder ('nil') value to indicate when nothing has been stored
 # in the cache ("None" may be a valid value in the cache, so we cannot use it).
-NO_CACHE_VALUE = object()
+NO_CACHE_VALUE = Sentinel("fields.NO_CACHE_VALUE")
 
 # define a placeholder value that indicates that a value is explicitly dirty,
 # because it was explicitly set
-EXPLICITLY_SET = object()
+EXPLICITLY_SET = Sentinel("fields.EXPLICITLY_SET")
 
 
 class Field(object):
