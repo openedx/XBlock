@@ -101,7 +101,8 @@ class KvsFieldData(FieldData):
     that uses the correct scoped keys for the underlying KeyValueStore
     """
 
-    def __init__(self, kvs):
+    def __init__(self, kvs, **kwargs):
+        super(KvsFieldData, self).__init__(**kwargs)
         self._kvs = kvs
 
     def __repr__(self):
