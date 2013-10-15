@@ -281,20 +281,19 @@ def test_values_dict():
     assert_equals({"min": 1, "max": 100}, test_field.values)
 
 
-class TwoFacedField(Field):
-    """A field that emits different 'json' than it parses."""
-    def from_json(self, thestr):
-        """Store an int, the length of the string parsed."""
-        return len(thestr)
-
-    def to_json(self, value):
-        """Emit some number of X's."""
-        return "X" * value
-
-
 def test_twofaced_field_access():
     # Check that a field with different to_json and from_json representations
     # persists and saves correctly.
+    class TwoFacedField(Field):
+        """A field that emits different 'json' than it parses."""
+        def from_json(self, thestr):
+            """Store an int, the length of the string parsed."""
+            return len(thestr)
+
+        def to_json(self, value):
+            """Emit some number of X's."""
+            return "X" * value
+
     class FieldTester(XBlock):
         """Test block for TwoFacedField."""
         how_many = TwoFacedField(scope=Scope.settings)
