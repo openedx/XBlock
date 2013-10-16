@@ -805,3 +805,30 @@ def test_services_decorators_with_inheritance():
     assert_equals(sub_service_using_block.service_declaration("n2"), "need")
     assert_equals(sub_service_using_block.service_declaration("w2"), "want")
     assert_equals(sub_service_using_block.service_declaration("xx"), None)
+
+
+def test_cached_parent():
+    class HasParent(XBlock):
+        pass
+
+    runtime = Mock()
+    block = HasParent(runtime, DictFieldData({}), Mock())
+
+    # block has no parent yet, and we don't need to call the runtime to find
+    # that out.
+    assert_equals(block.get_parent(), None)
+    assert not runtime.get_block.called
+
+    # Set a parent id for the block.  Get the parent.  Now we have one, and we
+    # used runtime.get_block to get it.
+    block.parent = "some_parent_id"
+    parent = block.get_parent()
+    assert_not_equals(parent, None)
+    assert runtime.get_block.called_with("some_parent_id")
+
+    # Get the parent again.  It will be the same parent, and we didn't call the
+    # runtime.
+    runtime.reset_mock()
+    parent2 = block.get_parent()
+    assert parent2 is parent
+    assert not runtime.get_block.called

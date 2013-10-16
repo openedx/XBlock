@@ -237,6 +237,10 @@ class XBlock(Plugin):
         self._dirty_fields = {}
         self.scope_ids = scope_ids
 
+        # A cache of the parent block, retrieved from .parent
+        self._parent_block = None
+        self._parent_block_id = None
+
     def __repr__(self):
         # `XBlock` obtains the `fields` attribute from the `ModelMetaclass`.
         # Since this is not understood by static analysis, silence this error.
@@ -259,6 +263,16 @@ class XBlock(Plugin):
             id(self) % 0xFFFF,
             ','.join(attrs)
         )
+
+    def get_parent(self):
+        """Return the parent block of this block, or None if there isn't one."""
+        if self._parent_block_id != self.parent:
+            if self.parent is not None:
+                self._parent_block = self.runtime.get_block(self.parent)
+            else:
+                self._parent_block = None
+            self._parent_block_id = self.parent
+        return self._parent_block
 
     def render(self, view, context=None):
         """Render `view` with this block's :class:`Runtime` and the supplied `context`"""
