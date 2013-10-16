@@ -5,7 +5,7 @@ from selenium import webdriver
 
 from nose.plugins.attrib import attr
 
-from workbench.runtime import MEMORY_KVS
+from workbench.runtime import reset_global_state
 
 
 @attr('selenium')
@@ -27,5 +27,6 @@ class SeleniumTest(LiveServerTestCase):
     def setUp(self):
         super(SeleniumTest, self).setUp()
 
-        # Clear the in-memory key value store
-        MEMORY_KVS.clear()
+        # Clear the in-memory key value store, the usage store, and whatever
+        # else needs to be cleared and re-initialized.
+        reset_global_state()
