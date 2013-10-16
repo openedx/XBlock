@@ -24,16 +24,32 @@ from .util import make_safe_for_html
 log = logging.getLogger(__name__)
 
 
-class MemoryKeyValueStore(KeyValueStore):
-    """Use a simple in-memory database for a key-value store."""
+class WorkbenchKeyValueStore(KeyValueStore):
+    """A `KeyValueStore` for the Workbench to use.
+
+    This is a simple `KeyValueStore` which stores everything in a dictionary.
+    The key mapping is a little complicated to make it somewhat possible to
+    read the dict when it is rendered in the browser.
+
+    """
     def __init__(self, db_dict):
+        super(WorkbenchKeyValueStore, self).__init__()
         self.db_dict = db_dict
+
+    # Workbench-special methods.
 
     def clear(self):
         """Clear all data from the store."""
         self.db_dict.clear()
 
-    def actual_key(self, key):
+    def as_html(self):
+        """Render the key value store to HTML."""
+        html = json.dumps(self.db_dict, sort_keys=True, indent=4)
+        return make_safe_for_html(html)
+
+    # Implementation details.
+
+    def _actual_key(self, key):
         """
         Constructs the full key name from the given `key`.
 
@@ -54,23 +70,20 @@ class MemoryKeyValueStore(KeyValueStore):
             key_list.append(key.user_id)
         return ".".join(key_list)
 
+    # KeyValueStore methods.
+
     def get(self, key):
-        return self.db_dict[self.actual_key(key)][key.field_name]
+        return self.db_dict[self._actual_key(key)][key.field_name]
 
     def set(self, key, value):
         """Sets the key to the new value"""
-        self.db_dict.setdefault(self.actual_key(key), {})[key.field_name] = value
+        self.db_dict.setdefault(self._actual_key(key), {})[key.field_name] = value
 
     def delete(self, key):
-        del self.db_dict[self.actual_key(key)][key.field_name]
+        del self.db_dict[self._actual_key(key)][key.field_name]
 
     def has(self, key):
-        return key.field_name in self.db_dict[self.actual_key(key)]
-
-    def as_html(self):
-        """Just for our Workbench!"""
-        html = json.dumps(self.db_dict, sort_keys=True, indent=4)
-        return make_safe_for_html(html)
+        return key.field_name in self.db_dict[self._actual_key(key)]
 
     def set_many(self, update_dict):
         """
@@ -133,7 +146,7 @@ class WorkbenchRuntime(Runtime):
     """
 
     def __init__(self, student_id=None):
-        super(WorkbenchRuntime, self).__init__(USAGE_STORE, DbModel(MEMORY_KVS))
+        super(WorkbenchRuntime, self).__init__(USAGE_STORE, DbModel(WORKBENCH_KVS))
         self.student_id = student_id
 
     def get_block(self, usage_id):
@@ -256,7 +269,7 @@ class _BlockSet(object):
 
 
 # Our global state (the "database").
-MEMORY_KVS = MemoryKeyValueStore({})
+WORKBENCH_KVS = WorkbenchKeyValueStore({})
 
 # Our global usage store
 USAGE_STORE = MemoryUsageStore()
