@@ -284,6 +284,6 @@ def reset_global_state():
     """
     from .scenarios import init_scenarios       # avoid circularity.
 
-    MEMORY_KVS.clear()
+    WORKBENCH_KVS.clear()
     USAGE_STORE.clear()
     init_scenarios()
