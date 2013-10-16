@@ -451,9 +451,8 @@ class Runtime(object):
         class BadPath(Exception):
             """Bad path exception thrown when path cannot be found."""
             pass
-        # pylint: disable=C0103
-        q = self.query(block)
-        ROOT, SEP, WORD, FINAL = range(4)
+        results = self.query(block)
+        ROOT, SEP, WORD, FINAL = range(4)               # pylint: disable=C0103
         state = ROOT
         lexer = RegexLexer(
             ("dotdot", r"\.\."),
@@ -472,7 +471,7 @@ class Runtime(object):
                 # .. (parent)
                 if state == WORD:
                     raise BadPath()
-                q = q.parent()
+                results = results.parent()
                 state = WORD
             elif tokname == "dot":
                 # . (current node)
@@ -485,7 +484,7 @@ class Runtime(object):
                     raise BadPath()
                 if state == ROOT:
                     raise NotImplementedError()
-                q = q.descendants()
+                results = results.descendants()
                 state = SEP
             elif tokname == "slash":
                 # / (here)
@@ -498,17 +497,17 @@ class Runtime(object):
                 # @xxx (attribute access)
                 if state != SEP:
                     raise BadPath()
-                q = q.attr(toktext[1:])
+                results = results.attr(toktext[1:])
                 state = FINAL
             elif tokname == "word":
                 # xxx (tag selection)
                 if state != SEP:
                     raise BadPath()
-                q = q.children().tagged(toktext)
+                results = results.children().tagged(toktext)
                 state = WORD
             else:
                 raise BadPath("Invalid thing: %r" % toktext)
-        return q
+        return results
 
 
 class ObjectAggregator(object):
