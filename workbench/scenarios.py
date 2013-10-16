@@ -45,13 +45,13 @@ def add_class_scenarios(class_name, cls):
             add_xml_scenario(scname, desc, xml)
 
 
-def _do_once():
+def init_scenarios():
     """
-    Called once when the module is imported to create the global scenarios.
+    Create all the scenarios declared in all the XBlock classes.
     """
+    # Clear any existing scenarios, since this is used repeatedly during testing.
+    SCENARIOS.clear()
+
     # Get all the XBlock classes, and add their scenarios.
     for class_name, cls in XBlock.load_classes():
         add_class_scenarios(class_name, cls)
-
-
-_do_once()

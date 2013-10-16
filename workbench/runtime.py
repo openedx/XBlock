@@ -97,6 +97,11 @@ class MemoryUsageStore(UsageStore):
         """Generate a new id."""
         return str(next(self._ids))
 
+    def clear(self):
+        """Remove all entries."""
+        self._usages.clear()
+        self._definitions.clear()
+
     def create_usage(self, def_id):
         """Make a usage, storing its definition id."""
         usage_id = self._next_id()
@@ -256,3 +261,17 @@ MEMORY_KVS = MemoryKeyValueStore({})
 
 # Our global usage store
 USAGE_STORE = MemoryUsageStore()
+
+
+def reset_global_state():
+    """
+    Reset any global state in the workbench.
+
+    This allows us to write properly isolated tests.
+
+    """
+    from .scenarios import init_scenarios       # avoid circularity.
+
+    MEMORY_KVS.clear()
+    USAGE_STORE.clear()
+    init_scenarios()
