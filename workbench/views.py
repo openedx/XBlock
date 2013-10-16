@@ -13,7 +13,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from .runtime import WorkbenchRuntime, MEMORY_KVS
+from .runtime import WorkbenchRuntime, WORKBENCH_KVS
 from .scenarios import SCENARIOS
 from .request import webob_to_django_response, django_to_webob_request
 
@@ -83,7 +83,7 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
         'scenario': scenario,
         'block': block,
         'body': frag.body_html(),
-        'database': MEMORY_KVS,
+        'database': WORKBENCH_KVS,
         'head_html': frag.head_html(),
         'foot_html': frag.foot_html(),
         'log': LOG_STREAM.getvalue(),
