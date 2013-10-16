@@ -27,7 +27,8 @@ class Fragment(object):
     def __init__(self, content=None):
         self.content = u""
         self.resources = []
-        self.js_init = None
+        self.js_init_fn = None
+        self.js_init_version = None
 
         if content is not None:
             self.add_content(content)
@@ -39,7 +40,8 @@ class Fragment(object):
         return {
             'content': self.content,
             'resources': [r._asdict() for r in self.resources],  # pylint: disable=W0212
-            'js_init': self.js_init
+            'js_init_fn': self.js_init_fn,
+            'js_init_version': self.js_init_version,
         }
 
     @classmethod
@@ -48,13 +50,14 @@ class Fragment(object):
         Returns a new Fragment from a `pods`.
 
         `pods` is a Plain Old Data Structure, a Python dictionary with
-        keys `content`, `resources`, and `js_init`
+        keys `content`, `resources`, `js_init_fn`, and `js_init_version`.
 
         """
         frag = cls()
         frag.content = pods['content']
         frag.resources = [_FragmentResource(**d) for d in pods['resources']]
-        frag.js_init = pods['js_init']
+        frag.js_init_fn = pods['js_init_fn']
+        frag.js_init_version = pods['js_init_version']
         return frag
 
     def add_content(self, content):
@@ -170,7 +173,8 @@ class Fragment(object):
 
         """
         # This is version 1 of the interface.
-        self.js_init = (js_func, 1)
+        self.js_init_fn = js_func
+        self.js_init_version = 1
 
     # Implementation methods: don't override
     # TODO: [rocha] should this go in the runtime?
