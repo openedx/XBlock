@@ -5,9 +5,9 @@ requests
 webob
 WSGIProxy
 simplejson
+mock
 
 # For Tests
-mock
 nose
 django-nose
 coverage
