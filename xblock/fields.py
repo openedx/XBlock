@@ -7,6 +7,7 @@ storage mechanism is.
 
 import copy
 from collections import namedtuple
+from mock import sentinel
 
 class BlockScope(object):
     """Enumeration defining BlockScopes"""
@@ -28,24 +29,7 @@ class UserScope(object):
     NONE, ONE, ALL = xrange(3)
 
 
-class Sentinel(object):
-    """
-    Class for implementing sentinel objects (only equal to themselves).
-    """
-    def __init__(self, name):
-        """
-        `name` is the name used to identify the sentinel (which will
-            be displayed as the __repr__) of the sentinel.
-        """
-        self.name = name
-
-    def __repr__(self):
-        return self.name
-
-
-UNSET = Sentinel("fields.UNSET")
-
-
+UNSET = sentinel.unset_field
 ScopeBase = namedtuple('ScopeBase', 'user block')  # pylint: disable=C0103
 
 
@@ -87,8 +71,8 @@ class Scope(ScopeBase):
     user_info = ScopeBase(user=UserScope.ONE, block=BlockScope.ALL)
     user_state_summary = ScopeBase(user=UserScope.ALL, block=BlockScope.USAGE)
 
-    children = Sentinel('Scope.children')
-    parent = Sentinel('Scope.parent')
+    children = sentinel.scope_children
+    parent = sentinel.scope_parent
 
 
 ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylint: disable=C0103
