@@ -4,14 +4,29 @@
 # pylint: disable=W0212
 
 from collections import namedtuple
-from mock import Mock
+from mock import Mock, patch
+from unittest import TestCase
 
 from xblock.core import XBlock
 from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, XBlockMixin, Integer
-from xblock.exceptions import NoSuchViewError, NoSuchHandlerError, NoSuchServiceError
-from xblock.runtime import KeyValueStore, DictKeyValueStore, KvsFieldData, Runtime, ObjectAggregator, Mixologist
+from xblock.exceptions import (
+    NoSuchDefinition,
+    NoSuchHandlerError,
+    NoSuchServiceError,
+    NoSuchUsage,
+    NoSuchViewError,
+)
+from xblock.runtime import (
+    DictKeyValueStore,
+    IdReader,
+    KeyValueStore,
+    KvsFieldData,
+    Mixologist,
+    ObjectAggregator,
+    Runtime,
+)
 from xblock.fragment import Fragment
-from xblock.field_data import DictFieldData
+from xblock.field_data import DictFieldData, FieldData
 
 from xblock.test.tools import (
     assert_equals, assert_false, assert_true, assert_raises,
@@ -197,7 +212,7 @@ class MockRuntimeForQuerying(Runtime):
     # OK for this mock class to not override abstract methods or call base __init__
     # pylint: disable=W0223, W0231
     def __init__(self):
-        super(MockRuntimeForQuerying, self).__init__(field_data=Mock(), usage_store=Mock())
+        super(MockRuntimeForQuerying, self).__init__(field_data=Mock(), id_reader=Mock())
         self.mock_query = Mock()
 
     def query(self, block):
@@ -583,3 +598,46 @@ def test_sub_service():
 
     # Call the student_view to run its assertions.
     runtime.render(tester, 'student_view')
+
+
+class TestRuntimeGetBlock(TestCase):
+    def setUp(self):
+        patcher = patch.object(TestRuntime, 'construct_xblock')
+        self.construct_block = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.id_reader = Mock(IdReader)
+        self.user_id = Mock()
+        self.field_data = Mock(FieldData)
+        self.runtime = TestRuntime(self.id_reader, self.field_data)
+        self.runtime.user_id = self.user_id
+
+        self.usage_id = 'usage_id'
+
+        # Can only get a definition id from the id_reader
+        self.def_id = self.id_reader.get_definition_id.return_value
+
+        # Can only get a block type from the id_reader
+        self.block_type = self.id_reader.get_block_type.return_value
+
+    def test_basic(self):
+        self.runtime.get_block(self.usage_id)
+
+        self.id_reader.get_definition_id.assert_called_with(self.usage_id)
+        self.id_reader.get_block_type.assert_called_with(self.def_id)
+        self.construct_block.assert_called_with(
+            self.block_type,
+            ScopeIds(self.user_id, self.block_type, self.def_id, self.usage_id)
+        )
+
+    def test_missing_usage(self):
+        self.id_reader.get_definition_id.side_effect = NoSuchUsage
+        with self.assertRaises(NoSuchUsage):
+            self.runtime.get_block(self.usage_id)
+
+    def test_missing_definition(self):
+        self.id_reader.get_block_type.side_effect = NoSuchDefinition
+
+        # If we don't have a definition, then the usage doesn't exist
+        with self.assertRaises(NoSuchUsage):
+            self.runtime.get_block(self.usage_id)

@@ -31,7 +31,7 @@ class Specialized(XBlock):
     num_children = Integer(default=0, scope=Scope.user_state)
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys):
+    def parse_xml(cls, node, runtime, keys, id_generator):
         """We'll just set num_children to the number of child nodes."""
         block = runtime.construct_xblock_from_class(cls, keys)
         block.num_children = len(node)
@@ -49,7 +49,11 @@ class XmlTest(object):
 
     def parse_xml_to_block(self, xml):
         """A helper to get a block from some XML."""
-        usage_id = self.runtime.parse_xml_string(xml)
+
+        # WorkbenchRuntime has an id_generator, but most runtimes won't
+        # (because the generator will be contextual), so we
+        # pass it explicitly to parse_xml_string.
+        usage_id = self.runtime.parse_xml_string(xml, self.runtime.id_generator)
         block = self.runtime.get_block(usage_id)
         return block
 

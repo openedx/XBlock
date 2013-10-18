@@ -322,15 +322,22 @@ class XBlock(Plugin):
         self._dirty_fields.clear()
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys):
+    def parse_xml(cls, node, runtime, keys, id_generator):
         """
         Use `node` to construct a new block.
+
+        Args:
+            node (etree.Element): The xml node to parse into an xblock
+            runtime (:class:`.Runtime`): The runtime to use while parsing
+            keys (:class:`.ScopeIds`): The keys identifying where this block will store its data
+            id_generator (:class:`.IdGenerator`): An object that will allow the runtime
+                to generate correct definition and usage ids for children of this block
         """
         block = runtime.construct_xblock_from_class(cls, keys)
 
         # The base implementation: child nodes become child blocks.
         for child in node:
-            block.runtime.add_node_as_child(block, child)
+            block.runtime.add_node_as_child(block, child, id_generator)
 
         # Attributes become fields.
         for name, value in node.items():
