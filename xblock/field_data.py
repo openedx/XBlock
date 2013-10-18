@@ -98,23 +98,44 @@ class FieldData(object):
 class DictFieldData(FieldData):
     """
     A FieldData that uses a single supplied dictionary to store fields by name.
+
+    Note that this class ignores the `block` parameter everywhere, it is only
+    useful when you know that it will be used for a single block.
+
     """
     def __init__(self, data):
         self._data = data
+        self._scope_ids = None
+
+    def _check_block(self, block):
+        """Be defensive about people misunderstanding how this class works."""
+        assert block is not None
+        if self._scope_ids is not None and block.scope_ids != self._scope_ids:
+            raise InvalidScopeError(
+                "DictFieldData can only be used with one block: {!r} != {!r}".format(
+                block.scope_ids, self._scope_ids
+                )
+            )
+        self._scope_ids = block.scope_ids
 
     def get(self, block, name):
+        self._check_block(block)
         return copy.deepcopy(self._data[name])
 
     def set(self, block, name, value):
+        self._check_block(block)
         self._data[name] = copy.deepcopy(value)
 
     def delete(self, block, name):
+        self._check_block(block)
         del self._data[name]
 
     def has(self, block, name):
+        self._check_block(block)
         return name in self._data
 
     def set_many(self, block, update_dict):
+        self._check_block(block)
         self._data.update(copy.deepcopy(update_dict))
 
 

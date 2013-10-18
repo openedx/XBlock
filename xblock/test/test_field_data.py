@@ -7,18 +7,22 @@ from mock import Mock
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, String
-from xblock.field_data import SplitFieldData, ReadOnlyFieldData
+from xblock.field_data import DictFieldData, SplitFieldData, ReadOnlyFieldData
 
 from xblock.test.tools import assert_false, assert_raises, assert_equals
 
 
 class TestingBlock(XBlock):
+    """An `XBlock` for use in these tests."""
+
     content = String(scope=Scope.content)
     settings = String(scope=Scope.settings)
     user_state = String(scope=Scope.user_state)
 
 
 class TestSplitFieldData(object):
+    """Tests of `SplitFieldData`."""
+
     def setUp(self):
         self.content = Mock()
         self.settings = Mock()
@@ -68,6 +72,8 @@ class TestSplitFieldData(object):
 
 
 class TestReadOnlyFieldData(object):
+    """Tests of `ReadOnlyFieldData`."""
+
     def setUp(self):
         self.source = Mock()
         self.read_only = ReadOnlyFieldData(self.source)
@@ -100,3 +106,37 @@ class TestReadOnlyFieldData(object):
     def test_has(self):
         assert_equals(self.source.has.return_value, self.read_only.has(self.block, 'content'))
         self.source.has.assert_called_once_with(self.block, 'content')
+
+
+class TestSimplisticDictFieldData(object):
+    """Test that DictFieldData guards against multi-block use."""
+
+    def setUp(self):
+        self.dfd = DictFieldData({'content': 'CONTENT'})
+        self.block1 = TestingBlock(
+            runtime=Mock(),
+            field_data=self.dfd,
+            scope_ids=Mock(),
+        )
+        self.block2 = TestingBlock(
+            runtime=Mock(),
+            field_data=self.dfd,
+            scope_ids=Mock(),
+        )
+
+    def test_get(self):
+        # Getting content from block1 is fine.
+        assert_equals(self.dfd.get(self.block1, "content"), "CONTENT")
+
+        # Getting content from a second block should fail.
+        with assert_raises(InvalidScopeError):
+            self.dfd.get(self.block2, "content")
+
+    def test_set(self):
+        # Setting content on block1 is fine.
+        self.dfd.set(self.block1, "content", "NEW CONTENT")
+        assert_equals(self.dfd.get(self.block1, "content"), "NEW CONTENT")
+
+        # Setting content on a second block should fail.
+        with assert_raises(InvalidScopeError):
+            self.dfd.set(self.block2, "content", "BAD WORDS")

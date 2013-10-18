@@ -370,18 +370,12 @@ def test_json_field_access():
             """Convert a datetime object to a string"""
             return value.strftime("%m/%d/%Y")
 
-    class FieldTester(object):
+    class FieldTester(XBlock):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
-
         field_a = Date(scope=Scope.settings)
         field_b = Date(scope=Scope.content, default=datetime(2013, 4, 1))
 
-        def __init__(self, field_data):
-            self._field_data = field_data
-            self._dirty_fields = {}
-
-    field_tester = FieldTester(DictFieldData({}))
+    field_tester = FieldTester(Mock(), DictFieldData({}), Mock())
 
     # Check initial values
     assert_equals(None, field_tester.field_a)
