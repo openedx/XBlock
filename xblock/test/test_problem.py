@@ -41,4 +41,4 @@ def test_problem_submission():
     json_data = json.dumps({"vote_count": [{"name": "input", "value": "4"}]})
     resp = runtime.handle(problem, 'check', make_request(json_data))
     resp_data = json.loads(text_of_response(resp))
-    assert_equals(resp_data['check_results']['votes_named'], True)
+    assert_equals(resp_data['checkResults']['votes_named'], True)

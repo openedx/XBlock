@@ -13,8 +13,8 @@ describe("Thumbs XBlock", function() {
                     '</div>');
 
         // Create a mock for the runtime
-        mockRuntime = jasmine.createSpyObj('runtime', ['handler_url']);
-        mockRuntime.handler_url.andCallFake(function() {
+        mockRuntime = jasmine.createSpyObj('runtime', ['handlerUrl']);
+        mockRuntime.handlerUrl.andCallFake(function() {
             return 'test url';
         });
 
@@ -37,7 +37,7 @@ describe("Thumbs XBlock", function() {
 
         // Expect that the XBlock is updated via HTTP POST request
         expect($.ajax).toHaveBeenCalled();
-        
+
         // Expect that the HTML gets updated
         actual = $('#fixture .upvote .count').text();
         expect(actual).toEqual('test up');
@@ -49,7 +49,7 @@ describe("Thumbs XBlock", function() {
 
         // Expect that the XBlock is updated via HTTP POST request
         expect($.ajax).toHaveBeenCalled();
-        
+
         // Expect that the HTML gets updated
         actual = $('#fixture .downvote .count').text();
         expect(actual).toEqual('test down');
