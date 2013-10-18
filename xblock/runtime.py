@@ -401,21 +401,25 @@ class Runtime(object):
 
     # Handlers
 
-    def handle(self, block, handler_name, data):
+    def handle(self, block, handler_name, request):
         """
         Handles any calls to the specified `handler_name`.
 
         Provides a fallback handler if the specified handler isn't found.
+
+        :param handler_name: The name of the handler to call
+        :param request: The request to handle
+        :type request: webob.Request
         """
         handler = getattr(block, handler_name, None)
         if handler:
             # Cache results of the handler call for later saving
-            results = handler(data)
+            results = handler(request)
         else:
             fallback_handler = getattr(block, "fallback_handler", None)
             if fallback_handler:
                 # Cache results of the handler call for later saving
-                results = fallback_handler(handler_name, data)
+                results = fallback_handler(handler_name, request)
             else:
                 raise NoSuchHandlerError("Couldn't find handler %r for %r" % (handler_name, block))
 

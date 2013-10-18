@@ -748,3 +748,14 @@ def test_change_mutable_default():
     assert_equals([1], mutable_test_a._field_data.get(mutable_test_a, 'list_field'))
     with assert_raises(KeyError):
         mutable_test_b._field_data.get(mutable_test_b, 'list_field')
+
+
+def test_handle_shortcut():
+    runtime = Mock(spec=['handle'])
+    field_data = Mock(spec=[])
+    scope_ids = Mock(spec=[])
+    request = Mock(spec=[])
+    block = XBlock(runtime, field_data, scope_ids)
+
+    block.handle('handler_name', request)
+    runtime.handle.assert_called_with(block, 'handler_name', request)
