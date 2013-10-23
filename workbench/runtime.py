@@ -200,11 +200,13 @@ class WorkbenchRuntime(Runtime):
         wrapped.add_frag_resources(frag)
         return wrapped
 
-    def handler_url(self, block, url):
-        return "/handler/{0}/{1}/?student={2}".format(
-            block.scope_ids.usage_id,
-            url,
-            block.scope_ids.user_id
+    def handler_url(self, block, handler_name, suffix='', query=''):
+        return "/handler/{usage}/{handler}/{suffix}?student={student}&{query}".format(
+            student=block.scope_ids.user_id,
+            usage=block.scope_ids.usage_id,
+            handler=handler_name,
+            suffix=suffix,
+            query=query,
         )
 
     def query(self, block):

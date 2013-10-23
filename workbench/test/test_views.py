@@ -4,6 +4,7 @@ import functools
 import json
 
 from django.test.client import Client
+from django.core.urlresolvers import reverse
 
 from xblock.test.tools import assert_equals, assert_in, assert_raises, assert_true
 
@@ -45,6 +46,13 @@ class MultiViewXBlock(XBlock):
         return Fragment(u"This is another view!")
 
 
+def test_unknown_scenario():
+    client = Client()
+
+    response = client.get(reverse('scenario', args=('unknown_scenario', 'unknown_view')))
+    assert_equals(response.status_code, 404)
+
+
 @temp_scenario(MultiViewXBlock, "multiview")
 def test_multiple_views():
     client = Client()
@@ -73,7 +81,7 @@ class XBlockWithHandlerAndStudentState(XBlock):
         return Fragment(body)
 
     @XBlock.json_handler
-    def update_the_data(self, _data):
+    def update_the_data(self, _data, suffix=''):  # pylint: disable=unused-argument
         """Mock handler that updates the student state."""
         self.the_data = self.the_data + "x"
         return {'the_data': self.the_data}
@@ -115,7 +123,11 @@ def test_xblock_without_handler():
     usage_id = USAGE_STORE._usages.keys()[0]
     # Plug that usage_id into a mock handler URL
     # /handler/[usage_id]/[handler_name]
-    handler_url = "/handler/" + usage_id + "/does_not_exist/?student=student_doesntexist"
+    handler_url = reverse('handler', kwargs={
+        'usage_id': usage_id,
+        'handler_slug': 'does_not_exist',
+        'suffix': ''
+    }) + '?student=student_doesntexist'
 
     # The default XBlock implementation doesn't provide
     # a handler, so this call should raise an exception

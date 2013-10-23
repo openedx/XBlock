@@ -73,7 +73,7 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
     try:
         scenario = SCENARIOS[scenario_id]
     except KeyError:
-        return Http404
+        raise Http404
 
     usage_id = scenario.usage_id
     runtime = WorkbenchRuntime(student_id)
@@ -92,16 +92,21 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
     })
 
 
-def handler(request, usage_id, handler_slug):
+def handler(request, usage_id, handler_slug, suffix=''):
     """Provide a handler for the request."""
     student_id = get_student_id(request)
     log.info("Start handler %s/%s for student %s", usage_id, handler_slug, student_id)
     runtime = WorkbenchRuntime(student_id)
-    block = runtime.get_block(usage_id)
+
+    try:
+        block = runtime.get_block(usage_id)
+    except KeyError:
+        raise Http404
+
     request = django_to_webob_request(request)
     request.path_info_pop()
     request.path_info_pop()
-    result = block.runtime.handle(block, handler_slug, request)
+    result = block.runtime.handle(block, handler_slug, request, suffix)
     log.info("End handler %s/%s", usage_id, handler_slug)
     return webob_to_django_response(result)
 

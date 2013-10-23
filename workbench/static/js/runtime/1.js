@@ -12,9 +12,15 @@ var RuntimeProvider = (function() {
 
   var versions = {
     1: {
-      handlerUrl: function(block, handlerName) {
+      handlerUrl: function(block, handlerName, suffix, query) {
+        suffix = typeof suffix !== 'undefined' ? suffix : '';
+        query = typeof query !== 'undefined' ? query : '';
         var usage = $(block).data('usage');
-        return "/handler/" + usage + "/" + handlerName + "/?student=" + studentId;
+        return ("/handler/" + usage +
+                        "/" + handlerName +
+                        "/" + suffix +
+                "?student=" + studentId +
+                        "&" + query);
       },
       children: function(block) {
         return $(block).prop('xblock_children');
