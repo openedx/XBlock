@@ -13,9 +13,10 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from xblock.django.request import webob_to_django_response, django_to_webob_request
+
 from .runtime import WorkbenchRuntime, WORKBENCH_KVS
 from .scenarios import SCENARIOS
-from .request import webob_to_django_response, django_to_webob_request
 
 
 LOG_STREAM = None
