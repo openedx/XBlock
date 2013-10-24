@@ -4,19 +4,19 @@ var XBlock = (function () {
 
     // Constructors for a runtime object provided to an XBlock init function.
     // Indexed by version number.  Only 1 right now.
-    var runtime_constructors = {
+    var runtimeConstructors = {
         1: function (element, children) {
-            var child_map = {}
+            var childMap = {}
             $.each(children, function(idx, child) {
-                child_map[child.name] = child
+                childMap[child.name] = child
             });
             return {
-                handler_url: function(handler_name) {
+                handlerUrl: function(handlerName) {
                     var usage = $(element).data('usage');
-                    return "/handler/" + usage + "/" + handler_name + "/?student=" + student_id;
+                    return "/handler/" + usage + "/" + handlerName + "/?student=" + studentId;
                 },
                 children: children,
-                child_map: child_map
+                childMap: childMap
             };
         }
     };
@@ -29,12 +29,12 @@ var XBlock = (function () {
             return null;
         }
 
-        var runtime = runtime_constructors[version](element, children);
-        var init_fn = window[$(element).data('init')];
-        var js_block = init_fn(runtime, element) || {};
-        js_block.element = element;
-        js_block.name = $(element).data('name');
-        return js_block;
+        var runtime = runtimeConstructors[version](element, children);
+        var initFn = window[$(element).data('init')];
+        var jsBlock = initFn(runtime, element) || {};
+        jsBlock.element = element;
+        jsBlock.name = $(element).data('name');
+        return jsBlock;
     };
 
     var initializeBlocks = function (element) {

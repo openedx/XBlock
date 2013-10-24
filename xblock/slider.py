@@ -46,7 +46,7 @@ function Slider(runtime, element) {
     return new Slider(runtime, element);
   }
 
-  this.handler_url = runtime.handler_url('update');
+  this.handlerUrl = runtime.handlerUrl('update');
   this.input = $(element).children('input[type="range"]');
   this.output = $(element).children('span');
 
@@ -57,7 +57,7 @@ function Slider(runtime, element) {
   });
 
   self.input.on('mouseup', function () {
-    $.post(self.handler_url, JSON.stringify({value: this.value}));
+    $.post(self.handlerUrl, JSON.stringify({value: this.value}));
   });
 };
 
@@ -65,6 +65,6 @@ Slider.prototype.submit = function() {
   return this.input.val();
 };
 
-Slider.prototype.handle_submit = function(result) {
+Slider.prototype.handleSubmit = function(result) {
 };
 """

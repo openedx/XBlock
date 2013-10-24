@@ -23,8 +23,8 @@ A rough sequence diagram::
        |         |          |                +------------------>|
        |         |          |                |<------------------|
        |<------------------------------------+         |         |
-       | handle_submit()    |                |         |         |
-       +-------->| handle_check()            |         |         |
+       | handleSubmit()     |                |         |         |
+       +-------->| handleCheck()             |         |         |
        +------------------->|                |         |         |
        |         |          |                |         |         |
 
@@ -109,7 +109,7 @@ class ProblemBlock(XBlock):
         result.add_javascript("""
             function ProblemBlock(runtime, element) {
 
-                function call_if_exists(obj, fn) {
+                function callIfExists(obj, fn) {
                     if (typeof obj[fn] == 'function') {
                         return obj[fn].apply(obj, Array.prototype.slice.call(arguments, 2));
                     } else {
@@ -117,12 +117,12 @@ class ProblemBlock(XBlock):
                     }
                 }
 
-                function handle_check_results(results) {
-                    $.each(results.submit_results || {}, function(input, result) {
-                        call_if_exists(runtime.child_map[input], 'handle_submit', result);
+                function handleCheckResults(results) {
+                    $.each(results.submitResults || {}, function(input, result) {
+                        callIfExists(runtime.childMap[input], 'handleSubmit', result);
                     });
-                    $.each(results.check_results || {}, function(checker, result) {
-                        call_if_exists(runtime.child_map[checker], 'handle_check', result);
+                    $.each(results.checkResults || {}, function(checker, result) {
+                        callIfExists(runtime.childMap[checker], 'handleCheck', result);
                     });
                 }
 
@@ -134,16 +134,16 @@ class ProblemBlock(XBlock):
                     for (var i = 0; i < runtime.children.length; i++) {
                         var child = runtime.children[i];
                         if (child.name !== undefined) {
-                            data[child.name] = call_if_exists(child, 'submit');
+                            data[child.name] = callIfExists(child, 'submit');
                         }
                     }
-                    var handler_url = runtime.handler_url('check')
-                    $.post(handler_url, JSON.stringify(data)).success(handle_check_results);
+                    var handlerUrl = runtime.handlerUrl('check')
+                    $.post(handlerUrl, JSON.stringify(data)).success(handleCheckResults);
                 });
 
                 $(element).find('.rerandomize').bind('click', function() {
-                    var handler_url = runtime.handler_url('rerandomize');
-                    $.post(handler_url, JSON.stringify({}));
+                    var handlerUrl = runtime.handlerUrl('rerandomize');
+                    $.post(handlerUrl, JSON.stringify({}));
                 });
             }
             """)
@@ -151,15 +151,15 @@ class ProblemBlock(XBlock):
         return result
 
     @XBlock.json_handler
-    def check(self, submissions):
+    def check(self, submissions, suffix=None):
         """
         Processess the `submissions` with each provided Checker.
 
         First calls the submit() method on each InputBlock. Then, for each Checker,
         finds the values it needs and passes them to the appropriate `check()` method.
 
-        Returns a dictionary of 'submit_results': {input_name: user_submitted_results},
-        'check_results': {checker_name: results_passed_through_checker}
+        Returns a dictionary of 'submitResults': {input_name: user_submitted_results},
+        'checkResults': {checker_name: results_passed_through_checker}
 
         """
         self.problem_attempted = True
@@ -206,8 +206,8 @@ class ProblemBlock(XBlock):
                 check_results[checker.name] = result
 
         return {
-            'submit_results': submit_results,
-            'check_results': check_results,
+            'submitResults': submit_results,
+            'checkResults': check_results,
         }
 
     @XBlock.json_handler
@@ -370,7 +370,7 @@ class TextInputBlock(InputBlock):
                     submit: function() {
                         return $(element).find(':input').serializeArray();
                     },
-                    handle_submit: function(result) {
+                    handleSubmit: function(result) {
                         $(element).find('.message').text((result || {}).error || '');
                     }
                 }
@@ -447,7 +447,7 @@ class EqualityCheckerBlock(CheckerBlock):
                 }
                 render();
                 return {
-                    handle_check: function(result) {
+                    handleCheck: function(result) {
                         $("span.mydata", element)
                               .data("correct", result ? "True" : "False")
                               .data("attempted", "True");

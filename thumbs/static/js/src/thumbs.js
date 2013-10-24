@@ -1,22 +1,26 @@
 function ThumbsBlock(runtime, element) {
-    function update_votes(votes) {
+    function updateVotes(votes) {
         $('.upvote .count', element).text(votes.up);
         $('.downvote .count', element).text(votes.down);
     }
 
-    var handler_url = runtime.handler_url('vote');
+    var handlerUrl = runtime.handlerUrl('vote');
 
     $('.upvote', element).click(function(eventObject) {
-        $.ajax({type: "POST",
-                url: handler_url,
-                data: JSON.stringify({vote_type: 'up'}),
-                success: update_votes});
+        $.ajax({
+            type: "POST",
+            url: handlerUrl,
+            data: JSON.stringify({voteType: 'up'}),
+            success: updateVotes
+        });
     });
 
     $('.downvote', element).click(function(eventObject) {
-        $.ajax({type: "POST",
-                url: handler_url,
-                data: JSON.stringify({vote_type: 'down'}),
-                success: update_votes});
+        $.ajax({
+            type: "POST",
+            url: handlerUrl,
+            data: JSON.stringify({voteType: 'down'}),
+            success: updateVotes
+        });
     });
 };

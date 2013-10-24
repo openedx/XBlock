@@ -63,11 +63,11 @@ class ThumbsBlock(InputBlock):
         #         log.error("cheater!")
         #         return
 
-        if data['vote_type'] not in ('up', 'down'):
+        if data['voteType'] not in ('up', 'down'):
             log.error('error!')
             return
 
-        if data['vote_type'] == 'up':
+        if data['voteType'] == 'up':
             self.upvotes += 1
         else:
             self.downvotes += 1
