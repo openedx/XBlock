@@ -1,35 +1,54 @@
 // XBlock runtime implementation.
 
+
+var RuntimeProvider = (function() {
+
+  var getRuntime = function(version) {
+    if (! this.versions.hasOwnProperty(version)) {
+      throw 'Unsupported XBlock version: ' + version;
+    }
+    return this.versions[version];
+  };
+
+  var versions = {
+    1: {
+      handlerUrl: function(block, handlerName) {
+        var usage = $(block).data('usage');
+        return "/handler/" + usage + "/" + handlerName + "/?student=" + studentId;
+      },
+      children: function(block) {
+        return $(block).prop('xblock_children');
+      },
+      childMap: function(block, childName) {
+        var children = this.children(block);
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          if (child.name == childName) {
+            return child
+          }
+        }
+      }
+    }
+  };
+
+  return {
+    getRuntime: getRuntime,
+    versions: versions
+  };
+}());
+
+
 var XBlock = (function () {
 
-    // Constructors for a runtime object provided to an XBlock init function.
-    // Indexed by version number.  Only 1 right now.
-    var runtimeConstructors = {
-        1: function (element, children) {
-            var childMap = {}
-            $.each(children, function(idx, child) {
-                childMap[child.name] = child
-            });
-            return {
-                handlerUrl: function(handlerName) {
-                    var usage = $(element).data('usage');
-                    return "/handler/" + usage + "/" + handlerName + "/?student=" + studentId;
-                },
-                children: children,
-                childMap: childMap
-            };
-        }
-    };
-
     var initializeBlock = function (element) {
-        var children = initializeBlocks($(element));
+        $(element).prop('xblock_children', initializeBlocks($(element)));
 
         var version = $(element).data('runtime-version');
         if (version === undefined) {
             return null;
         }
 
-        var runtime = runtimeConstructors[version](element, children);
+        var runtime = RuntimeProvider.getRuntime(version);
         var initFn = window[$(element).data('init')];
         var jsBlock = initFn(runtime, element) || {};
         jsBlock.element = element;

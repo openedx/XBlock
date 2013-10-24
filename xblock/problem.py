@@ -119,10 +119,10 @@ class ProblemBlock(XBlock):
 
                 function handleCheckResults(results) {
                     $.each(results.submitResults || {}, function(input, result) {
-                        callIfExists(runtime.childMap[input], 'handleSubmit', result);
+                        callIfExists(runtime.childMap(element, input), 'handleSubmit', result);
                     });
                     $.each(results.checkResults || {}, function(checker, result) {
-                        callIfExists(runtime.childMap[checker], 'handleCheck', result);
+                        callIfExists(runtime.childMap(element, checker), 'handleCheck', result);
                     });
                 }
 
@@ -131,18 +131,19 @@ class ProblemBlock(XBlock):
                 // to the check handler.
                 $(element).find('.check').bind('click', function() {
                     var data = {};
-                    for (var i = 0; i < runtime.children.length; i++) {
-                        var child = runtime.children[i];
+                    var children = runtime.children(element);
+                    for (var i = 0; i < children.length; i++) {
+                        var child = children[i];
                         if (child.name !== undefined) {
                             data[child.name] = callIfExists(child, 'submit');
                         }
                     }
-                    var handlerUrl = runtime.handlerUrl('check')
+                    var handlerUrl = runtime.handlerUrl(element, 'check')
                     $.post(handlerUrl, JSON.stringify(data)).success(handleCheckResults);
                 });
 
                 $(element).find('.rerandomize').bind('click', function() {
-                    var handlerUrl = runtime.handlerUrl('rerandomize');
+                    var handlerUrl = runtime.handlerUrl(element, 'rerandomize');
                     $.post(handlerUrl, JSON.stringify({}));
                 });
             }

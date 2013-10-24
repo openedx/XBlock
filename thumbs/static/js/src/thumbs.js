@@ -4,7 +4,7 @@ function ThumbsBlock(runtime, element) {
         $('.downvote .count', element).text(votes.down);
     }
 
-    var handlerUrl = runtime.handlerUrl('vote');
+    var handlerUrl = runtime.handlerUrl(element, 'vote');
 
     $('.upvote', element).click(function(eventObject) {
         $.ajax({
