@@ -46,7 +46,7 @@ function Slider(runtime, element) {
     return new Slider(runtime, element);
   }
 
-  this.handler_url = runtime.handler_url('update');
+  this.handler_url = runtime.handler_url(element, 'update');
   this.input = $(element).children('input[type="range"]');
   this.output = $(element).children('span');
 
