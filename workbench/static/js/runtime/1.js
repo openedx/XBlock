@@ -7,7 +7,7 @@ var RuntimeProvider = (function() {
     if (! this.versions.hasOwnProperty(version)) {
       throw 'Unsupported XBlock version: ' + version;
     }
-    return this.versions[version]
+    return this.versions[version];
   };
 
   var versions = {
@@ -34,7 +34,7 @@ var RuntimeProvider = (function() {
   return {
     getRuntime: getRuntime,
     versions: versions
-  }
+  };
 }());
 
 
