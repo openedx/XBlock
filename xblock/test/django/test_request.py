@@ -3,7 +3,6 @@ Test the xblock.django.request module, which provides helper functionality for
 converting django requests to webob requests and webob responses to django
 responses.
 """
-import unittest
 
 from django.test.client import RequestFactory
 from nose.tools import assert_equals  # pylint: disable=no-name-in-module
@@ -18,7 +17,6 @@ class TestDjangoWebobRequest(object):
     def setUp(self):
         self.req_factory = RequestFactory()
 
-    @unittest.expectedFailure
     def test_post_already_read(self):
         # Check that POST already having been read from doesn't
         # prevent access to the POST of the webob object
