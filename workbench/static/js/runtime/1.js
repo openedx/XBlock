@@ -1,35 +1,42 @@
 // XBlock runtime implementation.
 
 
-var Runtime = (function() {
+var RuntimeProvider = (function() {
 
-  var handler_url = function(block, handler_name) {
-    $(block).assertSupportedXblockVersion();
-    var usage = $(block).data('usage');
-    return "/handler/" + usage + "/" + handler_name + "/?student=" + student_id;
-  };
+  var getRuntime = function(version) {
+    if (version != 1) {
+      throw 'Only version 1 XBlock supported.';
+    }
 
-  var children = function(block) {
-    $(block).assertSupportedXblockVersion();
-    return $(block).prop('xblock_children');
-  };
-
-  var child_map = function(block, child_name) {
-    $(block).assertSupportedXblockVersion();
-    var children = this.children(block);
-    for (var i = 0; i < children.length; i++) {
-      var child = children[i];
-      if (child.name == child_name) {
-        return child
-      }
+    var handler_url = function(block, handler_name) {
+      var usage = $(block).data('usage');
+      return "/handler/" + usage + "/" + handler_name + "/?student=" + student_id;
+    };
+  
+    var children = function(block) {
+      return $(block).prop('xblock_children');
+    };
+  
+    var child_map = function(block, child_name) {
+      var children = this.children(block);
+      for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        if (child.name == child_name) {
+          return child
+        }
+      };
+    };
+  
+    return {
+      handler_url: handler_url,
+      children: children,
+      child_map: child_map
     };
   };
 
   return {
-    handler_url: handler_url,
-    children: children,
-    child_map: child_map
-  };
+    getRuntime: getRuntime
+  }
 }());
 
 
@@ -43,8 +50,9 @@ var XBlock = (function () {
             return null;
         }
 
+        var runtime = RuntimeProvider.getRuntime(version);
         var init_fn = window[$(element).data('init')];
-        var js_block = init_fn(Runtime, element) || {};
+        var js_block = init_fn(runtime, element) || {};
         js_block.element = element;
         js_block.name = $(element).data('name');
         return js_block;
@@ -75,11 +83,6 @@ $(function() {
                 return $(element).immediateDescendents(selector).toArray();
             }
         });
-    };
-    $.fn.assertSupportedXblockVersion = function() {
-      if (this.data('runtime-version') != 1) {
-        throw 'Only version 1 XBlock supported.';
-      }
     };
 
     $('body').on('ajaxSend', function(elm, xhr, s) {
