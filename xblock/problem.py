@@ -426,18 +426,24 @@ class EqualityCheckerBlock(CheckerBlock):
         # own copy of underscore.js, we won't be able to uniquify them.
         # Perhaps runtimes can offer a palette of popular libraries so that
         # XBlocks can refer to them in XBlock-standard ways?
-        result.add_javascript_url("/static/js/vendor/underscore-min.js")
+        result.add_javascript_url(
+            self.runtime.resources_url("js/vendor/underscore-min.js"))
 
         # TODO: The image tag here needs a magic URL, not a hard-coded one.
         result.add_resource(u"""
             <script type="text/template" id="xblock-equality-template">
-                <% if (attempted !== "True") { %>
+                <% if (attempted !== "True") {{ %>
                     (Not attempted)
-                <% } else { %>
-                    <img src="/resource/workbench/images/<%= (correct === "True") ? "correct" : "incorrect" %>-icon.png">
-                <% } %>
+                <% }} else if (correct === "True") {{ %>
+                    <img src="{correct}">
+                <% }} else {{ %>
+                    <img src="{incorrect}">
+                <% }} %>
             </script>
-            """, "text/html")
+            """.format(
+                correct=self.runtime.resources_url('images/correct-icon.png'),
+                incorrect=self.runtime.resources_url('images/incorrect-icon.png')),
+            "text/html")
 
         result.add_javascript("""
             function EqualityCheckerBlock(runtime, element) {
