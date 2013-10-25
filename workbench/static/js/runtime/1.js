@@ -4,38 +4,36 @@
 var RuntimeProvider = (function() {
 
   var getRuntime = function(version) {
-    if (version != 1) {
-      throw 'Only version 1 XBlock supported.';
+    if (! this.versions.hasOwnProperty(version)) {
+      throw 'Unsupported XBlock version: ' + version;
     }
+    return this.versions[version]
+  };
 
-    var handler_url = function(block, handler_name) {
-      var usage = $(block).data('usage');
-      return "/handler/" + usage + "/" + handler_name + "/?student=" + student_id;
-    };
-  
-    var children = function(block) {
-      return $(block).prop('xblock_children');
-    };
-  
-    var child_map = function(block, child_name) {
-      var children = this.children(block);
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
-        if (child.name == child_name) {
-          return child
+  var versions = {
+    1: {
+      handler_url: function(block, handler_name) {
+        var usage = $(block).data('usage');
+        return "/handler/" + usage + "/" + handler_name + "/?student=" + student_id;
+      },
+      children: function(block) {
+        return $(block).prop('xblock_children');
+      },
+      child_map: function(block, child_name) {
+        var children = this.children(block);
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          if (child.name == child_name) {
+            return child
+          }
         }
-      };
-    };
-  
-    return {
-      handler_url: handler_url,
-      children: children,
-      child_map: child_map
-    };
+      }
+    }
   };
 
   return {
-    getRuntime: getRuntime
+    getRuntime: getRuntime,
+    versions: versions
   }
 }());
 
