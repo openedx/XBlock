@@ -59,14 +59,14 @@ class TestXBlock(TestXBlockNoFallback):
     """
     Test xblock class with fallbock methods
     """
-    def existing_handler(self, data):
+    def existing_handler(self, request, suffix=''):  # pylint: disable=unused-argument
         """ an existing handler to be used """
-        self.user_state = data
+        self.user_state = request
         return "I am the existing test handler"
 
-    def fallback_handler(self, handler_name, data):
+    def fallback_handler(self, handler_name, request, suffix=''):  # pylint: disable=unused-argument
         """ test fallback handler """
-        self.user_state = data
+        self.user_state = request
         if handler_name == 'test_fallback_handler':
             return "I have been handled"
 

@@ -52,7 +52,7 @@ class ThumbsBlock(InputBlock):
     problem_view = student_view
 
     @XBlock.json_handler
-    def vote(self, data):
+    def vote(self, data, suffix=''):  # pylint: disable=unused-argument
         """
         Update the vote count in response to a user action.
         """

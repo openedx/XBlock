@@ -758,4 +758,8 @@ def test_handle_shortcut():
     block = XBlock(runtime, field_data, scope_ids)
 
     block.handle('handler_name', request)
-    runtime.handle.assert_called_with(block, 'handler_name', request)
+    runtime.handle.assert_called_with(block, 'handler_name', request, '')
+
+    runtime.handle.reset_mock()
+    block.handle('handler_name', request, 'suffix')
+    runtime.handle.assert_called_with(block, 'handler_name', request, 'suffix')

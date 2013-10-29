@@ -83,10 +83,10 @@ class XBlock(Plugin):
 
         """
         @functools.wraps(func)
-        def wrapper(self, request):
+        def wrapper(self, request, suffix=''):
             """The wrapper function `json_handler` returns."""
             request_json = json.loads(request.body)
-            response_json = json.dumps(func(self, request_json))
+            response_json = json.dumps(func(self, request_json, suffix))
             return Response(response_json, content_type='application/json')
         return wrapper
 
@@ -155,9 +155,9 @@ class XBlock(Plugin):
         """Render `view` with this block's :class:`Runtime` and the supplied `context`"""
         return self.runtime.render(self, view, context)
 
-    def handle(self, handler_name, request):
+    def handle(self, handler_name, request, suffix=''):
         """Handle `request` with this block's :class:`Runtime`"""
-        return self.runtime.handle(self, handler_name, request)
+        return self.runtime.handle(self, handler_name, request, suffix)
 
     def save(self):
         """Save all dirty fields attached to this XBlock."""

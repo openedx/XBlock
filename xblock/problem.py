@@ -152,7 +152,7 @@ class ProblemBlock(XBlock):
         return result
 
     @XBlock.json_handler
-    def check(self, submissions, suffix=None):
+    def check(self, submissions, suffix=''):  # pylint: disable=unused-argument
         """
         Processess the `submissions` with each provided Checker.
 
@@ -212,7 +212,7 @@ class ProblemBlock(XBlock):
         }
 
     @XBlock.json_handler
-    def rerandomize(self, unused):
+    def rerandomize(self, unused, suffix=''):  # pylint: disable=unused-argument
         """Set a new random seed for the student."""
         self.set_student_seed()
         return {'status': 'ok'}

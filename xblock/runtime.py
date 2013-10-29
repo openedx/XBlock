@@ -401,7 +401,7 @@ class Runtime(object):
 
     # Handlers
 
-    def handle(self, block, handler_name, request):
+    def handle(self, block, handler_name, request, suffix=''):
         """
         Handles any calls to the specified `handler_name`.
 
@@ -410,16 +410,17 @@ class Runtime(object):
         :param handler_name: The name of the handler to call
         :param request: The request to handle
         :type request: webob.Request
+        :param suffix: The remainder of the url, after the handler url prefix, if available
         """
         handler = getattr(block, handler_name, None)
         if handler:
             # Cache results of the handler call for later saving
-            results = handler(request)
+            results = handler(request, suffix)
         else:
             fallback_handler = getattr(block, "fallback_handler", None)
             if fallback_handler:
                 # Cache results of the handler call for later saving
-                results = fallback_handler(handler_name, request)
+                results = fallback_handler(handler_name, request, suffix)
             else:
                 raise NoSuchHandlerError("Couldn't find handler %r for %r" % (handler_name, block))
 
@@ -427,15 +428,20 @@ class Runtime(object):
         block.save()
         return results
 
-    def handler_url(self, block, url):
+    def handler_url(self, block, handler_name, suffix='', query=''):
         """Get the actual URL to invoke a handler.
 
-        `url` is the abstract URL to your handler.  It should start with the
-        name you used to register your handler.
+        `handler_name` is the name of your handler function. Any additional
+        portion of the url will be passed as the `suffix` argument to the handler.
 
         The return value is a complete absolute URL that will route through the
         runtime to your handler.
 
+        :param block: The block to generate the url for
+        :param handler_name: The handler on that block that the url should resolve to
+        :param suffix: Any path suffix that should be added to the handler url
+        :param query: Any query string that should be added to the handler url
+            (which should not include an initial ? or &)
         """
         raise NotImplementedError("Runtime needs to provide handler_url()")
 
