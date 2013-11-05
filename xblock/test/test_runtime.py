@@ -54,21 +54,29 @@ class TestXBlockNoFallback(XBlock):
     agg_def = String(scope=Scope(UserScope.ALL, BlockScope.DEFINITION), default='ad')
     agg_usage = String(scope=Scope.user_state_summary, default='au')
 
+    def handler_without_correct_decoration(self, request, suffix=''):
+        """a handler which is missing the @XBlock.handler decoration."""
+        pass
+
 
 class TestXBlock(TestXBlockNoFallback):
     """
     Test xblock class with fallbock methods
     """
+    @XBlock.handler
     def existing_handler(self, request, suffix=''):  # pylint: disable=unused-argument
         """ an existing handler to be used """
         self.user_state = request
         return "I am the existing test handler"
 
+    @XBlock.handler
     def fallback_handler(self, handler_name, request, suffix=''):  # pylint: disable=unused-argument
         """ test fallback handler """
         self.user_state = request
         if handler_name == 'test_fallback_handler':
             return "I have been handled"
+        if handler_name == 'handler_without_correct_decoration':
+            return "gone to fallback"
 
     def student_view(self, context):
         """ an existing view to be used """
@@ -202,11 +210,23 @@ def test_runtime_handle():
                   'I have been handled')
     assert_equals(tester.user_state, new_update_string)
 
+    # request to use a handler which doesn't have XBlock.handler decoration
+    # should use the fallback
+    new_update_string = "new update"
+    assert_equals(runtime.handle(tester, 'handler_without_correct_decoration', new_update_string),
+                  'gone to fallback')
+    assert_equals(tester.user_state, new_update_string)
+
     # handler can't be found & no fallback handler supplied, should throw an exception
     tester = TestXBlockNoFallback(Mock(), db_model, Mock())
     ultimate_string = "ultimate update"
     with assert_raises(NoSuchHandlerError):
         runtime.handle(tester, 'test_nonexistant_fallback_handler', ultimate_string)
+
+    # request to use a handler which doesn't have XBlock.handler decoration
+    # and no fallback should raise NoSuchHandlerError
+    with assert_raises(NoSuchHandlerError):
+        runtime.handle(tester, 'handler_without_correct_decoration', 'handled')
 
 
 def test_runtime_render():
