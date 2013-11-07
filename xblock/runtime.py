@@ -413,12 +413,12 @@ class Runtime(object):
         :param suffix: The remainder of the url, after the handler url prefix, if available
         """
         handler = getattr(block, handler_name, None)
-        if handler:
+        if handler and getattr(handler, '_is_xblock_handler', False):
             # Cache results of the handler call for later saving
             results = handler(request, suffix)
         else:
             fallback_handler = getattr(block, "fallback_handler", None)
-            if fallback_handler:
+            if fallback_handler and getattr(fallback_handler, '_is_xblock_handler', False):
                 # Cache results of the handler call for later saving
                 results = fallback_handler(handler_name, request, suffix)
             else:

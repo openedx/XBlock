@@ -82,6 +82,7 @@ class XBlock(Plugin):
         will be JSON-encoded and returned as the response.
 
         """
+        @XBlock.handler
         @functools.wraps(func)
         def wrapper(self, request, suffix=''):
             """The wrapper function `json_handler` returns."""
@@ -89,6 +90,11 @@ class XBlock(Plugin):
             response_json = json.dumps(func(self, request_json, suffix))
             return Response(response_json, content_type='application/json')
         return wrapper
+
+    @classmethod
+    def handler(cls, func):
+        func._is_xblock_handler = True
+        return func
 
     @classmethod
     def tag(cls, tags):
