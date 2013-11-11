@@ -20,7 +20,9 @@ class AcidBlock(XBlock):
         return data.decode("utf8")
 
     def student_view(self, context=None):               # pylint: disable=W0613
-        frag = Fragment(self.resource_string("static/html/acid.html"))
+        template = self.resource_string("static/html/acid.html")
+        handler_url = self.runtime.handler_url(self, "handler1")
+        frag = Fragment(template.format(handler_url=handler_url))
         frag.add_javascript(self.resource_string("static/js/src/acid.js"))
         frag.initialize_js('AcidBlock')
         return frag
