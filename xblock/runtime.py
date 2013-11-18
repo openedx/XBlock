@@ -350,7 +350,7 @@ class Runtime(object):
             if view_fn is None:
                 view_fn = getattr(block, "fallback_view", None)
                 if view_fn is None:
-                    raise NoSuchViewError()
+                    raise NoSuchViewError(block, view_name)
                 view_fn = functools.partial(view_fn, view_name)
 
             frag = view_fn(context)
