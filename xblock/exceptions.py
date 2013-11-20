@@ -50,7 +50,16 @@ class NoSuchViewError(Exception):
     """
     Raised to indicate that the view requested was not found.
     """
-    pass
+    def __init__(self, block, view_name):
+        """
+        Create a new NoSuchViewError
+
+        :param block: The XBlock without a view
+        :param view_name: The name of the view that couldn't be found
+        """
+        # Can't use super because Exception is an old-style class
+        Exception.__init__(self, "Unable to find view {!r} on block {!r}".format(view_name, block))
+
 
 
 class NoSuchHandlerError(Exception):

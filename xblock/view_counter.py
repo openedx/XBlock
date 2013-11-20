@@ -10,7 +10,7 @@ class ViewCounter(XBlock):
     """
     views = Integer(help="the number of times this block has been viewed",
                     default=0,
-                    scope=Scope.content)
+                    scope=Scope.user_state_summary)
 
     def student_view(self, context):  # pylint: disable=W0613
         """
