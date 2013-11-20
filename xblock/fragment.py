@@ -25,7 +25,9 @@ class Fragment(object):
 
     """
     def __init__(self, content=None):
+        #: The html content for this Fragment
         self.content = u""
+
         self.resources = []
         self.js_init_fn = None
         self.js_init_version = None

@@ -3,9 +3,18 @@ Module for all xblock exception classes
 """
 
 
+class XBlockNotFoundError(Exception):
+    """
+    Raised to indicate that an XBlock could not be found with the requested usage_id
+    """
+    def __init__(self, usage_id):
+        # Exception is an old-style class, so can't use super
+        Exception.__init__(self, "Unable to load an xblock for usage_id {!r}".format(usage_id))
+
+
 class XBlockSaveError(Exception):
     """
-    Raised to indicated an error in saving an XBlock
+    Raised to indicate an error in saving an XBlock
     """
     def __init__(self, saved_fields, dirty_fields):
         """

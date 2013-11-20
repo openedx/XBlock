@@ -19,6 +19,11 @@ from xblock.test.tools import (
 )
 
 
+class TestRuntime(Runtime):
+    def get_block(self, usage_id):
+        raise Exception("We shouldn't be retreiving blocks from the test runtime")
+
+
 class TestMixin(object):
     """
     Set up namespaces for each scope to use.
@@ -120,7 +125,7 @@ def test_db_model_keys():
     # and that the keys have been constructed correctly
     key_store = DictKeyValueStore()
     db_model = DbModel(key_store)
-    runtime = Runtime(Mock(), db_model, [TestMixin])
+    runtime = TestRuntime(Mock(), db_model, [TestMixin])
     tester = runtime.construct_xblock_from_class(TestXBlock, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
 
     assert_false(db_model.has(tester, 'not a field'))
@@ -179,6 +184,9 @@ class MockRuntimeForQuerying(Runtime):
 
     def query(self, block):
         return self.mock_query
+
+    def get_block(self, usage_id):
+        raise Exception("No blocks should be loaded w/ this runtime")
 
 
 def test_querypath_parsing():
@@ -327,7 +335,7 @@ def test_mixin_field_access():
         'field_a': 5,
         'field_x': [1, 2, 3],
     })
-    runtime = Runtime(Mock(), field_data, [TestSimpleMixin])
+    runtime = TestRuntime(Mock(), field_data, [TestSimpleMixin])
 
     field_tester = runtime.construct_xblock_from_class(FieldTester, Mock())
 
