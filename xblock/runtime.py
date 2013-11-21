@@ -283,6 +283,21 @@ class Runtime(object):
         """
         raise NotImplementedError("Runtime needs to provide resources_url()")
 
+    @abstractmethod
+    def local_resource_url(self, block, uri):
+        """Get the URL to load a static resource from an XBlock.
+
+        `block` is the XBlock that owns the resource.
+
+        `uri` is a relative URI to the resource. The XBlock class's
+             get_local_resource(uri) method should be able to open the resource
+             identified by this uri.
+
+        The return value is a complete absolute URL which will locate the
+        resource on your runtime.
+        """
+        raise NotImplementedError("Runtime needs to provide resources_url()")
+
     # Construction
 
     def __init__(self, usage_store, field_data, mixins=()):

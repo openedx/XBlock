@@ -31,7 +31,9 @@ A rough sequence diagram::
 """
 
 import inspect
+import pkg_resources
 import random
+import re
 import string  # pylint: disable=W0402
 import time
 
@@ -431,8 +433,10 @@ class EqualityCheckerBlock(CheckerBlock):
 
         # TODO: The image tag here needs a magic URL, not a hard-coded one.
         format_data = {
-            'correct': self.runtime.resources_url('images/correct-icon.png'),
-            'incorrect': self.runtime.resources_url('images/incorrect-icon.png'),
+            'correct': self.runtime.local_resource_url(
+                self, 'public/images/correct-icon.png'),
+            'incorrect': self.runtime.local_resource_url(
+                self, 'public/images/incorrect-icon.png'),
         }
         result.add_resource(u"""
             <script type="text/template" id="xblock-equality-template">

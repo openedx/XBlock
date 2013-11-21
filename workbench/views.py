@@ -13,6 +13,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 
 from .runtime import WorkbenchRuntime, WORKBENCH_KVS
@@ -116,7 +117,7 @@ def handler(request, usage_id, handler_slug, suffix='', authenticated=True):
     return webob_to_django_response(result)
 
 
-def package_resource(_request, package, resource):
+def package_resource(_request, block_type, resource):
     """
     Wrapper for `pkg_resources` that tries to access a resource and, if it
     is not found, raises an Http404 error.
@@ -124,8 +125,9 @@ def package_resource(_request, package, resource):
     if ".." in resource:
         raise Http404
     try:
-        content = pkg_resources.resource_string(package, "static/" + resource)
-    except IOError:
+        xblock_class = XBlock.load_class(block_type)
+        content = xblock_class.open_local_resource(resource)
+    except Exception:  # pylint: disable-msg=broad-except
         raise Http404
     mimetype, _ = mimetypes.guess_type(resource)
     return HttpResponse(content, mimetype=mimetype)

@@ -27,7 +27,11 @@ urlpatterns = patterns(
         'handler', {'authenticated': False},
         name='unauth_handler'
     ),
-    url(r'^resource/(?P<package>[^/]+)/(?P<resource>.*)$', 'package_resource', name='package_resource'),
+    url(
+        r'^resource/(?P<block_type>[^/]+)/(?P<resource>.*)$',
+        'package_resource',
+        name='package_resource'
+    ),
 )
 
 urlpatterns += staticfiles_urlpatterns()
