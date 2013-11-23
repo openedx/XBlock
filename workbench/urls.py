@@ -3,9 +3,6 @@
 from django.conf.urls import patterns, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-# This import is here simply to get this file imported explicitly.
-# If it fails to import later, it's inside the url resolver, and we
-# don't see the actual errors.
 from workbench.scenarios import init_scenarios
 
 
