@@ -3,10 +3,13 @@
 import functools
 import json
 
+from webob import Response
+
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 
-from xblock.test.tools import assert_equals, assert_in, assert_raises, assert_true
+from xblock.test.tools import assert_equals, assert_in, assert_true
+from xblock.test.tools import assert_raises, assert_raises_regexp
 
 from xblock.core import XBlock, String, Scope
 from xblock.fragment import Fragment
@@ -145,6 +148,108 @@ def test_xblock_invalid_handler_url():
     handler_url = "/handler/obviously/a/fake/handler"
     result = client.post(handler_url, '{}', 'text/json')
     assert_equals(result.status_code, 404)
+
+
+class XBlockWithHandlers(XBlock):
+    """A XBlock with one json handler."""
+
+    def student_view(self, context=None):               # pylint: disable=W0613
+        """Returned content has handler urls."""
+        all_args = [
+            # Arguments for handler_url
+            ("send_it_back",),
+            ("send_it_back", "with_some_suffix"),
+            ("send_it_back", "", "a=123"),
+            ("send_it_back", "", "a=123&b=456&c=789"),
+            ("send_it_back", "another_suffix", "a=123&b=456&c=789"),
+            ("send_it_back_public",),
+            ("send_it_back_public", "with_some_suffix"),
+            ("send_it_back_public", "", "a=123"),
+            ("send_it_back_public", "", "a=123&b=456&c=789"),
+            ("send_it_back_public", "another_suffix", "a=123&b=456&c=789"),
+        ]
+        urls = []
+        for args in all_args:
+            urls.append(self.runtime.handler_url(self, *args))
+        encoded = json.dumps(urls)
+        return Fragment(u":::" + encoded + u":::")
+
+    def try_bad_handler_urls(self, context=None):       # pylint: disable=W0613
+        """Force some assertions for the wrong kinds of handlers."""
+        # A completely non-existing function name.
+        with assert_raises_regexp(ValueError, "function name"):
+            self.runtime.handler_url(self, "this_doesnt_exist")
+
+        # An existing function, but it isn't a handler.
+        with assert_raises_regexp(ValueError, "handler name"):
+            self.runtime.handler_url(self, "try_bad_handler_urls")
+
+        return Fragment(u"Everything is Fine!")
+
+    @XBlock.handler
+    def send_it_back(self, request, suffix=''):
+        """Just return the data we got."""
+        assert_equals(self.scope_ids.user_id, "student_1")
+        response_json = json.dumps({
+            'suffix': suffix,
+            'a': request.GET.get('a', "no-a"),
+            'b': request.GET.get('b', "no-b"),
+        })
+        return Response(response_json, content_type='application/json')
+
+    @XBlock.handler
+    @XBlock.unauthenticated
+    def send_it_back_public(self, request, suffix=''):
+        """Just return the data we got."""
+        assert_equals(self.scope_ids.user_id, "none")
+        response_json = json.dumps({
+            'suffix': suffix,
+            'a': request.GET.get('a', "no-a"),
+            'b': request.GET.get('b', "no-b"),
+        })
+        return Response(response_json, content_type='application/json')
+
+
+@temp_scenario(XBlockWithHandlers, 'with-handlers')
+def test_xblock_with_handlers():
+    # Tests of handler urls.
+    client = Client()
+
+    # The view sends a list of URLs to try.
+    response = client.get("/view/with-handlers/")
+    parsed = response.content.split(':::')
+    assert_equals(len(parsed), 3)
+    urls = json.loads(parsed[1])
+
+    # These have to correspond to the urls in XBlockWithHandlers.student_view above.
+    expecteds = [
+        {'suffix': '', 'a': 'no-a', 'b': 'no-b'},
+        {'suffix': 'with_some_suffix', 'a': 'no-a', 'b': 'no-b'},
+        {'suffix': '', 'a': '123', 'b': 'no-b'},
+        {'suffix': '', 'a': '123', 'b': '456'},
+        {'suffix': 'another_suffix', 'a': '123', 'b': '456'},
+        {'suffix': '', 'a': 'no-a', 'b': 'no-b'},
+        {'suffix': 'with_some_suffix', 'a': 'no-a', 'b': 'no-b'},
+        {'suffix': '', 'a': '123', 'b': 'no-b'},
+        {'suffix': '', 'a': '123', 'b': '456'},
+        {'suffix': 'another_suffix', 'a': '123', 'b': '456'},
+    ]
+
+    for url, expected in zip(urls, expecteds):
+        print url   # so we can see which one failed, if any.
+        response = client.get(url)
+        assert_equals(response.status_code, 200)
+        actual = json.loads(response.content)
+        assert_equals(actual, expected)
+
+
+@temp_scenario(XBlockWithHandlers, 'with-handlers')
+def test_bad_handler_urls():
+    client = Client()
+
+    response = client.get("/view/with-handlers/try_bad_handler_urls/")
+    assert_equals(response.status_code, 200)
+    assert_in("Everything is Fine!", response.content)
 
 
 class XBlockWithoutStudentView(XBlock):

@@ -19,8 +19,13 @@ urlpatterns = patterns(
 
     url(
         r'^handler/(?P<usage_id>[^/]+)/(?P<handler_slug>[^/]*)(?:/(?P<suffix>.*))?$',
-        'handler',
+        'handler', {'authenticated': True},
         name='handler'
+    ),
+    url(
+        r'^unauth_handler/(?P<usage_id>[^/]+)/(?P<handler_slug>[^/]*)(?:/(?P<suffix>.*))?$',
+        'handler', {'authenticated': False},
+        name='unauth_handler'
     ),
     url(r'^resource/(?P<package>[^/]+)/(?P<resource>.*)$', 'package_resource', name='package_resource'),
 )

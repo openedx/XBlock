@@ -201,13 +201,29 @@ class WorkbenchRuntime(Runtime):
         return wrapped
 
     def handler_url(self, block, handler_name, suffix='', query=''):
-        return "/handler/{usage}/{handler}/{suffix}?student={student}&{query}".format(
-            student=block.scope_ids.user_id,
+        # Be sure this really is a handler.
+        func = getattr(block, handler_name, None)
+        if not func:
+            raise ValueError("{!r} is not a function name".format(handler_name))
+        if not getattr(func, "_is_xblock_handler", False):
+            raise ValueError("{!r} is not a handler name".format(handler_name))
+
+        authenticated = not getattr(func, "_is_unauthenticated", False)
+
+        url = "/{base}/{usage}/{handler}/{suffix}".format(
+            base="handler" if authenticated else "unauth_handler",
             usage=block.scope_ids.usage_id,
             handler=handler_name,
             suffix=suffix,
-            query=query,
         )
+        has_query = False
+        if authenticated:
+            url += "?student={student}".format(student=block.scope_ids.user_id)
+            has_query = True
+        if query:
+            url += "&" if has_query else "?"
+            url += query
+        return url
 
     def resources_url(self, resource):
         return "/static/" + resource

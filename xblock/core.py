@@ -98,6 +98,17 @@ class XBlock(Plugin):
         return func
 
     @classmethod
+    def unauthenticated(cls, func):
+        """A decorator to indicate a handler gets unauthenticated requests.
+
+        The handler itself may be responsible for authentication, or may be
+        available to anonymous users.
+
+        """
+        func._is_unauthenticated = True     # pylint: disable=protected-access
+        return func
+
+    @classmethod
     def tag(cls, tags):
         """Returns a function that adds the words in `tags` as class tags to this class."""
         def dec(cls):

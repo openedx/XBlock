@@ -92,10 +92,15 @@ def show_scenario(request, scenario_id, view_name='student_view', template='bloc
     })
 
 
-def handler(request, usage_id, handler_slug, suffix=''):
-    """Provide a handler for the request."""
-    student_id = get_student_id(request)
-    log.info("Start handler %s/%s for student %s", usage_id, handler_slug, student_id)
+def handler(request, usage_id, handler_slug, suffix='', authenticated=True):
+    """The view function for authenticated handler requests."""
+    if authenticated:
+        student_id = get_student_id(request)
+        log.info("Start handler %s/%s for student %s", usage_id, handler_slug, student_id)
+    else:
+        student_id = "none"
+        log.info("Start handler %s/%s", usage_id, handler_slug)
+
     runtime = WorkbenchRuntime(student_id)
 
     try:
