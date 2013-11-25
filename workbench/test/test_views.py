@@ -170,7 +170,8 @@ class XBlockWithHandlers(XBlock):
         ]
         urls = []
         for args in all_args:
-            urls.append(self.runtime.handler_url(self, *args))
+            thirdparty = (args[0] == "send_it_back_public")
+            urls.append(self.runtime.handler_url(self, *args, thirdparty=thirdparty))
         encoded = json.dumps(urls)
         return Fragment(u":::" + encoded + u":::")
 
@@ -198,7 +199,6 @@ class XBlockWithHandlers(XBlock):
         return Response(response_json, content_type='application/json')
 
     @XBlock.handler
-    @XBlock.unauthenticated
     def send_it_back_public(self, request, suffix=''):
         """Just return the data we got."""
         assert_equals(self.scope_ids.user_id, "none")

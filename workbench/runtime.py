@@ -200,7 +200,7 @@ class WorkbenchRuntime(Runtime):
         wrapped.add_frag_resources(frag)
         return wrapped
 
-    def handler_url(self, block, handler_name, suffix='', query=''):
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         # Be sure this really is a handler.
         func = getattr(block, handler_name, None)
         if not func:
@@ -208,16 +208,14 @@ class WorkbenchRuntime(Runtime):
         if not getattr(func, "_is_xblock_handler", False):
             raise ValueError("{!r} is not a handler name".format(handler_name))
 
-        authenticated = not getattr(func, "_is_unauthenticated", False)
-
         url = "/{base}/{usage}/{handler}/{suffix}".format(
-            base="handler" if authenticated else "unauth_handler",
+            base="unauth_handler" if thirdparty else "handler",
             usage=block.scope_ids.usage_id,
             handler=handler_name,
             suffix=suffix,
         )
         has_query = False
-        if authenticated:
+        if not thirdparty:
             url += "?student={student}".format(student=block.scope_ids.user_id)
             has_query = True
         if query:
