@@ -250,7 +250,7 @@ class Runtime(object):
         """
         raise XBlockNotFoundError(usage_id)
 
-    def handler_url(self, block, handler_name, suffix='', query=''):
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         """Get the actual URL to invoke a handler.
 
         `handler_name` is the name of your handler function. Any additional
@@ -264,6 +264,9 @@ class Runtime(object):
         :param suffix: Any path suffix that should be added to the handler url
         :param query: Any query string that should be added to the handler url
             (which should not include an initial ? or &)
+        :param thirdparty: If true, create a URL that can be used without the
+            user being logged in.  This is useful for URLs to be used by third-party
+            services.
         """
         raise NotImplementedError("Runtime needs to provide handler_url()")
 
@@ -476,7 +479,6 @@ class Runtime(object):
         # Write out dirty fields
         block.save()
         return results
-
 
     # Querying
 
