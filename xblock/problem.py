@@ -430,6 +430,10 @@ class EqualityCheckerBlock(CheckerBlock):
             self.runtime.resources_url("js/vendor/underscore-min.js"))
 
         # TODO: The image tag here needs a magic URL, not a hard-coded one.
+        format_data = {
+            'correct': self.runtime.resources_url('images/correct-icon.png'),
+            'incorrect': self.runtime.resources_url('images/incorrect-icon.png'),
+        }
         result.add_resource(u"""
             <script type="text/template" id="xblock-equality-template">
                 <% if (attempted !== "True") {{ %>
@@ -440,9 +444,7 @@ class EqualityCheckerBlock(CheckerBlock):
                     <img src="{incorrect}">
                 <% }} %>
             </script>
-            """.format(
-                correct=self.runtime.resources_url('images/correct-icon.png'),
-                incorrect=self.runtime.resources_url('images/incorrect-icon.png')),
+            """.format(**format_data),
             "text/html")
 
         result.add_javascript("""
