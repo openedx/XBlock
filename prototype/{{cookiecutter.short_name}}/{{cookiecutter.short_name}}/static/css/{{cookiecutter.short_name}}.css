@@ -1,0 +1,9 @@
+/* CSS for {{cookiecutter.class_name}} */
+
+.{{cookiecutter.short_name}}_block .count {
+    font-weight: bold;
+}
+
+.{{cookiecutter.short_name}}_block p {
+    cursor: pointer;
+}

@@ -20,6 +20,9 @@ diff-cover >= 0.2.1
 # For docs
 sphinx
 
+# For generating new XBlocks
+cookiecutter
+
 # Our own XBlocks
 -e .
 -e workbench

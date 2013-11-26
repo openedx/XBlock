@@ -179,6 +179,11 @@ Making an XBlock can be as simple as creating a Python class with a few
 specific methods.  The ``thumbs`` module demonstrates an XBlock with state,
 views, and input handling.
 
+We provide a script to create a new XBlock project to help you get started.
+Run script/startnew.py in a directory where you want to create your XBlock
+project.  startnew.py will prompt you for the name of the XBlock, and will
+create a minimal working XBlock, ready for you to begin development.
+
 You can provide scenarios for the workbench to display, see the thumbs.py
 sample for an example, or the xblock/problem.py file.  The scenarios are
 written in a simple XML language.  Note this is not an XML format we are
@@ -186,6 +191,7 @@ proposing as a standard.
 
 Once you install your XBlock into your virtualenv, the workbench will
 automatically display its scenarios for you to experiment with.
+
 
 License
 -------
@@ -195,6 +201,7 @@ otherwise noted.
 
 Please see ``LICENSE.txt`` for details.
 
+
 How to Contribute
 -----------------
 
@@ -202,10 +209,12 @@ Contributions are very welcome. The easiest way is to fork this repo, and then
 make a pull request from your fork. The first time you make a pull request, you
 may be asked to sign a Contributor Agreement.
 
+
 Reporting Security Issues
 -------------------------
 
 Please do not report security issues in public. Please email security@edx.org
+
 
 Mailing List and IRC Channel
 ----------------------------
