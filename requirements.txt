@@ -24,3 +24,4 @@ sphinx
 -e .
 -e workbench
 -e thumbs
+-e acid

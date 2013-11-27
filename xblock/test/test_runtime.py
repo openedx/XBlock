@@ -165,12 +165,30 @@ def test_db_model_keys():
     assert_equals('new mixin_user_state', get_key_value(Scope.user_state, 's0', 'u0', 'mixin_user_state'))
     assert_equals('new mixin_preferences', get_key_value(Scope.preferences, 's0', 'TestXBlock', 'mixin_preferences'))
     assert_equals('new mixin_user_info', get_key_value(Scope.user_info, 's0', None, 'mixin_user_info'))
-    assert_equals('new mixin_by_type', get_key_value(Scope(UserScope.NONE, BlockScope.TYPE), None, 'TestXBlock', 'mixin_by_type'))
-    assert_equals('new mixin_for_all', get_key_value(Scope(UserScope.NONE, BlockScope.ALL), None, None, 'mixin_for_all'))
-    assert_equals('new mixin_user_def', get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', 'd0', 'mixin_user_def'))
-    assert_equals('new mixin_agg_global', get_key_value(Scope(UserScope.ALL, BlockScope.ALL), None, None, 'mixin_agg_global'))
-    assert_equals('new mixin_agg_type', get_key_value(Scope(UserScope.ALL, BlockScope.TYPE), None, 'TestXBlock', 'mixin_agg_type'))
-    assert_equals('new mixin_agg_def', get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, 'd0', 'mixin_agg_def'))
+    assert_equals(
+        'new mixin_by_type',
+        get_key_value(Scope(UserScope.NONE, BlockScope.TYPE), None, 'TestXBlock', 'mixin_by_type')
+    )
+    assert_equals(
+        'new mixin_for_all',
+        get_key_value(Scope(UserScope.NONE, BlockScope.ALL), None, None, 'mixin_for_all')
+    )
+    assert_equals(
+        'new mixin_user_def',
+        get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', 'd0', 'mixin_user_def')
+    )
+    assert_equals(
+        'new mixin_agg_global',
+        get_key_value(Scope(UserScope.ALL, BlockScope.ALL), None, None, 'mixin_agg_global')
+    )
+    assert_equals(
+        'new mixin_agg_type',
+        get_key_value(Scope(UserScope.ALL, BlockScope.TYPE), None, 'TestXBlock', 'mixin_agg_type')
+    )
+    assert_equals(
+        'new mixin_agg_def',
+        get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, 'd0', 'mixin_agg_def')
+    )
     assert_equals('new mixin_agg_usage', get_key_value(Scope.user_state_summary, None, 'u0', 'mixin_agg_usage'))
 
 
