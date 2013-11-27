@@ -6,53 +6,62 @@ import functools
 import re
 import threading
 
+from abc import ABCMeta, abstractmethod
 from lxml import etree
 from cStringIO import StringIO
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
-from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
+from xblock.exceptions import NoSuchViewError, NoSuchHandlerError, XBlockNotFoundError
 from xblock.core import XBlock
 
 
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
 
+    __metaclass__ = ABCMeta
+
     # Keys are structured to retain information about the scope of the data.
     # Stores can use this information however they like to store and retrieve
     # data.
     Key = namedtuple("Key", "scope, user_id, block_scope_id, field_name")
 
+    @abstractmethod
     def get(self, key):
-        """Abstract get method. Implementations should return the value of the given `key`."""
+        """Reads the value of the given `key` from storage."""
         pass
 
+    @abstractmethod
     def set(self, key, value):
-        """Abstract set method. Implementations should set `key` equal to `value`."""
+        """Sets `key` equal to `value` in storage."""
         pass
 
+    @abstractmethod
     def delete(self, key):
-        """Abstract delete method. Implementations should remove the `key`."""
+        """Deletes `key` from storage."""
         pass
 
+    @abstractmethod
     def has(self, key):
-        """Abstract has method. Implementations should return Boolean, whether or not `key` is present."""
+        """Returns whether or not `key` is present in storage."""
         pass
 
     def default(self, key):
         """
-        Abstract default method. Implementations should return the context relevant default of the given `key`
+        Returns the context relevant default of the given `key`
         or raise KeyError which will result in the field's global default.
         """
         raise KeyError(repr(key))
 
     def set_many(self, update_dict):
         """
-        Bulk update of the kvs.
-        This implementation brute force updates field by field through set which may be inefficient
+        For each (`key, value`) in `update_dict`, set `key` to `value` in storage.
+
+        The default implementation brute force updates field by field through set which may be inefficient
         for any runtimes doing persistence operations on each set. Such implementations will want to
         override this method.
+
         :update_dict: field_name, field_value pairs for all cached changes
         """
         for key, value in update_dict.iteritems():
@@ -185,7 +194,9 @@ class DbModel(FieldData):
 
 class UsageStore(object):
     """An abstract object that stores usages and definitions."""
+    __metaclass__ = ABCMeta
 
+    @abstractmethod
     def create_usage(self, def_id):
         """Make a usage, storing its definition id.
 
@@ -194,6 +205,7 @@ class UsageStore(object):
         """
         pass
 
+    @abstractmethod
     def get_definition_id(self, usage_id):
         """Get a usage.
 
@@ -202,6 +214,7 @@ class UsageStore(object):
         """
         pass
 
+    @abstractmethod
     def create_definition(self, block_type):
         """Make a definition, storing its block type.
 
@@ -210,6 +223,7 @@ class UsageStore(object):
         """
         pass
 
+    @abstractmethod
     def get_block_type(self, def_id):
         """Get a definition.
 
@@ -224,11 +238,53 @@ class Runtime(object):
     Access to the runtime environment for XBlocks.
     """
 
+    __metaclass__ = ABCMeta
+
+    # Abstract methods
+
+    @abstractmethod
+    def get_block(self, usage_id):
+        """Get a block by usage id.
+
+        Returns the block identified by `usage_id`, or raises an exception.
+        """
+        raise XBlockNotFoundError(usage_id)
+
+    def handler_url(self, block, handler_name, suffix='', query=''):
+        """Get the actual URL to invoke a handler.
+
+        `handler_name` is the name of your handler function. Any additional
+        portion of the url will be passed as the `suffix` argument to the handler.
+
+        The return value is a complete absolute URL that will route through the
+        runtime to your handler.
+
+        :param block: The block to generate the url for
+        :param handler_name: The handler on that block that the url should resolve to
+        :param suffix: Any path suffix that should be added to the handler url
+        :param query: Any query string that should be added to the handler url
+            (which should not include an initial ? or &)
+        """
+        raise NotImplementedError("Runtime needs to provide handler_url()")
+
+    def resources_url(self, resource):
+        """Get the URL for a static resorce file.
+
+        `resource` is the application local path to the resource.
+
+        The return value is a complete absolute URL that will locate the
+        resource on your runtime.
+
+        """
+        raise NotImplementedError("Runtime needs to provide resources_url()")
+
+    # Construction
+
     def __init__(self, usage_store, field_data, mixins=()):
         """
         :param mixins: Classes that should be mixed in with every :class:`~xblock.core.XBlock`
             created by this `Runtime`
-        :type mixins: `tuple` of `class`es
+        :type mixins: `tuple` of `class` es
         """
         self._view_name = None
         self.mixologist = Mixologist(mixins)
@@ -261,13 +317,6 @@ class Runtime(object):
             scope_ids=scope_ids,
             *args, **kwargs
         )
-
-    def get_block(self, usage_id):
-        """Get a block by usage id.
-
-        Returns the block identified by `usage_id`, or raises an exception.
-        """
-        raise NotImplementedError("Runtime needs to provide get_block()")
 
     # Parsing XML
 
@@ -428,33 +477,6 @@ class Runtime(object):
         block.save()
         return results
 
-    def handler_url(self, block, handler_name, suffix='', query=''):
-        """Get the actual URL to invoke a handler.
-
-        `handler_name` is the name of your handler function. Any additional
-        portion of the url will be passed as the `suffix` argument to the handler.
-
-        The return value is a complete absolute URL that will route through the
-        runtime to your handler.
-
-        :param block: The block to generate the url for
-        :param handler_name: The handler on that block that the url should resolve to
-        :param suffix: Any path suffix that should be added to the handler url
-        :param query: Any query string that should be added to the handler url
-            (which should not include an initial ? or &)
-        """
-        raise NotImplementedError("Runtime needs to provide handler_url()")
-
-    def resources_url(self, resource):
-        """Get the URL for a static resorce file.
-
-        `resource` is the application local path to the resource.
-
-        The return value is a complete absolute URL that will locate the
-        resource on your runtime.
-
-        """
-        raise NotImplementedError("Runtime needs to provide resources_url()")
 
     # Querying
 
@@ -465,7 +487,7 @@ class Runtime(object):
         retrieving information.
 
         """
-        raise NotImplementedError("Runtime needs to provide query()")
+        raise NotImplementedError("Querying is an experimental feature")
 
     def querypath(self, block, path):
         """An XPath-like interface to `query`."""

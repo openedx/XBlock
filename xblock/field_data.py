@@ -6,7 +6,10 @@ simple.
 """
 
 import copy
+
+from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+
 from xblock.exceptions import InvalidScopeError
 
 
@@ -14,6 +17,10 @@ class FieldData(object):
     """
     An interface allowing access to an XBlock's field values indexed by field names.
     """
+
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def get(self, block, name):
         """
         Retrieve the value for the field named `name` for the XBlock `block`.
@@ -29,6 +36,7 @@ class FieldData(object):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def set(self, block, name, value):
         """
         Set the value of the field named `name` for XBlock `block`.
@@ -43,6 +51,7 @@ class FieldData(object):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def delete(self, block, name):
         """
         Reset the value of the field named `name` to the default for XBlock `block`.
@@ -54,6 +63,7 @@ class FieldData(object):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def has(self, block, name):
         """
         Return whether or not the field named `name` has a non-default value for the XBlock `block`.
