@@ -73,10 +73,10 @@ class AcidBlock(XBlock):
         return [
             ("XBlock Acid test",
              """\
-                <vertical>
+                <vertical_demo>
                     <acid/>
                     <acid/>
                     <acid/>
-                </vertical>
+                </vertical_demo>
              """)
         ]

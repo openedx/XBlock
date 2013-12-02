@@ -31,12 +31,12 @@ def test_all_scenarios():
     # We should have at least one scenario with a vertical tag, since we use
     # empty verticals as our canary in the coal mine that something has gone
     # horribly wrong with loading the scenarios.
-    assert any("<vertical>" in xml for xml in scenarios)
+    assert any("<vertical_demo>" in xml for xml in scenarios)
 
     # Since we are claiming in try_scenario that no vertical is empty, let's
     # eliminate the possibility that a scenario has an actual empty vertical.
-    assert all("<vertical></vertical>" not in xml for xml in scenarios)
-    assert all("<vertical/>" not in xml for xml in scenarios)
+    assert all("<vertical_demo></vertical_demo>" not in xml for xml in scenarios)
+    assert all("<vertical_demo/>" not in xml for xml in scenarios)
 
 
 def try_scenario(url, name):

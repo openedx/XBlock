@@ -82,10 +82,10 @@ class ThumbsBlock(InputBlock):
         return [
             ("three thumbs at once",
              """\
-                <vertical>
+                <vertical_demo>
                     <thumbs/>
                     <thumbs/>
                     <thumbs/>
-                </vertical>
+                </vertical_demo>
              """)
         ]

@@ -223,78 +223,78 @@ class ProblemBlock(XBlock):
         return [
             ("problem with thumbs and textbox",
              """\
-                <problem>
-                    <html>
+                <problem_demo>
+                    <html_demo>
                         <p>You have three constraints to satisfy:</p>
                         <ol>
                             <li>The upvotes and downvotes must be equal.</li>
                             <li>You must enter the number of upvotes into the text field.</li>
                             <li>The number of upvotes must be $numvotes.</li>
                         </ol>
-                    </html>
+                    </html_demo>
 
                     <thumbs name='thumb'/>
-                    <textinput name='vote_count' input_type='int'/>
+                    <textinput_demo name='vote_count' input_type='int'/>
 
                     <script>
                         # Compute the random answer.
                         import random
                         numvotes = random.randrange(2,5)
                     </script>
-                    <equality name='votes_equal' left='./thumb/@upvotes' right='./thumb/@downvotes'>
+                    <equality_demo name='votes_equal' left='./thumb/@upvotes' right='./thumb/@downvotes'>
                         Upvotes match downvotes
-                    </equality>
-                    <equality name='votes_named' left='./thumb/@upvotes' right='./vote_count/@student_input'>
+                    </equality_demo>
+                    <equality_demo name='votes_named' left='./thumb/@upvotes' right='./vote_count/@student_input'>
                         Number of upvotes matches entered string
-                    </equality>
-                    <equality name='votes_specified' left='./thumb/@upvotes' right='$numvotes'>
+                    </equality_demo>
+                    <equality_demo name='votes_specified' left='./thumb/@upvotes' right='$numvotes'>
                         Number of upvotes is $numvotes
-                    </equality>
-                </problem>
+                    </equality_demo>
+                </problem_demo>
              """),
 
             ("three problems 2",
              """
-                <vertical>
-                    <attempts_scoreboard/>
-                    <problem>
-                        <html><p>What is $a+$b?</p></html>
-                        <textinput name="sum_input" input_type="int" />
-                        <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
+                <vertical_demo>
+                    <attempts_scoreboard_demo/>
+                    <problem_demo>
+                        <html_demo><p>What is $a+$b?</p></html_demo>
+                        <textinput_demo name="sum_input" input_type="int" />
+                        <equality_demo name="sum_checker" left="./sum_input/@student_input" right="$c" />
                         <script>
                             import random
                             a = random.randint(2, 5)
                             b = random.randint(1, 4)
                             c = a + b
                         </script>
-                    </problem>
+                    </problem_demo>
 
-                    <sidebar>
-                        <problem>
-                            <html><p>What is $a &#215; $b?</p></html>
-                            <textinput name="sum_input" input_type="int" />
-                            <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
+                    <sidebar_demo>
+                        <problem_demo>
+                            <html_demo><p>What is $a &#215; $b?</p></html_demo>
+                            <textinput_demo name="sum_input" input_type="int" />
+                            <equality_demo name="sum_checker" left="./sum_input/@student_input" right="$c" />
                             <script>
                                 import random
                                 a = random.randint(2, 6)
                                 b = random.randint(3, 7)
                                 c = a * b
                             </script>
-                        </problem>
-                    </sidebar>
+                        </problem_demo>
+                    </sidebar_demo>
 
-                    <problem>
-                        <html><p>What is $a+$b?</p></html>
-                        <textinput name="sum_input" input_type="int" />
-                        <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
+                    <problem_demo>
+                        <html_demo><p>What is $a+$b?</p></html_demo>
+                        <textinput_demo name="sum_input" input_type="int" />
+                        <equality_demo name="sum_checker" left="./sum_input/@student_input" right="$c" />
                         <script>
                             import random
                             a = random.randint(3, 5)
                             b = random.randint(2, 6)
                             c = a + b
                         </script>
-                    </problem>
-                </vertical>
+                    </problem_demo>
+                </vertical_demo>
              """),
         ]
 

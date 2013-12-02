@@ -173,11 +173,11 @@ class HtmlInOutTest(XmlTest, unittest.TestCase):
         # This test is fiddly about where the whitespace goes in the xml...
         the_xml = """\
             <?xml version='1.0' encoding='UTF8'?>
-            <html><p>Hello there.</p>
+            <html_demo><p>Hello there.</p>
                 <p>This is HTML!</p>
                 <p>ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!</p>
                 <p>1 &lt; 2 &amp; 4 &gt; 3</p>
-            </html>
+            </html_demo>
             """.strip()
         block = self.parse_xml_to_block(the_xml)
         new_xml = self.export_xml_for_block(block)
@@ -186,11 +186,11 @@ class HtmlInOutTest(XmlTest, unittest.TestCase):
 
     def test_text_content(self):
         tests = [
-            "<html>Hello, world!</html>",
-            "<html>Hello, <b>world!</b></html>",
-            "<html><b>Hello</b>, world!</html>",
-            "<html><b>Hello</b>, <b>world!</b></html>",
-            "<html><b>Hello</b>, <b>world!</b> &amp; goodbye.</html>",
+            "<html_demo>Hello, world!</html_demo>",
+            "<html_demo>Hello, <b>world!</b></html_demo>",
+            "<html_demo><b>Hello</b>, world!</html_demo>",
+            "<html_demo><b>Hello</b>, <b>world!</b></html_demo>",
+            "<html_demo><b>Hello</b>, <b>world!</b> &amp; goodbye.</html_demo>",
         ]
 
         for test in tests:
@@ -201,8 +201,8 @@ class HtmlInOutTest(XmlTest, unittest.TestCase):
 
     def test_text_is_unicode(self):
         tests = [
-            "<html>Hello, world</html>",
-            "<html>ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!</html>",
+            "<html_demo>Hello, world</html_demo>",
+            "<html_demo>ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!</html_demo>",
         ]
 
         for test in tests:
