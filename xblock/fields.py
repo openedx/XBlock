@@ -8,6 +8,7 @@ storage mechanism is.
 import copy
 from collections import namedtuple
 
+
 class BlockScope(object):
     """Enumeration defining BlockScopes"""
     USAGE, DEFINITION, TYPE, ALL = xrange(4)

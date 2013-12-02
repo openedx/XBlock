@@ -70,7 +70,6 @@ class NoSuchViewError(Exception):
         Exception.__init__(self, "Unable to find view {!r} on block {!r}".format(view_name, block))
 
 
-
 class NoSuchHandlerError(Exception):
     """
     Raised to indicate that the requested handler was not found.

@@ -1,0 +1,1 @@
+from .thumbs import ThumbsBlock
