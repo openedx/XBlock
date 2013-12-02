@@ -3,9 +3,6 @@
 from django.conf.urls import patterns, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-# This import is here simply to get this file imported explicitly.
-# If it fails to import later, it's inside the url resolver, and we
-# don't see the actual errors.
 from workbench.scenarios import init_scenarios
 
 
@@ -22,8 +19,13 @@ urlpatterns = patterns(
 
     url(
         r'^handler/(?P<usage_id>[^/]+)/(?P<handler_slug>[^/]*)(?:/(?P<suffix>.*))?$',
-        'handler',
+        'handler', {'authenticated': True},
         name='handler'
+    ),
+    url(
+        r'^unauth_handler/(?P<usage_id>[^/]+)/(?P<handler_slug>[^/]*)(?:/(?P<suffix>.*))?$',
+        'handler', {'authenticated': False},
+        name='unauth_handler'
     ),
     url(r'^resource/(?P<package>[^/]+)/(?P<resource>.*)$', 'package_resource', name='package_resource'),
 )

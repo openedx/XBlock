@@ -93,7 +93,8 @@ class XBlock(Plugin):
 
     @classmethod
     def handler(cls, func):
-        func._is_xblock_handler = True
+        """A decorator to indicate a function is usable as a handler."""
+        func._is_xblock_handler = True      # pylint: disable=protected-access
         return func
 
     @classmethod
