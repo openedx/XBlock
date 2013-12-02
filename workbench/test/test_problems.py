@@ -13,22 +13,22 @@ class ProblemInteractionTest(SeleniumTest):
         super(ProblemInteractionTest, self).setUp()
 
         one_problem = """
-            <problem>
-                <html><p class="the_numbers">$a $b</p></html>
-                <textinput name="sum_input" input_type="int" />
-                <equality name="sum_checker" left="./sum_input/@student_input" right="$c" />
+            <problem_demo>
+                <html_demo><p class="the_numbers">$a $b</p></html_demo>
+                <textinput_demo name="sum_input" input_type="int" />
+                <equality_demo name="sum_checker" left="./sum_input/@student_input" right="$c" />
                 <script>
                     import random
                     a = random.randint(1, 1000000)
                     b = random.randint(1, 1000000)
                     c = a + b
                 </script>
-            </problem>
+            </problem_demo>
             """
         self.num_problems = 3
         scenarios.add_xml_scenario(
             "test_many_problems", "Many problems",
-            "<vertical>" + one_problem * self.num_problems + "</vertical>"
+            "<vertical_demo>" + one_problem * self.num_problems + "</vertical_demo>"
         )
         self.addCleanup(scenarios.remove_scenario, "test_many_problems")
 
@@ -44,7 +44,7 @@ class ProblemInteractionTest(SeleniumTest):
         # They should be all different.
         self.assertEqual(len(set(num_pairs)), self.num_problems)
 
-        text_ctrls_xpath = '//div[@data-block-type="textinput"][@data-name="sum_input"]/input'
+        text_ctrls_xpath = '//div[@data-block-type="textinput_demo"][@data-name="sum_input"]/input'
         text_ctrls = self.browser.find_elements_by_xpath(text_ctrls_xpath)
         check_btns = self.browser.find_elements_by_css_selector('input.check')
         right_wrongs = self.browser.find_elements_by_css_selector('span.indicator')

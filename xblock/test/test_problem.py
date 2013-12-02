@@ -26,16 +26,16 @@ def text_of_response(response):
 def test_problem_submission():
     runtime = WorkbenchRuntime()
     problem_usage_id = runtime.parse_xml_string("""
-        <problem>
-            <textinput name='vote_count' input_type='int'/>
+        <problem_demo>
+            <textinput_demo name='vote_count' input_type='int'/>
 
             <script>
                 numvotes = 4
             </script>
-            <equality name='votes_named' left='./vote_count/@student_input' right='$numvotes'>
+            <equality_demo name='votes_named' left='./vote_count/@student_input' right='$numvotes'>
                 Number of upvotes matches entered string
-            </equality>
-        </problem>
+            </equality_demo>
+        </problem_demo>
     """)
     problem = runtime.get_block(problem_usage_id)
     json_data = json.dumps({"vote_count": [{"name": "input", "value": "4"}]})

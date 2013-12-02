@@ -54,7 +54,7 @@ class HtmlBlock(XBlock):
         We parse our HTML content, and graft those nodes onto `node`.
 
         """
-        xml = "<html>" + self.content + "</html>"
+        xml = "<html_demo>" + self.content + "</html_demo>"
         html_node = etree.fromstring(xml)
 
         node.tag = html_node.tag
@@ -65,9 +65,9 @@ class HtmlBlock(XBlock):
     @staticmethod
     def workbench_scenarios():
         return [
-            ("A litte HTML", """
-                <vertical>
-                <html>
+            ("A little HTML", """
+                <vertical_demo>
+                <html_demo>
                 <h2>Gettysburg Address</h2>
 
                 <p>Four score and seven years ago our fathers brought forth on
@@ -98,7 +98,7 @@ class HtmlBlock(XBlock):
                 under God, shall have a new birth of freedom &#8212; and that
                 government of the people, by the people, for the people, shall not
                 perish from the earth.</p>
-                </html>
-                </vertical>
+                </html_demo>
+                </vertical_demo>
              """),
         ]

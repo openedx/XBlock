@@ -12,7 +12,7 @@ class ThreeThumbsTest(SeleniumTest):
 
         scenarios.add_xml_scenario(
             "test_three_thumbs", "three thumbs test",
-            """<vertical><thumbs/><thumbs/><thumbs/></vertical>"""
+            """<vertical_demo><thumbs/><thumbs/><thumbs/></vertical_demo>"""
         )
         self.addCleanup(scenarios.remove_scenario, "test_three_thumbs")
 
