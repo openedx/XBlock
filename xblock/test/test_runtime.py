@@ -21,7 +21,13 @@ from xblock.test.tools import (
 
 class TestRuntime(Runtime):
     def get_block(self, usage_id):
-        raise Exception("We shouldn't be retreiving blocks from the test runtime")
+        raise Exception("Not Used By Tests")
+
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
+        raise Exception("Not Used By Tests")
+
+    def resources_url(self, resource):
+        raise Exception("Not Used By Tests")
 
 
 class TestMixin(object):
@@ -204,7 +210,13 @@ class MockRuntimeForQuerying(Runtime):
         return self.mock_query
 
     def get_block(self, usage_id):
-        raise Exception("No blocks should be loaded w/ this runtime")
+        raise Exception("Not Used By Tests")
+
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
+        raise Exception("Not Used By Tests")
+
+    def resources_url(self, resource):
+        raise Exception("Not Used By Tests")
 
 
 def test_querypath_parsing():

@@ -250,6 +250,7 @@ class Runtime(object):
         """
         raise XBlockNotFoundError(usage_id)
 
+    @abstractmethod
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         """Get the actual URL to invoke a handler.
 
@@ -270,6 +271,7 @@ class Runtime(object):
         """
         raise NotImplementedError("Runtime needs to provide handler_url()")
 
+    @abstractmethod
     def resources_url(self, resource):
         """Get the URL for a static resorce file.
 
