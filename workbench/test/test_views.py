@@ -267,3 +267,15 @@ def test_xblock_no_student_view():
     client = Client()
     response = client.get("/view/xblockwithoutstudentview/")
     assert_true('No such view' in response.content)
+
+def test_local_resources():
+    client = Client()
+
+    # The Equality block has local resources
+    result = client.get('/resource/equality_demo/public/images/correct-icon.png')
+    assert_equals(result.status_code, 200)
+    assert_equals(result['Content-Type'], 'image/png')
+
+    # The Equality block defends against malicious resource URIs
+    result = client.get('/resource/equality_demo/core.py')
+    assert_equals(result.status_code, 404)

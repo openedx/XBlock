@@ -29,6 +29,9 @@ class TestRuntime(Runtime):
     def resources_url(self, resource):
         raise Exception("Not Used By Tests")
 
+    def local_resource_url(self, block, uri):
+        raise Exception("Not Used By Tests")
+
 
 class TestMixin(object):
     """
@@ -216,6 +219,9 @@ class MockRuntimeForQuerying(Runtime):
         raise Exception("Not Used By Tests")
 
     def resources_url(self, resource):
+        raise Exception("Not Used By Tests")
+
+    def local_resource_url(self, block, uri):
         raise Exception("Not Used By Tests")
 
 
