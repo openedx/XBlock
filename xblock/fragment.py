@@ -6,7 +6,8 @@ This code is in the Runtime layer.
 
 from collections import namedtuple
 
-_FragmentResource = namedtuple("_FragmentResource", "kind, data, mimetype, placement")  # pylint: disable=C0103
+
+FragmentResource = namedtuple("FragmentResource", "kind, data, mimetype, placement")  # pylint: disable=C0103
 
 
 class Fragment(object):
@@ -28,17 +29,30 @@ class Fragment(object):
         #: The html content for this Fragment
         self.content = u""
 
-        self.resources = []
+        self._resources = []
         self.js_init_fn = None
         self.js_init_version = None
 
         if content is not None:
             self.add_content(content)
 
-    def to_pods(self):
-        """Returns the data in a dictionary.
+    @property
+    def resources(self):
+        """
+        Returns list of unique `FragmentResource`s by order of first appearance.
+        """
+        seen = set()
+        # seen.add always returns None, so 'not seen.add(x)' is always True,
+        # but will only be called if the value is not already in seen (because
+        # 'and' short-circuits)
+        return [x for x in self._resources if x not in seen and not seen.add(x)]
 
-        'pods' = Plain Old Data Structure."""
+    def to_pods(self):
+        """
+        Returns the data in a dictionary.
+
+        'pods' = Plain Old Data Structure.
+        """
         return {
             'content': self.content,
             'resources': [r._asdict() for r in self.resources],  # pylint: disable=W0212
@@ -57,7 +71,7 @@ class Fragment(object):
         """
         frag = cls()
         frag.content = pods['content']
-        frag.resources = [_FragmentResource(**d) for d in pods['resources']]
+        frag.resources = [FragmentResource(**d) for d in pods['resources']]
         frag.js_init_fn = pods['js_init_fn']
         frag.js_init_version = pods['js_init_version']
         return frag
@@ -101,8 +115,8 @@ class Fragment(object):
         """
         if not placement:
             placement = self._default_placement(mimetype)
-        res = _FragmentResource('text', text, mimetype, placement)
-        self.resources.append(res)
+        res = FragmentResource('text', text, mimetype, placement)
+        self._resources.append(res)
 
     def add_resource_url(self, url, mimetype, placement=None):
         """Add a resource by URL needed by this Fragment.
@@ -118,7 +132,7 @@ class Fragment(object):
         """
         if not placement:
             placement = self._default_placement(mimetype)
-        self.resources.append(_FragmentResource('url', url, mimetype, placement))
+        self._resources.append(FragmentResource('url', url, mimetype, placement))
 
     def add_css(self, text):
         """Add literal CSS to the Fragment."""
@@ -148,7 +162,7 @@ class Fragment(object):
         together the content into this Fragment's content.
 
         """
-        self.resources.extend(frag.resources)
+        self._resources.extend(frag.resources)
 
     def add_frags_resources(self, frags):
         """Add all the resources from `frags` to my resources.
@@ -197,7 +211,7 @@ class Fragment(object):
         of the page.
 
         """
-        return self._resource_html("head")
+        return self.resources_to_html("head")
 
     def foot_html(self):
         """Get the foot HTML for this Fragment.
@@ -206,9 +220,9 @@ class Fragment(object):
         ``<body>`` section of the page.
 
         """
-        return self._resource_html("foot")
+        return self.resources_to_html("foot")
 
-    def _resource_html(self, placement):
+    def resources_to_html(self, placement):
         """Get some resource HTML for this Fragment.
 
         `placement` is "head" or "foot".
@@ -216,38 +230,36 @@ class Fragment(object):
         Returns a unicode string, the HTML for the head or foot of the page.
 
         """
-        # The list of HTML to return
-        html = []
-        # The set of all data we've already seen, so no dups.
-        seen = set()
-
         # TODO: [rocha] aggregate and wrap css and javascript.
         # - non url js could be wrapped in an anonymous function
         # - non url css could be rewritten to match the wrapper tag
 
-        for kind, data, mimetype, place in self.resources:
-            # Only take the pieces for our placement.
-            if place != placement:
-                continue
-            # De-dup the data.
-            if data in seen:
-                continue
-            seen.add(data)
-            # Different things get different tags.
-            if mimetype == "text/css":
-                if kind == "text":
-                    html.append(u"<style type='text/css'>\n%s\n</style>" % data)
-                elif kind == "url":
-                    html.append(u"<link rel='stylesheet' href='%s' type='text/css'>" % data)
-            elif mimetype == "application/javascript":
-                if kind == "text":
-                    html.append(u"<script>\n%s\n</script>" % data)
-                elif kind == "url":
-                    html.append(u"<script src='%s' type='application/javascript'></script>" % data)
-            elif mimetype == "text/html":
-                assert kind == "text"
-                html.append(data)
-            else:
-                raise Exception("Never heard of mimetype %r" % mimetype)
+        return '\n'.join(
+            self.resource_to_html(resource)
+            for resource in self.resources
+            if resource.placement == placement
+        )
 
-        return u"\n".join(html)
+    @staticmethod
+    def resource_to_html(resource):
+        """
+        Returns `resource` wrapped in the appropriate html tag for it's mimetype.
+        """
+        if resource.mimetype == "text/css":
+            if resource.kind == "text":
+                return (u"<style type='text/css'>\n%s\n</style>" % resource.data)
+            elif resource.kind == "url":
+                return (u"<link rel='stylesheet' href='%s' type='text/css'>" % resource.data)
+
+        elif resource.mimetype == "application/javascript":
+            if resource.kind == "text":
+                return (u"<script>\n%s\n</script>" % resource.data)
+            elif resource.kind == "url":
+                return (u"<script src='%s' type='application/javascript'></script>" % resource.data)
+
+        elif resource.mimetype == "text/html":
+            assert resource.kind == "text"
+            return resource.data
+
+        else:
+            raise Exception("Never heard of mimetype %r" % resource.mimetype)
