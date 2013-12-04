@@ -10,7 +10,7 @@ import unittest
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
-from xblock.fields import Any, Boolean, Dict, Field, Float, Integer, List, String
+from xblock.fields import Any, Boolean, Dict, Field, Float, Integer, List, String, Reference, ReferenceList
 
 from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
 
@@ -178,6 +178,48 @@ class ListTest(FieldTest):
     Tests the List Field.
     """
     field_totest = List
+
+    def test_json_equals(self):
+        self.assertJSONEquals([], [])
+        self.assertJSONEquals(['foo', 'bar'], ['foo', 'bar'])
+        self.assertJSONEquals([1, 3.4], [1, 3.4])
+
+    def test_none(self):
+        self.assertJSONEquals(None, None)
+
+    def test_error(self):
+        self.assertJSONTypeError('abc')
+        self.assertJSONTypeError('')
+        self.assertJSONTypeError('1.23')
+        self.assertJSONTypeError('true')
+        self.assertJSONTypeError(3.7)
+        self.assertJSONTypeError(True)
+        self.assertJSONTypeError({})
+
+
+class ReferenceTest(FieldTest):
+    """
+    Tests the Reference Field.
+    """
+    field_totest = Reference
+
+    def test_json_equals(self):
+        self.assertJSONEquals({'id': 'bar', 'usage': 'baz'}, {'id': 'bar', 'usage': 'baz'})
+        self.assertJSONEquals("i4x://myu/mycourse/problem/myproblem", "i4x://myu/mycourse/problem/myproblem")
+        self.assertJSONEquals('', '')
+        self.assertJSONEquals(3.2, 3.2)
+        self.assertJSONEquals(False, False)
+        self.assertJSONEquals([3, 4], [3, 4])
+
+    def test_none(self):
+        self.assertJSONEquals(None, None)
+
+
+class ReferenceListTest(FieldTest):
+    """
+    Tests the ReferenceList Field.
+    """
+    field_totest = ReferenceList
 
     def test_json_equals(self):
         self.assertJSONEquals([], [])
