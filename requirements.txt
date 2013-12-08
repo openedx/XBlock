@@ -19,6 +19,7 @@ diff-cover >= 0.2.1
 
 # For docs
 sphinx
+sphinxcontrib-napoleon
 
 # For generating new XBlocks
 cookiecutter
