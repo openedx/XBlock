@@ -1,6 +1,6 @@
-======
-XBlock
-======
+=============================
+XBlock: courseware components
+=============================
 
 .. note::
 
@@ -24,7 +24,8 @@ ecosystem will make use of a number of web applications, all of which will need
 access to course content and data.  XBlocks provide the structure and APIs
 needed to build components for use in all of these applications.
 
-Contents:
+User's Guide
+------------
 
 .. toctree::
     :maxdepth: 2
@@ -34,12 +35,11 @@ Contents:
     guide/runtimes
     guide/fragment
 
-
 API
-===
+---
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     :glob:
 
     api/*
@@ -60,6 +60,13 @@ API
         - Fragments
     - Existing XBlock types
 
+Project Info
+------------
+
+.. toctree::
+    :maxdepth: 1
+
+    changelog
 
 ..
     Indices and tables
