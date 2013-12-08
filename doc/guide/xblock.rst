@@ -15,11 +15,12 @@ techniques.  They have Python code, and other file resources, including CSS and
 Javascript needed to fully render themselves in a browser.
 
 
-State
------
+Fields
+------
 
-XBlock state (or data) is arbitrary JSON-able data.  XBlock state can be scoped
-on several axes:
+XBlock state (or data) is arbitrary JSON-able data stored in Python attributes
+called **fields**.  Fields declare their relationship to both blocks and users,
+by specifying their **scope**.
 
 * By User: State scoped by user is different for every user in the system.
 
