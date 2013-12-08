@@ -38,8 +38,8 @@ class Fragment(object):
 
     @property
     def resources(self):
-        """
-        Returns list of unique `FragmentResource`s by order of first appearance.
+        r"""
+        Returns list of unique `FragmentResource`\s by order of first appearance.
         """
         seen = set()
         # seen.add always returns None, so 'not seen.add(x)' is always True,

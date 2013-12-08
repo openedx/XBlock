@@ -314,9 +314,9 @@ class Runtime(object):
     # Block operations
 
     def construct_xblock(self, block_type, scope_ids, field_data=None, default_class=None, *args, **kwargs):
-        """
+        r"""
         Construct a new xblock of the type identified by block_type,
-        passing *args and **kwargs into __init__
+        passing \*args and \*\*kwargs into `__init__`.
         """
         block_class = XBlock.load_class(block_type, default_class)
         return self.construct_xblock_from_class(
