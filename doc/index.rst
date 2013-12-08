@@ -40,9 +40,12 @@ API
 
 .. toctree::
     :maxdepth: 2
-    :glob:
 
-    api/*
+    api/xblock
+    api/fields
+    api/runtime
+    api/fragment
+    api/exceptions
 
 ..
     Outline:
