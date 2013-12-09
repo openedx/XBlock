@@ -1,0 +1,5 @@
+# Packages we need in order to build the docs, separated out so that rtfd.org
+# can install them.
+
+sphinx
+sphinxcontrib-napoleon

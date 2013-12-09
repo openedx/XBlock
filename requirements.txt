@@ -18,8 +18,7 @@ pep8
 diff-cover >= 0.2.1
 
 # For docs
-sphinx
-sphinxcontrib-napoleon
+-r doc/requirements.txt
 
 # For generating new XBlocks
 cookiecutter
