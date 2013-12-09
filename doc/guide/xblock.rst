@@ -22,34 +22,47 @@ XBlock state (or data) is arbitrary JSON-able data stored in Python attributes
 called **fields**.  Fields declare their relationship to both blocks and users,
 by specifying their **scope**.
 
-* By User: State scoped by user is different for every user in the system.
+* By user: fields declare how they relate to the user:
 
-* By XBlock: State scoped by XBlock can be scoped by various aspects of the
-  XBlock:
+  * No user: the data is related to no users, for example, the content of the
+    course which is independent of any users.
 
-  * block usage - the instance of the XBlock in a particular course
+  * One user: the data is particular to a single user, such as an answer to a
+    problem.
 
-  * block definition - the definition of an XBlock created by a content
-    creator (potentially shared across runs of a course)
+  * All users: the data is an aggregate of all users.  An example is the total
+    number of students answering a question.
 
-  * block type - the Python type of the XBlock (shared across all instances
-    of the XBlock in all courses)
+* By XBlock: fields declare how they relate to the block:
 
-  * all - all XBlocks share the same data
+  * Block usage: the instance of the XBlock in a particular course.
 
-For example:
+  * Block definition: the definition of an XBlock created by a content
+    creator (potentially shared across runs of a course).
+
+  * Block type: the Python type of the XBlock (shared across all instances
+    of the XBlock in all courses).
+
+  * All: all XBlocks share the same data.
+
+These two aspects, user and block, are independent.  A field scope specifies
+both.  For example:
 
 * A user's progress through a particular set of problems would be stored in a
-  User=True, XBlock=Usage scope.
+  scope with User=One and XBlock=Usage.
 
-* The content to display in an XBlock would be stored in a User=False,
-  XBlock=Definition scope.
+* The content to display in an XBlock would be stored in a scope with
+  User=None and XBlock=Definition.
 
 * A user's preferences for a type of XBlock, such as the preferences for a
-  circuit editor, would be stored in a User=True, XBlock=Type scope.
+  circuit editor, would be stored in a scope with User=One and XBlock=Type.
 
 * Information about the user, such as language or timezone, would be stored in
-  a User=True, XBlock=All scope.
+  a scope with User=One and XBlock=All.
+
+For convenience, we also provide five predefined scopes: ``Scope.content``,
+``Scope.settings``, ``Scope.user_state``, ``Scope.preferences``, and
+``Scope.user_info``.
 
 XBlocks declare their data with a schema in the XBlock class definition.  The
 schema defines a series of properties, each of which has at least a name, a
@@ -58,10 +71,6 @@ type, and a scope::
     upvotes = Integer(help="Number of up votes", display_name="Up Votes", default=0, scope=Scope(user=False, module=DEFINITION))
     downvotes = Integer(help="Number of down votes", display_name="Down Votes", default=0, scope=Scope(user=False, module=DEFINITION))
     voted = Boolean(help="Whether a student has already voted", default=False, scope=Scope(user=True, module=USAGE))
-
-For convenience, we also provide five predefined scopes: ``Scope.content``,
-``Scope.settings``, ``Scope.user_state``, ``Scope.preferences``, and
-``Scope.user_info``.
 
 In XBlock code, state is accessed as attributes on self. In our example above,
 the data is available as ``self.upvotes``, ``self.downvotes``, and
