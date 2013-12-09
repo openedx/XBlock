@@ -12,7 +12,8 @@ def webob_to_django_response(webob_response):
     from django.http import HttpResponse
     django_response = HttpResponse(
         webob_response.app_iter,
-        content_type=webob_response.content_type
+        content_type=webob_response.content_type,
+        status=webob_response.status_code,
     )
     for name, value in webob_response.headerlist:
         django_response[name] = value
