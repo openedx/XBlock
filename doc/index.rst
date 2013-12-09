@@ -1,16 +1,15 @@
-=============================
-XBlock: courseware components
-=============================
+======================================
+XBlock: Open edX courseware components
+======================================
 
 .. note::
 
-    This is extremely preliminary documentation.  Please get in touch with us
+    This is still preliminary documentation.  Please get in touch with us
     if you have any questions or concerns. Do not make any plans based on this
     document without talking to us first.
 
-    The ideas here are our current best guess at how XBlocks will work, but
-    some parts are more settled than others.
-
+    edX is in the process of implementing XBlock support, and that effort
+    could produce changes to these documents.
 
 To create rich engaging online courses, course authors must be able to combine
 components from a variety of sources.  XBlock is edX's component architecture
@@ -47,21 +46,6 @@ API
     api/fragment
     api/exceptions
 
-..
-    Outline:
-
-    - Concepts
-        - Roles
-    - XBlock structure
-        - Python structure
-        - State
-        - Methods
-    - Getting started
-    - The XBlock Workbench
-    - Writing an XBlock
-        - Views
-        - Fragments
-    - Existing XBlock types
 
 Project Info
 ------------
