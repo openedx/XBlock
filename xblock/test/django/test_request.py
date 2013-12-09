@@ -5,7 +5,7 @@ responses.
 """
 
 from django.test.client import RequestFactory
-from unittest import TestCase, expectedFailure
+from unittest import TestCase
 from webob import Response
 
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -43,7 +43,6 @@ class TestDjangoWebobResponse(TestCase):
         """
         return webob_to_django_response(Response(*args, **kwargs))
 
-    @expectedFailure
     def test_status_code(self):
         self.assertEquals(self._as_django(status=200).status_code, 200)
         self.assertEquals(self._as_django(status=404).status_code, 404)
