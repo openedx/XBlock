@@ -26,13 +26,17 @@ needed to build components for use in all of these applications.
 Getting Started
 ---------------
 
+How to begin writing an XBlock.
+
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     getting_started
 
 User's Guide
 ------------
+
+The concepts of XBlock, in depth.
 
 .. toctree::
     :maxdepth: 2
@@ -44,6 +48,8 @@ User's Guide
 
 API
 ---
+
+Details of the XBlock APIs.
 
 .. toctree::
     :maxdepth: 2
@@ -57,6 +63,8 @@ API
 
 Project Info
 ------------
+
+Other information about the project.
 
 .. toctree::
     :maxdepth: 1
