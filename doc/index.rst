@@ -1,16 +1,15 @@
-======
-XBlock
-======
+======================================
+XBlock: Open edX courseware components
+======================================
 
 .. note::
 
-    This is extremely preliminary documentation.  Please get in touch with us
+    This is still preliminary documentation.  Please get in touch with us
     if you have any questions or concerns. Do not make any plans based on this
     document without talking to us first.
 
-    The ideas here are our current best guess at how XBlocks will work, but
-    some parts are more settled than others.
-
+    edX is in the process of implementing XBlock support, and that effort
+    could produce changes to these documents.
 
 To create rich engaging online courses, course authors must be able to combine
 components from a variety of sources.  XBlock is edX's component architecture
@@ -24,7 +23,20 @@ ecosystem will make use of a number of web applications, all of which will need
 access to course content and data.  XBlocks provide the structure and APIs
 needed to build components for use in all of these applications.
 
-Contents:
+Getting Started
+---------------
+
+How to begin writing an XBlock.
+
+.. toctree::
+    :maxdepth: 2
+
+    getting_started
+
+User's Guide
+------------
+
+The concepts of XBlock, in depth.
 
 .. toctree::
     :maxdepth: 2
@@ -34,32 +46,30 @@ Contents:
     guide/runtimes
     guide/fragment
 
-
 API
-===
+---
+
+Details of the XBlock APIs.
+
+.. toctree::
+    :maxdepth: 2
+
+    api/xblock
+    api/fields
+    api/runtime
+    api/fragment
+    api/exceptions
+
+
+Project Info
+------------
+
+Other information about the project.
 
 .. toctree::
     :maxdepth: 1
-    :glob:
 
-    api/*
-
-..
-    Outline:
-
-    - Concepts
-        - Roles
-    - XBlock structure
-        - Python structure
-        - State
-        - Methods
-    - Getting started
-    - The XBlock Workbench
-    - Writing an XBlock
-        - Views
-        - Fragments
-    - Existing XBlock types
-
+    changelog
 
 ..
     Indices and tables

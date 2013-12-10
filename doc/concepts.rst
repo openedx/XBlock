@@ -54,19 +54,21 @@ Runtime
 
 XBlocks do not run by themselves, they run within web applications such as
 Studio, or LMS, known as runtimes. Each runtime provides services to the
-XBlock, such as storage, URL mapping, and analytics.
+XBlock, such as storage, URL mapping, and analytics.  Runtimes should perform
+functions common to all blocks, leaving the XBlock developer to write code
+particular to their block.
 
 Runtimes will differ in the context they provide to XBlocks. For example, while
 editing content, Studio won't provide user state, because there is no
 interesting user state. Another runtime might provide user state, but as
 read-only data.
 
-Runtimes also differ in what views they make use of. Studio might use "edit" to
-edit the XBlock content, and "read" to preview that content, while the LMS
-might only use the "read" view to render the XBlock for students. Each runtime
-is free to define view names it will use for its purposes. XBlock Developers
-need to understand the runtimes they will be running in to write the proper
-views.
+Runtimes also differ in what views they make use of. Studio might use
+"author_view" to edit the XBlock content, and "student_view" to preview that
+content, while the LMS might only use the "student_view" view to render the
+XBlock for students. Each runtime is free to define view names it will use for
+its purposes. XBlock Developers need to understand the runtimes they will be
+running in to write the proper views.
 
 Runtimes are responsible for performing any authentication needed before
 executing a view or handler in an XBlock.

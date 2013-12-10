@@ -1,30 +1,67 @@
 """
-Fields are used to provide XBlocks with a storage mechanism that provides
-abstract notions of scopes (per-user vs global, across all blocks vs local to a particular
-block), while allowing the hosting Runtime Application to decide what the actual
-storage mechanism is.
+Fields declare storage for XBlock data.  They use abstract notions of
+**scopes** to associate each field with particular sets of blocks and users.
+The hosting runtime application decides what actual storage mechanism to use
+for each scope.
+
 """
 
 import copy
 from collections import namedtuple
 
 
+# __all__ controls what classes end up in the docs, and in what order.
+__all__ = [
+    'BlockScope', 'UserScope', 'Scope', 'ScopeIds',
+    'Field',
+    'Boolean', 'Dict', 'Float', 'Integer', 'List', 'String',
+    'XBlockMixin',
+]
+
+
 class BlockScope(object):
-    """Enumeration defining BlockScopes"""
+    """
+    Enumeration of block scopes.
+
+    The block scope specifies how a field relates to blocks.  A
+    :class:`.BlockScope` and a :class:`.UserScope` are combined to make a
+    :class:`.Scope` for a field.
+
+    USAGE: The data is related to a particular use of a block in a course.
+
+    DEFINITION: The data is related to the definition of the block.  Although
+        unusual, one block definition can be used in more than one place in a
+        course.
+
+    TYPE: The data is related to all instances of this type of XBlock.
+
+    ALL: The data is common to all blocks.  This can be useful for storing
+        information that is purely about the student.
+
+    """
     USAGE, DEFINITION, TYPE, ALL = xrange(4)
 
 
 class UserScope(object):
     """
-    Enumeration of valid UserScopes
+    Enumeration of user scopes.
 
-    NONE: This scope identifies data agnostic to the user of the xblock
-        For instance, the definition of a randomized problem
-    ONE: This scope identifies data supplied by a single user of the xblock
-        For instance, a students answer to a randomized problem
-    ALL: This scope identifies data aggregated while the block is used
-        by many users.
-        For instance, a histogram of the answers submitted by all students
+    The user scope specifies how a field relates to users.  A
+    :class:`.BlockScope` and a :class:`.UserScope` are combined to make a
+    :class:`.Scope` for a field.
+
+    NONE: Identifies data agnostic to the user of the :class:`.XBlock`.  The
+        data is related to no particular user.  All users see the same data.
+        For instance, the definition of a problem.
+
+    ONE: Identifies data particular to a single user of the :class:`.XBlock`.
+        For instance, a student's answer to a problem.
+
+    ALL: Identifies data aggregated while the block is used by many users.
+        The data is related to all the users.  For instance, a count of how
+        many students have answered a question, or a histogram of the answers
+        submitted by all students.
+
     """
     NONE, ONE, ALL = xrange(3)
 
@@ -52,7 +89,7 @@ ScopeBase = namedtuple('ScopeBase', 'user block')  # pylint: disable=C0103
 
 class Scope(ScopeBase):
     """
-    Defines six types of Scopes to be used: `content`, `settings`,
+    Defines six types of scopes to be used: `content`, `settings`,
     `user_state`, `preferences`, `user_info`, and `user_state_summary`.
 
     The `content` scope is used to save data for all users, for one particular
@@ -60,27 +97,29 @@ class Scope(ScopeBase):
     wishes to tabulate user "upvotes", or HTML content ti display literally on
     the page (this example being the reason this scope is named `content`).
 
-    The `settings` scope is used to save data for all users, for one particular block,
-    for one specific run of a course. This is like the `content` scope, but scoped to
-    one run of a course. An example might be a due date for a problem.
+    The `settings` scope is used to save data for all users, for one particular
+    block, for one specific run of a course. This is like the `content` scope,
+    but scoped to one run of a course. An example might be a due date for a
+    problem.
 
-    The `user_state` scope is used to save data for one user, for one block, for one run
-    of a course. An example might be how many points a user scored on one specific problem.
+    The `user_state` scope is used to save data for one user, for one block,
+    for one run of a course. An example might be how many points a user scored
+    on one specific problem.
 
-    The `preferences` scope is used to save data for one user, for all instances of one
-    specific TYPE of block, across the entire platform. An example might be that a user
-    can set their preferred default speed for the video player. This default would apply
-    to all instances of the video player, across the whole platform, but only for that student.
+    The `preferences` scope is used to save data for one user, for all
+    instances of one specific TYPE of block, across the entire platform. An
+    example might be that a user can set their preferred default speed for the
+    video player. This default would apply to all instances of the video
+    player, across the whole platform, but only for that student.
 
-    The `user_info` scope is used to save data for one user, across the entire platform. An
-    example might be a user's time zone or language preference.
+    The `user_info` scope is used to save data for one user, across the entire
+    platform. An example might be a user's time zone or language preference.
 
-    The `user_state_summary` scope is used to save data aggregated across many users of a
-    single block. For example, a block might store a histogram of the points scored by all
-    users attempting a problem.
+    The `user_state_summary` scope is used to save data aggregated across many
+    users of a single block. For example, a block might store a histogram of
+    the points scored by all users attempting a problem.
 
     """
-
     content = ScopeBase(user=UserScope.NONE, block=BlockScope.DEFINITION)
     settings = ScopeBase(user=UserScope.NONE, block=BlockScope.USAGE)
     user_state = ScopeBase(user=UserScope.ONE, block=BlockScope.USAGE)
@@ -114,19 +153,23 @@ class Field(object):
     the containing object.
 
     Parameters:
-      `help` : documentation of field class, suitable for presenting in a GUI
-          (defaults to None).
-      `default` : static value to default to if not otherwise specified
-          (defaults to None).
-      `scope` : the scope in which this field class is used (defaults to
-          Scope.content).
-      `display_name` : the display name for the field class, suitable for
-          presenting in a GUI (defaults to name of class).
-      `values` : for field classes with a known set of valid values, provides
-          the ability to explicitly specify the valid values. This can
-          be specified as either a static return value, or a function
-          that generates the valid values. For example formats, see the
-          values property definition.
+
+        help (str): documentation for the field, suitable for presenting to a
+            user (defaults to None).
+
+        default: static value to default to if not otherwise specified
+            (defaults to None).
+
+        scope: this field's scope (defaults to Scope.content).
+
+        display_name: the display name for the field, suitable for presenting
+            to a user (defaults to name of the field).
+
+        values: a specification of the valid values for this field. This can be
+            specified as either a static specification, or a function that
+            returns the specification. For example specification formats, see
+            the values property definition.
+
     """
     MUTABLE = True
     _default = None
@@ -165,16 +208,26 @@ class Field(object):
         for representing possible values in a UI.
 
         Example formats:
-            `[1, 2, 3]` : a finite set of elements
-            `[{"display_name": "Always", "value": "always"},
-              {"display_name": "Past Due", "value": "past_due"}]` :
-                a finite set of elements where the display names differ from
-                the values
-            `{"min" : 0 , "max" : 10, "step": .1}` :
-                a range for floating point numbers with increment .1
 
-        If this field class does not define a set of valid values, this method
-        will return None.
+        * A finite set of elements::
+
+            [1, 2, 3]
+
+        * A finite set of elements where the display names differ from the
+          values::
+
+            [
+             {"display_name": "Always", "value": "always"},
+             {"display_name": "Past Due", "value": "past_due"},
+            ]
+
+        * A range for floating point numbers with specific increments::
+
+            {"min": 0 , "max": 10, "step": .1}
+
+        If this field class does not define a set of valid values, this
+        property will return None.
+
         """
         if callable(self._values):
             return self._values()
@@ -363,11 +416,13 @@ class Integer(Field):
     """
     A field that contains an integer.
 
-    The value, as stored, can be None, '' (which will be treated as None), a Python integer,
-    or a value that will parse as an integer, ie., something for which int(value) does not throw an Error.
+    The value, as stored, can be None, '' (which will be treated as None), a
+    Python integer, or a value that will parse as an integer, ie., something
+    for which int(value) does not throw an error.
 
-    Note that a floating point value will convert to an integer, but a string containing a floating point
-    number ('3.48') will throw an Error.
+    Note that a floating point value will convert to an integer, but a string
+    containing a floating point number ('3.48') will throw an error.
+
     """
     MUTABLE = False
 
@@ -381,8 +436,10 @@ class Float(Field):
     """
     A field that contains a float.
 
-    The value, as stored, can be None, '' (which will be treated as None), a Python float,
-    or a value that will parse as an float, ie., something for which float(value) does not throw an Error.
+    The value, as stored, can be None, '' (which will be treated as None), a
+    Python float, or a value that will parse as an float, ie., something for
+    which float(value) does not throw an error.
+
     """
     MUTABLE = False
 
@@ -396,10 +453,13 @@ class Boolean(Field):
     """
     A field class for representing a boolean.
 
-    The stored value can be either a Python bool, a string, or any value that will then be converted
-    to a bool in the from_json method.
+    The stored value can be either a Python bool, a string, or any value that
+    will then be converted to a bool in the from_json method.
 
     Examples:
+
+    ::
+
         True -> True
         'true' -> True
         'TRUE' -> True
@@ -408,11 +468,9 @@ class Boolean(Field):
         ['123'] -> True
         None - > False
 
-    This class has the 'values' property defined.
     """
     MUTABLE = False
 
-    # We're OK redefining built-in `help`
     # pylint: disable=W0622
     def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
         super(Boolean, self).__init__(help, default, scope, display_name,
@@ -432,6 +490,7 @@ class Dict(Field):
     A field class for representing a Python dict.
 
     The stored value must be either be None or a dict.
+
     """
     _default = {}
 
@@ -447,6 +506,7 @@ class List(Field):
     A field class for representing a list.
 
     The stored value can either be None or a list.
+
     """
     _default = []
 
@@ -462,6 +522,7 @@ class String(Field):
     A field class for representing a string.
 
     The stored value can either be None or a basestring instance.
+
     """
     MUTABLE = False
 
@@ -477,17 +538,18 @@ class Any(Field):
     A field class for representing any piece of data; type is not enforced.
 
     All methods are inherited directly from `Field`.
+
     """
     pass
 
 
 class ModelMetaclass(type):
     """
-    A metaclass to be used for classes that want to use Fields as class attributes
-    to define data access.
+    A metaclass for using Fields as class attributes to define data access.
 
-    All class attributes that are Fields will be added to the 'fields' attribute on
-    the instance.
+    All class attributes that are Fields will be added to the 'fields'
+    attribute on the class.
+
     """
     def __new__(mcs, name, bases, attrs):
         new_class = super(ModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
@@ -521,8 +583,9 @@ class ModelMetaclass(type):
 
 class ChildrenModelMetaclass(type):
     """
-    A ModelMetaclass that transforms the attribute `has_children = True`
-    into a List field with an empty scope.
+    A metaclass that transforms the attribute `has_children = True` into a List
+    field with a children scope.
+
     """
     def __new__(mcs, name, bases, attrs):
         if (attrs.get('has_children', False) or
@@ -537,10 +600,12 @@ class ChildrenModelMetaclass(type):
 
 class XBlockMixin(object):
     """
-    Base class for XBlock Mixin classes. These classes can add new fields
-    and new properties to all XBlocks created by a particular runtime.
+    Base class for XBlock Mixin classes.
 
-    This doesn't use the ChildrenModelMetaclass, because it doesn't seem sensible
-    to add children to a module not written to use them.
+    XBlockMixin classes can add new fields and new properties to all XBlocks
+    created by a particular runtime.
+
     """
+    # This doesn't use the ChildrenModelMetaclass, because it doesn't seem
+    # sensible to add children to a module not written to use them.
     __metaclass__ = ModelMetaclass

@@ -15,61 +15,85 @@ techniques.  They have Python code, and other file resources, including CSS and
 Javascript needed to fully render themselves in a browser.
 
 
-State
------
+.. _guide_fields:
 
-XBlock state (or data) is arbitrary JSON-able data.  XBlock state can be scoped
-on several axes:
+Fields
+------
 
-* By User: State scoped by user is different for every user in the system.
+XBlock state (or data) is arbitrary JSON-able data stored in Python attributes
+called **fields**.  Fields declare their relationship to both blocks and users,
+by specifying their **scope**.
 
-* By XBlock: State scoped by XBlock can be scoped by various aspects of the
-  XBlock:
+* By user: fields declare how they relate to the user:
 
-  * block usage - the instance of the XBlock in a particular course
+  * No user: the data is related to no users, for example, the content of the
+    course which is independent of any users.
 
-  * block definition - the definition of an XBlock created by a content
-    creator (potentially shared across runs of a course)
+  * One user: the data is particular to a single user, such as an answer to a
+    problem.
 
-  * block type - the Python type of the XBlock (shared across all instances
-    of the XBlock in all courses)
+  * All users: the data is an aggregate of all users.  An example is the total
+    number of students answering a question.
 
-  * all - all XBlocks share the same data
+* By XBlock: fields declare how they relate to the block:
 
-For example:
+  * Block usage: the instance of the XBlock in a particular course.
+
+  * Block definition: the definition of an XBlock created by a content
+    creator (potentially shared across runs of a course).
+
+  * Block type: the Python type of the XBlock (shared across all instances
+    of the XBlock in all courses).
+
+  * All: all XBlocks share the same data.
+
+These two aspects, user and block, are independent.  A field scope specifies
+both.  For example:
 
 * A user's progress through a particular set of problems would be stored in a
-  User=True, XBlock=Usage scope.
+  scope with User=One and XBlock=Usage.
 
-* The content to display in an XBlock would be stored in a User=False,
-  XBlock=Definition scope.
+* The content to display in an XBlock would be stored in a scope with
+  User=None and XBlock=Definition.
 
 * A user's preferences for a type of XBlock, such as the preferences for a
-  circuit editor, would be stored in a User=True, XBlock=Type scope.
+  circuit editor, would be stored in a scope with User=One and XBlock=Type.
 
 * Information about the user, such as language or timezone, would be stored in
-  a User=True, XBlock=All scope.
+  a scope with User=One and XBlock=All.
 
-XBlocks declare their data with a schema in the XBlock class definition.  The
-schema defines a series of properties, each of which has at least a name, a
-type, and a scope::
+For convenience, we also provide six predefined scopes: ``Scope.content``,
+``Scope.settings``, ``Scope.user_state``, ``Scope.preferences``,
+``Scope.user_info``, and ``Scope.user_state_summary``:
 
-    upvotes = Integer(help="Number of up votes", display_name="Up Votes", default=0, scope=Scope(user=False, module=DEFINITION))
-    downvotes = Integer(help="Number of down votes", display_name="Down Votes", default=0, scope=Scope(user=False, module=DEFINITION))
-    voted = Boolean(help="Whether a student has already voted", default=False, scope=Scope(user=True, module=USAGE))
++---------------------------+----------------+-------------------+--------------------------+
+|                           | UserScope.NONE | UserScope.ONE     | UserScope.ALL            |
++===========================+================+===================+==========================+
+| **BlockScope.DEFINITION** | Scope.content  |                   |                          |
++---------------------------+----------------+-------------------+--------------------------+
+| **BlockScope.USAGE**      | Scope.settings | Scope.user_state  | Scope.user_state_summary |
++---------------------------+----------------+-------------------+--------------------------+
+| **BlockScope.TYPE**       |                | Scope.preferences |                          |
++---------------------------+----------------+-------------------+--------------------------+
+| **BlockScope.ALL**        |                | Scope.user_info   |                          |
++---------------------------+----------------+-------------------+--------------------------+
 
-For convenience, we also provide five predefined scopes: ``Scope.content``,
-``Scope.settings``, ``Scope.user_state``, ``Scope.preferences``, and
-``Scope.user_info``.
+XBlocks declare their fields as class attributes in the XBlock class
+definition.  Each field has at least a name, a type, and a scope::
+
+    class ThumbsBlock(XBlock):
+
+        upvotes = Integer(help="Number of up votes", default=0, scope=Scope.user_state_summary)
+        downvotes = Integer(help="Number of down votes", default=0, scope=Scope.user_state_summary)
+        voted = Boolean(help="Has this student voted?", default=False, scope=Scope.user_state)
 
 In XBlock code, state is accessed as attributes on self. In our example above,
 the data is available as ``self.upvotes``, ``self.downvotes``, and
 ``self.voted``.  The data is automatically scoped for the current user and
 block.  Modifications to the attributes are stored in memory, and persisted to
 underlying ``FieldData`` instance when ``save()`` is called on the ``XBlock``.
-Runtimes should call ``save()`` after an ``XBlock`` is constructed, and after
-every invocation of a handler, view, or method on an XBlock. (The base ``Runtime`` class
-in ``xblock.runtime`` automatically calls ``save()`` after invoking views or handlers.)
+Runtimes will call ``save()`` after an ``XBlock`` is constructed, and after
+every invocation of a handler, view, or method on an XBlock.
 
 
 Children
@@ -119,31 +143,32 @@ categories:
   URLs so that XBlock Javascript code can make requests to its handlers.
   Handlers can be used with GET requests as well as POST requests.
 
-* Recalculators: (not a great word!) There can be any number of these, written
-  as ordinary Python methods. Each has a specific name, and is invoked by the
-  runtime when a particular kind of recalculation needs to be done.  An example
-  is "regrade", run when a TA needs to adjust a problem, and all the students'
-  inputs should be checked again, and their grades republished.
+..
+    * Recalculators: (not a great word!) There can be any number of these, written
+      as ordinary Python methods. Each has a specific name, and is invoked by the
+      runtime when a particular kind of recalculation needs to be done.  An example
+      is "regrade", run when a TA needs to adjust a problem, and all the students'
+      inputs should be checked again, and their grades republished.
 
 * Methods: XBlocks have access to their children and parent, and can invoke
   methods on them simply by invoking Python methods.
 
-Views and Handlers are both inspired by web applications, but have different
+Views and handlers are both inspired by web applications, but have different
 uses, and therefore different designs.  Views are invoked by the runtime to
 produce a rendering of some course content.  Their results are aggregated
 together hierarchically, and so are not expressed as an HTTP response, but as a
-structured Fragment.  Handlers are invoked by XBlock code in the browser, so they
-are defined more like traditional web applications: they accept an HTTP
+structured Fragment.  Handlers are invoked by XBlock code in the browser, so
+they are defined more like traditional web applications: they accept an HTTP
 request, and produce an HTTP response.
 
 
 Views
 -----
 
-Views are how XBlocks render themselves.  The runtime will invoke a view as
-part of creating a webpage for part of a course.  The XBlock view should return
-data in the form needed by the runtime.  Often, the result will be a
-:ref:`fragment <fragment>` that the runtime can compose together into a
+Views are methods on the XBlock that render the block.  The runtime will invoke
+a view as part of creating a webpage for part of a course.  The XBlock view
+should return data in the form needed by the runtime.  Often, the result will
+be a :ref:`fragment <fragment>` that the runtime can compose together into a
 complete page.
 
 Views can specify caching information to let runtimes avoid invoking the view
@@ -153,20 +178,26 @@ more frequently than needed.  TODO: Describe this.
 Handlers
 --------
 
-TODO: Describe handlers.
+Handlers are methods on the XBlock that process requests coming from the
+browser.  Typically, they'll be used to implement ajax endpoints.  They get a
+standard request object and return a standard response.  You can have as many
+handlers as you like, and name them whatever you like.  Your code asks the
+runtime for the URL that corresponds to your handler, and then you can use that
+URL to make ajax requests.
 
 
-Querying
---------
+..
+    Querying
+    --------
 
-Blocks often need access to information from other blocks in a course.  An exam
-page may want to collect information from each problem on the page, for
-example.
+    Blocks often need access to information from other blocks in a course.  An exam
+    page may want to collect information from each problem on the page, for
+    example.
 
-TODO: Describe how that works.
+    TODO: Describe how that works.
 
 
-Tags
-----
+    Tags
+    ----
 
-TODO: Blocks can have tags and you can use them in querying.
+    TODO: Blocks can have tags and you can use them in querying.

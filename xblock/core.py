@@ -1,4 +1,5 @@
-"""Implementation of the XBlock facility.
+"""
+Core classes for XBlocks.
 
 This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
@@ -16,6 +17,10 @@ from webob import Response
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
 from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope
 from xblock.plugin import Plugin
+
+
+# __all__ controls what classes end up in the docs.
+__all__ = ['XBlock']
 
 
 class TagCombiningMetaclass(type):
@@ -39,15 +44,19 @@ class TagCombiningMetaclass(type):
 
 
 class XBlockMetaclass(
-        ChildrenModelMetaclass,
-        ModelMetaclass,
-        TagCombiningMetaclass,
+    ChildrenModelMetaclass,
+    ModelMetaclass,
+    TagCombiningMetaclass,
 ):
     """
-    Metaclass that combines the three base XBlock metaclasses:
+    Metaclass for XBlock.
+
+    Combines three metaclasses:
+
     * `ChildrenModelMetaclass`
     * `ModelMetaclass`
     * `TagCombiningMetaclass`
+
     """
     pass
 
@@ -130,32 +139,38 @@ class XBlock(Plugin):
 
         For security reasons, the default implementation will return only a
         very restricted set of file types, which must be located in a folder
-        called "public". XBlock authors who want to override this behavior
-        will need to take care to ensure that the method only serves legitimate
+        called "public". XBlock authors who want to override this behavior will
+        need to take care to ensure that the method only serves legitimate
         public resources. At the least, the URI should be matched against a
-        whitelist regex to ensure that you do not serve an unauthorized resource.
-        """
+        whitelist regex to ensure that you do not serve an unauthorized
+        resource.
 
+        """
         # Verify the URI is in whitelisted form before opening for serving.
         # URI must begin with public/, all file/folder names must use only
         # characters from [a-zA-Z0-9\-], and the file type must be one of
         # jpg, jpeg, png, gif, js, css
         assert re.match(
-            '^public/([a-zA-Z0-9\-]+/)*[a-zA-Z0-9\-]+\.(jpg|jpeg|png|gif|js|css)$', uri)
+            r'^public/([a-zA-Z0-9\-]+/)*[a-zA-Z0-9\-]+\.(jpg|jpeg|png|gif|js|css)$', uri
+        )
         return pkg_resources.resource_stream(cls.__module__, uri)
 
     def __init__(self, runtime, field_data, scope_ids):
         """
-        :param runtime: Use it to access the environment.
-            It is available in XBlock code as ``self.runtime``.
-        :type runtime: :class:`xblock.core.Runtime`.
+        Construct a new XBlock.
 
-        :param field_data: Interface used by the XBlock fields to access their data
-            from wherever it is persisted
-        :type field_data: :class:`xblock.field_data.FieldData`
+        This class should only be used by runtimes.
 
-        :param scope_ids: Identifiers needed to resolve scopes
-        :type scope_ids: `~xblock.fields.ScopeIds`.
+        Parameters:
+
+            runtime (Runtime): Use it to access the environment.
+                It is available in XBlock code as ``self.runtime``.
+
+            field_data (FieldData): Interface used by the XBlock
+                fields to access their data from wherever it is persisted.
+
+            scope_ids (ScopeIds): Identifiers needed to resolve scopes.
+
         """
         self.runtime = runtime
         self._field_data = field_data
@@ -229,7 +244,7 @@ class XBlock(Plugin):
 
     def _clear_dirty_fields(self):
         """
-        Remove all dirty fields from an XBlock
+        Remove all dirty fields from an XBlock.
         """
         self._dirty_fields.clear()
 

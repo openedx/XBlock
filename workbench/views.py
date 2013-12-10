@@ -6,7 +6,6 @@ This code is in the Workbench layer.
 
 import logging
 import mimetypes
-import pkg_resources
 from StringIO import StringIO
 
 from django.http import HttpResponse, Http404
