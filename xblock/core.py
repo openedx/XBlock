@@ -151,7 +151,8 @@ class XBlock(Plugin):
         # characters from [a-zA-Z0-9\-], and the file type must be one of
         # jpg, jpeg, png, gif, js, css
         assert re.match(
-            '^public/([a-zA-Z0-9\-]+/)*[a-zA-Z0-9\-]+\.(jpg|jpeg|png|gif|js|css)$', uri)
+            r'^public/([a-zA-Z0-9\-]+/)*[a-zA-Z0-9\-]+\.(jpg|jpeg|png|gif|js|css)$', uri
+        )
         return pkg_resources.resource_stream(cls.__module__, uri)
 
     def __init__(self, runtime, field_data, scope_ids):

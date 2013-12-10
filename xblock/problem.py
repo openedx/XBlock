@@ -31,9 +31,7 @@ A rough sequence diagram::
 """
 
 import inspect
-import pkg_resources
 import random
-import re
 import string  # pylint: disable=W0402
 import time
 
