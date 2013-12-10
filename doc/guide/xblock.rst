@@ -15,6 +15,8 @@ techniques.  They have Python code, and other file resources, including CSS and
 Javascript needed to fully render themselves in a browser.
 
 
+.. _guide_fields:
+
 Fields
 ------
 

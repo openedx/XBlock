@@ -23,6 +23,14 @@ ecosystem will make use of a number of web applications, all of which will need
 access to course content and data.  XBlocks provide the structure and APIs
 needed to build components for use in all of these applications.
 
+Getting Started
+---------------
+
+.. toctree::
+    :maxdepth: 1
+
+    getting_started
+
 User's Guide
 ------------
 
