@@ -2,15 +2,15 @@
 Runtimes
 ========
 
-In casual XBlock terms, a ``Runtime`` is the application that hosts XBlocks.
+In casual XBlock terms, a **Runtime** is the application that hosts XBlocks.
 
 Nomenclature
 ------------
 
-There are several entities that go by the name ``Runtime``. This will attempt
+There are several entities that go by the name **Runtime**. This will attempt
 to provide context and names to disambiguate them.
 
-``Runtime Application``
+**Runtime Application**
 
     This is a general term used to refer to the application code hosting the
     XBlocks.
@@ -84,7 +84,7 @@ When a runtime application renders a view (by calling :meth:`.Runtime.render`
 or :meth:`.XBlock.render`), it will receive a :class:`.Fragment` as a result.
 It should embed :attr:`.Fragment.content` into the HTML it is producing, add
 :meth:`.Fragment.head_html` to the head of the page, and add
-:meth:`.Fragment.foot_html` to the foot of the page. This ensures that the 
+:meth:`.Fragment.foot_html` to the foot of the page. This ensures that the
 Javascript and CSS of all of the fragments on the page are combined properly.
 
 
