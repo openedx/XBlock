@@ -15,7 +15,7 @@ except ImportError:
 from webob import Response
 
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
-from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope
+from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope, Reference
 from xblock.plugin import Plugin
 
 
@@ -78,7 +78,7 @@ class XBlock(Plugin):
 
     entry_point = 'xblock.v1'
 
-    parent = String(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
+    parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
     name = String(help="Short name for the block", scope=Scope.settings)
     tags = List(help="Tags for this block", scope=Scope.settings)
 
