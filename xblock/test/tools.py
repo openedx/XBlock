@@ -2,6 +2,8 @@
 Tools for testing XBlocks
 """
 
+from functools import partial
+
 from xblock.runtime import KeyValueStore
 
 # nose.tools has convenient assert methods, but it defines them in a clever way
@@ -78,3 +80,35 @@ def blocks_are_equivalent(block1, block2):
                 return False
 
     return True
+
+
+def _unabc(cls, msg="{} isn't implemented"):
+    """Helper method to implement `unabc`"""
+    for ab_name in cls.__abstractmethods__:
+        def dummy_method(self, *args, **kwargs):  # pylint: disable=unused-argument, missing-docstring
+            raise NotImplementedError(msg.format(ab_name))
+        setattr(cls, ab_name, dummy_method)
+    cls.__abstractmethods__ = ()
+    return cls
+
+
+def unabc(msg):
+    """
+    Add dummy methods to a class to satisfy abstract base class constraints.
+
+    Usage::
+
+        @unabc
+        class NotAbstract(SomeAbstractClass):
+            pass
+
+        @unabc('Fake {}')
+        class NotAbstract(SomeAbstractClass):
+            pass
+    """
+
+    # Handle the possibility that unabc is called without a custom message
+    if isinstance(msg, type):
+        return _unabc(msg)
+    else:
+        return partial(_unabc, msg=msg)
