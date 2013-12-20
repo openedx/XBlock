@@ -6,7 +6,7 @@ from collections import namedtuple
 from mock import Mock
 
 from xblock.core import XBlock
-from xblock.fields import BlockScope, Scope, String, ScopeIds, Integer, List, UserScope, XBlockMixin, Integer
+from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, XBlockMixin, Integer
 from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
 from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
 from xblock.fragment import Fragment
@@ -15,22 +15,13 @@ from xblock.field_data import DictFieldData
 from xblock.test.tools import DictKeyValueStore
 from xblock.test.tools import (
     assert_equals, assert_false, assert_true, assert_raises,
-    assert_is, assert_is_not
+    assert_is, assert_is_not, unabc
 )
 
 
+@unabc("{} shouldn't be used in tests")
 class TestRuntime(Runtime):
-    def get_block(self, usage_id):
-        raise Exception("Not Used By Tests")
-
-    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        raise Exception("Not Used By Tests")
-
-    def resources_url(self, resource):
-        raise Exception("Not Used By Tests")
-
-    def local_resource_url(self, block, uri):
-        raise Exception("Not Used By Tests")
+    pass
 
 
 class TestMixin(object):
