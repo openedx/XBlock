@@ -3,6 +3,7 @@ Machinery to make the common case easy when building new runtimes
 """
 
 import functools
+import gettext
 import re
 import threading
 
@@ -13,7 +14,10 @@ from cStringIO import StringIO
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
-from xblock.exceptions import NoSuchViewError, NoSuchHandlerError, XBlockNotFoundError
+from xblock.exceptions import (
+    NoSuchViewError, NoSuchHandlerError, XBlockNotFoundError,
+    NoSuchServiceError,
+)
 from xblock.core import XBlock
 
 
@@ -300,16 +304,24 @@ class Runtime(object):
 
     # Construction
 
-    def __init__(self, usage_store, field_data, mixins=()):
+    def __init__(self, usage_store, field_data, mixins=(), services=None):
         """
-        :param mixins: Classes that should be mixed in with every :class:`~xblock.core.XBlock`
-            created by this `Runtime`
-        :type mixins: `tuple` of `class` es
+        Arguments:
+            mixins (tuple of classes): Classes that should be mixed in with
+                every :class:`~xblock.core.XBlock` created by this `Runtime`.
+            services (dictionary): Services to make available through the
+                :meth:`service` method.  There's no point passing anything here
+                if you are overriding :meth:`service` in your sub-class.
+
         """
         self._view_name = None
         self.mixologist = Mixologist(mixins)
         self.usage_store = usage_store
         self.field_data = field_data
+        self._services = services or {}
+
+        # Provide some default implementations
+        self._services.setdefault("i18n", gettext.NullTranslations())
 
     # Block operations
 
@@ -496,6 +508,19 @@ class Runtime(object):
         # Write out dirty fields
         block.save()
         return results
+
+    # Services
+
+    def service(self, block, service_name):
+        """Return a service, or None."""
+        desire = block._services_requested.get(service_name)  # pylint: disable=W0212
+        if desire is None:
+            raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
+        service = self._services.get(service_name)
+        if service is None and desire == "need":
+            raise NoSuchServiceError("Service {!r} is not available.".format(service_name))
+        return service
+
 
     # Querying
 

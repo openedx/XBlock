@@ -43,19 +43,33 @@ class TagCombiningMetaclass(type):
         return super(TagCombiningMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+class ServiceRequestedMetaclass(type):
+    """
+    Creates the _services_requested dict on the class.
+
+    Keys are service names, values are "need" or "want".
+
+    """
+    def __new__(mcs, name, bases, attrs):
+        attrs['_services_requested'] = {}
+        return super(ServiceRequestedMetaclass, mcs).__new__(mcs, name, bases, attrs)
+
+
 class XBlockMetaclass(
     ChildrenModelMetaclass,
     ModelMetaclass,
     TagCombiningMetaclass,
+    ServiceRequestedMetaclass,
 ):
     """
     Metaclass for XBlock.
 
-    Combines three metaclasses:
+    Combines all the metaclasses XBlocks needs:
 
     * `ChildrenModelMetaclass`
     * `ModelMetaclass`
     * `TagCombiningMetaclass`
+    * `ServiceRequestedMetaclass`
 
     """
     pass
@@ -108,8 +122,8 @@ class XBlock(Plugin):
         func._is_xblock_handler = True      # pylint: disable=protected-access
         return func
 
-    @classmethod
-    def tag(cls, tags):
+    @staticmethod
+    def tag(tags):
         """Returns a function that adds the words in `tags` as class tags to this class."""
         def dec(cls):
             """Add the words in `tags` as class tags to this class."""
@@ -117,6 +131,22 @@ class XBlock(Plugin):
             cls._class_tags.update(tags.replace(",", " ").split())
             return cls
         return dec
+
+    @staticmethod
+    def needs(service_name):
+        """A class decorator to indicate that an XBlock class needs a particular service."""
+        def _decorator(cls):                                # pylint: disable=C0111
+            cls._services_requested[service_name] = "need"  # pylint: disable=W0212
+            return cls
+        return _decorator
+
+    @staticmethod
+    def wants(service_name):
+        """A class decorator to indicate that an XBlock class wants a particular service."""
+        def _decorator(cls):                                # pylint: disable=C0111
+            cls._services_requested[service_name] = "want"  # pylint: disable=W0212
+            return cls
+        return _decorator
 
     @classmethod
     def load_tagged_classes(cls, tag):
