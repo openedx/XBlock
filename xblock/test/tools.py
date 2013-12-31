@@ -84,10 +84,16 @@ def blocks_are_equivalent(block1, block2):
 
 def _unabc(cls, msg="{} isn't implemented"):
     """Helper method to implement `unabc`"""
-    for ab_name in cls.__abstractmethods__:
-        def dummy_method(self, *args, **kwargs):  # pylint: disable=unused-argument, missing-docstring
+    def make_dummy_method(ab_name):
+        """A function to make the dummy method, to close over ab_name."""
+        def dummy_method(self, *args, **kwargs):  # pylint: disable=unused-argument
+            """The method provided for all missing abstract methods."""
             raise NotImplementedError(msg.format(ab_name))
-        setattr(cls, ab_name, dummy_method)
+        return dummy_method
+
+    for ab_name in cls.__abstractmethods__:
+        setattr(cls, ab_name, make_dummy_method(ab_name))
+
     cls.__abstractmethods__ = ()
     return cls
 
