@@ -585,7 +585,7 @@ class ObjectAggregator(object):
 
     def _object_with_attr(self, name):
         """
-        Generate a list of objects that have the attribute `name`
+        Returns the first object that has the attribute `name`
 
         :param name: the attribute to filter by
         :type name: `str`
