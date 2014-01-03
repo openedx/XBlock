@@ -11,7 +11,7 @@ mock
 nose
 django-nose
 coverage
-pylint
+pylint == 0.28
 selenium
 rednose
 pep8
