@@ -9,7 +9,7 @@ from xblock.fragment import Fragment
 
 class {{cookiecutter.class_name}}(XBlock):
     """
-    A testing block that checks the behavior of the container.
+    TO-DO: document what your XBlock does.
     """
 
     # Fields are defined on the class.  You can access them in your code as
