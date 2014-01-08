@@ -1,5 +1,8 @@
-"""Tests the fundamentals of XBlocks, including - but not limited to -
-metaclassing, field access, caching, serialization, and bulk saves."""
+"""
+Tests the fundamentals of XBlocks including - but not limited to -
+metaclassing, field access, caching, serialization, and bulk saves.
+"""
+
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
 from mock import patch, MagicMock, Mock
@@ -763,3 +766,21 @@ def test_handle_shortcut():
     runtime.handle.reset_mock()
     block.handle('handler_name', request, 'suffix')
     runtime.handle.assert_called_with(block, 'handler_name', request, 'suffix')
+
+
+def test_services_decorators():
+    # pylint: disable=E1101
+    # A default XBlock has requested no services
+    xblock = XBlock(None, None, None)
+    assert_equals(XBlock._services_requested, {})
+    assert_equals(xblock._services_requested, {})
+
+    @XBlock.needs("n")
+    @XBlock.wants("w")
+    class ServiceUsingBlock(XBlock):
+        """XBlock using some services."""
+        pass
+
+    service_using_block = ServiceUsingBlock(None, None, None)
+    assert_equals(ServiceUsingBlock._services_requested, {'n': 'need', 'w': 'want'})
+    assert_equals(service_using_block._services_requested, {'n': 'need', 'w': 'want'})

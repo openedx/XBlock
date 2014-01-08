@@ -186,6 +186,18 @@ runtime for the URL that corresponds to your handler, and then you can use that
 URL to make ajax requests.
 
 
+Services
+--------
+
+XBlocks often need other services to implement full functionality.  As Python
+programs, they can import whatever libraries they need.  But some services need
+to be provided by the surrounding application in order to work properly as a
+unified whole.  Perhaps they need to be implemented specially, or integrated
+into the full application.
+
+XBlocks can request services from their runtime to get the best integration.
+TODO: finish describing the service() method.
+
 ..
     Querying
     --------

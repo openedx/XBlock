@@ -75,3 +75,10 @@ class NoSuchHandlerError(Exception):
     Raised to indicate that the requested handler was not found.
     """
     pass
+
+
+class NoSuchServiceError(Exception):
+    """
+    Raised to indicate that a requested service was not found.
+    """
+    pass

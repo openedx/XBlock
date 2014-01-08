@@ -7,6 +7,12 @@ These are notable changes in XBlock.
 0.3
 ---
 
+* Added services available through `Runtime.service`, once XBlocks have
+  announced their desires with `@XBlock.needs` and `@XBlock.wants`.
+
+* The "i18n" service provides a `gettext.Translations` object for retrieving
+  localized strings.
+
 * Make `context` an optional parameter for all views.
 
 * Add shortcut method to make rendering an XBlock's view with its own

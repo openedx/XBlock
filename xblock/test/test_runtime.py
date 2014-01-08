@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests the features of xblock/runtime"""
 # Allow tests to access private members of classes
 # pylint: disable=W0212
@@ -7,7 +8,7 @@ from mock import Mock
 
 from xblock.core import XBlock
 from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, XBlockMixin, Integer
-from xblock.exceptions import NoSuchViewError, NoSuchHandlerError
+from xblock.exceptions import NoSuchViewError, NoSuchHandlerError, NoSuchServiceError
 from xblock.runtime import KeyValueStore, DbModel, Runtime, ObjectAggregator, Mixologist
 from xblock.fragment import Fragment
 from xblock.field_data import DictFieldData
@@ -66,7 +67,7 @@ class TestXBlockNoFallback(XBlock):
 
 class TestXBlock(TestXBlockNoFallback):
     """
-    Test xblock class with fallbock methods
+    Test xblock class with fallback methods
     """
     @XBlock.handler
     def existing_handler(self, request, suffix=''):  # pylint: disable=unused-argument
@@ -509,3 +510,48 @@ class TestMixologist(object):
 
         assert_equals(4, len(pre_mixed.__bases__))  # 1 for the original class + 3 mixin classes
         assert_equals(4, len(post_mixed.__bases__))
+
+
+@XBlock.needs("i18n")
+@XBlock.wants("secret_service")
+@XBlock.needs("no_such_service")
+@XBlock.wants("another_not_service")
+class XBlockWithServices(XBlock):
+    """
+    Test XBlock class with service desires.
+    """
+    def student_view(self, _context):
+        """Try out some services."""
+        # i18n is available, and works.
+        def assert_equals_unicode(str1, str2):
+            """`str1` equals `str2`, and both are Unicode strings."""
+            assert_equals(str1, str2)
+            assert isinstance(str1, unicode)
+            assert isinstance(str2, unicode)
+
+        i18n = self.runtime.service(self, "i18n")
+        assert_equals_unicode(u"Welcome!", i18n.ugettext("Welcome!"))
+
+        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 0))
+        assert_equals_unicode(u"Singular", i18n.ungettext("Singular", "Plural", 1))
+        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 2))
+
+        # secret_service is available.
+        assert_equals(self.runtime.service(self, "secret_service"), 17)
+
+        # no_such_service is not available, and raises an exception, because we
+        # said we needed it.
+        with assert_raises(NoSuchServiceError):
+            self.runtime.service(self, "no_such_service")
+
+        # another_not_service is not available, and returns None, because we
+        # didn't need it, we only wanted it.
+        assert_is(self.runtime.service(self, "another_not_service"), None)
+
+
+def test_service():
+    runtime = TestRuntime(Mock(), Mock(), (), services={'secret_service': 17})
+    tester = XBlockWithServices(runtime, Mock(), Mock())
+
+    # Call the student_view to run its assertions.
+    runtime.render(tester, 'student_view')
