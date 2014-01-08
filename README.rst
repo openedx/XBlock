@@ -219,7 +219,7 @@ Please do not report security issues in public. Please email security@edx.org
 Mailing List and IRC Channel
 ----------------------------
 
-You can discuss this code on the `edx-xblock Google Group`__ or in the
-``edx-code`` IRC channel on Freenode.
+You can discuss this code on the `edx-code Google Group`__ or in the
+``#edx-code`` IRC channel on Freenode.
 
-__ https://groups.google.com/forum/#!forum/edx-xblock
+__ https://groups.google.com/group/edx-code
