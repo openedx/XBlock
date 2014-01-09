@@ -64,6 +64,5 @@ class {{cookiecutter.class_name}}(XBlock):
                 <{{cookiecutter.short_name}}/>
                 <{{cookiecutter.short_name}}/>
                 </vertical_demo>
-             """
-            ),
+             """),
         ]
