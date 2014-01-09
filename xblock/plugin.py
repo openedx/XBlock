@@ -129,7 +129,7 @@ class Plugin(object):
             yield (class_.name, cls._load_class_entry_point(class_))
 
     @classmethod
-    def register_temp_plugin(cls, class_, identifier=None):
+    def register_temp_plugin(cls, class_, identifier=None, dist='xblock'):
         """Decorate a function to run with a temporary plugin available.
 
         Use it like this in tests::
@@ -139,9 +139,16 @@ class Plugin(object):
                 # Here I can load MyXBlockClass by name.
 
         """
+        from mock import Mock
+
         if identifier is None:
             identifier = class_.__name__.lower()
-        entry_point = _EntryPointStub(class_, identifier)
+
+        entry_point = Mock(
+            dist=Mock(key=dist),
+            load=Mock(return_value=class_),
+        )
+        entry_point.name = identifier
 
         def _decorator(func):                           # pylint: disable=C0111
             @functools.wraps(func)
@@ -154,16 +161,3 @@ class Plugin(object):
                     cls.extra_entry_points = old
             return _inner
         return _decorator
-
-
-class _EntryPointStub(object):
-    """A simple stub for entry points for use by register_temp_plugin."""
-    def __init__(self, class_, name):
-        self.class_ = class_
-        self.name = name
-
-    def load(self):
-        """
-        Stub implementation of loading the entry point: just return our class.
-        """
-        return self.class_
