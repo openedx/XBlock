@@ -252,23 +252,20 @@ class Field(object):
 
     def _set_cached_value(self, xblock, value):
         """Store a value in the xblock's cache, creating the cache if necessary."""
-        # Allow this method to access the `_field_data_cache` of `xblock`
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         if not hasattr(xblock, '_field_data_cache'):
             xblock._field_data_cache = {}
         xblock._field_data_cache[self.name] = value
 
     def _del_cached_value(self, xblock):
         """Remove a value from the xblock's cache, if the cache exists."""
-        # Allow this method to access the `_field_data_cache` of `xblock`
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         if hasattr(xblock, '_field_data_cache') and self.name in xblock._field_data_cache:
             del xblock._field_data_cache[self.name]
 
     def _mark_dirty(self, xblock, value):
         """Set this field to dirty on the xblock."""
-        # Allow this method to access the `_dirty_fields` of `xblock`
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
 
         # Deep copy the value being marked as dirty, so that there
         # is a baseline to check against when saving later
@@ -279,6 +276,7 @@ class Field(object):
         """
         Return whether this field should be saved when xblock.save() is called
         """
+        # pylint: disable=protected-access
         if self not in xblock._dirty_fields:
             return False
 
@@ -291,8 +289,7 @@ class Field(object):
         obtaining the value from the _field_data. Thus if a cached value
         exists, that is the value that will be returned.
         """
-        # Allow this method to access the `_field_data_cache` of `xblock`
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         if xblock is None:
             return self
 
@@ -332,8 +329,7 @@ class Field(object):
         Deletes `xblock` from the underlying data store.
         Deletes are not cached; they are performed immediately.
         """
-        # Allow this method to access the `_field_data` and `_dirty_fields` of `xblock`
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
 
         # Try to perform the deletion on the field_data, and accept
         # that it's okay if the key is not present.  (It may never
@@ -406,6 +402,7 @@ class Field(object):
         """
         Return whether this field has a non-default value on the supplied xblock
         """
+        # pylint: disable=protected-access
         return self._is_dirty(xblock) or xblock._field_data.has(xblock, self.name)
 
     def __hash__(self):
@@ -596,7 +593,7 @@ class ModelMetaclass(type):
                     fields.setdefault(attr_name, attr_value)
 
                     # Allow the field to know what its name is
-                    attr_value._name = attr_name  # pylint: disable=W0212
+                    attr_value._name = attr_name  # pylint: disable=protected-access
 
         new_class.fields = fields
 
