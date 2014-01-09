@@ -69,6 +69,9 @@ output-format=text
 # Include message's id in output
 include-ids=yes
 
+# Display symbolic names of messages in reports
+symbols=yes
+
 # Put messages in a separate file for each module / package specified on the
 # command line instead of printing them on stdout. Reports (if any) will be
 # written in a file name "pylint_global.[txt|html]".
@@ -140,10 +143,10 @@ const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__)|log|urlpatterns)$
 class-rgx=[A-Z_][a-zA-Z0-9]+$
 
 # Regular expression which should only match correct function names
-function-rgx=[a-z_][a-z0-9_]{2,30}$
+function-rgx=([a-z_][a-z0-9_]{2,30}|test_[a-z0-9_]+)$
 
 # Regular expression which should only match correct method names
-method-rgx=([a-z_][a-z0-9_]{2,60}|setUp|set[Uu]pClass|tearDown|tear[Dd]ownClass|assert[A-Z]\w*)$
+method-rgx=([a-z_][a-z0-9_]{2,40}|setUp|set[Uu]pClass|tearDown|tear[Dd]ownClass|assert[A-Z]\w*|test_[a-z0-9_]+)$
 
 # Regular expression which should only match correct instance attribute names
 attr-rgx=[a-z_][a-z0-9_]{2,30}$

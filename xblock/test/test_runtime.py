@@ -16,7 +16,7 @@ from xblock.field_data import DictFieldData
 from xblock.test.tools import DictKeyValueStore
 from xblock.test.tools import (
     assert_equals, assert_false, assert_true, assert_raises,
-    assert_is, assert_is_not, unabc
+    assert_raises_regexp, assert_is, assert_is_not, unabc
 )
 
 
@@ -518,7 +518,7 @@ class TestMixologist(object):
 @XBlock.wants("another_not_service")
 class XBlockWithServices(XBlock):
     """
-    Test XBlock class with service desires.
+    Test XBlock class with service declarations.
     """
     def student_view(self, _context):
         """Try out some services."""
@@ -541,7 +541,7 @@ class XBlockWithServices(XBlock):
 
         # no_such_service is not available, and raises an exception, because we
         # said we needed it.
-        with assert_raises(NoSuchServiceError):
+        with assert_raises_regexp(NoSuchServiceError, "is not available"):
             self.runtime.service(self, "no_such_service")
 
         # another_not_service is not available, and returns None, because we
@@ -552,6 +552,35 @@ class XBlockWithServices(XBlock):
 def test_service():
     runtime = TestRuntime(Mock(), Mock(), (), services={'secret_service': 17})
     tester = XBlockWithServices(runtime, Mock(), Mock())
+
+    # Call the student_view to run its assertions.
+    runtime.render(tester, 'student_view')
+
+
+@XBlock.needs("no_such_service_sub")
+@XBlock.wants("another_not_service_sub")
+class SubXBlockWithServices(XBlockWithServices):
+    """
+    Test that subclasses can use services declared on the parent.
+    """
+    def student_view(self, context):
+        """Try the services."""
+        # First, call the super class, its assertions should still pass.
+        super(SubXBlockWithServices, self).student_view(context)
+
+        # no_such_service_sub is not available, and raises an exception,
+        # because we said we needed it.
+        with assert_raises_regexp(NoSuchServiceError, "is not available"):
+            self.runtime.service(self, "no_such_service_sub")
+
+        # another_not_service_sub is not available, and returns None,
+        # because we didn't need it, we only wanted it.
+        assert_is(self.runtime.service(self, "another_not_service_sub"), None)
+
+
+def test_sub_service():
+    runtime = TestRuntime(Mock(), Mock(), (), services={'secret_service': 17})
+    tester = SubXBlockWithServices(runtime, Mock(), Mock())
 
     # Call the student_view to run its assertions.
     runtime.render(tester, 'student_view')

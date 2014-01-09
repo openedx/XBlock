@@ -784,3 +784,24 @@ def test_services_decorators():
     service_using_block = ServiceUsingBlock(None, None, None)
     assert_equals(ServiceUsingBlock._services_requested, {'n': 'need', 'w': 'want'})
     assert_equals(service_using_block._services_requested, {'n': 'need', 'w': 'want'})
+
+
+def test_services_decorators_with_inheritance():
+    @XBlock.needs("n1")
+    @XBlock.wants("w1")
+    class ServiceUsingBlock(XBlock):
+        """XBlock using some services."""
+        pass
+
+    @XBlock.needs("n2")
+    @XBlock.wants("w2")
+    class SubServiceUsingBlock(ServiceUsingBlock):
+        """Does this class properly inherit services from ServiceUsingBlock?"""
+        pass
+
+    sub_service_using_block = SubServiceUsingBlock(None, None, None)
+    assert_equals(sub_service_using_block.service_declaration("n1"), "need")
+    assert_equals(sub_service_using_block.service_declaration("w1"), "want")
+    assert_equals(sub_service_using_block.service_declaration("n2"), "need")
+    assert_equals(sub_service_using_block.service_declaration("w2"), "want")
+    assert_equals(sub_service_using_block.service_declaration("xx"), None)

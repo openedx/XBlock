@@ -132,22 +132,6 @@ class XBlock(Plugin):
             return cls
         return dec
 
-    @staticmethod
-    def needs(service_name):
-        """A class decorator to indicate that an XBlock class needs a particular service."""
-        def _decorator(cls):                                # pylint: disable=C0111
-            cls._services_requested[service_name] = "need"  # pylint: disable=W0212
-            return cls
-        return _decorator
-
-    @staticmethod
-    def wants(service_name):
-        """A class decorator to indicate that an XBlock class wants a particular service."""
-        def _decorator(cls):                                # pylint: disable=C0111
-            cls._services_requested[service_name] = "want"  # pylint: disable=W0212
-            return cls
-        return _decorator
-
     @classmethod
     def load_tagged_classes(cls, tag):
         """Produce a sequence of all XBlock classes tagged with `tag`."""
@@ -184,6 +168,51 @@ class XBlock(Plugin):
             r'^public/([a-zA-Z0-9\-_]+/)*[a-zA-Z0-9\-_]+\.(jpg|jpeg|png|gif|js|css)$', uri
         )
         return pkg_resources.resource_stream(cls.__module__, uri)
+
+    @staticmethod
+    def needs(service_name):
+        """A class decorator to indicate that an XBlock class needs a particular service."""
+        def _decorator(cls):                                # pylint: disable=missing-docstring
+            cls._services_requested[service_name] = "need"  # pylint: disable=protected-access
+            return cls
+        return _decorator
+
+    @staticmethod
+    def wants(service_name):
+        """A class decorator to indicate that an XBlock class wants a particular service."""
+        def _decorator(cls):                                # pylint: disable=missing-docstring
+            cls._services_requested[service_name] = "want"  # pylint: disable=protected-access
+            return cls
+        return _decorator
+
+    @classmethod
+    def service_declaration(cls, service_name):
+        """
+        Find and return a service declaration.
+
+        XBlocks declare their service requirements with @XBlock.needs and
+        @XBlock.wants decorators.  These store information on the class.
+        This function finds those declarations for a block.
+
+        Arguments:
+            service_name (string): the name of the service requested.
+
+        Returns:
+            One of "need", "want", or None.
+
+        """
+        # The class declares what services it desires. To deal with subclasses,
+        # especially mixins, properly, we have to walk up the inheritance
+        # hierarchy, and combine all the declared services into one dictionary.
+        # We do this once per class, then store the result on the class.
+        if "_combined_services" not in cls.__dict__:
+            # Walk the MRO chain, collecting all the services together.
+            combined = {}
+            for parent in reversed(cls.__mro__):
+                combined.update(getattr(parent, "_services_requested", {}))
+            cls._combined_services = combined
+        declaration = cls._combined_services.get(service_name)
+        return declaration
 
     def __init__(self, runtime, field_data, scope_ids):
         """

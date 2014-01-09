@@ -512,15 +512,36 @@ class Runtime(object):
     # Services
 
     def service(self, block, service_name):
-        """Return a service, or None."""
-        desire = block._services_requested.get(service_name)  # pylint: disable=W0212
-        if desire is None:
+        """Return a service, or None.
+
+        Services are objects implementing arbitrary other interfaces.  They are
+        requested by agreed-upon names, see [XXX TODO] for a list of possible
+        services.  The object returned depends on the service requested.
+
+        XBlocks must announce their intention to request services with the
+        `XBlock.needs` or `XBlock.wants` decorators.  Use `needs` if you assume
+        that the service is available, or `wants` if your code is flexible and
+        can accept a None from this method.
+
+        Runtimes can override this method if they have different techniques for
+        finding and delivering services.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+
+        """
+        declaration = block.service_declaration(service_name)
+        if declaration is None:
             raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
         service = self._services.get(service_name)
-        if service is None and desire == "need":
+        if service is None and declaration == "need":
             raise NoSuchServiceError("Service {!r} is not available.".format(service_name))
         return service
-
 
     # Querying
 
