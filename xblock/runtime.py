@@ -304,14 +304,28 @@ class Runtime(object):
 
     # Construction
 
-    def __init__(self, usage_store, field_data, mixins=(), services=None):
+    def __init__(self, usage_store, field_data, mixins=(), services=None, default_class=None, select=None):
         """
         Arguments:
-            mixins (tuple of classes): Classes that should be mixed in with
-                every :class:`~xblock.core.XBlock` created by this `Runtime`.
+            usage_store (UsageStore): An object that allows the `Runtime` to
+                map between *usage_ids*, *definition_ids*, and *block_types*.
+
+            field_data (FieldData): The :class:`.FieldData` to use by default when
+                constructing an :class:`.XBlock` from this `Runtime`.
+
+            mixins (tuple): Classes that should be mixed in with every :class:`.XBlock`
+                created by this `Runtime`.
+
             services (dictionary): Services to make available through the
                 :meth:`service` method.  There's no point passing anything here
                 if you are overriding :meth:`service` in your sub-class.
+
+            default_class (class): The default class to use if a class can't be found for a
+                particular `block_type` when loading an :class:`.XBlock`.
+
+            select: A function to select from one or more :class:`.XBlock` subtypes found
+                when calling :meth:`.XBlock.load_class` to resolve a `block_type`.
+                This is the same `select` as used by :meth:`.Plugin.load_class`.
 
         """
         self._view_name = None
@@ -323,16 +337,24 @@ class Runtime(object):
         # Provide some default implementations
         self._services.setdefault("i18n", gettext.NullTranslations())
 
+        self.default_class = default_class
+        self.select = select
+
     # Block operations
 
-    def construct_xblock(self, block_type, scope_ids, field_data=None, default_class=None, *args, **kwargs):
+    def load_block_type(self, block_type):
+        """
+        Returns a subclass of :class:`.XBlock` that corresponds to the specified `block_type`.
+        """
+        return XBlock.load_class(block_type, self.default_class, self.select)
+
+    def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
         r"""
         Construct a new xblock of the type identified by block_type,
         passing \*args and \*\*kwargs into `__init__`.
         """
-        block_class = XBlock.load_class(block_type, default_class)
         return self.construct_xblock_from_class(
-            cls=block_class,
+            cls=self.load_block_type(block_type),
             scope_ids=scope_ids,
             field_data=field_data,
             *args, **kwargs
@@ -341,7 +363,7 @@ class Runtime(object):
     def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
-        defined for this application
+        defined for this application.
         """
         return self.mixologist.mix(cls)(
             runtime=self,
