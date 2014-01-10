@@ -1,63 +1,61 @@
 /* Javascript for the Acid XBlock. */
 function AcidBlock(runtime, element) {
 
-    function mark_yes(selector) {
-        $(selector, element).text("yes");
-    };
+    function mark_yes(selector, subelem) {
+        var elems = $(selector, subelem || element)
+        if (elems.length == 1) {
+            elems.text("yes")
+        } else {
+            elem.text("ASSERTION FAILURE: Can only mark_yes single elements");
+            console.log(elems);
+        }
+    }
 
-    function mark_no(selector, message) {
-        $(selector, element).text("no: " + message);
-    };
-
-    function make_rand9999() {
-        return Math.floor((Math.random()*10000));
-    };
+    function mark_no(selector, message, subelem) {
+        var elems = $(selector, subelem || element)
+        if (elems.length == 1) {
+            elems.text("no: " + message)
+        } else {
+            elem.text("ASSERTION FAILURE: Can only mark_no single elements");
+            console.log(elems);
+        }
+    }
 
     mark_yes('.js_init_run');
 
     $(function ($) {
         mark_yes('.document_ready_run');
-        var rand9999 = make_rand9999();
 
-        /* Compare the handler URLs made on the server and on the client. */
-        var server_handler_url = $(".acid_block", element).data("handler_url");
-        var client_handler_url = runtime.handlerUrl(element, "handler1");
-        if (server_handler_url == client_handler_url) {
-            mark_yes('.handler_urls_match');
-        }
-        else {
-            mark_no('.handler_urls_match', server_handler_url + " != " + client_handler_url);
-        }
+        $('.scope-storage-test', element).each(function() {
+            var $this = $(this);
+            $.ajax({
+                type: "POST",
+                data: {"VALUE": $this.data('value')},
+                url: $this.data('handler-url'),
+                success: function (ret) {
+                    mark_yes('.server-storage-test-returned', $this);
+                    if (ret.status == "ok") {
+                        mark_yes('.server-storage-test-succeeded', $this);
 
-        /* Immediately ping a handler. */
-        $.ajax({
-            type: "POST",
-            url: runtime.handlerUrl(element, "handler1", "SUFFIX"+rand9999),
-            data: JSON.stringify({rand9999: rand9999}),
-            success: function (ret) {
-                mark_yes('.handler1_returned');
-                if (ret.status == "ok") {
-                    mark_yes('.handler1_succeeded');
+                        $.ajax({
+                            type: "POST",
+                            data: {"VALUE": ret.value},
+                            url: runtime.handlerUrl(element, "check_storage", ret.suffix, ret.query),
+                            success: function (ret) {
+                                mark_yes('.client-storage-test-returned', $this);
 
-                    $.ajax({
-                        type: "POST",
-                        url: runtime.handlerUrl(element, "handler2"),
-                        data: JSON.stringify({rand9999: rand9999}),
-                        success: function (ret) {
-                            mark_yes('.handler2_returned');
-                            if (ret.status == "ok") {
-                                mark_yes('.handler2_succeeded');
+                                if (ret.status == "ok") {
+                                    mark_yes('.client-storage-test-succeeded', $this);
+                                } else {
+                                    mark_no('.client-storage-test-succeeded', ret.message, $this);
+                                }
                             }
-                            else {
-                                mark_no('.handler2_succeeded', ret.message);
-                            }
-                        }
-                    });
+                        });
+                    } else {
+                        mark_no('.server-storage-test-succeed', ret.message, $this);
+                    }
                 }
-                else {
-                    mark_no('.handler1_succeeded', ret.message);
-                }
-            }
+            });
         });
     });
 }
