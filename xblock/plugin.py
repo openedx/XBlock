@@ -26,12 +26,19 @@ class AmbiguousPluginError(Exception):
         super(AmbiguousPluginError, self).__init__(msg)
 
 
-def raise_ambiguous_exception(entry_points):
+def default_select(identifier, entry_points):
     """
     Raise an exception when we have ambiguous entry points.
     """
-    assert len(entry_points) > 1
-    raise AmbiguousPluginError(entry_points)
+
+    if len(entry_points) == 0:
+        raise PluginMissingError(identifier)
+
+    elif len(entry_points) == 1:
+        return entry_points[0]
+
+    elif len(entry_points) > 1:
+        raise AmbiguousPluginError(entry_points)
 
 
 class Plugin(object):
@@ -74,16 +81,17 @@ class Plugin(object):
 
         If `select` is provided, it should be a callable of the form::
 
-            def select(entry_points):
+            def select(identifier, entry_points):
                 # ...
                 return an_entry_point
 
         The `entry_points` argument will be a list of all entry_points matching `identifier`
         that were found, and `select` should return one of those entry_points to be
-        loaded.
+        loaded. `select` should raise `PluginMissingError` if no plugin is found, or `AmbiguousPluginError`
+        if too many plugins are found
         """
         if select is None:
-            select = raise_ambiguous_exception
+            select = default_select
 
         if cls._plugin_cache is None:
             cls._plugin_cache = {}
@@ -95,16 +103,12 @@ class Plugin(object):
                 if identifier == extra_identifier:
                     entry_points.append(extra_entry_point)
 
-            if len(entry_points) > 1:
-                entry_point = select(entry_points)
-
-            elif len(entry_points) == 0:
+            try:
+                entry_point = select(identifier, entry_points)
+            except PluginMissingError:
                 if default is not None:
                     return default
-                raise PluginMissingError(identifier)
-
-            else:
-                entry_point = entry_points[0]
+                raise
 
             cls._plugin_cache[identifier] = cls._load_class_entry_point(entry_point)
         return cls._plugin_cache[identifier]

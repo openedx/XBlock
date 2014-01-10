@@ -45,9 +45,10 @@ def test_ambiguous_plugins():
         """We'll raise this from `boom`."""
         pass
 
-    def boom(entry_points):
+    def boom(identifier, entry_points):
         """A select function to prove user-defined functions are called."""
         assert len(entry_points) == 2
+        assert identifier == "bad_block"
         raise MyOwnException("This is boom")
 
     with assert_raises_regexp(MyOwnException, "This is boom"):

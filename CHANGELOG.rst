@@ -4,8 +4,14 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
-0.3
----
+0.4 - In Progress
+-----------------
+
+* Allowed `Runtime` implementations to customize loading from **block_types** to
+  `XBlock` classes.
+
+0.3 - 2014-01-09
+----------------
 
 * Added services available through `Runtime.service`, once XBlocks have
   announced their desires with `@XBlock.needs` and `@XBlock.wants`.
