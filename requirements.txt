@@ -28,3 +28,4 @@ cookiecutter
 -e workbench
 -e thumbs
 -e acid
+-e demo_xblocks
