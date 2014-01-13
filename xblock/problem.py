@@ -51,7 +51,7 @@ class ProblemBlock(XBlock):
     has_children = True
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys):
+    def parse_xml(cls, node, runtime, keys, id_generator):
         block = runtime.construct_xblock_from_class(cls, keys)
 
         # Find <script> children, turn them into script content.
@@ -59,7 +59,7 @@ class ProblemBlock(XBlock):
             if child.tag == "script":
                 block.script += child.text
             else:
-                block.runtime.add_node_as_child(block, child)
+                block.runtime.add_node_as_child(block, child, id_generator)
 
         return block
 
@@ -332,12 +332,12 @@ class CheckerBlock(XBlock):
         self.arguments = arguments
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys):
+    def parse_xml(cls, node, runtime, keys, id_generator):
         """
         Parse the XML for a checker. A few arguments are handled specially,
         then the rest get the usual treatment.
         """
-        block = super(CheckerBlock, cls).parse_xml(node, runtime, keys)
+        block = super(CheckerBlock, cls).parse_xml(node, runtime, keys, id_generator)
         block.set_arguments_from_xml(node)
         return block
 

@@ -4,8 +4,6 @@ Tools for testing XBlocks
 
 from functools import partial
 
-from xblock.runtime import KeyValueStore
-
 # nose.tools has convenient assert methods, but it defines them in a clever way
 # that baffles pylint.  Import them all here so we can keep the pylint clutter
 # out of the rest of our files.
@@ -17,29 +15,6 @@ from nose.tools import (                        # pylint: disable=W0611,E0611
     assert_in, assert_not_in,
     assert_raises, assert_raises_regexp,
 )
-
-
-class DictKeyValueStore(KeyValueStore):
-    """
-    Mock key value store backed by a dictionary.
-    """
-    def __init__(self):
-        self.db_dict = {}
-
-    def get(self, key):
-        return self.db_dict[key]
-
-    def set(self, key, value):
-        self.db_dict[key] = value
-
-    def set_many(self, other_dict):
-        self.db_dict.update(other_dict)
-
-    def delete(self, key):
-        del self.db_dict[key]
-
-    def has(self, key):
-        return key in self.db_dict
 
 
 def blocks_are_equivalent(block1, block2):

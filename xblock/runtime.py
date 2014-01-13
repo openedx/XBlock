@@ -4,6 +4,7 @@ Machinery to make the common case easy when building new runtimes
 
 import functools
 import gettext
+import itertools
 import re
 import threading
 
@@ -15,8 +16,11 @@ from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
 from xblock.exceptions import (
-    NoSuchViewError, NoSuchHandlerError, XBlockNotFoundError,
+    NoSuchViewError,
+    NoSuchHandlerError,
     NoSuchServiceError,
+    NoSuchUsage,
+    NoSuchDefinition,
 )
 from xblock.core import XBlock
 
@@ -72,13 +76,37 @@ class KeyValueStore(object):
             self.set(key, value)
 
 
-class DbModel(FieldData):
+class DictKeyValueStore(KeyValueStore):
+    """
+    A `KeyValueStore` that stores everything into a Python dictionary.
+    """
+    def __init__(self, storage=None):
+        self.db_dict = storage if storage is not None else {}
+
+    def get(self, key):
+        return self.db_dict[key]
+
+    def set(self, key, value):
+        self.db_dict[key] = value
+
+    def set_many(self, other_dict):
+        self.db_dict.update(other_dict)
+
+    def delete(self, key):
+        del self.db_dict[key]
+
+    def has(self, key):
+        return key in self.db_dict
+
+
+class KvsFieldData(FieldData):
     """
     An interface mapping value access that uses field names to one
     that uses the correct scoped keys for the underlying KeyValueStore
     """
 
-    def __init__(self, kvs):
+    def __init__(self, kvs, **kwargs):
+        super(KvsFieldData, self).__init__(**kwargs)
         self._kvs = kvs
 
     def __repr__(self):
@@ -196,8 +224,41 @@ class DbModel(FieldData):
         return self._kvs.default(self._key(block, name))
 
 
-class UsageStore(object):
+# The old name for KvsFieldData, to ease transition.
+DbModel = KvsFieldData                                  # pylint: disable=C0103
+
+
+class IdReader(object):
     """An abstract object that stores usages and definitions."""
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def get_definition_id(self, usage_id):
+        """Retrieve the definition that a usage is derived from.
+
+        Args:
+            usage_id: The id of the usage to query
+
+        Returns:
+            The `definition_id` the usage is derived from
+        """
+        pass
+
+    @abstractmethod
+    def get_block_type(self, def_id):
+        """Retrieve the block_type of a particular definition
+
+        Args:
+            def_id: The id of the definition to query
+
+        Returns:
+            The `block_type` of the definition
+        """
+        pass
+
+
+class IdGenerator(object):
+    """An abstract object that creates usage and definition ids"""
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -205,36 +266,67 @@ class UsageStore(object):
         """Make a usage, storing its definition id.
 
         Returns the newly-created usage id.
-
         """
         pass
 
     @abstractmethod
-    def get_definition_id(self, usage_id):
-        """Get a usage.
-
-        Returns the definition id stored as the usage.
-
-        """
-        pass
-
-    @abstractmethod
-    def create_definition(self, block_type):
+    def create_definition(self, block_type, slug=None):
         """Make a definition, storing its block type.
+
+        If `slug` is provided, it is a suggestion that the definition id
+        incorporate the slug somehow.
 
         Returns the newly-created definition id.
 
         """
         pass
 
-    @abstractmethod
+
+class MemoryIdManager(IdReader, IdGenerator):
+    """A simple dict-based implementation of IdReader and IdGenerator."""
+
+    def __init__(self):
+        self._ids = itertools.count()
+        self._usages = {}
+        self._definitions = {}
+
+    def _next_id(self, prefix):
+        """Generate a new id."""
+        return "{}_{}".format(prefix, next(self._ids))
+
+    def clear(self):
+        """Remove all entries."""
+        self._usages.clear()
+        self._definitions.clear()
+
+    def create_usage(self, def_id):
+        """Make a usage, storing its definition id."""
+        usage_id = self._next_id("u")
+        self._usages[usage_id] = def_id
+        return usage_id
+
+    def get_definition_id(self, usage_id):
+        """Get a definition_id by its usage id."""
+        try:
+            return self._usages[usage_id]
+        except KeyError:
+            raise NoSuchUsage(repr(usage_id))
+
+    def create_definition(self, block_type, slug=None):
+        """Make a definition, storing its block type."""
+        prefix = "d"
+        if slug:
+            prefix += "_" + slug
+        def_id = self._next_id(prefix)
+        self._definitions[def_id] = block_type
+        return def_id
+
     def get_block_type(self, def_id):
-        """Get a definition.
-
-        Returns the block_type stored as the definition.
-
-        """
-        pass
+        """Get a block_type by its definition id."""
+        try:
+            return self._definitions[def_id]
+        except KeyError:
+            raise NoSuchDefinition(repr(def_id))
 
 
 class Runtime(object):
@@ -245,15 +337,6 @@ class Runtime(object):
     __metaclass__ = ABCMeta
 
     # Abstract methods
-
-    @abstractmethod
-    def get_block(self, usage_id):
-        """Get a block by usage id.
-
-        Returns the block identified by `usage_id`, or raises an exception.
-        """
-        raise XBlockNotFoundError(usage_id)
-
     @abstractmethod
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         """Get the actual URL to invoke a handler.
@@ -304,10 +387,10 @@ class Runtime(object):
 
     # Construction
 
-    def __init__(self, usage_store, field_data, mixins=(), services=None, default_class=None, select=None):
+    def __init__(self, id_reader, field_data, mixins=(), services=None, default_class=None, select=None):
         """
         Arguments:
-            usage_store (UsageStore): An object that allows the `Runtime` to
+            id_reader (IdReader): An object that allows the `Runtime` to
                 map between *usage_ids*, *definition_ids*, and *block_types*.
 
             field_data (FieldData): The :class:`.FieldData` to use by default when
@@ -328,9 +411,7 @@ class Runtime(object):
                 This is the same `select` as used by :meth:`.Plugin.load_class`.
 
         """
-        self._view_name = None
-        self.mixologist = Mixologist(mixins)
-        self.usage_store = usage_store
+        self.id_reader = id_reader
         self.field_data = field_data
         self._services = services or {}
 
@@ -339,6 +420,10 @@ class Runtime(object):
 
         self.default_class = default_class
         self.select = select
+
+        self.user_id = None
+        self.mixologist = Mixologist(mixins)
+        self._view_name = None
 
     # Block operations
 
@@ -372,42 +457,59 @@ class Runtime(object):
             *args, **kwargs
         )
 
+    def get_block(self, usage_id):
+        """
+        Create an XBlock instance in this runtime.
+
+        The `usage_id` is used to find the XBlock class and data.
+
+        """
+        def_id = self.id_reader.get_definition_id(usage_id)
+        try:
+            block_type = self.id_reader.get_block_type(def_id)
+        except NoSuchDefinition:
+            raise NoSuchUsage(repr(usage_id))
+        keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
+        block = self.construct_xblock(block_type, keys)
+        return block
+
     # Parsing XML
 
-    def parse_xml_string(self, xml):
+    def parse_xml_string(self, xml, id_generator):
         """Parse a string of XML, returning a usage id."""
-        return self.parse_xml_file(StringIO(xml))
+        return self.parse_xml_file(StringIO(xml), id_generator)
 
-    def parse_xml_file(self, fileobj):
+    def parse_xml_file(self, fileobj, id_generator):
         """Parse an open XML file, returning a usage id."""
         root = etree.parse(fileobj).getroot()
-        usage_id = self._usage_id_from_node(root, None)
+        usage_id = self._usage_id_from_node(root, None, id_generator)
         return usage_id
 
-    def _usage_id_from_node(self, node, parent_id):
+    def _usage_id_from_node(self, node, parent_id, id_generator):
         """Create a new usage id from an XML dom node.
 
-        :param node: The DOM node to interpret.
-        :type node: `lxml.etree.Element`
-        :param parent_id: The usage ID of the parent block.
-
+        Args:
+            node (lxml.etree.Element): The DOM node to interpret.
+            parent_id: The usage ID of the parent block
+            id_generator (IdGenerator): The :class:`.IdGenerator` to use
+                for creating ids
         """
         block_type = node.tag
         # TODO: a way for this node to be a usage to an existing definition?
-        def_id = self.usage_store.create_definition(block_type)
-        usage_id = self.usage_store.create_usage(def_id)
+        def_id = id_generator.create_definition(block_type)
+        usage_id = id_generator.create_usage(def_id)
         keys = ScopeIds(UserScope.NONE, block_type, def_id, usage_id)
-        block_class = self.mixologist.mix(XBlock.load_class(block_type))
-        block = block_class.parse_xml(node, self, keys)
+        block_class = self.mixologist.mix(self.load_block_type(block_type))
+        block = block_class.parse_xml(node, self, keys, id_generator)
         block.parent = parent_id
         block.save()
         return usage_id
 
-    def add_node_as_child(self, block, node):
+    def add_node_as_child(self, block, node, id_generator):
         """
         Called by XBlock.parse_xml to treat a child node as a child block.
         """
-        usage_id = self._usage_id_from_node(node, block.scope_ids.usage_id)
+        usage_id = self._usage_id_from_node(node, block.scope_ids.usage_id, id_generator)
         block.children.append(usage_id)
 
     # Exporting XML

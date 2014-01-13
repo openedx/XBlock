@@ -82,3 +82,13 @@ class NoSuchServiceError(Exception):
     Raised to indicate that a requested service was not found.
     """
     pass
+
+
+class NoSuchUsage(Exception):
+    """Raised by :meth:`.IdReader.get_definition_id` if the usage doesn't exist."""
+    pass
+
+
+class NoSuchDefinition(Exception):
+    """Raised by :meth:`.IdReader.get_block_type` if the definition doesn't exist."""
+    pass

@@ -16,7 +16,7 @@ from xblock.fragment import Fragment
 from xblock.runtime import NoSuchHandlerError
 
 from workbench import scenarios
-from workbench.runtime import USAGE_STORE
+from workbench.runtime import ID_MANAGER
 
 
 def temp_scenario(temp_class, scenario_name='test_scenario'):
@@ -120,10 +120,10 @@ def test_xblock_without_handler():
     # when we try to hit a handler on it
     client = Client()
 
-    # Pick a random usage_id from the USAGE_STORE because we
+    # Pick a random usage_id from the ID_MANAGER because we
     # need to ensure the usage is a valid id.
     # TODO: Make a usage in this test instead.
-    usage_id = USAGE_STORE._usages.keys()[0]
+    usage_id = ID_MANAGER._usages.keys()[0]
     # Plug that usage_id into a mock handler URL
     # /handler/[usage_id]/[handler_name]
     handler_url = reverse('handler', kwargs={

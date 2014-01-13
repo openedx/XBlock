@@ -23,7 +23,11 @@ def add_xml_scenario(scname, description, xml):
     """
     assert scname not in SCENARIOS, "Already have a %r scenario" % scname
     runtime = WorkbenchRuntime()
-    usage_id = runtime.parse_xml_string(xml)
+
+    # WorkbenchRuntime has an id_generator, but most runtimes won't
+    # (because the generator will be contextual), so we
+    # pass it explicitly to parse_xml_string.
+    usage_id = runtime.parse_xml_string(xml, runtime.id_generator)
     SCENARIOS[scname] = Scenario(description, usage_id)
 
 

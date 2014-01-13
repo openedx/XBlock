@@ -14,6 +14,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
+from xblock.exceptions import NoSuchUsage
 
 from .runtime import WorkbenchRuntime, WORKBENCH_KVS
 from .scenarios import SCENARIOS
@@ -105,7 +106,7 @@ def handler(request, usage_id, handler_slug, suffix='', authenticated=True):
 
     try:
         block = runtime.get_block(usage_id)
-    except KeyError:
+    except NoSuchUsage:
         raise Http404
 
     request = django_to_webob_request(request)
