@@ -127,12 +127,12 @@ class WorkbenchRuntime(Runtime):
 
     def wrap_child(self, block, view, frag, context):  # pylint: disable=W0613
         wrapped = Fragment()
-        wrapped.add_javascript_url(self.resources_url("js/vendor/jquery.min.js"))
-        wrapped.add_javascript_url(self.resources_url("js/vendor/jquery.cookie.js"))
+        wrapped.add_javascript_url(self.resource_url("js/vendor/jquery.min.js"))
+        wrapped.add_javascript_url(self.resource_url("js/vendor/jquery.cookie.js"))
 
         data = {}
         if frag.js_init_fn:
-            wrapped.add_javascript_url(self.resources_url("js/runtime/%s.js" % frag.js_init_version))
+            wrapped.add_javascript_url(self.resource_url("js/runtime/%s.js" % frag.js_init_version))
             data['init'] = frag.js_init_fn
             data['runtime-version'] = frag.js_init_version
             data['usage'] = block.scope_ids.usage_id
@@ -172,7 +172,7 @@ class WorkbenchRuntime(Runtime):
             url += query
         return url
 
-    def resources_url(self, resource):
+    def resource_url(self, resource):
         return "/static/" + resource
 
     def local_resource_url(self, block, uri):
