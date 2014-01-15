@@ -114,7 +114,7 @@ WSGI_APPLICATION = 'workbench.wsgi.application'
 
 TEMPLATE_DIRS = (
     'workbench/templates',
-    'xblock/templates',
+    'demo_xblocks/demo_xblocks/templates',
 )
 
 INSTALLED_APPS = (

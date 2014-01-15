@@ -3,7 +3,7 @@
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Boolean
 from xblock.fragment import Fragment
-from xblock.problem import InputBlock
+from demo_xblocks.problem import InputBlock
 import pkg_resources
 
 import logging

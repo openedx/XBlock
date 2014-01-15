@@ -1,7 +1,7 @@
 """Structure-oriented XBlocks."""
 
-from .core import XBlock
-from .fragment import Fragment
+from xblock.core import XBlock
+from xblock.fragment import Fragment
 
 
 class Sequence(XBlock):

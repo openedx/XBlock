@@ -4,8 +4,8 @@ from string import Template  # pylint: disable=W0402
 
 from lxml import etree
 
-from .core import XBlock, String, Scope
-from .fragment import Fragment
+from xblock.core import XBlock, String, Scope
+from xblock.fragment import Fragment
 
 
 class HelloWorldBlock(XBlock):
