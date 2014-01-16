@@ -3,14 +3,13 @@
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Boolean
 from xblock.fragment import Fragment
-from demo_xblocks.problem import InputBlock
 import pkg_resources
 
 import logging
 log = logging.getLogger(__name__)
 
 
-class ThumbsBlock(InputBlock):
+class ThumbsBlock(XBlock):
     """
     An XBlock with thumbs-up/thumbs-down voting.
 
