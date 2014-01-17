@@ -124,7 +124,7 @@ class XBlock(Plugin):
 
     @staticmethod
     def tag(tags):
-        """Returns a function that adds the words in `tags` as class tags to this class."""
+        """Decorate an XBlock class with a list of tags."""
         def dec(cls):
             """Add the words in `tags` as class tags to this class."""
             # Add in this class's tags
@@ -140,6 +140,11 @@ class XBlock(Plugin):
         for name, class_ in cls.load_classes():
             if tag in class_._class_tags:
                 yield name, class_
+
+    @classmethod
+    def class_tags(cls):
+        """What tags are on this class?"""
+        return cls._class_tags
 
     @classmethod
     def open_local_resource(cls, uri):
