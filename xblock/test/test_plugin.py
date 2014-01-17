@@ -74,17 +74,21 @@ def test_broken_plugin():
     plugins = XBlock.load_classes()
     assert_equals(list(plugins), [])
 
-def num_plugins_cached():
-    """Returns the number of plugins that have been cached."""
-    return len(plugin._plugin_cache.keys())
+
+def _num_plugins_cached():
+    """
+    Returns the number of plugins that have been cached.
+    """
+    return len(plugin.PLUGIN_CACHE.keys())
+
 
 @XBlock.register_temp_plugin(AmbiguousBlock1, "thumbs")
 def test_plugin_caching():
-    plugin._plugin_cache = {}
-    assert_equals(num_plugins_cached(), 0)
+    plugin.PLUGIN_CACHE = {}
+    assert_equals(_num_plugins_cached(), 0)
 
     XBlock.load_class("thumbs")
-    assert_equals(num_plugins_cached(), 1)
+    assert_equals(_num_plugins_cached(), 1)
 
     XBlock.load_class("thumbs")
-    assert_equals(num_plugins_cached(), 1)
+    assert_equals(_num_plugins_cached(), 1)

@@ -11,7 +11,7 @@ import pkg_resources
 
 log = logging.getLogger(__name__)
 
-_plugin_cache = {}
+PLUGIN_CACHE = {}
 
 
 class PluginMissingError(Exception):
@@ -21,26 +21,26 @@ class PluginMissingError(Exception):
 
 class AmbiguousPluginError(Exception):
     """Raised when a class name produces more than one entry_point."""
-    def __init__(self, entry_points):
-        classes = (entpt.load() for entpt in entry_points)
+    def __init__(self, all_entry_points):
+        classes = (entpt.load() for entpt in all_entry_points)
         desc = ", ".join("{0.__module__}.{0.__name__}".format(cls) for cls in classes)
-        msg = "Ambiguous entry points for {}: {}".format(entry_points[0].name, desc)
+        msg = "Ambiguous entry points for {}: {}".format(all_entry_points[0].name, desc)
         super(AmbiguousPluginError, self).__init__(msg)
 
 
-def default_select(identifier, entry_points):
+def default_select(identifier, all_entry_points):
     """
     Raise an exception when we have ambiguous entry points.
     """
 
-    if len(entry_points) == 0:
+    if len(all_entry_points) == 0:
         raise PluginMissingError(identifier)
 
-    elif len(entry_points) == 1:
-        return entry_points[0]
+    elif len(all_entry_points) == 1:
+        return all_entry_points[0]
 
-    elif len(entry_points) > 1:
-        raise AmbiguousPluginError(entry_points)
+    elif len(all_entry_points) > 1:
+        raise AmbiguousPluginError(all_entry_points)
 
 
 class Plugin(object):
@@ -82,35 +82,37 @@ class Plugin(object):
 
         If `select` is provided, it should be a callable of the form::
 
-            def select(identifier, entry_points):
+            def select(identifier, all_entry_points):
                 # ...
                 return an_entry_point
 
-        The `entry_points` argument will be a list of all entry_points matching `identifier`
+        The `all_entry_points` argument will be a list of all entry_points matching `identifier`
         that were found, and `select` should return one of those entry_points to be
         loaded. `select` should raise `PluginMissingError` if no plugin is found, or `AmbiguousPluginError`
         if too many plugins are found
         """
-        if select is None:
-            select = default_select
-
         identifier = identifier.lower()
-        entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
-        for extra_identifier, extra_entry_point in cls.extra_entry_points:
-            if identifier == extra_identifier:
-                entry_points.append(extra_entry_point)
+        key = (cls.entry_point, identifier)
+        if key not in PLUGIN_CACHE:
 
-        try:
-            entry_point = select(identifier, entry_points)
-        except PluginMissingError:
-            if default is not None:
-                return default
-            raise
+            if select is None:
+                select = default_select
 
-        key = "{}:{}".format(entry_point, identifier)
-        if key not in _plugin_cache:
-            _plugin_cache[key] = cls._load_class_entry_point(entry_point)
-        return _plugin_cache[key]
+            all_entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
+            for extra_identifier, extra_entry_point in cls.extra_entry_points:
+                if identifier == extra_identifier:
+                    all_entry_points.append(extra_entry_point)
+
+            try:
+                selected_entry_point = select(identifier, all_entry_points)
+            except PluginMissingError:
+                if default is not None:
+                    return default
+                raise
+
+            PLUGIN_CACHE[key] = cls._load_class_entry_point(selected_entry_point)
+
+        return PLUGIN_CACHE[key]
 
     @classmethod
     def load_classes(cls):
