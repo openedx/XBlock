@@ -11,6 +11,8 @@ import pkg_resources
 
 log = logging.getLogger(__name__)
 
+_plugin_cache = {}
+
 
 class PluginMissingError(Exception):
     """Raised when trying to load a plugin from an entry_point that cannot be found."""
@@ -50,7 +52,6 @@ class Plugin(object):
 
     """
 
-    _plugin_cache = None
     entry_point = None  # Should be overwritten by children classes
 
     # Temporary entry points, for register_temp_plugin.  A list of pairs,
@@ -93,25 +94,23 @@ class Plugin(object):
         if select is None:
             select = default_select
 
-        if cls._plugin_cache is None:
-            cls._plugin_cache = {}
+        identifier = identifier.lower()
+        entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
+        for extra_identifier, extra_entry_point in cls.extra_entry_points:
+            if identifier == extra_identifier:
+                entry_points.append(extra_entry_point)
 
-        if identifier not in cls._plugin_cache:
-            identifier = identifier.lower()
-            entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
-            for extra_identifier, extra_entry_point in cls.extra_entry_points:
-                if identifier == extra_identifier:
-                    entry_points.append(extra_entry_point)
+        try:
+            entry_point = select(identifier, entry_points)
+        except PluginMissingError:
+            if default is not None:
+                return default
+            raise
 
-            try:
-                entry_point = select(identifier, entry_points)
-            except PluginMissingError:
-                if default is not None:
-                    return default
-                raise
-
-            cls._plugin_cache[identifier] = cls._load_class_entry_point(entry_point)
-        return cls._plugin_cache[identifier]
+        key = "{}:{}".format(entry_point, identifier)
+        if key not in _plugin_cache:
+            _plugin_cache[key] = cls._load_class_entry_point(entry_point)
+        return _plugin_cache[key]
 
     @classmethod
     def load_classes(cls):
