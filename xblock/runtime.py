@@ -359,8 +359,8 @@ class Runtime(object):
         raise NotImplementedError("Runtime needs to provide handler_url()")
 
     @abstractmethod
-    def resources_url(self, resource):
-        """Get the URL for a static resorce file.
+    def resource_url(self, resource):
+        """Get the URL for a static resource file.
 
         `resource` is the application local path to the resource.
 
@@ -368,7 +368,7 @@ class Runtime(object):
         resource on your runtime.
 
         """
-        raise NotImplementedError("Runtime needs to provide resources_url()")
+        raise NotImplementedError("Runtime needs to provide resource_url()")
 
     @abstractmethod
     def local_resource_url(self, block, uri):
@@ -383,7 +383,7 @@ class Runtime(object):
         The return value is a complete absolute URL which will locate the
         resource on your runtime.
         """
-        raise NotImplementedError("Runtime needs to provide resources_url()")
+        raise NotImplementedError("Runtime needs to provide local_resource_url()")
 
     # Construction
 

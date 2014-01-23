@@ -427,7 +427,7 @@ class EqualityCheckerBlock(CheckerBlock):
         # Perhaps runtimes can offer a palette of popular libraries so that
         # XBlocks can refer to them in XBlock-standard ways?
         result.add_javascript_url(
-            self.runtime.resources_url("js/vendor/underscore-min.js"))
+            self.runtime.resource_url("js/vendor/underscore-min.js"))
 
         # TODO: The image tag here needs a magic URL, not a hard-coded one.
         format_data = {

@@ -224,7 +224,7 @@ class MockRuntimeForQuerying(Runtime):
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         raise Exception("Not Used By Tests")
 
-    def resources_url(self, resource):
+    def resource_url(self, resource):
         raise Exception("Not Used By Tests")
 
     def local_resource_url(self, block, uri):
