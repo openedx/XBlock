@@ -207,6 +207,7 @@ def test_db_model_keys():
     assert_equals('new mixin_agg_usage', get_key_value(Scope.user_state_summary, None, 'u0', 'mixin_agg_usage'))
 
 
+@unabc("{} shouldn't be used in tests")
 class MockRuntimeForQuerying(Runtime):
     """Mock out a runtime for querypath_parsing test"""
     # OK for this mock class to not override abstract methods or call base __init__
@@ -219,15 +220,6 @@ class MockRuntimeForQuerying(Runtime):
         return self.mock_query
 
     def get_block(self, usage_id):
-        raise Exception("Not Used By Tests")
-
-    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        raise Exception("Not Used By Tests")
-
-    def resource_url(self, resource):
-        raise Exception("Not Used By Tests")
-
-    def local_resource_url(self, block, uri):
         raise Exception("Not Used By Tests")
 
 
