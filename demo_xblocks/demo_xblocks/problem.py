@@ -475,6 +475,11 @@ class EqualityCheckerBlock(CheckerBlock):
         self.attempted = True
         self.left = left
         self.right = right
+        self.runtime.publish(
+            self, {
+                'event_type': 'grade',
+                'value': 1 if left == right else 0,
+                'max_value': 1})
         return left == right
 
 

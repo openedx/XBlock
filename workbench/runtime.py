@@ -178,6 +178,11 @@ class WorkbenchRuntime(Runtime):
     def local_resource_url(self, block, uri):
         return '/resource/%s/%s' % (block.scope_ids.block_type, uri)
 
+    def publish(self, block, event):
+        log.info("XBlock event for {block_type} (usage_id={usage_id}):".format(
+            block_type=block.scope_ids.block_type, usage_id=block.scope_ids.usage_id))
+        log.info(event)
+
     def query(self, block):
         return _BlockSet(self, [block])
 
