@@ -174,7 +174,7 @@ class WorkbenchRuntime(Runtime):
         return url
 
     def resource_url(self, resource):
-        return static(resource)
+        return static("workbench/" + resource)
 
     def local_resource_url(self, block, uri):
         return reverse("package_resource", args=(block.scope_ids.block_type, uri))
