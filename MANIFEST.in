@@ -1,0 +1,2 @@
+recursive-include workbench/static *
+recursive-include workbench/templates *
