@@ -10,7 +10,6 @@ setup(
         'demo_xblocks' : 'demo_xblocks/demo_xblocks'
     },
     install_requires=[
-        'lxml',
         'webob',
     ]
 )
