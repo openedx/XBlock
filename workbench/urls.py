@@ -10,9 +10,9 @@ init_scenarios()
 
 urlpatterns = patterns(
     'workbench.views',
-    url(r'^$', 'index', name='index'),
+    url(r'^$', 'index', name='workbench_index'),
     url(r'^scenario/(?P<scenario_id>[^/]+)/(?P<view_name>[^/]+)/$', 'show_scenario', name='scenario'),
-    url(r'^scenario/(?P<scenario_id>[^/]+)/$', 'show_scenario'),
+    url(r'^scenario/(?P<scenario_id>[^/]+)/$', 'show_scenario', name='workbench_show_scenario'),
 
     url(r'^view/(?P<scenario_id>[^/]+)/(?P<view_name>[^/]+)/$', 'show_scenario', {'template': 'blockview.html'}),
     url(r'^view/(?P<scenario_id>[^/]+)/$', 'show_scenario', {'template': 'blockview.html'}),

@@ -16,11 +16,13 @@ var RuntimeProvider = (function() {
         suffix = typeof suffix !== 'undefined' ? suffix : '';
         query = typeof query !== 'undefined' ? query : '';
         var usage = $(block).data('usage');
-        return ("/handler/" + usage +
-                        "/" + handlerName +
-                        "/" + suffix +
-                "?student=" + studentId +
-                        "&" + query);
+
+        // studentId and handlerBaseUrl are both defined in block.html
+        return (handlerBaseUrl + usage +
+                           "/" + handlerName +
+                           "/" + suffix +
+                   "?student=" + studentId +
+                           "&" + query);
       },
       children: function(block) {
         return $(block).prop('xblock_children');
