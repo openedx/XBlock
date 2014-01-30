@@ -10,7 +10,7 @@ header {
     width: 100%;
     border-bottom: 1px solid #aaaaaa;
     background-color: #cccccc;
-    background-image: url(/static/images/header-logo.png);
+    background-image: url(../images/header-logo.png);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: 1em .5em;
