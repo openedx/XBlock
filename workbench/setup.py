@@ -11,5 +11,6 @@ setup(
         'xblock.v1': [
             'debugchild = workbench.blocks:DebuggingChildBlock',
         ]
-    }
+    },
+    # TODO: install demo xblocks.
 )
