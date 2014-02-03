@@ -11,6 +11,8 @@ try:
 except ImportError:
     import json
 
+from django.core.urlresolvers import reverse
+from django.templatetags.static import static
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
@@ -157,12 +159,11 @@ class WorkbenchRuntime(Runtime):
         if not getattr(func, "_is_xblock_handler", False):
             raise ValueError("{!r} is not a handler name".format(handler_name))
 
-        url = "/{base}/{usage}/{handler}/{suffix}".format(
-            base="unauth_handler" if thirdparty else "handler",
-            usage=block.scope_ids.usage_id,
-            handler=handler_name,
-            suffix=suffix,
+        url = reverse(
+            "unauth_handler" if thirdparty else "handler",
+            args=(block.scope_ids.usage_id, handler_name, suffix)
         )
+
         has_query = False
         if not thirdparty:
             url += "?student={student}".format(student=block.scope_ids.user_id)
@@ -173,10 +174,10 @@ class WorkbenchRuntime(Runtime):
         return url
 
     def resource_url(self, resource):
-        return "/static/" + resource
+        return static("workbench/" + resource)
 
     def local_resource_url(self, block, uri):
-        return '/resource/%s/%s' % (block.scope_ids.block_type, uri)
+        return reverse("package_resource", args=(block.scope_ids.block_type, uri))
 
     def publish(self, block, event):
         log.info("XBlock event for {block_type} (usage_id={usage_id}):".format(

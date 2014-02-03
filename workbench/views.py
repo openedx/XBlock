@@ -54,13 +54,13 @@ def get_student_id(request):
 def index(_request):
     """Render `index.html`"""
     the_scenarios = sorted(SCENARIOS.items())
-    return render_to_response('index.html', {
+    return render_to_response('workbench/index.html', {
         'scenarios': [(desc, scenario.description) for desc, scenario in the_scenarios]
     })
 
 
 @ensure_csrf_cookie
-def show_scenario(request, scenario_id, view_name='student_view', template='block.html'):
+def show_scenario(request, scenario_id, view_name='student_view', template='workbench/block.html'):
     """
     Render the given `scenario_id` for the given `view_name`, on the provided `template`.
 
