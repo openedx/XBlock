@@ -542,7 +542,7 @@ class Runtime(object):
         """
         root = etree.Element("unknown_root")
         tree = etree.ElementTree(root)
-        block.export_xml(root)
+        block.add_xml_to_node(root)
         tree.write(xmlfile, xml_declaration=True, encoding="utf8")
 
     def add_block_as_child_node(self, block, node):
@@ -550,7 +550,7 @@ class Runtime(object):
         Export `block` as a child node of `node`.
         """
         child = etree.SubElement(node, "unknown")
-        block.export_xml(child)
+        block.add_xml_to_node(child)
 
     # Rendering
 

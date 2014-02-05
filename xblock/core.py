@@ -354,7 +354,7 @@ class XBlock(Plugin):
 
         return block
 
-    def export_xml(self, node):
+    def add_xml_to_node(self, node):
         """
         For exporting, set data on `node` from ourselves.
         """

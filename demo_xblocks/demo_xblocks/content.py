@@ -47,7 +47,7 @@ class HtmlBlock(XBlock):
 
         return block
 
-    def export_xml(self, node):
+    def add_xml_to_node(self, node):
         """
         Set attributes and children on `node` to represent ourselves as XML.
 
