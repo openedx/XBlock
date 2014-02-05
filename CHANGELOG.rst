@@ -7,6 +7,8 @@ These are notable changes in XBlock.
 0.4 - In Progress
 -----------------
 
+* Rename `export_xml` to `add_xml_to_node`, to more accurately capture the semantics.
+
 * Allowed `Runtime` implementations to customize loading from **block_types** to
   `XBlock` classes.
 
