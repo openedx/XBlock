@@ -159,7 +159,7 @@ your `workbench_scenarios` method.
 Testing with the edX LMS
 ........................
 
-See https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/xblocks.rst#Testing
+See https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/xblocks.rst#testing
 
 Deploying your XBlock
 ---------------------
