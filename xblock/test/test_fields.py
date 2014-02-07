@@ -10,7 +10,10 @@ import unittest
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
-from xblock.fields import Any, Boolean, Dict, Field, Float, Integer, List, String, Reference, ReferenceList
+from xblock.fields import (
+    Any, Boolean, Dict, Field, Float,
+    Integer, List, String, Reference, ReferenceList, Sentinel
+)
 
 from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
 
@@ -352,3 +355,20 @@ def test_twofaced_field_access():
     assert_equals(len(field_tester._dirty_fields), 1)
     # However, the field should not ACTUALLY be marked as a field that is needing to be saved.
     assert_not_in('how_many', field_tester._get_fields_to_save())   # pylint: disable=W0212
+
+
+class SentinelTest(unittest.TestCase):
+    def test_equality(self):
+        base = Sentinel('base')
+        self.assertEquals(base, base)
+        self.assertEquals(base, Sentinel('base'))
+        self.assertNotEquals(base, Sentinel('foo'))
+        self.assertNotEquals(base, 'base')
+
+    def test_hashing(self):
+        base = Sentinel('base')
+        dict = {base: True}
+        self.assertEquals(dict[Sentinel('base')], True)
+        self.assertEquals(dict[base], True)
+        self.assertNotIn(Sentinel('foo'), dict)
+        self.assertNotIn('base', dict)

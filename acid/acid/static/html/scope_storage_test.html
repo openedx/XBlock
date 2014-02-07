@@ -1,7 +1,23 @@
-<div class="scope-storage-test scope-{scope}" data-handler-url="{handler_url}" data-scope="{scope}" data-value="{value}">
-    <p>For scope {scope}:</p>
-    <p>Server-side handler_url returned: <span class="server-storage-test-returned">no</span></p>
-    <p>Server-side handler_url succeeded: <span class="server-storage-test-succeeded">no</span></p>
-    <p>Client-side handler_url returned: <span class="client-storage-test-returned">no</span></p>
-    <p>Client-side handler_url succeeded: <span class="client-storage-test-succeeded">no</span></p>
-</div>
+<tr class="scope-storage-test scope-{scope} {alt}" data-handler-url="{handler_url}" data-scope="{scope}" data-value="{value}">
+    <td>{scope}</td>
+    <td>
+        <span class="server-storage-test-returned">
+            <i class="{unknown_class}"></i>
+        </span>
+    </td>
+    <td>
+        <span class="server-storage-test-succeeded">
+            <i class="{unknown_class}"></i>
+        </span>
+    </td>
+    <td>
+        <span class="client-storage-test-returned">
+            <i class="{unknown_class}"></i>
+        </span>
+    </td>
+    <td>
+        <span class="client-storage-test-succeeded">
+            <i class="{unknown_class}"></i>
+        </span>
+    </td>
+</tr>
