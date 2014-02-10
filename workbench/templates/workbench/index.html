@@ -1,7 +1,9 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="/static/css/workbench.css">
+        <link rel="stylesheet" type="text/css"
+              href="{% static 'workbench/css/workbench.css' %}">
     </head>
     <body>
         <header>
@@ -9,7 +11,7 @@
         </header>
         <section class="main">
             {% for scname, desc in scenarios %}
-                <p><a href="/scenario/{{scname}}">{{desc}}</a></p>
+                <p><a href="{% url workbench_show_scenario scname %}">{{desc}}</a></p>
             {% endfor %}
         </section>
     </body>
