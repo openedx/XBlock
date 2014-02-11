@@ -19,6 +19,31 @@ __all__ = [
 ]
 
 
+class Sentinel(object):
+    """
+    Class for implementing sentinel objects (only equal to themselves).
+    """
+    def __init__(self, name):
+        """
+        `name` is the name used to identify the sentinel (which will
+            be displayed as the __repr__) of the sentinel.
+        """
+        self.name = name
+
+    def __repr__(self):
+        return self.name
+
+    @property
+    def attr_name(self):
+        return self.name.lower().replace('.', '_')
+
+    def __eq__(self, other):
+        return isinstance(other, Sentinel) and self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+
 class BlockScope(object):
     """
     Enumeration of block scopes.
@@ -39,7 +64,14 @@ class BlockScope(object):
         information that is purely about the student.
 
     """
-    USAGE, DEFINITION, TYPE, ALL = xrange(4)
+    USAGE = Sentinel('BlockScope.USAGE')
+    DEFINITION = Sentinel('BlockScope.DEFINITION')
+    TYPE = Sentinel('BlockScope.TYPE')
+    ALL = Sentinel('BlockScope.ALL')
+
+    @classmethod
+    def scopes(cls):
+        return [cls.USAGE, cls.DEFINITION, cls.TYPE, cls.ALL]
 
 
 class UserScope(object):
@@ -63,28 +95,19 @@ class UserScope(object):
         submitted by all students.
 
     """
-    NONE, ONE, ALL = xrange(3)
+    NONE = Sentinel('UserScope.NONE')
+    ONE = Sentinel('UserScope.ONE')
+    ALL = Sentinel('UserScope.ALL')
 
-
-class Sentinel(object):
-    """
-    Class for implementing sentinel objects (only equal to themselves).
-    """
-    def __init__(self, name):
-        """
-        `name` is the name used to identify the sentinel (which will
-            be displayed as the __repr__) of the sentinel.
-        """
-        self.name = name
-
-    def __repr__(self):
-        return self.name
+    @classmethod
+    def scopes(cls):
+        return [cls.NONE, cls.ONE, cls.ALL]
 
 
 UNSET = Sentinel("fields.UNSET")
 
 
-ScopeBase = namedtuple('ScopeBase', 'user block')  # pylint: disable=C0103
+ScopeBase = namedtuple('ScopeBase', 'user block name')  # pylint: disable=C0103
 
 
 class Scope(ScopeBase):
@@ -120,15 +143,53 @@ class Scope(ScopeBase):
     the points scored by all users attempting a problem.
 
     """
-    content = ScopeBase(user=UserScope.NONE, block=BlockScope.DEFINITION)
-    settings = ScopeBase(user=UserScope.NONE, block=BlockScope.USAGE)
-    user_state = ScopeBase(user=UserScope.ONE, block=BlockScope.USAGE)
-    preferences = ScopeBase(user=UserScope.ONE, block=BlockScope.TYPE)
-    user_info = ScopeBase(user=UserScope.ONE, block=BlockScope.ALL)
-    user_state_summary = ScopeBase(user=UserScope.ALL, block=BlockScope.USAGE)
+    content = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, u'content')
+    settings = ScopeBase(UserScope.NONE, BlockScope.USAGE, u'settings')
+    user_state = ScopeBase(UserScope.ONE, BlockScope.USAGE, u'user_state')
+    preferences = ScopeBase(UserScope.ONE, BlockScope.TYPE, u'preferences')
+    user_info = ScopeBase(UserScope.ONE, BlockScope.ALL, u'user_info')
+    user_state_summary = ScopeBase(UserScope.ALL, BlockScope.USAGE, u'user_state_summary')
+
+    @classmethod
+    def named_scopes(cls):
+        """Return all named Scopes."""
+        return [
+            cls.content,
+            cls.settings,
+            cls.user_state,
+            cls.preferences,
+            cls.user_info,
+            cls.user_state_summary
+        ]
+
+    @classmethod
+    def scopes(cls):
+        """Return all possible Scopes."""
+        named_scopes = cls.named_scopes()
+        return named_scopes + [
+            cls(user, block)
+            for user in UserScope.scopes()
+            for block in BlockScope.scopes()
+            if cls(user, block) not in named_scopes
+        ]
+
+    def __new__(cls, user, block, name=None):
+        """Create a new Scope, with an optional name."""
+
+        if name is None:
+            name = u'{}_{}'.format(user, block)
+
+        return ScopeBase.__new__(cls, user, block, name)
 
     children = Sentinel('Scope.children')
     parent = Sentinel('Scope.parent')
+
+    def __unicode__(self):
+        return self.name
+
+    def __eq__(self, other):
+        return isinstance(other, Scope) and self.user == other.user and self.block == other.block
+
 
 
 ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylint: disable=C0103

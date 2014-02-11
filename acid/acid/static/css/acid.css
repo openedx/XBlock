@@ -1,0 +1,38 @@
+.acid-block .scope-storage-test .results {
+    padding-left: 30px;
+}
+
+.fail {
+    color: red;
+}
+
+.pass {
+    color: green;
+}
+
+.error {
+    color: orange;
+}
+
+table.storage-tests {
+    border-collapse: collapse;
+}
+
+table.storage-tests, .storage-tests th {
+    border: 1px solid black;
+}
+
+.storage-tests th {
+    background: lightgray;
+    padding: 5px;
+}
+
+.storage-tests tr.alt {
+    background: gainsboro;
+}
+
+.storage-tests td {
+    text-align: center;
+    padding: 5px;
+    border-top: 1px solid lightgrey;
+}

@@ -1,30 +1,25 @@
 """An XBlock checking container/block relationships for correctness."""
 
+import logging
 import pkg_resources
 import random
 import webob
 from itertools import chain
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer
+from xblock.fields import Scope, Dict, Boolean
 from xblock.fragment import Fragment
-
-
-REQUIRED_SCOPES = {
-    'student_view': ['user_state'],
-    'studio_view': ['settings', 'content']
-}
 
 
 def generate_fields(cls):
     """
-    Generate fields for any scope listed in REQUIRED_SCOPES
+    A class decorator that generates fields for all field scopes.
+    These fields are Dicts, and map usage_ids to values.
     """
-    for scope in set(chain(*REQUIRED_SCOPES.values())):
-        setattr(cls, scope, Integer(
-            help="A value stored in the {} scope".format(scope),
-            default=None,
-            scope=getattr(Scope, scope)
+    for scope in Scope.scopes():
+        setattr(cls, scope.name, Dict(
+            help="Values stored in the {} scope".format(scope),
+            scope=scope
         ))
 
     return cls
@@ -61,6 +56,20 @@ class AcidBlock(XBlock):
     A testing block that checks the behavior of the container.
     """
 
+    SUCCESS_CLASS = 'fa fa-check-square-o fa-lg pass'
+    FAILURE_CLASS = 'fa fa-times fa-lg fail'
+    ERROR_CLASS = 'fa fa-exclamation-triangle fa-lg error'
+    UNKNOWN_CLASS = 'fa fa-question-circle fa-lg unknown'
+
+    enabled_fields = Dict(
+        help="Dictionary specifying which fields should be enabled for which views. If a view is left out, all fields are enabled",
+        scope=Scope.content,
+        default={
+            'studio_view': ['content', 'settings'],
+            'student_view': ['user_state', 'user_state_summary', 'preferences', 'user_info']
+        }
+    )
+
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
@@ -70,7 +79,8 @@ class AcidBlock(XBlock):
         """
         Set up the block for a storage test of the specified scope.
 
-        This sets the value for the field named `scope` to a random value.
+        This updates the field named scope with an entry keyed on
+        this block's `usage_id`, set to a random integer.
 
         Args:
             scope (str): The name of the scope to test
@@ -85,7 +95,10 @@ class AcidBlock(XBlock):
                     storage for the specified `scope`
         """
         new_value = random.randint(0, 9999)
-        setattr(self, scope, new_value)
+
+        # Retrieve the field named for the scope (whose value is a dictionary)
+        # and add an entry for this block's usage_id, set to `new_value`.
+        getattr(self, scope)[str(self.scope_ids.usage_id)] = new_value
 
         query = 'QUERY={}&SCOPE={}'.format(new_value, scope)
         suffix = 'SUFFIX{}'.format(new_value)
@@ -106,14 +119,39 @@ class AcidBlock(XBlock):
         block_template = self.resource_string("static/html/acid.html")
         storage_test_template = self.resource_string('static/html/scope_storage_test.html')
 
+        scopes = (
+            scope
+            for scope in Scope.scopes()
+            if (view_name not in self.enabled_fields
+                or scope.name in self.enabled_fields[view_name])
+        )
+
+        scope_test_contexts = []
+        for scope in scopes:
+            try:
+                scope_test_contexts.append(self.setup_storage(scope.name))
+            except Exception as exc:
+                logging.warning('Unable to use scope in acid test', exc_info=True)
+
         frag = Fragment(block_template.format(
+            error_class=self.ERROR_CLASS,
+            success_class=self.SUCCESS_CLASS,
+            failure_class=self.FAILURE_CLASS,
+            unknown_class=self.UNKNOWN_CLASS,
             storage_tests='\n'.join(
-                storage_test_template.format(**self.setup_storage(scope))
-                for scope in REQUIRED_SCOPES[view_name]
+                storage_test_template.format(
+                    alt="alt" if idx % 2 else "",
+                    unknown_class=self.UNKNOWN_CLASS,
+                    **context
+                )
+                for idx, context in enumerate(scope_test_contexts)
             ),
         ))
 
-        frag.add_javascript(self.resource_string("static/js/src/acid.js"))
+        frag.add_javascript(self.resource_string("static/js/jquery.ajaxq-0.0.1.js"))
+        frag.add_javascript(self.resource_string('static/js/acid.js'))
+        frag.add_css(self.resource_string("static/css/acid.css"))
+        frag.add_css_url('//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css')
         frag.initialize_js('AcidBlock')
         return frag
 
@@ -136,7 +174,7 @@ class AcidBlock(XBlock):
         if 'QUERY' not in request.GET:
             return FailureResponse("QUERY is missing from query parameters")
 
-        stored_value = getattr(self, scope)
+        stored_value = getattr(self, scope).get(str(self.scope_ids.usage_id))
         query_value = int(request.GET['QUERY'])
 
         if stored_value != query_value:

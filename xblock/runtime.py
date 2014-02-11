@@ -520,7 +520,7 @@ class Runtime(object):
         # TODO: a way for this node to be a usage to an existing definition?
         def_id = id_generator.create_definition(block_type)
         usage_id = id_generator.create_usage(def_id)
-        keys = ScopeIds(UserScope.NONE, block_type, def_id, usage_id)
+        keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
         block = block_class.parse_xml(node, self, keys, id_generator)
         block.parent = parent_id

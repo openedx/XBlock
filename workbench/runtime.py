@@ -63,7 +63,7 @@ class WorkbenchKeyValueStore(KeyValueStore):
         elif key.scope == Scope.parent:
             key_list.append('parent')
         else:
-            key_list.append(["usage", "definition", "type", "all"][key.scope.block])
+            key_list.append(key.scope.block.attr_name)
 
         if key.block_scope_id is not None:
             key_list.append(key.block_scope_id)
