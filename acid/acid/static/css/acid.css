@@ -36,3 +36,9 @@ table.storage-tests, .storage-tests th {
     padding: 5px;
     border-top: 1px solid lightgrey;
 }
+
+.acid-children {
+    border-top: 3px solid lightgrey;
+    margin: 5px;
+    padding-left: 30px;
+}

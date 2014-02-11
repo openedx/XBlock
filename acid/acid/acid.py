@@ -1,10 +1,13 @@
 """An XBlock checking container/block relationships for correctness."""
 
+import json
 import logging
 import pkg_resources
 import random
 import webob
 from itertools import chain
+from lazy import lazy
+from mako.lookup import TemplateLookup
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Dict, Boolean
@@ -55,6 +58,7 @@ class AcidBlock(XBlock):
     """
     A testing block that checks the behavior of the container.
     """
+    has_children = True
 
     SUCCESS_CLASS = 'fa fa-check-square-o fa-lg pass'
     FAILURE_CLASS = 'fa fa-times fa-lg fail'
@@ -69,6 +73,25 @@ class AcidBlock(XBlock):
             'student_view': ['user_state', 'user_state_summary', 'preferences', 'user_info']
         }
     )
+
+    @lazy
+    def template_lookup(self):
+        return TemplateLookup(
+            directories=[pkg_resources.resource_filename(__name__, 'static')],
+        )
+
+    def render_template(self, path, **kwargs):
+        """
+        Render the template at `path`, supplying `kwargs`.
+        """
+        return self.template_lookup.get_template(path).render_unicode(**kwargs)
+
+    @lazy
+    def parent_value(self):
+        """
+        This value is used to test that AcidBlock are visible to their parents.
+        """
+        return random.randint(0, 9999)
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -116,9 +139,6 @@ class AcidBlock(XBlock):
         This view is used by the Acid XBlock to test various features of
         the runtime it is contained in
         """
-        block_template = self.resource_string("static/html/acid.html")
-        storage_test_template = self.resource_string('static/html/scope_storage_test.html')
-
         scopes = (
             scope
             for scope in Scope.scopes()
@@ -133,20 +153,34 @@ class AcidBlock(XBlock):
             except Exception as exc:
                 logging.warning('Unable to use scope in acid test', exc_info=True)
 
-        frag = Fragment(block_template.format(
+        children = [
+            self.runtime.get_block(child_id)
+            for child_id in self.children
+        ]
+
+        rendered_children = [
+            self.runtime.render_child(child, context=context)
+            for child in children
+        ]
+
+        child_values = {
+            child.name: child.parent_value
+            for child in children
+            if child.scope_ids.block_type == 'acid' and child.name is not None
+        }
+
+        frag = Fragment(self.render_template(
+            'html/acid.html.mako',
             error_class=self.ERROR_CLASS,
             success_class=self.SUCCESS_CLASS,
             failure_class=self.FAILURE_CLASS,
             unknown_class=self.UNKNOWN_CLASS,
-            storage_tests='\n'.join(
-                storage_test_template.format(
-                    alt="alt" if idx % 2 else "",
-                    unknown_class=self.UNKNOWN_CLASS,
-                    **context
-                )
-                for idx, context in enumerate(scope_test_contexts)
-            ),
+            acid_child_values=json.dumps(child_values),
+            acid_child_count=len([child for child in children if child.scope_ids.block_type == 'acid']),
+            rendered_children=(fragment.content for fragment in rendered_children),
+            storage_tests=scope_test_contexts,
         ))
+        frag.add_frags_resources(rendered_children)
 
         frag.add_javascript(self.resource_string("static/js/jquery.ajaxq-0.0.1.js"))
         frag.add_javascript(self.resource_string('static/js/acid.js'))
@@ -220,9 +254,10 @@ class AcidBlock(XBlock):
             ("XBlock Acid test",
              """\
                 <vertical_demo>
-                    <acid/>
-                    <acid/>
-                    <acid/>
+                    <acid name='parent'>
+                        <acid name='left-child'/>
+                        <acid name='right-child'/>
+                    </acid>
                 </vertical_demo>
              """)
         ]
