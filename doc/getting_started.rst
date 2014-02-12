@@ -147,7 +147,7 @@ running without a cumbersome edit-install-run cycle.
 Use pip to install your block::
 
     $ cd ~/edxwork
-    $ pip install -e myxblock
+    $ sudo pip install -e myxblock
 
 Testing with the workbench
 ..........................

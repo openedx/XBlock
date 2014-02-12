@@ -21,7 +21,9 @@ Fields
 ------
 
 XBlock state (or data) is arbitrary JSON-able data stored in Python attributes
-called **fields**.  Fields declare their relationship to both blocks and users,
+called **fields**.
+
+Fields declare their relationship to both blocks and users,
 by specifying their **scope**.
 
 * By user: fields declare how they relate to the user:
@@ -37,15 +39,19 @@ by specifying their **scope**.
 
 * By XBlock: fields declare how they relate to the block:
 
-  * Block usage: the instance of the XBlock in a particular course.
+  * Block usage: the fields are related *only* to that instance of the XBlock in
+  a particular course.
 
-  * Block definition: the definition of an XBlock created by a content
-    creator (potentially shared across runs of a course).
+  * Block definition: the fields are related to the *definition* of the XBlock.
+  This definition is specified by the content creator.  For instance, using a
+  definition, you could create an XBlock whose data is shared across multiple
+  runs of a course.
 
-  * Block type: the Python type of the XBlock (shared across all instances
-    of the XBlock in all courses).
+  * Block type: the fields are related to the *Python type* of the XBlock, and
+  thus shared across all instances of the XBlock in all courses).
 
-  * All: all XBlocks share the same data.
+  * All: the fields are related to all XBlocks, of all types (thus, any XBlock
+  can access the data).
 
 These two aspects, user and block, are independent.  A field scope specifies
 both.  For example:
@@ -78,6 +84,8 @@ For convenience, we also provide six predefined scopes: ``Scope.content``,
 | **BlockScope.ALL**        |                | Scope.user_info   |                          |
 +---------------------------+----------------+-------------------+--------------------------+
 
+
+
 XBlocks declare their fields as class attributes in the XBlock class
 definition.  Each field has at least a name, a type, and a scope::
 
@@ -94,6 +102,13 @@ block.  Modifications to the attributes are stored in memory, and persisted to
 underlying ``FieldData`` instance when ``save()`` is called on the ``XBlock``.
 Runtimes will call ``save()`` after an ``XBlock`` is constructed, and after
 every invocation of a handler, view, or method on an XBlock.
+
+**Important note:** At present, XBlocks does not support storing a very large amount
+of data in a single field.  This is because XBlocks fields are written and retrieved
+as single entities, reading the whole field into memory.  Thus, a field that contains,
+say, a list of one million items would become problematic.  If you need to store
+very large amounts of data, a possible workaround is to split the data
+across many smaller fields.
 
 
 Children
