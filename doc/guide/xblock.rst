@@ -84,6 +84,39 @@ For convenience, we also provide six predefined scopes: ``Scope.content``,
 | **BlockScope.ALL**        |                | Scope.user_info   |                          |
 +---------------------------+----------------+-------------------+--------------------------+
 
+An example of situations in which you might want to use each (UserScope, BlockScope) pairing:
+
+BlockScope.USAGE:
+- UserScope.NONE: Settings.  You want something to be true for an entire course, but it is not
+specific to any users.
+- UserScope.ONE: User state.  You want to keep track of questions a user has answered correctly
+and incorrectly.
+- UserScope.ALL: User state summary.  You want to compare how all the users are doing in a course.
+
+BlockScope.DEFINITION:
+- UserScope.NONE: Content.  You have some content you would like to share across several courses
+(i.e., a table of math formulas), but it is not specific to any user.
+- UserScope.ONE: Multi-course user state.  You want to keep track of the user's state across
+multiple courses.
+- UserScope.ALL: Multi-course user state summary.  You want to compare how all users in all math
+courses are doing.
+
+BlockScope.TYPE:
+- UserScope.NONE: XBlock content.  You have information related to this XBlock's functionality
+that needs to be shared across all XBlocks of its type, but it is not user-specific.
+- UserScope.ONE: User preferences.  In courses where this XBlock is present, you want to keep track
+of what preferences the user has chosen (for instance, selecting a particular type of display for
+the XBlock)
+- UserScope.ALL: User XBlock-related interaction summary.  In courses where this XBlock is present,
+you want to compare the different ways users interact with that XBlock.
+
+BlockScope.ALL:
+- UserScope.NONE: Global settings.  You want to establish information that all XBlocks anywhere
+should have access to.
+- UserScope.ONE: User information.  You want all XBlocks of all types to be able to access basic
+information such as user name, geographic location, language, etc.
+- UserScope.ALL: User demographics.  You want to be able to aggregate data for all users in all
+courses.
 
 
 XBlocks declare their fields as class attributes in the XBlock class
