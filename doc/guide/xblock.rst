@@ -21,7 +21,9 @@ Fields
 ------
 
 XBlock state (or data) is arbitrary JSON-able data stored in Python attributes
-called **fields**.  Fields declare their relationship to both blocks and users,
+called **fields**.
+
+Fields declare their relationship to both blocks and users,
 by specifying their **scope**.
 
 * By user: fields declare how they relate to the user:
@@ -37,15 +39,19 @@ by specifying their **scope**.
 
 * By XBlock: fields declare how they relate to the block:
 
-  * Block usage: the instance of the XBlock in a particular course.
+  * Block usage: the fields are related *only* to that instance of the XBlock in
+  a particular course.
 
-  * Block definition: the definition of an XBlock created by a content
-    creator (potentially shared across runs of a course).
+  * Block definition: the fields are related to the *definition* of the XBlock.
+  This definition is specified by the content creator.  For instance, using a
+  definition, you could create an XBlock whose data is shared across multiple
+  runs of a course.
 
-  * Block type: the Python type of the XBlock (shared across all instances
-    of the XBlock in all courses).
+  * Block type: the fields are related to the *Python type* of the XBlock, and
+  thus shared across all instances of the XBlock in all courses).
 
-  * All: all XBlocks share the same data.
+  * All: the fields are related to all XBlocks, of all types (thus, any XBlock
+  can access the data).
 
 These two aspects, user and block, are independent.  A field scope specifies
 both.  For example:
@@ -78,6 +84,41 @@ For convenience, we also provide six predefined scopes: ``Scope.content``,
 | **BlockScope.ALL**        |                | Scope.user_info   |                          |
 +---------------------------+----------------+-------------------+--------------------------+
 
+An example of situations in which you might want to use each (UserScope, BlockScope) pairing:
+
+BlockScope.USAGE:
+- UserScope.NONE: Settings.  You want something to be true for an entire course, but it is not
+specific to any users.
+- UserScope.ONE: User state.  You want to keep track of questions a user has answered correctly
+and incorrectly.
+- UserScope.ALL: User state summary.  You want to compare how all the users are doing in a course.
+
+BlockScope.DEFINITION:
+- UserScope.NONE: Content.  You have some content you would like to share across several courses
+(i.e., a table of math formulas), but it is not specific to any user.
+- UserScope.ONE: Multi-course user state.  You want to keep track of the user's state across
+multiple courses.
+- UserScope.ALL: Multi-course user state summary.  You want to compare how all users in all math
+courses are doing.
+
+BlockScope.TYPE:
+- UserScope.NONE: XBlock content.  You have information related to this XBlock's functionality
+that needs to be shared across all XBlocks of its type, but it is not user-specific.
+- UserScope.ONE: User preferences.  In courses where this XBlock is present, you want to keep track
+of what preferences the user has chosen (for instance, selecting a particular type of display for
+the XBlock)
+- UserScope.ALL: User XBlock-related interaction summary.  In courses where this XBlock is present,
+you want to compare the different ways users interact with that XBlock.
+
+BlockScope.ALL:
+- UserScope.NONE: Global settings.  You want to establish information that all XBlocks anywhere
+should have access to.
+- UserScope.ONE: User information.  You want all XBlocks of all types to be able to access basic
+information such as user name, geographic location, language, etc.
+- UserScope.ALL: User demographics.  You want to be able to aggregate data for all users in all
+courses.
+
+
 XBlocks declare their fields as class attributes in the XBlock class
 definition.  Each field has at least a name, a type, and a scope::
 
@@ -94,6 +135,13 @@ block.  Modifications to the attributes are stored in memory, and persisted to
 underlying ``FieldData`` instance when ``save()`` is called on the ``XBlock``.
 Runtimes will call ``save()`` after an ``XBlock`` is constructed, and after
 every invocation of a handler, view, or method on an XBlock.
+
+**Important note:** At present, XBlocks does not support storing a very large amount
+of data in a single field.  This is because XBlocks fields are written and retrieved
+as single entities, reading the whole field into memory.  Thus, a field that contains,
+say, a list of one million items would become problematic.  If you need to store
+very large amounts of data, a possible workaround is to split the data
+across many smaller fields.
 
 
 Children
