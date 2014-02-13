@@ -11,6 +11,8 @@ setup(
     ],
     install_requires=[
         'XBlock',
+        'Mako',
+        'lazy',
     ],
     entry_points={
         'xblock.v1': [
