@@ -33,7 +33,9 @@
             <div class="student_view">
                 {{body|safe}}
             </div>
-            <hr />
+            {{foot_html|safe}}
+        </section>
+        <section class="debug">
             <div class="data">
                 <span class="data_label">Log</span>
                 {{log|safe}}
@@ -49,6 +51,5 @@
                 {{block}}
             </div>
         </section>
-    {{foot_html|safe}}
     </body>
 </html>
