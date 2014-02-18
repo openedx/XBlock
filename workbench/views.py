@@ -122,8 +122,6 @@ def package_resource(_request, block_type, resource):
     Wrapper for `pkg_resources` that tries to access a resource and, if it
     is not found, raises an Http404 error.
     """
-    if ".." in resource:
-        raise Http404
     try:
         xblock_class = XBlock.load_class(block_type)
         content = xblock_class.open_local_resource(resource)
