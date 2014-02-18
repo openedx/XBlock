@@ -438,7 +438,7 @@ class Runtime(object):
         self._services = services or {}
 
         # Provide some default implementations
-        self._services.setdefault("i18n", gettext.NullTranslations())
+        self._services.setdefault("i18n", NullI18nService())
 
         self.default_class = default_class
         self.select = select
@@ -865,3 +865,30 @@ class RegexLexer(object):
         for match in self.regex.finditer(text):
             name = match.lastgroup
             yield (name, match.group(name))
+
+
+class NullI18nService(object):
+    """
+    A simple implementation of the runtime "i18n" service.
+    """
+    def __init__(self):
+        self._translations = gettext.NullTranslations()
+
+    def __getattr__(self, name):
+        return getattr(self._translations, name)
+
+    STRFTIME_FORMATS = {
+        "SHORT_DATE_FORMAT": "%b %d, %Y",
+        "LONG_DATE_FORMAT": "%A, %B %d, %Y",
+        "TIME_FORMAT": "%I:%M:%S %p",
+        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
+    }
+
+    def strftime(self, dtime, format):      # pylint: disable=redefined-builtin
+        """
+        Locale-aware strftime, with format short-cuts.
+        """
+        format = self.STRFTIME_FORMATS.get(format+"_FORMAT", format)
+        if isinstance(format, unicode):
+            format = format.encode("utf8")
+        return dtime.strftime(format).decode("utf8")

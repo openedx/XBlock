@@ -358,6 +358,9 @@ def test_twofaced_field_access():
 
 
 class SentinelTest(unittest.TestCase):
+    """
+    Tests of :ref:`xblock.fields.Sentinel`.
+    """
     def test_equality(self):
         base = Sentinel('base')
         self.assertEquals(base, base)
@@ -367,8 +370,8 @@ class SentinelTest(unittest.TestCase):
 
     def test_hashing(self):
         base = Sentinel('base')
-        dict = {base: True}
-        self.assertEquals(dict[Sentinel('base')], True)
-        self.assertEquals(dict[base], True)
-        self.assertNotIn(Sentinel('foo'), dict)
-        self.assertNotIn('base', dict)
+        a_dict = {base: True}
+        self.assertEquals(a_dict[Sentinel('base')], True)
+        self.assertEquals(a_dict[base], True)
+        self.assertNotIn(Sentinel('foo'), a_dict)
+        self.assertNotIn('base', a_dict)
