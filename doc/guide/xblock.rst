@@ -213,8 +213,8 @@ To access children via the server-side, the best method is:
 
 To access children via the client-side, the best method is:
 
-- Call runtime.children(element) to get a list of child elements (where does element come from?)
-runtime.childMap(element, name) to get child element of a specific name
+- Call runtime.children(element) to get a list of child elements
+- Call runtime.childMap(element, name) to get child element of a specific name
 
 
 
