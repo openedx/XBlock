@@ -13,12 +13,22 @@ from xblock.test.tools import assert_false, assert_raises, assert_equals
 
 
 class TestingBlock(XBlock):
+    """
+    An XBlock for use in the tests below.
+
+    It has fields in a handful of scopes to test that the different scopes
+    do the right thing with a split fielddata.
+
+    """
     content = String(scope=Scope.content)
     settings = String(scope=Scope.settings)
     user_state = String(scope=Scope.user_state)
 
 
 class TestSplitFieldData(object):
+    """
+    Tests of :ref:`SplitFieldData`.
+    """
     def setUp(self):
         self.content = Mock()
         self.settings = Mock()
@@ -68,6 +78,9 @@ class TestSplitFieldData(object):
 
 
 class TestReadOnlyFieldData(object):
+    """
+    Tests of :ref:`ReadOnlyFieldData`.
+    """
     def setUp(self):
         self.source = Mock()
         self.read_only = ReadOnlyFieldData(self.source)
