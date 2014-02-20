@@ -145,7 +145,7 @@ as the default does.
 Documentation
 -------------
 
-The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org .
+The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org . Information on how to integrate XBlocks with the edx platform are sourced from https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/xblocks.rst#deploying-your-xblock
 
 
 
