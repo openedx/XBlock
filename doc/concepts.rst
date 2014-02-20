@@ -78,7 +78,6 @@ Examples of runtimes:
 * edX Studio 
 * edX LMS
 * XBlock workbench
-* Peer grading workflow app
 * `XBlock Runtime for Google App Engine`__
 
 __ https://github.com/google/appengine_xblock_runtime

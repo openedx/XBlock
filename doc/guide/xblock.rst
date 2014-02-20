@@ -23,8 +23,8 @@ Fields
 XBlock state (or data) is arbitrary JSON-able data stored in Python attributes
 called **fields**.
 
-Fields declare their relationship to both blocks and users,
-by specifying their **scope**.
+Fields declare their relationship to both blocks and users, by specifying their
+**scope**.
 
 * By user: fields declare how they relate to the user:
 
@@ -34,18 +34,21 @@ by specifying their **scope**.
   * One user: the data is particular to a single user, such as an answer to a
     problem.
 
-  * All users: the data is an aggregate of all users.  An example is the total
-    number of students answering a question.
+  * All users: the data shared for all users.  An example is the total
+    number of students answering a question.  Note that this is *not* the
+    same as aggregate or query data.  The same value will be shared for
+    all users, and there's no way to link specific actions to specific users.
 
 * By XBlock: fields declare how they relate to the block:
 
-  * Block usage: the fields are related *only* to that instance of the XBlock in
-    a particular course.
+  * Block usage: the fields are related *only* to that instance, or usage, of the
+    XBlock in a particular course.
 
   * Block definition: the fields are related to the *definition* of the XBlock.
-    This definition is specified by the content creator.  For instance, using a
-    definition, you could create an XBlock whose data is shared across multiple
-    runs of a course.
+    This definition is specified by the content creator.  A definition can be
+    shared across one or more *usages*.  For instance, you could create a single
+    XBlock definition with many usages, and those usages can appear across
+    courses or within the same course.
 
   * Block type: the fields are related to the *Python type* of the XBlock, and
     thus shared across all instances of the XBlock in all courses.
@@ -84,49 +87,56 @@ For convenience, we also provide six predefined scopes: ``Scope.content``,
 | **BlockScope.ALL**        |                | Scope.user_info   |                          |
 +---------------------------+----------------+-------------------+--------------------------+
 
-An example of situations in which you might want to use each (UserScope, BlockScope) pairing:
+**Examples of Situations.**  The following list shows examples of cases in which you
+may want to use a particular (UserScope, BlockScope) pairing.  There are many other
+situations in which you may want to use these scopes.
 
 BlockScope.USAGE:
-- UserScope.NONE: Settings.  You want something to be true for an entire course, but it is not
-  specific to any users.
-- UserScope.ONE: User state.  You want to keep track of questions a user has answered correctly
-  and incorrectly.
-- UserScope.ALL: User state summary.  You want to compare how all the users are doing in a course.
+- UserScope.NONE: Settings.  You want something to be true only for a specific
+  instance of an XBlock.
+- UserScope.ONE: User state.  You want to keep track of questions a user has
+  answered correctly and incorrectly for a specific instance of an XBlock.
+- UserScope.ALL: User state summary.  You want to show how all the users respond
+  to a question on a specific instance of an XBlock.
 
 BlockScope.DEFINITION:
-- UserScope.NONE: Content.  You have some content you would like to share across several courses
-  (i.e., a table of math formulas), but it is not specific to any user.
-- UserScope.ONE: Multi-course user state.  You want to keep track of the user's state across
-  multiple courses.
-- UserScope.ALL: Multi-course user state summary.  You want to compare how all users in all math
-  courses are doing.
+- UserScope.NONE: Content.  You have some content you would like to share across
+  several courses (i.e., a table of math formulas), but it is not specific to any
+  user.  All content is in this scope.
+- UserScope.ONE: Multi-course user state.  You want to keep track of the user's state 
+  across multiple instances of this XBlock.  For instance, you could have a Test
+  XBlock and then show the user their comparative scores on pre-tests and post-tests.
+- UserScope.ALL: Multi-course user state summary.  For instance, you could show the
+  average score of users on all Tests and display this average to users.
 
 BlockScope.TYPE:
-- UserScope.NONE: XBlock content.  You have information related to this XBlock's functionality
-  that needs to be shared across all XBlocks of its type, but it is not user-specific.
-- UserScope.ONE: User preferences.  In courses where this XBlock is present, you want to keep track
-  of what preferences the user has chosen (for instance, selecting a particular type of display for
-  the XBlock)
-- UserScope.ALL: User XBlock-related interaction summary.  In courses where this XBlock is present,
-  you want to compare the different ways users interact with that XBlock.
+- UserScope.NONE: XBlock settings.  You have information related to this XBlock's 
+  functionality that needs to be shared across all XBlocks of its type, but it is not
+  user-specific.
+- UserScope.ONE: User preferences.  In courses where this XBlock is present, you want
+  to keep track of what preferences the user has chosen (for instance, a user can set
+  a default speed for the video player, and that default is accessible to all video player instances)
+- UserScope.ALL: User XBlock-related interaction summary.  For instance, you could
+  find the total number of users who use various features of the XBlock for every
+  instance of this XBlock in all courses.
 
 BlockScope.ALL:
-- UserScope.NONE: Global settings.  You want to establish information that all XBlocks anywhere
-  should have access to.
-- UserScope.ONE: User information.  You want all XBlocks of all types to be able to access basic
-  information such as user name, geographic location, language, etc.
-- UserScope.ALL: User demographics.  You want to be able to aggregate data for all users in all
-  courses.
+- UserScope.NONE: Global settings.  You want to establish information that all
+  XBlocks anywhere should have access to.
+- UserScope.ONE: User information.  You want all XBlocks of all types to be able to 
+  access basic information such as user name, geographic location, language, etc.
+- UserScope.ALL: User demographics.  You want to establish user-related information
+  that all XBlocks anywhere should have access to.  For instance, a count of the
+  total number of users.
 
-**A note about sharing data across XBlocks:** Sharing data between two blocks that are not scoped
-to know about each other is difficult.  In particular, the only way to share information across
-differently-scoped blocks is by putting that data in ALL.  However, putting data in ALL can
-introduce scoping and name conflict issues.  For instance, if two fields that are both scoped
-to ALL have the same field name, both blocks will actually be pointing to the same data.
+**A note about sharing data across XBlocks:** Sharing data between two blocks that
+are differently typed is difficult.  In particular, the only way to share information across differently-typed blocks (say, between a video xblock and a problem xblock) is
+by putting that data in ALL.  However, putting data in ALL can introduce scoping and
+name conflict issues.  For instance, if two fields that are both scoped to ALL have
+the same field name, both blocks will actually be pointing to the same data.
 
-For this reason, we encourage developers to be careful when deciding how to scope their
-fields, taking into account this limitation.
-
+For this reason, we encourage developers to be careful when deciding how to scope
+their fields.
 
 XBlocks declare their fields as class attributes in the XBlock class
 definition.  Each field has at least a name, a type, and a scope::
@@ -182,6 +192,30 @@ can defer loading children until they are actually required (if ever).
 
     When editing an XBlock, it might want to modify its children. How can it do
     that?
+
+
+**Accessing Children (Server-Side)**
+
+To access children via the server-side, the best method is:
+
+- Iterate over the XBlock's children attribute (self.children), which will
+  yield you the usage IDs for each of the children.
+- Then, to access a child block, use self.runtime.get_block(usage_id) for your
+  desired usage_id
+- To render a given child, use self.runtime.render_child(usage_id)
+- To render *all* children for a given XBlock, use self.runtime.render_children 
+- To ensure things render correctly, template the fragment.content into the
+  parent block's html, and then use fargment.add_frag_resources (or
+  .add_frags_resources, in the case of rendering all children).  This will
+  ensure that the javascript and CSS of child elements are included.
+
+**Accessing Children (Client-Side)**
+
+To access children via the client-side, the best method is:
+
+- Call runtime.children(element) to get a list of child elements (where does element come from?)
+runtime.childMap(element, name) to get child element of a specific name
+
 
 
 Methods
