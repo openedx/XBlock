@@ -582,9 +582,12 @@ class Runtime(object):
 
             frag = view_fn(context)
 
-            # Explicitly save because render action may have changed state
-            block.save()
-            return self.wrap_child(block, view_name, frag, context)
+            if( frag != None):
+                # Explicitly save because render action may have changed state
+                block.save()
+                return self.wrap_child(block, view_name, frag, context)
+            else:
+                return None
         finally:
             # Reset the active view to what it was before entering this method
             self._view_name = old_view_name
@@ -614,7 +617,8 @@ class Runtime(object):
         for child_id in block.children:
             child = self.get_block(child_id)
             result = self.render_child(child, view_name, context)
-            results.append(result)
+            if( result != None): #don't append any xblock which doesn't render a view
+                results.append(result)
         return results
 
     def wrap_child(self, block, view, frag, context):  # pylint: disable=W0613
