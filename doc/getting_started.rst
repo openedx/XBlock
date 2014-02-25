@@ -165,3 +165,26 @@ Deploying your XBlock
 ---------------------
 
 See https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/xblocks.rst#deploying-your-xblock
+
+Submitting your XBlock to edX
+-----------------------------
+
+If you would like your XBlock to be available on edx.org, please do the following:
+
+- Upload your XBlock to a public Git repository on a reliable host.  We
+  recommend Github_.
+- Create a pull request against `edx-platform`_.  However, *do not include your
+  XBlock code in this request*.  Instead, add a line to the 
+  `requirements file`_, indicating which version of your XBlock you would like
+  to use.  That line should be the only change in your pull request.
+  Additionally, in your pull request description, please include a link to where
+  the XBlock code is hosted.
+- A developer at edX will see the pull request and review your XBlock to ensure
+  that it can integrate safely with the rest of edx-platform.
+- To expedite the review process, please include, in the pull request, a
+  thorough description of what your XBlock does, so that we can find the best
+  person to review your code.
+
+.. _Github: http://www.github.com/
+.. _`edx-platform`: https://github.com/edx/edx-platform
+.. _requirements file: https://github.com/edx/edx-platform/blob/master/requirements/edx/github.txt

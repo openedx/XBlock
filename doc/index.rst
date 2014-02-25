@@ -11,7 +11,7 @@ XBlock: Open edX courseware components
     edX is in the process of implementing XBlock support, and that effort
     could produce changes to these documents.
 
-To create rich engaging online courses, course authors must be able to combine
+To create rich, engaging online courses, course authors must be able to combine
 components from a variety of sources.  XBlock is edX's component architecture
 that makes this possible.  Courses are built hierarchically of pieces called
 **XBlocks**. Like an HTML ``<div>``, XBlocks can represent pieces as small as a

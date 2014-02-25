@@ -52,11 +52,11 @@ small piece of a complete web page.
 Runtime
 -------
 
-XBlocks do not run by themselves, they run within web applications such as
-Studio, or LMS, known as runtimes. Each runtime provides services to the
-XBlock, such as storage, URL mapping, and analytics.  Runtimes should perform
-functions common to all blocks, leaving the XBlock developer to write code
-particular to their block.
+XBlocks do not run by themselves, they run within web applications, such as
+edX Studio or edX LMS, that are known as runtimes. Each runtime provides
+services to the XBlock, such as storage, URL mapping, and analytics.
+Runtimes should perform functions common to all blocks, leaving the XBlock
+developer to write code particular to their block.
 
 Runtimes will differ in the context they provide to XBlocks. For example, while
 editing content, Studio won't provide user state, because there is no
@@ -75,10 +75,13 @@ executing a view or handler in an XBlock.
 
 Examples of runtimes:
 
-* Studio 
-* LMS
-* XBlock workbench
-* Peer grading workflow app
+* edX Studio 
+* edX LMS
+* `XBlock workbench`__
+* `XBlock Runtime for Google App Engine`__
+
+__ https://github.com/edx/XBlock/blob/master/workbench/runtime.py
+__ https://github.com/google/appengine_xblock_runtime
 
 .. todo::
 
