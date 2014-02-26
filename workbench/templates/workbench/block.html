@@ -3,21 +3,6 @@
     <head>
         <link rel="stylesheet" type="text/css"
               href="{% static 'workbench/css/workbench.css' %}">
-        <style type="text/css">
-        .data_label {
-            margin-left: -8em;
-            float: left;
-        }
-        .data {
-            margin: .5em 0 0 8em;
-        }
-        .data p {
-            margin: 0;
-        }
-        .student_view {
-            margin: 1em;
-        }
-        </style>
         <script>
             // TODO: This should be handled more modularly.
             studentId = '{{student_id}}';
@@ -25,31 +10,41 @@
         </script>
         {{head_html|safe}}
     </head>
-    <body>
-        <header>
-            <h1>XBlock: {{scenario.description}}</h1>
-        </header>
-        <section class="main">
-            <div class="student_view">
-                {{body|safe}}
+    <body class="view-workbench">
+        <div class="wrapper-workbench">
+            <div class="workbench">
+                <header class="banner" role="banner">
+                    <h1 class="title" >XBlock: {{scenario.description}}</h1>
+                </header>
+
+                <section class="main">
+                    <div class="preview student_view">
+                        {{body|safe}}
+                    </div>
+
+                    {{foot_html|safe}}
+                </section>
+
+                <section class="debug">
+                    <div class="data">
+                        <span class="label">Log</span>
+
+                        {{log|safe}}
+                    </div>
+
+                    <div class="data">
+                        <span class="label">Database</span>
+
+                        {{database.as_html|safe}}
+                    </div>
+
+                    <div class="data">
+                        <span class="label">Block</span>
+
+                        {{block}}
+                    </div>
+                </section>
             </div>
-            {{foot_html|safe}}
-        </section>
-        <section class="debug">
-            <div class="data">
-                <span class="data_label">Log</span>
-                {{log|safe}}
-                &nbsp;
-            </div>
-            <div class="data">
-                <span class="data_label">Database</span>
-                {{database.as_html|safe}}
-                &nbsp;
-            </div>
-            <div class="data">
-                <span class="data_label">Block</span>
-                {{block}}
-            </div>
-        </section>
+        </div>
     </body>
 </html>

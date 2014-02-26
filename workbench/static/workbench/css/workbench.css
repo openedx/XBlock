@@ -1,26 +1,48 @@
+/* basic reset */
 html, body {
-    font-family: "Open Sans",Verdana,Geneva,sans-serif;
-    padding: 0;
     margin: 0;
+    padding: 0;
     color: #222222;
+    font-family: "Open Sans", Verdana, Geneva, sans-serif;
 }
-header {
+
+/* basic workbench styling */
+.workbench .banner {
     position: fixed;
-    height: 1.75em;
     width: 100%;
+    margin: 0;
     border-bottom: 1px solid #aaaaaa;
+    padding: .5em 0 .5em 100px;
     background-color: #cccccc;
     background-image: url(../images/header-logo.png);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: 1em .5em;
-    padding: .5em 0 .5em 100px;
-    margin: 0;
+    z-index: 10000;
 }
-header h1 {
+
+.workbench .banner .title {
     margin: 0;
     font-size: 1.5em;
 }
-section.main {
+.workbench .main {
     padding: 2.75em 1em;
+    z-index: 1000;
+}
+
+.workbench .preview {
+    margin: 1em;
+}
+
+.workbench .debug .data {
+    margin: .5em 0 0 8em;
+}
+
+.workbench .debug .data .label {
+    float: left;
+    margin-left: -8em;
+}
+
+.workbench .debug .data p {
+    margin: 0;
 }
