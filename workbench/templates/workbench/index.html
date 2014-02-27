@@ -5,14 +5,18 @@
         <link rel="stylesheet" type="text/css"
               href="{% static 'workbench/css/workbench.css' %}">
     </head>
-    <body>
-        <header>
-            <h1>XBlock scenarios</h1>
-        </header>
-        <section class="main">
-            {% for scname, desc in scenarios %}
-                <p><a href="{% url workbench_show_scenario scname %}">{{desc}}</a></p>
-            {% endfor %}
-        </section>
+    <body class="view-workbench">
+        <div class="wrapper-workbench">
+            <div class="workbench">
+                <header class="banner" role="banner">
+                    <h1 class="title">XBlock scenarios</h1>
+                </header>
+                <section class="main">
+                    {% for scname, desc in scenarios %}
+                        <p><a href="{% url workbench_show_scenario scname %}">{{desc}}</a></p>
+                    {% endfor %}
+                </section>
+            </div>
+        </div>
     </body>
 </body>
