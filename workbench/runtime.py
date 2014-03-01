@@ -3,7 +3,8 @@
 Code in this file is a mix of Runtime layer and Workbench layer.
 
 """
-
+from collections import defaultdict, OrderedDict
+import itertools
 import logging
 
 try:
@@ -16,46 +17,48 @@ from django.templatetags.static import static
 from django.template import loader as django_template_loader, \
     Context as DjangoContext
 
-from xblock.fields import Scope, ScopeIds
-from xblock.runtime import KvsFieldData, KeyValueStore, Runtime, NoSuchViewError, MemoryIdManager
+from xblock.fields import Scope
+from xblock.runtime import (
+    KvsFieldData, KeyValueStore, Runtime, NoSuchViewError, IdReader, IdGenerator
+)
+from xblock.exceptions import NoSuchDefinition, NoSuchUsage
 from xblock.fragment import Fragment
 
+from .models import XBlockState
 from .util import make_safe_for_html
 
 log = logging.getLogger(__name__)
 
 
-class WorkbenchKeyValueStore(KeyValueStore):
-    """A `KeyValueStore` for the Workbench to use.
+class WorkbenchDjangoKeyValueStore(KeyValueStore):
+    """A Django model backed `KeyValueStore` for the Workbench to use.
 
-    This is a simple `KeyValueStore` which stores everything in a dictionary.
-    The key mapping is a little complicated to make it somewhat possible to
-    read the dict when it is rendered in the browser.
+    If you use this key-value store, you *must* use `ScenarioIdManager` or
+    another ID Manager that uses the scope_id convention:
 
+      {scenario-slug}.{block_type}.d{def #}(.u{usage #})
+
+    So an example: a-little-html.html.d0.u0
+
+    We store all fields for a given (scope, scope_id, user_id) in one JSON blob,
+    rather than having a single row for each field name. This is why there's
+    some JSON packing/unpacking code.
     """
-    def __init__(self, db_dict):
-        super(WorkbenchKeyValueStore, self).__init__()
-        self.db_dict = db_dict
-
     # Workbench-special methods.
-
     def clear(self):
         """Clear all data from the store."""
-        self.db_dict.clear()
+        XBlockState.objects.all().delete()
 
-    def as_html(self):
-        """Render the key value store to HTML."""
-        html = json.dumps(self.db_dict, sort_keys=True, indent=4)
-        return make_safe_for_html(html)
+    def prep_for_scenario_loading(self):
+        """Reset any state that's necessary before we load scenarios."""
+        XBlockState.prep_for_scenario_loading()
 
     # Implementation details.
-
     def _actual_key(self, key):
         """
         Constructs the full key name from the given `key`.
 
         The actual key consists of the scope, block scope id, and user_id.
-
         """
         key_list = []
         if key.scope == Scope.children:
@@ -71,32 +74,116 @@ class WorkbenchKeyValueStore(KeyValueStore):
             key_list.append(key.user_id)
         return ".".join(key_list)
 
-    # KeyValueStore methods.
+    @staticmethod
+    def _to_json_str(data):
+        return json.dumps(data, indent=2, sort_keys=True)
 
+    # KeyValueStore methods.
     def get(self, key):
-        return self.db_dict[self._actual_key(key)][key.field_name]
+        """Get state for a given `KeyValueStore.Key`."""
+        record = XBlockState.get_for_key(key)
+        return json.loads(record.state)[key.field_name]
 
     def set(self, key, value):
-        """Sets the key to the new value"""
-        self.db_dict.setdefault(self._actual_key(key), {})[key.field_name] = value
+        """Set state for a given `KeyValueStore.Key` to `value`."""
+        record = XBlockState.get_for_key(key)
+        state_dict = json.loads(record.state)
+        state_dict[key.field_name] = value
+
+        record.state = self._to_json_str(state_dict)
+        record.save()
 
     def delete(self, key):
-        del self.db_dict[self._actual_key(key)][key.field_name]
+        """Delete state for a given `KeyValueStore.Key`."""
+        record = XBlockState.get_for_key(key)
+        state_dict = json.loads(record.state)
+        del state_dict[key.field_name]
+        record.state = self._to_json_str(state_dict)
+        record.save()
 
     def has(self, key):
-        return key.field_name in self.db_dict[self._actual_key(key)]
+        """Check if an entry exists for `KeyValueStore.Key`."""
+        record = XBlockState.get_for_key(key)
+        state_dict = json.loads(record.state)
+        return key.field_name in state_dict
 
-    def set_many(self, update_dict):
-        """
-        Sets many fields to new values in one call.
 
-        `update_dict`: A dictionary of keys: values.
-        This method sets the value of each key to the specified new value.
+class ScenarioIdManager(IdReader, IdGenerator):
+    """A scenario-aware ID manager.
+
+    This will create IDs in the form of::
+
+      {scenario-slug}.{block_type}.d{def #}(.u{usage #})
+
+    So an example: a-little-html.html.d0.u0
+
+    The definition numbering is local to the scenario + block_type, and usage
+    numbering is local to the definition_id. This is to help ensure that IDs
+    shift around as little as possible when you add new content/scenarios.
+
+    """
+    def __init__(self):
+        self._block_types_to_id_seq = defaultdict(itertools.count)
+        self._def_ids_to_id_seq = defaultdict(itertools.count)
+        self._usages = OrderedDict()
+        self._definitions = OrderedDict()
+        self.scenario = ""
+
+    def clear(self):
+        """Remove all entries."""
+        self._block_types_to_id_seq.clear()
+        self._def_ids_to_id_seq.clear()
+        self._usages.clear()
+        self._definitions.clear()
+        self.scenario = ""
+
+    def create_usage(self, def_id):
+        """Make a usage, storing its definition id."""
+        id_seq = self._def_ids_to_id_seq[def_id]
+        usage_id = "{}.u{}".format(def_id, next(id_seq))
+        self._usages[usage_id] = def_id
+
+        return usage_id
+
+    def get_definition_id(self, usage_id):
+        """Get a definition_id by its usage id."""
+        try:
+            return self._usages[usage_id]
+        except KeyError:
+            raise NoSuchUsage(repr(usage_id))
+
+    def create_definition(self, block_type, slug=None):
+        """Make a definition_id, storing its block type."""
+        prefix = "{}.{}".format(self.scenario, block_type)
+        if slug:
+            prefix += "." + slug
+
+        id_seq = self._block_types_to_id_seq[prefix]
+        def_id = "{}.d{}".format(prefix, next(id_seq))
+        self._definitions[def_id] = block_type
+
+        return def_id
+
+    def get_block_type(self, def_id):
+        """Get a block_type by its definition id."""
+        try:
+            return self._definitions[def_id]
+        except KeyError:
+            raise NoSuchDefinition(repr(def_id))
+
+    # Workbench specific functionality
+    def set_scenario(self, scenario):
+        """Call this before loading a scenario so that this `ScenarioIdManager`
+        knows what to prefix the IDs with. This helps isolate scenarios from
+        each other so that changes in one will not affect ID numbers in another.
         """
-        for key, value in update_dict.items():
-            # We just call `set` directly here, because this is an in-memory representation
-            # thus we don't concern ourselves with bulk writes.
-            self.set(key, value)
+        self.scenario = scenario
+
+    def last_created_usage_id(self):
+        """Sometimes you create a usage for testing and just want to grab it
+        back. This gives an easy hook to do that.
+        """
+        return self._usages.keys()[-1] if self._usages else None
 
 
 class WorkbenchRuntime(Runtime):
@@ -244,12 +331,11 @@ class _BlockSet(object):
             if hasattr(block, attr_name):
                 yield getattr(block, attr_name)
 
-
 # Our global state (the "database").
-WORKBENCH_KVS = WorkbenchKeyValueStore({})
+WORKBENCH_KVS = WorkbenchDjangoKeyValueStore()
 
 # Our global id manager
-ID_MANAGER = MemoryIdManager()
+ID_MANAGER = ScenarioIdManager()
 
 
 def reset_global_state():

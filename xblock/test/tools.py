@@ -11,7 +11,7 @@ from nose.tools import (                        # pylint: disable=W0611,E0611
     assert_true, assert_false,
     assert_equals, assert_not_equals,
     assert_is, assert_is_not,
-    assert_is_instance,
+    assert_is_instance, assert_is_none,
     assert_in, assert_not_in,
     assert_raises, assert_raises_regexp,
 )

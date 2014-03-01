@@ -9,14 +9,14 @@ import mimetypes
 from StringIO import StringIO
 
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.shortcuts import redirect, render_to_response
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchUsage
 
-from .runtime import WorkbenchRuntime, WORKBENCH_KVS
+from .runtime import WorkbenchRuntime, reset_global_state
 from .scenarios import SCENARIOS
 
 
@@ -33,7 +33,7 @@ def setup_logging():
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     log_handler = logging.StreamHandler(LOG_STREAM)
-    log_handler.setFormatter(logging.Formatter("<p>%(asctime)s %(name)s %(levelname)s: %(message)s</p>"))
+    log_handler.setFormatter(logging.Formatter("%(asctime)s %(name)s %(levelname)s: %(message)s"))
     root_logger.addHandler(log_handler)
 
 setup_logging()
@@ -85,7 +85,6 @@ def show_scenario(request, scenario_id, view_name='student_view', template='work
         'scenario': scenario,
         'block': block,
         'body': frag.body_html(),
-        'database': WORKBENCH_KVS,
         'head_html': frag.head_html(),
         'foot_html': frag.foot_html(),
         'log': LOG_STREAM.getvalue(),
@@ -129,3 +128,13 @@ def package_resource(_request, block_type, resource):
         raise Http404
     mimetype, _ = mimetypes.guess_type(resource)
     return HttpResponse(content, mimetype=mimetype)
+
+
+@csrf_exempt
+def reset_state(request):
+    """Delete all state and reload the scenarios."""
+    log.info("RESETTING ALL STATE")
+    reset_global_state()
+    referrer_url = request.META['HTTP_REFERER']
+
+    return redirect(referrer_url)

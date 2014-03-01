@@ -1,4 +1,6 @@
 """Django settings for workbench project."""
+import json
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -12,16 +14,15 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': ':memory:',                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+if 'WORKBENCH_DATABASES' in os.environ:
+    DATABASES = json.loads(os.environ['WORKBENCH_DATABASES'])
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'workbench.db'
+        }
     }
-}
 
 CACHES = {
     'default': {
@@ -34,7 +35,7 @@ CACHES = {
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'America/New_York'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -121,13 +122,14 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'workbench',
     'django_nose',
+
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
+
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -160,5 +162,14 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'django': {
+            'level': 'INFO',
+        }
     }
+}
+
+WORKBENCH = {
+    'reset_state_on_restart': (
+        os.environ.get('WORKBENCH_RESET_STATE_ON_RESTART', "false").lower() == "true"
+    )
 }
