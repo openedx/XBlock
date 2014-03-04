@@ -406,9 +406,7 @@ class Runtime(object):
         """
         raise NotImplementedError("Runtime needs to provide publish()")
 
-
     # Construction
-
     def __init__(self, id_reader, field_data, mixins=(), services=None, default_class=None, select=None):
         """
         Arguments:
@@ -888,7 +886,7 @@ class NullI18nService(object):
         """
         Locale-aware strftime, with format short-cuts.
         """
-        format = self.STRFTIME_FORMATS.get(format+"_FORMAT", format)
+        format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
         if isinstance(format, unicode):
             format = format.encode("utf8")
         return dtime.strftime(format).decode("utf8")

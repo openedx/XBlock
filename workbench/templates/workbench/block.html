@@ -27,21 +27,35 @@
 
                 <section class="debug">
                     <div class="data">
-                        <span class="label">Log</span>
-
-                        {{log|safe}}
-                    </div>
-
-                    <div class="data">
                         <span class="label">Database</span>
-
-                        {{database.as_html|safe}}
+                        <div align="left" style="float:left">
+                            <a href="{% url admin:workbench_xblockstate_changelist %}?scenario={{scenario.description|slugify}}"
+                            >Scenario State</a>
+                        </div>
+                        <div align="right">
+                            <form method="POST" action="{% url workbench.views.reset_state %}">
+                                <input type="submit" value="Reset State"/>
+                            </form>
+                        </div>
                     </div>
-
                     <div class="data">
                         <span class="label">Block</span>
-
                         {{block}}
+                    </div>
+                    <div class="data">
+                        <span class="label">Scenario</span>
+                        <pre>{{scenario.xml}}</pre>
+                    </div>
+                    <div class="data">
+                        <span class="label">Log</span>
+                        <div id="workbench_log" style="max-height: 300px; overflow-y: scroll;">
+                            <pre>{{log}}</pre>
+                        </div>
+                        <!-- Temporary expedient before log gets moved out -->
+                        <script type="text/javascript">
+                            // Scroll the Workbench Log to the bottom of the div...
+                            $('#workbench_log').scrollTop($('#workbench_log')[0].scrollHeight);
+                        </script>
                     </div>
                 </section>
             </div>

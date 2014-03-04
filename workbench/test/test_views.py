@@ -27,7 +27,7 @@ def temp_scenario(temp_class, scenario_name='test_scenario'):
         def _inner(*args, **kwargs):                    # pylint: disable=C0111
             # Create a scenario, just one tag for our mocked class.
             scenarios.add_xml_scenario(
-                scenario_name, "Temporary scenario",
+                scenario_name, "Temporary scenario {}".format(temp_class.__name__),
                 "<%s/>" % temp_class.__name__
             )
             try:
@@ -120,10 +120,9 @@ def test_xblock_without_handler():
     # when we try to hit a handler on it
     client = Client()
 
-    # Pick a random usage_id from the ID_MANAGER because we
-    # need to ensure the usage is a valid id.
-    # TODO: Make a usage in this test instead.
-    usage_id = ID_MANAGER._usages.keys()[0]
+    # Pick the most usage ID we just made in the temp_scenario setup...
+    usage_id = ID_MANAGER.last_created_usage_id()
+
     # Plug that usage_id into a mock handler URL
     # /handler/[usage_id]/[handler_name]
     handler_url = reverse('handler', kwargs={

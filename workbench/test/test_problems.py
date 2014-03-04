@@ -1,4 +1,7 @@
 """Test that problems and problem submission works well."""
+import time
+
+from selenium.common.exceptions import StaleElementReferenceException
 
 from workbench import scenarios
 from workbench.test.selenium_test import SeleniumTest
@@ -49,6 +52,20 @@ class ProblemInteractionTest(SeleniumTest):
         check_btns = self.browser.find_elements_by_css_selector('input.check')
         right_wrongs = self.browser.find_elements_by_css_selector('span.indicator')
 
+        def assert_image(right_wrong_idx, expected_icon):
+            """Assert that the img src text includes `expected_icon`"""
+            for _ in range(3):
+                try:
+                    img = right_wrongs[right_wrong_idx].find_element_by_tag_name("img")
+                    src = img.get_attribute("src")
+                    if expected_icon in src:
+                        break
+                    else:
+                        time.sleep(.25)
+                except StaleElementReferenceException as exc:
+                    print exc
+            self.assertIn(expected_icon, src)
+
         for i in range(self.num_problems):
             # Before answering, the indicator says Not Attempted.
             self.assertIn("Not attempted", right_wrongs[i].text)
@@ -60,12 +77,10 @@ class ProblemInteractionTest(SeleniumTest):
                 text_ctrls[i].clear()
                 text_ctrls[i].send_keys(str(answer))
                 check_btns[i].click()
-                img = right_wrongs[i].find_element_by_css_selector("img")
-                self.assertIn("/correct-icon.png", img.get_attribute("src"))
+                assert_image(i, "/correct-icon.png")
 
                 # Answer wrong.
                 text_ctrls[i].clear()
                 text_ctrls[i].send_keys(str(answer + 1))
                 check_btns[i].click()
-                img = right_wrongs[i].find_element_by_css_selector("img")
-                self.assertIn("/incorrect-icon.png", img.get_attribute("src"))
+                assert_image(i, "/incorrect-icon.png")
