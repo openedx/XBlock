@@ -627,6 +627,18 @@ class ReferenceList(List):
     pass
 
 
+class ReferenceValueDict(Dict):
+    """
+    A dictionary where the values are xblock references. That is, pointers to xblocks.
+
+    It's up to the runtime to know how to dereference the elements of the list. The field type enables the
+    runtime to know that it must do the interpretation.
+    """
+    # this could define from_json and to_json as list comprehensions calling from/to_json on the list eles,
+    # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
+    pass
+
+
 class ModelMetaclass(type):
     """
     A metaclass for using Fields as class attributes to define data access.
