@@ -4,7 +4,19 @@ converting django requests to webob requests and webob responses to django
 responses.
 """
 
-from django.test.client import RequestFactory
+# Set up Django settings
+import os
+import sys
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xblock.test.settings")
+
+# Django isn't always available, so skip tests if it isn't.
+from nose.plugins.skip import SkipTest
+try:
+    from django.test.client import RequestFactory
+    has_django = True
+except ImportError:
+    has_django = False
+
 from unittest import TestCase
 from webob import Response
 
@@ -16,12 +28,14 @@ class TestDjangoWebobRequest(TestCase):
     Tests of the django_to_webob_request function
     """
     def setUp(self):
+        if not has_django:
+            raise SkipTest("Django not available")
+
         self.req_factory = RequestFactory()
 
     def test_post_already_read(self):
         # Check that POST already having been read from doesn't
         # prevent access to the POST of the webob object
-
         dj_req = self.req_factory.post('dummy_url', data={'foo': 'bar'})
 
         # Read from POST before constructing the webob request
@@ -35,6 +49,10 @@ class TestDjangoWebobResponse(TestCase):
     """
     Tests of the webob_to_django_response function
     """
+
+    def setUp(self):
+        if not has_django:
+            raise SkipTest("Django not available")
 
     def _as_django(self, *args, **kwargs):
         """

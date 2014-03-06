@@ -1,18 +1,14 @@
 # 3rd-party needs
-Django >= 1.4, < 1.5
 lxml
 requests
 webob
-WSGIProxy
 simplejson
 
 # For Tests
 mock
 nose
-django-nose
 coverage
 pylint == 0.28
-selenium
 rednose
 pep8
 diff-cover >= 0.2.1
@@ -25,6 +21,3 @@ cookiecutter
 
 # Our own XBlocks
 -e .
--e workbench
--e thumbs
--e demo_xblocks

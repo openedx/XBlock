@@ -57,14 +57,18 @@ Create a new XBlock
 .. highlight: console
 
 The simplest way to get started on a new XBlock is to use the
-script/startnew.py script in the XBlock repo.  Make a directory for your
+script/startnew.py script in the XBlock SDK repo: 
+
+    https://github.com/edx/xblock-sdk
+
+Make a directory for your
 development work, outside the XBlock directory, let's call it ``~/edxwork``,
 and run the startnew.py script from there::
 
     $ cd ~
     $ mkdir edxwork
     $ cd edxwork
-    $ /path/to/XBlock/script/startnew.py
+    $ /path/to/xblock-sdk/script/startnew.py
 
 The script will need two pieces of information, both related to the name of
 your XBlock:  a short name that can be used for directory names, and a Python
@@ -152,9 +156,10 @@ Use pip to install your block::
 Testing with the workbench
 ..........................
 
-The simplest test environment is the XBlock workbench.  Once you've installed
-your XBlock, the workbench will display whatever scenarios you've defined in
-your `workbench_scenarios` method.
+The simplest test environment is the XBlock workbench. It can be found in the XBlock SDK:
+
+    https://github.com/edx/xblock-sdk
+
 
 Testing with the edX LMS
 ........................

@@ -1,4 +1,4 @@
-"""Django settings for workbench project."""
+"""Django settings for toy runtime project."""
 import json
 import os
 
@@ -14,15 +14,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-if 'WORKBENCH_DATABASES' in os.environ:
-    DATABASES = json.loads(os.environ['WORKBENCH_DATABASES'])
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'workbench.db'
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'toyruntime.db'
     }
+}
 
 CACHES = {
     'default': {
@@ -108,23 +105,12 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'workbench.urls'
-
-# Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'workbench.wsgi.application'
-
-TEMPLATE_DIRS = (
-    'workbench/templates',
-    'demo_xblocks/demo_xblocks/templates',
-)
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'workbench',
     'django_nose',
 
     # Uncomment the next line to enable the admin:

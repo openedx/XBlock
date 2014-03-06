@@ -11,8 +11,7 @@ This is a pre-alpha release of the XBlock API, to gather input from potential
 users of the API.  We like what is here, but are open to suggestions for
 changes. We will be implementing this shortly in the edX LMS.
 
-This repo contains the core code for implementing XBlocks as well as a simple
-workbench application for running XBlocks in a small simple environment.
+This repo contains the core code for implementing XBlocks.
 
 
 Background
@@ -54,37 +53,21 @@ This code runs on Python 2.7.
 
         $ pip install -r requirements.txt
 
-4.  Run the Django development server:
-
-        $ python manage.py runserver
-
-5.  Open a web browser to: http://127.0.0.1:8000
-
 
 Testing
 --------
 
 To run the test suite:
 
-    $ python manage.py test
+    $ nosetests
 
 This will run:
 
     * Unit tests of the XBlock core and runtime.
 
-    * Integration tests of XBlocks running within the workbench.
-
-You can test XBlocks through a browser using `Selenium`_. We have included an
-example Selenium test for ``thumbs`` that uses Django's `LiveServerTestCase`_.
-It runs as part of the test suite as executed by the above command. You need to
-have Firefox installed for this test case to run successfully.
-
-.. _Selenium: http://docs.seleniumhq.org/
-.. _LiveServerTestCase: https://docs.djangoproject.com/en/1.4/topics/testing/#django.test.LiveServerTestCase
-
 To run the test suite under coverage:
 
-    $ coverage run manage.py test
+    $ coverage run -m nose
 
 to execute the tests. Then to view the coverage report:
 
@@ -94,8 +77,6 @@ See the `coverage.py`_ docs for more info and options.
 
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
 
-You can also run unit tests of the JavaScript used by the `thumbs` example.
-See `thumbs/static/js/README.md` for details.
 
 Style Testing
 -------------
@@ -121,25 +102,14 @@ we ignore by viewing the contents of `pylintrc`_ and `.pep8`_. Before making a p
 request, you should ensure that your branch does not add any new quality violations
 by checking your code with these tools.
 
-Using the workbench
+Using the XBlock-SDK
 -------------------
 
-When you open the workbench, you'll see a list of sample XBlock configurations
-(scenarios).  Each will display a page showing the XBlocks composited together,
-along with internal information like the "database" contents.
+The XBlock-SDK exists in a separate repository. The SDK contains useful tools for
+developing your own XBlocks, such as a template XBlock generator, sample XBlocks
+that demonstrate XBlock functionality.
 
-The workbench doesn't use a real database, it simply stores all data in an
-in-memory dictionary.  The data is all lost and reset when you restart the
-server.
-
-If you want to experiment with different students, you can use a URL parameter
-to set the student ID, which defaults to 1:
-
-    http://127.0.0.1:8000/?student_id=17
-
-Different students will see different student state, for example, while seeing
-the same content.  Student ids are strings, even if they contain only digits
-as the default does.
+You can find it in its own repository: https://github.com/edx/xblock-sdk
 
 
 Documentation
@@ -164,33 +134,15 @@ clear which layer the code lives in, though sometimes the lines are blurred:
     This layer may not be real code here, but we'll need to write real code to
     perform these functions.
 
-3.  **Workbench** The workbench-specific code we wrote to make everything work.
-    This code is the least real, in that it might be just stubs, and will be
-    done very differently in real code.
-
-4.  **Thumbs** This is a sample XBlock written as a separate installable kit as
-    an example of how third-party XBlocks can be structured.
-
 
 Making your own XBlock
 ----------------------
 
 Making an XBlock can be as simple as creating a Python class with a few
-specific methods.  The ``thumbs`` module demonstrates an XBlock with state,
-views, and input handling.
+specific methods.  
 
-We provide a script to create a new XBlock project to help you get started.
-Run script/startnew.py in a directory where you want to create your XBlock
-project.  startnew.py will prompt you for the name of the XBlock, and will
-create a minimal working XBlock, ready for you to begin development.
-
-You can provide scenarios for the workbench to display, see the thumbs.py
-sample for an example, or the xblock/problem.py file.  The scenarios are
-written in a simple XML language.  Note this is not an XML format we are
-proposing as a standard.
-
-Once you install your XBlock into your virtualenv, the workbench will
-automatically display its scenarios for you to experiment with.
+Instructions for constructing a new XBlock along with examples can be found in
+the XBlock SDK: https://github.com/edx/xblock-sdk
 
 
 License
