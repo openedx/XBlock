@@ -8,11 +8,14 @@ Tests for classes extending Field.
 from mock import MagicMock, Mock
 import unittest
 
+import datetime as dt
+import pytz
+
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
 from xblock.fields import (
     Any, Boolean, Dict, Field, Float,
-    Integer, List, String, Reference, ReferenceList, Sentinel
+    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel
 )
 
 from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
@@ -31,6 +34,12 @@ class FieldTest(unittest.TestCase):
         Asserts the result of field.from_json.
         """
         self.assertEqual(expected, self.field_totest().from_json(arg))
+
+    def assertToJSONEquals(self, expected, arg):
+        """
+        Assert that serialization of `arg` to JSON equals `expected`.
+        """
+        self.assertEqual(expected, self.field_totest().to_json(arg))
 
     def assertJSONValueError(self, arg):
         """
@@ -156,6 +165,57 @@ class StringTest(FieldTest):
         self.assertJSONTypeError([1])
         self.assertJSONTypeError([])
         self.assertJSONTypeError({})
+
+
+class DateTest(FieldTest):
+    """
+    Tests of the Date field.
+    """
+    field_totest = DateTime
+
+    def test_json_equals(self):
+        self.assertJSONEquals(
+            dt.datetime(2014, 4, 1, 2, 3, 4, 567890).replace(tzinfo=pytz.utc),
+            '2014-04-01T02:03:04.567890'
+        )
+        self.assertJSONEquals(
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
+            '2014-04-01T02:03:04.000000'
+        )
+
+    def test_serialize(self):
+        self.assertToJSONEquals(
+            '2014-04-01T02:03:04.567890',
+            dt.datetime(2014, 4, 1, 2, 3, 4, 567890).replace(tzinfo=pytz.utc)
+        )
+
+        self.assertToJSONEquals(
+            '2014-04-01T02:03:04.000000',
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)
+        )
+
+    def test_none(self):
+        self.assertJSONEquals(None, None)
+        self.assertEqual(DateTime().to_json(None), None)
+
+    def test_error(self):
+        self.assertJSONTypeError(['a'])
+        self.assertJSONTypeError(dt.datetime.now())
+        self.assertJSONTypeError(5)
+        self.assertJSONTypeError(5.123)
+
+    def test_date_format_error(self):
+        # Date format must exactly match what we're looking for:
+        # YYYY-MM-DDTHH:MM:SS.mmmmmmm
+        with self.assertRaises(ValueError):
+            DateTime().from_json('2012-04-01')
+
+        with self.assertRaises(ValueError):
+            DateTime().from_json('')
+
+    def test_serialize_error(self):
+        with self.assertRaises(TypeError):
+            DateTime().to_json('not a datetime')
 
 
 class AnyTest(FieldTest):

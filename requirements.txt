@@ -5,6 +5,7 @@ requests
 webob
 WSGIProxy
 simplejson
+pytz
 
 # For Tests
 mock
