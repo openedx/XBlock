@@ -11,12 +11,10 @@ export PIP_DOWNLOAD_CACHE=${PIP_DOWNLOAD_CACHE-.pip_cache}
 
 # Install requirements
 pip install -r requirements.txt
-
-# Allow django liveserver tests to use a range of ports
-export DJANGO_LIVE_TEST_SERVER_ADDRESS=${DJANGO_LIVE_TEST_SERVER_ADDRESS-localhost:8000-9000}
+pip install -r django_requirements.txt
 
 # Run the tests
-NOSE_ATTR='!selenium' coverage run manage.py test
+coverage run -m nose
 
 # Compute coverage
 coverage html
@@ -29,4 +27,4 @@ diff-quality --violations=pylint --html-report diff_quality_pylint.html
 
 # Compute style violations
 pep8 > pep8.report || echo "Not pep8 clean"
-pylint -f parseable xblock demo-xblocks workbench thumbs/thumbs/thumbs.py > pylint.report || echo "Not pylint clean"
+pylint -f parseable xblock > pylint.report || echo "Not pylint clean"

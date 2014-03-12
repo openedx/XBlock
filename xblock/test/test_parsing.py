@@ -9,7 +9,7 @@ import unittest
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer
 from xblock.test.tools import blocks_are_equivalent
-from workbench.runtime import WorkbenchRuntime
+from xblock.test.toy_runtime import ToyRuntime
 
 # XBlock classes to use in the tests.
 
@@ -45,12 +45,12 @@ class XmlTest(object):
 
     def setUp(self):
         super(XmlTest, self).setUp()
-        self.runtime = WorkbenchRuntime()
+        self.runtime = ToyRuntime()
 
     def parse_xml_to_block(self, xml):
         """A helper to get a block from some XML."""
 
-        # WorkbenchRuntime has an id_generator, but most runtimes won't
+        # ToyRuntime has an id_generator, but most runtimes won't
         # (because the generator will be contextual), so we
         # pass it explicitly to parse_xml_string.
         usage_id = self.runtime.parse_xml_string(xml, self.runtime.id_generator)
@@ -168,47 +168,3 @@ class ExportTest(XmlTest, unittest.TestCase):
 def squish(text):
     """Turn any run of whitespace into one space."""
     return re.sub(r"\s+", " ", text)
-
-
-class HtmlInOutTest(XmlTest, unittest.TestCase):
-    """Tests of the implicit HTML block."""
-
-    def test_implicit_html_import(self):
-        # This test is fiddly about where the whitespace goes in the xml...
-        the_xml = """\
-            <?xml version='1.0' encoding='UTF8'?>
-            <html_demo><p>Hello there.</p>
-                <p>This is HTML!</p>
-                <p>ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!</p>
-                <p>1 &lt; 2 &amp; 4 &gt; 3</p>
-            </html_demo>
-            """.strip()
-        block = self.parse_xml_to_block(the_xml)
-        new_xml = self.export_xml_for_block(block)
-        # For now, I'm not sure how to treat the whitespace, so ignore it.
-        self.assertEqual(squish(the_xml), squish(new_xml))
-
-    def test_text_content(self):
-        tests = [
-            "<html_demo>Hello, world!</html_demo>",
-            "<html_demo>Hello, <b>world!</b></html_demo>",
-            "<html_demo><b>Hello</b>, world!</html_demo>",
-            "<html_demo><b>Hello</b>, <b>world!</b></html_demo>",
-            "<html_demo><b>Hello</b>, <b>world!</b> &amp; goodbye.</html_demo>",
-        ]
-
-        for test in tests:
-            block = self.parse_xml_to_block(test)
-            xml = self.export_xml_for_block(block)
-
-            self.assertIn(test, xml)
-
-    def test_text_is_unicode(self):
-        tests = [
-            "<html_demo>Hello, world</html_demo>",
-            "<html_demo>ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!</html_demo>",
-        ]
-
-        for test in tests:
-            block = self.parse_xml_to_block(test)
-            self.assertIsInstance(block.content, unicode)
