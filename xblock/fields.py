@@ -6,10 +6,11 @@ for each scope.
 
 """
 
-import copy
 import datetime
+import copy
 from collections import namedtuple
 import pytz
+import dateutil.parser
 
 
 # __all__ controls what classes end up in the docs, and in what order.
@@ -611,7 +612,22 @@ class DateTime(Field):
         Parse the date from an ISO-formatted date string, or None.
         """
         if isinstance(value, basestring):
-            return datetime.datetime.strptime(value, self.DATETIME_FORMAT).replace(tzinfo=pytz.utc)
+
+            # Parser interprets empty string as now by default
+            if value == "":
+                return None
+
+            try:
+                parsed_date = dateutil.parser.parse(value)
+            except (TypeError, ValueError):
+                raise ValueError("Could not parse {} as a date".format(value))
+
+            if parsed_date.tzinfo is not None:
+                parsed_date.astimezone(pytz.utc)
+            else:
+                parsed_date = parsed_date.replace(tzinfo=pytz.utc)
+
+            return parsed_date
 
         if value is None:
             return None
