@@ -3,6 +3,7 @@ lxml
 requests
 webob
 simplejson
+pytz
 
 # For Tests
 mock

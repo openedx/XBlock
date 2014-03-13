@@ -7,7 +7,9 @@ for each scope.
 """
 
 import copy
+import datetime
 from collections import namedtuple
+import pytz
 
 
 # __all__ controls what classes end up in the docs, and in what order.
@@ -593,6 +595,38 @@ class String(Field):
             return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
+
+
+class DateTime(Field):
+    """
+    A field for representing a datetime.
+
+    The stored value is either a datetime or None.
+    """
+
+    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+
+    def from_json(self, value):
+        """
+        Parse the date from an ISO-formatted date string, or None.
+        """
+        if isinstance(value, basestring):
+            return datetime.datetime.strptime(value, self.DATETIME_FORMAT).replace(tzinfo=pytz.utc)
+
+        if value is None:
+            return None
+
+        raise TypeError("Value should be loaded from a string, not {}".format(type(value)))
+
+    def to_json(self, value):
+        """
+        Serialize the date as an ISO-formatted date string, or None.
+        """
+        if isinstance(value, datetime.datetime):
+            return value.strftime(self.DATETIME_FORMAT)
+        if value is None:
+            return None
+        raise TypeError("Value stored must be a datetime object, not {}".format(type(value)))
 
 
 class Any(Field):
