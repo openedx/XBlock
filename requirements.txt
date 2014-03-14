@@ -4,6 +4,7 @@ requests
 webob
 simplejson
 pytz
+python-dateutil
 
 # For Tests
 mock

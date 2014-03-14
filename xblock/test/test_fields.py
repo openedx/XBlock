@@ -182,6 +182,10 @@ class DateTest(FieldTest):
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
             '2014-04-01T02:03:04.000000'
         )
+        self.assertJSONEquals(
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
+            '2014-04-01T02:03:04Z'
+        )
 
     def test_serialize(self):
         self.assertToJSONEquals(
@@ -196,6 +200,7 @@ class DateTest(FieldTest):
 
     def test_none(self):
         self.assertJSONEquals(None, None)
+        self.assertJSONEquals(None, '')
         self.assertEqual(DateTime().to_json(None), None)
 
     def test_error(self):
@@ -205,13 +210,8 @@ class DateTest(FieldTest):
         self.assertJSONTypeError(5.123)
 
     def test_date_format_error(self):
-        # Date format must exactly match what we're looking for:
-        # YYYY-MM-DDTHH:MM:SS.mmmmmmm
         with self.assertRaises(ValueError):
-            DateTime().from_json('2012-04-01')
-
-        with self.assertRaises(ValueError):
-            DateTime().from_json('')
+            DateTime().from_json('invalid')
 
     def test_serialize_error(self):
         with self.assertRaises(TypeError):
