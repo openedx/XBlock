@@ -218,17 +218,18 @@ class XBlock(Plugin):
         """
         Construct a new XBlock.
 
-        This class should only be used by runtimes.
+        This class should only be instantiated by runtimes.
 
-        Parameters:
+        Arguments:
 
-            runtime (Runtime): Use it to access the environment.
+            runtime (:class:`.Runtime`): Use it to access the environment.
                 It is available in XBlock code as ``self.runtime``.
 
-            field_data (FieldData): Interface used by the XBlock
+            field_data (:class:`.FieldData`): Interface used by the XBlock
                 fields to access their data from wherever it is persisted.
 
-            scope_ids (ScopeIds): Identifiers needed to resolve scopes.
+            scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
+                scopes.
 
         """
         self.runtime = runtime
@@ -275,11 +276,11 @@ class XBlock(Plugin):
         return self._parent_block
 
     def render(self, view, context=None):
-        """Render `view` with this block's :class:`Runtime` and the supplied `context`"""
+        """Render `view` with this block's runtime and the supplied `context`"""
         return self.runtime.render(self, view, context)
 
     def handle(self, handler_name, request, suffix=''):
-        """Handle `request` with this block's :class:`Runtime`"""
+        """Handle `request` with this block's runtime."""
         return self.runtime.handle(self, handler_name, request, suffix)
 
     def save(self):
@@ -326,12 +327,18 @@ class XBlock(Plugin):
         """
         Use `node` to construct a new block.
 
-        Args:
-            node (etree.Element): The xml node to parse into an xblock
-            runtime (:class:`.Runtime`): The runtime to use while parsing
-            keys (:class:`.ScopeIds`): The keys identifying where this block will store its data
-            id_generator (:class:`.IdGenerator`): An object that will allow the runtime
-                to generate correct definition and usage ids for children of this block
+        Arguments:
+            node (etree.Element): The xml node to parse into an xblock.
+
+            runtime (:class:`.Runtime`): The runtime to use while parsing.
+
+            keys (:class:`.ScopeIds`): The keys identifying where this block
+                will store its data.
+
+            id_generator (:class:`.IdGenerator`): An object that will allow the
+                runtime to generate correct definition and usage ids for
+                children of this block.
+
         """
         block = runtime.construct_xblock_from_class(cls, keys)
 
