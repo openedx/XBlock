@@ -386,16 +386,16 @@ class Runtime(object):
         raise NotImplementedError("Runtime needs to provide local_resource_url()")
 
     @abstractmethod
-    def publish(self, block, event):
+    def publish(self, block, event_type, event_data):
         """Publish an event.
 
         For example, to participate in the course grade, an XBlock should set
         has_score to True, and should publish a grade event whenever the grade
         changes.
 
-        In this case `event` would be a dictionary of the following form:
+        In this case the `event_type` would be `grade`, and the `event_data`
+        would be a dictionary of the following form:
             {
-                'event_type': 'grade',
                 'value': <number>,
                 'max_value': <number>,
             }
