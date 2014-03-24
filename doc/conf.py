@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'XBlock'
-copyright = u'2012\N{en dash}2013, edX.org'
+copyright = u'2012\N{en dash}2014, edX.org'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -96,6 +96,13 @@ pygments_style = 'sphinx'
 # When auto-doc'ing a class, write the class' docstring and the __init__ docstring
 # into the class docs.
 autoclass_content = "both"
+
+# Warn about unresolvable references, but not all of them.
+nitpicky = True
+nitpick_ignore = [
+    ('py:obj', 'str'),
+    ('py:obj', 'string'),
+]
 
 # -- Options for HTML output ---------------------------------------------------
 
