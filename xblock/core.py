@@ -163,9 +163,9 @@ class XBlock(Plugin):
         # Verify the URI is in whitelisted form before opening for serving.
         # URI must begin with public/, all file/folder names must use only
         # characters from [a-zA-Z0-9\-_], and the file type must be one of
-        # jpg, jpeg, png, gif, js, css, or json
+        # jpg, jpeg, png, gif, js, css, json or html
         assert re.match(
-            r'^public/([a-zA-Z0-9\-_]+/)*[a-zA-Z0-9\-_]+\.(jpg|jpeg|png|gif|js|css|json)$', uri
+            r'^public/([a-zA-Z0-9\-_]+/)*[a-zA-Z0-9\-_]+\.(jpg|jpeg|png|gif|js|css|json|html)$', uri
         )
         return pkg_resources.resource_stream(cls.__module__, uri)
 
