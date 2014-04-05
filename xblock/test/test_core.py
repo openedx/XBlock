@@ -598,7 +598,7 @@ def setup_save_failure(set_many):
         """
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.user_state, default='field c')
+        field_c = Integer(scope=Scope.user_state, default=42)
 
     field_tester = FieldTester(MagicMock(), field_data, Mock())
     return field_tester
@@ -644,7 +644,7 @@ def test_xblock_save_failure_none():
     field_tester = setup_save_failure(fake_set_many)
     field_tester.field_a = 20
     field_tester.field_b = 30
-    field_tester.field_c = "hello world"
+    field_tester.field_c = 40
 
     with assert_raises(XBlockSaveError) as save_error:
         # This call should raise an XBlockSaveError

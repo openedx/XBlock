@@ -149,6 +149,8 @@ def test_db_model_keys():
     for field in tester.fields.values():
         new_value = 'new ' + field.name
         assert_false(field_data.has(tester, field.name))
+        if type(field) is List:
+            new_value = [new_value]
         setattr(tester, field.name, new_value)
 
     # Write out the values
