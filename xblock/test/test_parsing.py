@@ -118,6 +118,12 @@ class ParsingTest(XmlTest, unittest.TestCase):
         self.assertIsInstance(block, Specialized)
         self.assertEqual(block.num_children, 3)
 
+    @XBlock.register_temp_plugin(Leaf)
+    def test_parse_unicode(self):
+        block = self.parse_xml_to_block(u"<leaf data1='\u2603' />")
+        self.assertIsInstance(block, Leaf)
+        self.assertEqual(block.data1, u'\u2603')
+
 
 class ExportTest(XmlTest, unittest.TestCase):
     """Tests of the XML export facility."""
