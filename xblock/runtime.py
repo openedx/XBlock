@@ -10,7 +10,7 @@ import threading
 
 from abc import ABCMeta, abstractmethod
 from lxml import etree
-from cStringIO import StringIO
+from StringIO import StringIO
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
