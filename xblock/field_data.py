@@ -6,6 +6,7 @@ simple.
 """
 
 import copy
+import six
 
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
@@ -13,12 +14,11 @@ from collections import defaultdict
 from xblock.exceptions import InvalidScopeError
 
 
+@six.add_metaclass(ABCMeta)
 class FieldData(object):
     """
     An interface allowing access to an XBlock's field values indexed by field names.
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get(self, block, name):

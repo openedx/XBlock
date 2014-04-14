@@ -26,10 +26,9 @@ from xblock.exceptions import (
 from xblock.core import XBlock
 
 
+@six.add_metaclass(ABCMeta)
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
-
-    __metaclass__ = ABCMeta
 
     # Keys are structured to retain information about the scope of the data.
     # Stores can use this information however they like to store and retrieve
@@ -229,9 +228,9 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
+@six.add_metaclass(ABCMeta)
 class IdReader(object):
     """An abstract object that stores usages and definitions."""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_definition_id(self, usage_id):
@@ -258,9 +257,9 @@ class IdReader(object):
         pass
 
 
+@six.add_metaclass(ABCMeta)
 class IdGenerator(object):
     """An abstract object that creates usage and definition ids"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_usage(self, def_id):
@@ -330,12 +329,11 @@ class MemoryIdManager(IdReader, IdGenerator):
             raise NoSuchDefinition(repr(def_id))
 
 
+@six.add_metaclass(ABCMeta)
 class Runtime(object):
     """
     Access to the runtime environment for XBlocks.
     """
-
-    __metaclass__ = ABCMeta
 
     # Abstract methods
     @abstractmethod

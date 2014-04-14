@@ -78,7 +78,7 @@ class XBlockMetaclass(
 
 # -- Base Block
 
-
+@six.add_metaclass(XBlockMetaclass)
 class XBlock(Plugin):
     """Base class for XBlocks.
 
@@ -88,8 +88,6 @@ class XBlock(Plugin):
     Don't provide the ``__init__`` method when deriving from this class.
 
     """
-
-    __metaclass__ = XBlockMetaclass
 
     entry_point = 'xblock.v1'
 

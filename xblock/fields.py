@@ -11,6 +11,7 @@ import copy
 from collections import namedtuple
 import pytz
 import dateutil.parser
+import six
 
 
 # __all__ controls what classes end up in the docs, and in what order.
@@ -745,6 +746,9 @@ class ChildrenModelMetaclass(type):
         return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+# This doesn't use the ChildrenModelMetaclass, because it doesn't seem
+# sensible to add children to a module not written to use them.
+@six.add_metaclass(ModelMetaclass)
 class XBlockMixin(object):
     """
     Base class for XBlock Mixin classes.
@@ -753,6 +757,4 @@ class XBlockMixin(object):
     created by a particular runtime.
 
     """
-    # This doesn't use the ChildrenModelMetaclass, because it doesn't seem
-    # sensible to add children to a module not written to use them.
-    __metaclass__ = ModelMetaclass
+    pass
