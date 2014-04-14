@@ -3,9 +3,8 @@
 Tests the fundamentals of XBlocks including - but not limited to -
 metaclassing, field access, caching, serialization, and bulk saves.
 """
+from __future__ import unicode_literals
 
-# Allow accessing protected members for testing purposes
-# pylint: disable=W0212
 from mock import patch, MagicMock, Mock
 from datetime import datetime
 import json
@@ -33,6 +32,7 @@ from xblock.test.tools import (
     assert_not_equals, assert_false,
     WarningTestMixin, TestRuntime,
 )
+# pylint: disable=protected-access, unused-argument
 
 
 def test_field_access():
@@ -528,7 +528,8 @@ def test_xblock_save_one():
     def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
-        raise KeyValueMultiSaveError([update_dict.keys()[0]])
+        keys = list(update_dict.keys())
+        raise KeyValueMultiSaveError([keys[0]])
 
     field_tester = setup_save_failure(fake_set_many)
 
@@ -761,7 +762,7 @@ def test_cached_parent():
 def test_json_handler_basic():
     test_self = Mock()
     test_data = {"foo": "bar", "baz": "quux"}
-    test_data_json = json.dumps(test_data)
+    test_data_json = json.dumps(test_data).encode('utf-8')
     test_suffix = "suff"
     test_request = Mock(method="POST", body=test_data_json)
 
@@ -774,21 +775,22 @@ def test_json_handler_basic():
 
     response = test_func(test_self, test_request, test_suffix)
     assert_equals(response.status_code, 200)
-    assert_equals(response.body, test_data_json)
+    assert_equals(json.loads(response.body.decode('utf-8')), test_data)
     assert_equals(response.content_type, "application/json")
 
 
 def test_json_handler_invalid_json():
-    test_request = Mock(method="POST", body="{")
+    test_request = Mock(method="POST", body=b"{")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):   # pylint: disable=unused-argument
+    def test_func(self, request, suffix):  # pylint: disable=unused-argument
         return {}
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 400)
-    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    body = response.body.decode('utf-8')
+    assert_equals(json.loads(body), {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
 
 
@@ -796,54 +798,57 @@ def test_json_handler_get():
     test_request = Mock(method="GET")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):   # pylint: disable=unused-argument
+    def test_func(self, request, suffix):  # pylint: disable=unused-argument
         return {}
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 405)
-    assert_equals(json.loads(response.body), {"error": "Method must be POST"})
+    body = response.body.decode('utf-8')
+    assert_equals(json.loads(body), {"error": "Method must be POST"})
     assert_equals(list(response.allow), ["POST"])
 
 
 def test_json_handler_empty_request():
-    test_request = Mock(method="POST", body="")
+    test_request = Mock(method="POST", body=b"")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):   # pylint: disable=unused-argument
+    def test_func(self, request, suffix):  # pylint: disable=unused-argument
         return {}
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 400)
-    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    body = response.body.decode("utf-8")
+    assert_equals(json.loads(body), {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
 
 
 def test_json_handler_error():
     test_status_code = 418
     test_message = "I'm a teapot"
-    test_request = Mock(method="POST", body="{}")
+    test_request = Mock(method="POST", body=b"{}")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):   # pylint: disable=unused-argument
+    def test_func(self, request, suffix):  # pylint: disable=unused-argument
         raise JsonHandlerError(test_status_code, test_message)
 
     response = test_func(Mock(), test_request, "dummy_suffix")  # pylint: disable=assignment-from-no-return
     assert_equals(response.status_code, test_status_code)
-    assert_equals(json.loads(response.body), {"error": test_message})
+    body = response.body.decode('utf-8')
+    assert_equals(json.loads(body), {"error": test_message})
     assert_equals(response.content_type, "application/json")
 
 
 def test_json_handler_return_response():
-    test_request = Mock(method="POST", body="{}")
+    test_request = Mock(method="POST", body=b"{}")
 
     @XBlock.json_handler
     def test_func(self, request, suffix):  # pylint: disable=unused-argument
-        return Response(body="not JSON", status=418, content_type="text/plain")
+        return Response(body=b"not JSON", status=418, content_type="text/plain")
 
     response = test_func(Mock(), test_request, "dummy_suffix")
-    assert_equals(response.body, "not JSON")
+    assert_equals(response.body, b"not JSON")
     assert_equals(response.status_code, 418)
     assert_equals(response.content_type, "text/plain")
 

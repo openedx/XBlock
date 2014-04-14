@@ -1,3 +1,0 @@
-# Install Django requirements, if we're using the optional Django-integrated
-# parts of XBlock
-Django >= 1.4, < 1.7

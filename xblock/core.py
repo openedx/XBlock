@@ -5,6 +5,7 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
+from __future__ import unicode_literals
 import inspect
 import pkg_resources
 import warnings
@@ -75,7 +76,7 @@ class SharedBlockBase(Plugin):
             raise DisallowedFileError("Only files from public/ are allowed: %r" % uri)
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
-        return pkg_resources.resource_stream(cls.__module__, uri)
+        return pkg_resources.resource_stream(cls.__module__, uri)  # pylint: disable=no-member
 
 
 # -- Base Block
@@ -243,7 +244,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         If all of the aside's data is empty or a default value, then the aside shouldn't
         be serialized as XML at all.
         """
-        return any([field.is_set_on(self) for field in self.fields.itervalues()])
+        return any([field.is_set_on(self) for field in self.fields.values()])
 
 
 # Maintain backwards compatibility

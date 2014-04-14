@@ -6,6 +6,7 @@ The README file in this directory contains much more information.
 
 Much of this still needs to be organized.
 """
+from __future__ import unicode_literals
 
 try:
     from djpyfs import djpyfs  # pylint: disable=import-error
