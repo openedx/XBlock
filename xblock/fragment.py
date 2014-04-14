@@ -5,6 +5,7 @@ This code is in the Runtime layer.
 """
 
 from collections import namedtuple
+import six
 
 
 FragmentResource = namedtuple("FragmentResource", "kind, data, mimetype, placement")  # pylint: disable=C0103
@@ -84,7 +85,7 @@ class Fragment(object):
         that it is the only content on the page.
 
         """
-        assert isinstance(content, unicode)
+        assert isinstance(content, six.text_type)
         self.content += content
 
     def _default_placement(self, mimetype):

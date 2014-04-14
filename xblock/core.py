@@ -13,6 +13,7 @@ try:
 except ImportError:
     import json
 from webob import Response
+import six
 
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
 from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope, Reference
@@ -374,7 +375,7 @@ class XBlock(Plugin):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                node.set(field_name, unicode(field.read_from(self)))
+                node.set(field_name, six.text_type(field.read_from(self)))
 
         # Add children for each of our children.
         if self.has_children:

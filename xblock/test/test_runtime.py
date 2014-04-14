@@ -3,6 +3,7 @@
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
+import six
 from collections import namedtuple
 from datetime import datetime
 from mock import Mock, patch
@@ -533,8 +534,8 @@ class XBlockWithServices(XBlock):
         def assert_equals_unicode(str1, str2):
             """`str1` equals `str2`, and both are Unicode strings."""
             assert_equals(str1, str2)
-            assert isinstance(str1, unicode)
-            assert isinstance(str2, unicode)
+            assert isinstance(str1, six.text_type)
+            assert isinstance(str2, six.text_type)
 
         i18n = self.runtime.service(self, "i18n")
         assert_equals_unicode(u"Welcome!", i18n.ugettext("Welcome!"))

@@ -8,6 +8,7 @@ import itertools
 import re
 import threading
 
+import six
 from abc import ABCMeta, abstractmethod
 from lxml import etree
 from StringIO import StringIO
@@ -497,7 +498,9 @@ class Runtime(object):
 
     def parse_xml_string(self, xml, id_generator):
         """Parse a string of XML, returning a usage id."""
-        return self.parse_xml_file(StringIO(xml), id_generator)
+        if isinstance(xml, six.text_type):
+            xml = xml.encode('utf-8')
+        return self.parse_xml_file(six.BytesIO(xml), id_generator)
 
     def parse_xml_file(self, fileobj, id_generator):
         """Parse an open XML file, returning a usage id."""
@@ -887,6 +890,9 @@ class NullI18nService(object):
         Locale-aware strftime, with format short-cuts.
         """
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if isinstance(format, unicode):
+        if isinstance(format, six.binary_type):
             format = format.encode("utf8")
-        return dtime.strftime(format).decode("utf8")
+        ret = dtime.strftime(format)
+        if isinstance(ret, six.binary_type):
+            ret = ret.decode("utf-8")
+        return ret
