@@ -3,7 +3,8 @@
 import webob
 from collections import MutableMapping
 from lazy import lazy
-from itertools import chain, repeat, izip
+from itertools import chain, repeat
+from six.moves import zip
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
@@ -77,7 +78,7 @@ def querydict_to_multidict(query_dict, wrap=None):
     """
     wrap = wrap or (lambda val: val)
     return MultiDict(chain.from_iterable(
-        izip(repeat(key), (wrap(v) for v in vals))
+        zip(repeat(key), (wrap(v) for v in vals))
         for key, vals in query_dict.iterlists()
     ))
 
