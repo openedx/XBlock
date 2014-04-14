@@ -7,6 +7,7 @@ metaclassing, field access, caching, serialization, and bulk saves.
 # pylint: disable=W0212
 from mock import patch, MagicMock, Mock
 from datetime import datetime
+import six
 
 from xblock.core import XBlock
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
@@ -22,10 +23,9 @@ from xblock.test.tools import (
 
 
 def test_model_metaclass():
+    @six.add_metaclass(ModelMetaclass)
     class ModelMetaclassTester(object):
         """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
-
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content)
 
@@ -59,9 +59,10 @@ def test_with_mixins():
         """Toy class for field testing"""
         field_a = Integer(scope=Scope.settings)
 
+    @six.add_metaclass(ModelMetaclass)
     class BaseClass(object):
         """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
+        pass
 
     class ChildClass(FieldsMixin, BaseClass):
         """Toy class for ModelMetaclass and field testing"""
@@ -85,15 +86,15 @@ def test_with_mixins():
 
 def test_children_metaclass():
 
+    @six.add_metaclass(ChildrenModelMetaclass)
     class HasChildren(object):
         """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
-
         has_children = True
 
+    @six.add_metaclass(ChildrenModelMetaclass)
     class WithoutChildren(object):
         """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
+        pass
 
     class InheritedChildren(HasChildren):
         """Toy class for ChildrenModelMetaclass testing"""
@@ -373,9 +374,9 @@ def test_json_field_access():
             """Convert a datetime object to a string"""
             return value.strftime("%m/%d/%Y")
 
+    @six.add_metaclass(ModelMetaclass)
     class FieldTester(object):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
 
         field_a = Date(scope=Scope.settings)
         field_b = Date(scope=Scope.content, default=datetime(2013, 4, 1))
@@ -424,9 +425,9 @@ def test_defaults_not_shared():
 
 def test_object_identity():
     # Check that values that are modified are what is returned
+    @six.add_metaclass(ModelMetaclass)
     class FieldTester(object):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
 
         field_a = List(scope=Scope.settings)
 
@@ -460,9 +461,9 @@ def test_object_identity():
 
 def test_caching_is_per_instance():
     # Test that values cached for one instance do not appear on another
+    @six.add_metaclass(ModelMetaclass)
     class FieldTester(object):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
 
         field_a = List(scope=Scope.settings)
 
@@ -606,7 +607,8 @@ def test_xblock_save_one():
     def fake_set_many(block, update_dict):
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
-        raise KeyValueMultiSaveError([update_dict.keys()[0]])
+        keys = list(update_dict.keys())
+        raise KeyValueMultiSaveError([keys[0]])
     # pylint: enable=W0613
 
     field_tester = setup_save_failure(fake_set_many)

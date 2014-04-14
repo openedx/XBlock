@@ -253,7 +253,7 @@ class XBlock(Plugin):
                 # Ensure we return a string, even if unanticipated exceptions.
                 attrs.append(" %s=???" % (field.name,))
             else:
-                if isinstance(value, basestring):
+                if isinstance(value, six.string_types):
                     value = value.strip()
                     if len(value) > 40:
                         value = value[:37] + "..."

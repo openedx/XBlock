@@ -11,7 +11,6 @@ import threading
 import six
 from abc import ABCMeta, abstractmethod
 from lxml import etree
-from StringIO import StringIO
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope

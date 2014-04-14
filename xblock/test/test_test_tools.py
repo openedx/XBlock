@@ -7,14 +7,14 @@
 from abc import ABCMeta, abstractmethod
 
 import unittest
+import six
 
 from xblock.test.tools import unabc
 
 
+@six.add_metaclass(ABCMeta)
 class Abstract(object):
     """Our test subject: an abstract class with two abstract methods."""
-
-    __metaclass__ = ABCMeta
 
     def concrete(self, arg):
         """This is available as-is on all subclasses."""

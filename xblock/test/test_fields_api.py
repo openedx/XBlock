@@ -26,6 +26,7 @@ particular combination of initial conditions that we want to test)
 
 import copy
 from mock import Mock
+from six.moves import range
 
 from xblock.core import XBlock
 from xblock.fields import Integer, List
@@ -409,7 +410,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
 
     @property
     def default_iterator(self):
-        return iter(xrange(1000))
+        return iter(range(1000))
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
@@ -426,7 +427,7 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
 
     @property
     def default_iterator(self):
-        return ([None] * i for i in xrange(1000))
+        return ([None] * i for i in range(1000))
 
 
 # ~~~~~~~~~~~~~ Classes for testing noops before other tests ~~~~~~~~~~~~~~~~~~~~

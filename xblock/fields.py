@@ -545,7 +545,7 @@ class Boolean(Field):
     # pylint: enable=W0622
 
     def from_json(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return value.lower() == 'true'
         else:
             return bool(value)
@@ -593,7 +593,7 @@ class String(Field):
     MUTABLE = False
 
     def from_json(self, value):
-        if value is None or isinstance(value, basestring):
+        if value is None or isinstance(value, six.string_types):
             return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
@@ -612,7 +612,7 @@ class DateTime(Field):
         """
         Parse the date from an ISO-formatted date string, or None.
         """
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
 
             # Parser interprets empty string as now by default
             if value == "":
