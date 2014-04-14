@@ -2,8 +2,8 @@ Part of `edX code`__.
 
 __ http://code.edx.org/
 
-XBlock Courseware Components
-============================
+XBlock Courseware Components |build-status| |coverage-status|
+=============================================================
 
 XBlock is a component architecture by edX.org for building courseware.
 
@@ -139,7 +139,7 @@ Making your own XBlock
 ----------------------
 
 Making an XBlock can be as simple as creating a Python class with a few
-specific methods.  
+specific methods.
 
 Instructions for constructing a new XBlock along with examples can be found in
 the XBlock SDK: https://github.com/edx/xblock-sdk
@@ -175,3 +175,8 @@ You can discuss this code on the `edx-code Google Group`__ or in the
 ``#edx-code`` IRC channel on Freenode.
 
 __ https://groups.google.com/group/edx-code
+
+.. |build-status| image:: https://travis-ci.org/edx/XBlock.svg?branch=master
+   :target: https://travis-ci.org/edx/XBlock
+.. |coverage-status| image:: https://coveralls.io/repos/edx/XBlock/badge.png
+   :target: https://coveralls.io/r/edx/XBlock
