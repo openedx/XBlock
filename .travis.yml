@@ -4,5 +4,10 @@ python:
 before_install:
   - "export DISPLAY=:99"
   - "sh -e /etc/init.d/xvfb start"
-install: pip install -r requirements.txt
-script:  python manage.py test
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+script:
+  - coverage run -m nose
+after_success:
+  - coveralls
