@@ -194,6 +194,9 @@ class Scope(ScopeBase):
     def __eq__(self, other):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
+    def __hash__(self):
+        return hash((self.user, self.block))
+
 
 ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylint: disable=C0103
 
