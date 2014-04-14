@@ -59,9 +59,9 @@ class XmlTest(object):
 
     def export_xml_for_block(self, block):
         """A helper to return the XML string for a block."""
-        output = six.StringIO()
+        output = six.BytesIO()
         self.runtime.export_to_xml(block, output)
-        return output.getvalue()
+        return output.getvalue().decode("utf-8")
 
 
 # Tests!
