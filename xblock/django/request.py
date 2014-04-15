@@ -77,9 +77,13 @@ def querydict_to_multidict(query_dict, wrap=None):
 
     """
     wrap = wrap or (lambda val: val)
+    try:
+        iterlists = query_dict.iterlists
+    except AttributeError:
+        iterlists = query_dict.lists
     return MultiDict(chain.from_iterable(
         zip(repeat(key), (wrap(v) for v in vals))
-        for key, vals in query_dict.iterlists()
+        for key, vals in iterlists()
     ))
 
 
