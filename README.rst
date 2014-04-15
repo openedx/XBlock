@@ -102,6 +102,9 @@ we ignore by viewing the contents of `pylintrc`_ and `.pep8`_. Before making a p
 request, you should ensure that your branch does not add any new quality violations
 by checking your code with these tools.
 
+.. _pylintrc: https://github.com/edx/XBlock/blob/master/pylintrc
+.. _.pep8: https://github.com/edx/XBlock/blob/master/.pep8
+
 Using the XBlock-SDK
 -------------------
 
