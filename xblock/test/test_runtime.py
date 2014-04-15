@@ -112,10 +112,6 @@ class TestXBlock(TestXBlockNoFallback):
             return Fragment(self.preferences)
 
 
-# Allow this tuple to be named as if it were a class
-TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
-
-
 def check_field(collection, field):
     """
     Test method.
