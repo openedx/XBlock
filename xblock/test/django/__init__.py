@@ -1,1 +1,3 @@
-# pylint: disable=missing-docstring
+"""
+Tests for Django integration with XBlock
+"""

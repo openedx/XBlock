@@ -1,1 +1,3 @@
-# pylint: disable=missing-docstring
+"""
+XBlock Courseware Components
+"""
