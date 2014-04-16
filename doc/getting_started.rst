@@ -1,52 +1,33 @@
-===============
+.. topic:: Required Background Knowledge
+
+   To understand the contents of this document, you must understand the 
+   following concepts/ideas: Git, Github, Virtual environments in Python, 
+   and Shell configuration files (ex: .bashrc/.bash_profile)
+
 Getting Started
 ===============
-
 Creating a new XBlock means creating an installable Python kit with a class
 derived from :class:`.XBlock`.  That sounds complicated, but it isn't.
-
 
 Prerequisites
 -------------
 
 You'll need some software installed in order to work with XBlock:
+    * `Git <https://help.github.com/articles/set-up-git>`_ for source control
+    * Something to create Python virtual environments. Available options include: 
+        * `PyEnv <https://github.com/yyuu/pyenv>`_
+        * `VirtualEnv <http://www.virtualenv.org/en/latest/>`_ 
+          and `VirtualEnvWrapper <http://virtualenvwrapper.readthedocs.org/en/latest>`_
 
-Python 2.7
+Get and Configure the XBlock Repo
+---------------------------------
 
-    Chances are good that you already have Python 2.7 installed.  If you need
-    to install it, you can get a kit from `python.org`__.   Do not install the
-    highest version you find.  Python 3.x will not work.  You want Python 2.7.
-
-.. __: http://python.org/download/
-
-Pip
-
-    Python's package manager is called pip, with its own `installation
-    instructions`__.
-
-.. __: http://www.pip-installer.org/en/latest/installing.html
-
-Git
-
-    Git manages code repositories.  Github has a good `introduction to setting
-    up git`__ if you need one.
-
-.. __: https://help.github.com/articles/set-up-git
-
-
-
-Get the XBlock repository
--------------------------
-
-.. highlight: console
-
-The XBlock code is on Github.  Get the code by cloning the XBlock repo::
+#. The XBlock code is on Github.  Get the code by cloning the XBlock repo::
 
     $ git clone https://github.com/edx/XBlock.git
 
-This will create the XBlock directory in your current directory.
-
-In the XBlock directory, install its prerequisite Python packages::
+#. Create a virtual environment for your XBlock development work.
+#. Activate your virtual environment and install prerequisite Python packages::
 
     $ pip install -r requirements.txt
 
@@ -54,10 +35,8 @@ In the XBlock directory, install its prerequisite Python packages::
 Create a new XBlock
 -------------------
 
-.. highlight: console
-
 The simplest way to get started on a new XBlock is to use the
-script/startnew.py script in the XBlock SDK repo: 
+``script/startnew.py`` script in the XBlock SDK repo: 
 
     https://github.com/edx/xblock-sdk
 
@@ -156,20 +135,20 @@ Use pip to install your block::
 Testing with the workbench
 ..........................
 
-The simplest test environment is the XBlock workbench. It can be found in the XBlock SDK:
-
-    https://github.com/edx/xblock-sdk
-
+The simplest test environment is the XBlock workbench. It can be found in the 
+`XBlock SDK <https://github.com/edx/xblock-sdk>`_.
 
 Testing with the edX LMS
 ........................
 
-See https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/xblocks.rst#testing
+See `testing documentation <https://github.com/edx/edx-platform/blob/master/
+docs/en_us/developers/source/xblocks.rst#testing>`_. 
 
 Deploying your XBlock
 ---------------------
 
-See https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/xblocks.rst#deploying-your-xblock
+See `deployment documentation <https://github.com/edx/edx-platform/blob/master/
+docs/en_us/developers/source/xblocks.rst#deploying-your-xblock>`_.  
 
 Submitting your XBlock to edX
 -----------------------------
@@ -193,3 +172,4 @@ If you would like your XBlock to be available on edx.org, please do the followin
 .. _Github: http://www.github.com/
 .. _`edx-platform`: https://github.com/edx/edx-platform
 .. _requirements file: https://github.com/edx/edx-platform/blob/master/requirements/edx/github.txt
+
