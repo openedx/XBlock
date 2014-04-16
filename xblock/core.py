@@ -128,7 +128,7 @@ class XBlock(Plugin):
         def dec(cls):
             """Add the words in `tags` as class tags to this class."""
             # Add in this class's tags
-            cls._class_tags.update(tags.replace(",", " ").split())
+            cls._class_tags.update(tags.replace(",", " ").split())  # pylint: disable=protected-access
             return cls
         return dec
 
@@ -312,7 +312,7 @@ class XBlock(Plugin):
         for field in self._dirty_fields.keys():
             # If the field value isn't the same as the baseline we recorded
             # when it was read, then save it
-            if field._is_dirty(self):
+            if field._is_dirty(self):  # pylint: disable=protected-access
                 fields_to_save[field.name] = field.to_json(self._field_data_cache[field.name])
         return fields_to_save
 

@@ -136,11 +136,11 @@ class DjangoWebobRequest(webob.Request):
         )
 
     @lazy
-    def body(self):
+    def body(self):  # pylint: disable=method-hidden
         return self._request.body
 
     @lazy
-    def body_file(self):
+    def body_file(self):  # pylint: disable=method-hidden
         return self._request
 
 

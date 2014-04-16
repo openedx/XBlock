@@ -202,10 +202,10 @@ def test_list_field_access():
     assert_equals([1], field_tester.field_d)
 
     # Examine model data directly
-    ## Caveat: there's not a clean way to copy the originally provided values for `field_a` and `field_b`
-    ## when we instantiate the XBlock. So, the values for those two in both `_field_data` and `_field_data_cache`
-    ## point at the same object. Thus, `field_a` and `field_b` actually have the correct values in
-    ## `_field_data` right now. `field_c` does not, because it has never been written to the `_field_data`.
+    #  Caveat: there's not a clean way to copy the originally provided values for `field_a` and `field_b`
+    #  when we instantiate the XBlock. So, the values for those two in both `_field_data` and `_field_data_cache`
+    #  point at the same object. Thus, `field_a` and `field_b` actually have the correct values in
+    #  `_field_data` right now. `field_c` does not, because it has never been written to the `_field_data`.
     assert_false(field_tester._field_data.has(field_tester, 'field_c'))
     assert_false(field_tester._field_data.has(field_tester, 'field_d'))
 
@@ -291,10 +291,10 @@ def test_dict_field_access():
     assert_equals({'new': 'value'}, field_tester.field_d)
 
     # Examine model data directly
-    ## Caveat: there's not a clean way to copy the originally provided values for `field_a` and `field_b`
-    ## when we instantiate the XBlock. So, the values for those two in both `_field_data` and `_field_data_cache`
-    ## point at the same object. Thus, `field_a` and `field_b` actually have the correct values in
-    ## `_field_data` right now. `field_c` does not, because it has never been written to the `_field_data`.
+    #  Caveat: there's not a clean way to copy the originally provided values for `field_a` and `field_b`
+    #  when we instantiate the XBlock. So, the values for those two in both `_field_data` and `_field_data_cache`
+    #  point at the same object. Thus, `field_a` and `field_b` actually have the correct values in
+    #  `_field_data` right now. `field_c` does not, because it has never been written to the `_field_data`.
     assert_false(field_tester._field_data.has(field_tester, 'field_c'))
     assert_false(field_tester._field_data.has(field_tester, 'field_d'))
 

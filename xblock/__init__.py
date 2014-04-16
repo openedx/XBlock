@@ -1,0 +1,3 @@
+"""
+XBlock Courseware Components
+"""
