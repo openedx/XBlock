@@ -91,7 +91,7 @@ class FieldData(object):
         for key, value in update_dict.items():
             self.set(block, key, value)
 
-    def default(self, block, name):  # pylint: disable=unused-argument,no-self-use
+    def default(self, block, name):  # pylint: disable=unused-argument
         """
         Get the default value for this field which may depend on context or may just be the field's global
         default. The default behavior is to raise KeyError which will cause the caller to return the field's

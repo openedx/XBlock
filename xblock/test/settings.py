@@ -1,5 +1,4 @@
 """Django settings for toy runtime project."""
-import json
 import os
 
 DEBUG = True
