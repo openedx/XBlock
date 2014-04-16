@@ -6,16 +6,15 @@ responses.
 
 # Set up Django settings
 import os
-import sys
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xblock.test.settings")
 
 # Django isn't always available, so skip tests if it isn't.
 from nose.plugins.skip import SkipTest
 try:
-    from django.test.client import RequestFactory
-    has_django = True
+    from django.test.client import RequestFactory  # pylint: disable=import-error
+    HAS_DJANGO = True
 except ImportError:
-    has_django = False
+    HAS_DJANGO = False
 
 from unittest import TestCase
 from webob import Response
@@ -28,7 +27,7 @@ class TestDjangoWebobRequest(TestCase):
     Tests of the django_to_webob_request function
     """
     def setUp(self):
-        if not has_django:
+        if not HAS_DJANGO:
             raise SkipTest("Django not available")
 
         self.req_factory = RequestFactory()
@@ -51,7 +50,7 @@ class TestDjangoWebobResponse(TestCase):
     """
 
     def setUp(self):
-        if not has_django:
+        if not HAS_DJANGO:
             raise SkipTest("Django not available")
 
     def _as_django(self, *args, **kwargs):

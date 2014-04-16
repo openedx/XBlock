@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-class Sentinel(object):
+class Sentinel(object): # pylint: disable=too-few-public-methods
     """
     Class for implementing sentinel objects (only equal to themselves).
     """
@@ -622,10 +622,10 @@ class DateTime(Field):
             except (TypeError, ValueError):
                 raise ValueError("Could not parse {} as a date".format(value))
 
-            if parsed_date.tzinfo is not None:
-                parsed_date.astimezone(pytz.utc)
+            if parsed_date.tzinfo is not None:  # pylint: disable=maybe-no-member
+                parsed_date.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
             else:
-                parsed_date = parsed_date.replace(tzinfo=pytz.utc)
+                parsed_date = parsed_date.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
 
             return parsed_date
 
