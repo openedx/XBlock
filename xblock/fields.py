@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-class Sentinel(object): # pylint: disable=too-few-public-methods
+class Sentinel(object):  # pylint: disable=too-few-public-methods
     """
     Class for implementing sentinel objects (only equal to themselves).
     """

@@ -128,7 +128,7 @@ class XBlock(Plugin):
         def dec(cls):
             """Add the words in `tags` as class tags to this class."""
             # Add in this class's tags
-            cls._class_tags.update(tags.replace(",", " ").split()) # pylint: disable=protected-access
+            cls._class_tags.update(tags.replace(",", " ").split())  # pylint: disable=protected-access
             return cls
         return dec
 
