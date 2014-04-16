@@ -7,7 +7,7 @@ install:
   - pip install coveralls
 script:
   - coverage run -m nose
-  - cd doc; make html
+  - cd doc; make html; cd ..
   - pep8 --exclude="doc/*"
   - script/max_pylint_violations 30
 after_success:
