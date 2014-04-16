@@ -9,6 +9,6 @@ script:
   - coverage run -m nose
   - cd doc; make html
   - pep8 --exclude="doc/*"
-  - pylint xblock
+  - scripts/max_pylint_violations 30
 after_success:
   - coveralls
