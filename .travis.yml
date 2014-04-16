@@ -9,6 +9,6 @@ script:
   - coverage run -m nose
   - cd doc; make html
   - pep8 --exclude="doc/*"
-  - pylint -f parseable xblock
+  - pylint xblock
 after_success:
   - coveralls
