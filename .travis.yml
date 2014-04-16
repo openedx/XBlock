@@ -10,5 +10,7 @@ install:
   - pip install coveralls
 script:
   - coverage run -m nose
+  - pep8
+  - pylint -f parseable xblock
 after_success:
   - coveralls
