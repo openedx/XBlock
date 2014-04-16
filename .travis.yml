@@ -8,7 +8,7 @@ install:
 script:
   - coverage run -m nose
   - cd doc; make html
-  - pep8
+  - pep8 --exclude="doc/*"
   - pylint -f parseable xblock
 after_success:
   - coveralls
