@@ -14,7 +14,7 @@ Prerequisites
 
 You'll need some software installed in order to work with XBlock:
     * `Git <https://help.github.com/articles/set-up-git>`_ for source control
-    * Something to create Python virtual environments, for example: 
+    * Something to create Python virtual environments. Available options include: 
         * `PyEnv <https://github.com/yyuu/pyenv>`_
         * `VirtualEnv <http://www.virtualenv.org/en/latest/>`_ 
           and `VirtualEnvWrapper <http://virtualenvwrapper.readthedocs.org/en/latest>`_
