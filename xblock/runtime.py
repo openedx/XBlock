@@ -876,6 +876,11 @@ class NullI18nService(object):
         self._translations = gettext.NullTranslations()
 
     def __getattr__(self, name):
+        # when requesting unicode output, the function is "ugettext" on
+        # Python 2.x, but simply "gettext" on Python 3.x. Similarly,
+        # "ungettext" on Python 2.x becomes simply "ngettext" on Python 3.x,
+        if six.PY3 and name in ("ugettext", "ungettext"):
+            name = name[1:]
         return getattr(self._translations, name)
 
     STRFTIME_FORMATS = {
