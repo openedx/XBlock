@@ -26,6 +26,7 @@ particular combination of initial conditions that we want to test)
 from __future__ import unicode_literals
 import copy
 from mock import Mock
+import six
 from six.moves import range
 
 from xblock.core import XBlock
@@ -490,6 +491,10 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
             if noop_prefix is not None:
                 test_name += "And" + noop_prefix.__name__
                 test_classes = (noop_prefix, ) + test_classes
+
+            if six.PY2:
+                # Python 2.x can't handle unicode as an argument to the type() function
+                test_name = test_name.encode('utf-8')
 
             vars()[test_name] = type(test_name, test_classes, {'__test__': True})
 

@@ -841,8 +841,12 @@ class Mixologist(object):
                 # Use setdefault so that if someone else has already
                 # created a class before we got the lock, we don't
                 # overwrite it
+                name = base_class.__name__ + 'WithMixins'
+                if six.PY2:
+                    # Python 2.x can't handle unicode as an argument to the type() function
+                    name = name.encode('utf-8')
                 return _CLASS_CACHE.setdefault(mixin_key, type(
-                    base_class.__name__ + 'WithMixins',
+                    name,
                     (base_class, ) + mixins,
                     {'unmixed_class': base_class}
                 ))
