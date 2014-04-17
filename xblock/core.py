@@ -110,7 +110,10 @@ class XBlock(Plugin):
         @functools.wraps(func)
         def wrapper(self, request, suffix=''):
             """The wrapper function `json_handler` returns."""
-            request_json = json.loads(request.body)
+            body = request.body
+            if isinstance(body, six.binary_type):
+                body = body.decode('utf-8')
+            request_json = json.loads(body)
             response_json = json.dumps(func(self, request_json, suffix))
             return Response(response_json, content_type='application/json')
         return wrapper
