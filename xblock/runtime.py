@@ -71,7 +71,7 @@ class KeyValueStore(object):
 
         :update_dict: field_name, field_value pairs for all cached changes
         """
-        for key, value in update_dict.iteritems():
+        for key, value in six.iteritems(update_dict):
             self.set(key, value)
 
 
