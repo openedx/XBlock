@@ -3,6 +3,7 @@ Module for all xblock exception classes
 """
 from __future__ import unicode_literals
 
+
 class XBlockNotFoundError(Exception):
     """
     Raised to indicate that an XBlock could not be found with the requested usage_id
