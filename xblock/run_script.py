@@ -1,6 +1,7 @@
 """Script execution for script fragments in content."""
 
 import textwrap
+import six
 
 
 def run_script(pycode):
@@ -13,6 +14,6 @@ def run_script(pycode):
 
     # execute it.
     globs = {}
-    exec pycode in globs, globs  # pylint: disable=W0122
+    six.exec_(pycode, globs, globs)
 
     return globs
