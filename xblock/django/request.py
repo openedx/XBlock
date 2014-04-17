@@ -1,5 +1,5 @@
 """Helpers for WebOb requests and responses."""
-
+from __future__ import unicode_literals
 import webob
 from collections import MutableMapping
 from lazy import lazy

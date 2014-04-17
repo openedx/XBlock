@@ -4,7 +4,7 @@ data to particular scoped fields by name. This allows individual runtimes to
 provide varied persistence backends while keeping the API used by the `XBlock`
 simple.
 """
-
+from __future__ import unicode_literals
 import copy
 import six
 

@@ -1,7 +1,7 @@
 """
 Tools for testing XBlocks
 """
-
+from __future__ import unicode_literals
 from functools import partial
 
 # nose.tools has convenient assert methods, but it defines them in a clever way

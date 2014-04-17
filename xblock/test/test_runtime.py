@@ -2,7 +2,7 @@
 """Tests the features of xblock/runtime"""
 # Allow tests to access private members of classes
 # pylint: disable=W0212
-from __future__ import print_function
+from __future__ import unicode_literals, print_function
 import six
 from collections import namedtuple
 from datetime import datetime
