@@ -3,6 +3,7 @@ Test the xblock.django.request module, which provides helper functionality for
 converting django requests to webob requests and webob responses to django
 responses.
 """
+
 from __future__ import unicode_literals
 # Set up Django settings
 import os

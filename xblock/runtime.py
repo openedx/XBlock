@@ -1,6 +1,7 @@
 """
 Machinery to make the common case easy when building new runtimes
 """
+
 from __future__ import unicode_literals
 import functools
 import gettext

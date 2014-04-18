@@ -5,6 +5,7 @@ The hosting runtime application decides what actual storage mechanism to use
 for each scope.
 
 """
+
 from __future__ import unicode_literals
 import datetime
 import copy
