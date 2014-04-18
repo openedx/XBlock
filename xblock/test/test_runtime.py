@@ -545,18 +545,21 @@ class XBlockWithServices(XBlock):
             assert isinstance(str2, six.text_type)
 
         i18n = self.runtime.service(self, "i18n")
-        assert_equals_unicode(u"Welcome!", i18n.ugettext("Welcome!"))
+        assert_equals_unicode("Welcome!", i18n.ugettext("Welcome!"))
 
-        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 0))
-        assert_equals_unicode(u"Singular", i18n.ungettext("Singular", "Plural", 1))
-        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 2))
+        assert_equals_unicode("Plural", i18n.ungettext("Singular", "Plural", 0))
+        assert_equals_unicode("Singular", i18n.ungettext("Singular", "Plural", 1))
+        assert_equals_unicode("Plural", i18n.ungettext("Singular", "Plural", 2))
 
         when = datetime(2013, 2, 14, 22, 30, 17)
-        assert_equals_unicode(u"2013-02-14", i18n.strftime(when, "%Y-%m-%d"))
-        assert_equals_unicode(u"Feb 14, 2013", i18n.strftime(when, "SHORT_DATE"))
-        assert_equals_unicode(u"Thursday, February 14, 2013", i18n.strftime(when, "LONG_DATE"))
-        assert_equals_unicode(u"Feb 14, 2013 at 22:30", i18n.strftime(when, "DATE_TIME"))
-        assert_equals_unicode(u"10:30:17 PM", i18n.strftime(when, "TIME"))
+        assert_equals_unicode("2013-02-14", i18n.strftime(when, "%Y-%m-%d"))
+        assert_equals_unicode("Feb 14, 2013", i18n.strftime(when, "SHORT_DATE"))
+        assert_equals_unicode("Thursday, February 14, 2013", i18n.strftime(when, "LONG_DATE"))
+        assert_equals_unicode("Feb 14, 2013 at 22:30", i18n.strftime(when, "DATE_TIME"))
+        assert_equals_unicode("10:30:17 PM", i18n.strftime(when, "TIME"))
+        # check bytestring input (Python 2)
+        bytes_format = "%Y-%m-%d".encode("utf-8")
+        assert_equals_unicode("2013-02-14", i18n.strftime(when, bytes_format))
 
         # secret_service is available.
         assert_equals(self.runtime.service(self, "secret_service"), 17)
