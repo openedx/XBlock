@@ -897,7 +897,7 @@ class NullI18nService(object):
         Locale-aware strftime, with format short-cuts.
         """
         if isinstance(format, six.binary_type):
-            format = format.encode("utf8")
+            format = format.decode("utf-8")
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
         ret = dtime.strftime(format)
         if isinstance(ret, six.binary_type):
