@@ -2,7 +2,9 @@
 Test xblock/core/plugin.py
 """
 
-from xblock.test.tools import assert_is, assert_raises_regexp
+from mock import patch, Mock
+
+from xblock.test.tools import assert_is, assert_raises_regexp, assert_equals
 
 from xblock.core import XBlock
 from xblock.plugin import AmbiguousPluginError, PluginMissingError
@@ -63,3 +65,9 @@ def test_nosuch_plugin():
     # If we don't provide a default class, an exception is raised.
     with assert_raises_regexp(PluginMissingError, "nosuch_block"):
         XBlock.load_class("nosuch_block")
+
+
+@patch.object(XBlock, '_load_class_entry_point', Mock(side_effect=Exception))
+def test_broken_plugin():
+    plugins = XBlock.load_classes()
+    assert_equals(list(plugins), [])
