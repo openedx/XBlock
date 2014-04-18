@@ -164,8 +164,8 @@ class ExportTest(XmlTest, unittest.TestCase):
         self.assertEqual(xml.count("container"), 4)
         self.assertEqual(xml.count("child1"), 2)
         self.assertEqual(xml.count("child2"), 1)
-        self.assertEqual(xml.count(u"ʇxǝʇ uʍop-ǝpısdn"), 1)
-        self.assertEqual(xml.count(u"ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!"), 1)
+        self.assertEqual(xml.count("ʇxǝʇ uʍop-ǝpısdn"), 1)
+        self.assertEqual(xml.count("ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!"), 1)
 
         # The important part: exporting then importing a block should give
         # you an equivalent block.
