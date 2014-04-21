@@ -98,9 +98,12 @@ To run these tools on the whole project:
     $ pep8 .
 
 We do not abide by all pylint and pep8 violations. You can check out which violations
-we ignore by viewing the contents of `pylintrc`_ and `.pep8`_. Before making a pull
+we ignore by viewing the contents of `pylintrc`_ and `setup.cfg`_. Before making a pull
 request, you should ensure that your branch does not add any new quality violations
 by checking your code with these tools.
+
+.. _pylintrc: https://github.com/edx/XBlock/blob/master/pylintrc
+.. _setup.cfg: https://github.com/edx/XBlock/blob/master/setup.cfg
 
 Using the XBlock-SDK
 -------------------
@@ -162,7 +165,7 @@ make a pull request from your fork. The first time you make a pull request, you
 may be asked to sign a Contributor Agreement.
 
 Please refer to our `contributor guidelines <https://github.com/edx/edx-platform/
-blob/master/CONTRIBUTING.rst>`_ in the main edx-platform repo for 
+blob/master/CONTRIBUTING.rst>`_ in the main edx-platform repo for
 important additional information.
 
 
