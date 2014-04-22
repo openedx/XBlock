@@ -3,6 +3,8 @@
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
+from __future__ import unicode_literals, print_function
+import six
 from collections import namedtuple
 from datetime import datetime
 from mock import Mock, patch
@@ -111,10 +113,6 @@ class TestXBlock(TestXBlockNoFallback):
             return Fragment(self.preferences)
 
 
-# Allow this tuple to be named as if it were a class
-TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
-
-
 def check_field(collection, field):
     """
     Test method.
@@ -123,16 +121,26 @@ def check_field(collection, field):
     Sets the field to a new value and asserts that the update properly occurs.
     Deletes the new value, and asserts that the default value is properly restored.
     """
-    print "Getting %s from %r" % (field.name, collection)
+    print("Getting {field} from {collection}".format(
+        field=field.name, collection=collection
+    ))
     assert_equals(field.default, getattr(collection, field.name))
     new_value = 'new ' + field.name
-    print "Setting %s to %s on %r" % (field.name, new_value, collection)
+    print("Setting {field} to {value} on {collection}".format(
+        field=field.name, value=new_value, collection=collection
+    ))
     setattr(collection, field.name, new_value)
-    print "Checking %s on %r" % (field.name, collection)
+    print("Checking {field} on {collection}".format(
+        field=field.name, collection=collection
+    ))
     assert_equals(new_value, getattr(collection, field.name))
-    print "Deleting %s from %r" % (field.name, collection)
+    print("Deleting {field} from {collection}".format(
+        field=field.name, collection=collection
+    ))
     delattr(collection, field.name)
-    print "Back to defaults for %s in %r" % (field.name, collection)
+    print("Back to defaults for {field} in {collection}".format(
+        field=field.name, collection=collection
+    ))
     assert_equals(field.default, getattr(collection, field.name))
 
 
@@ -228,7 +236,7 @@ def test_querypath_parsing():
     mrun = MockRuntimeForQuerying()
     block = Mock()
     mrun.querypath(block, "..//@hello")
-    print mrun.mock_query.mock_calls
+    print(mrun.mock_query.mock_calls)
     expected = Mock()
     expected.parent().descendants().attr("hello")
     assert mrun.mock_query.mock_calls == expected.mock_calls
@@ -533,22 +541,25 @@ class XBlockWithServices(XBlock):
         def assert_equals_unicode(str1, str2):
             """`str1` equals `str2`, and both are Unicode strings."""
             assert_equals(str1, str2)
-            assert isinstance(str1, unicode)
-            assert isinstance(str2, unicode)
+            assert isinstance(str1, six.text_type)
+            assert isinstance(str2, six.text_type)
 
         i18n = self.runtime.service(self, "i18n")
-        assert_equals_unicode(u"Welcome!", i18n.ugettext("Welcome!"))
+        assert_equals_unicode("Welcome!", i18n.ugettext("Welcome!"))
 
-        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 0))
-        assert_equals_unicode(u"Singular", i18n.ungettext("Singular", "Plural", 1))
-        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 2))
+        assert_equals_unicode("Plural", i18n.ungettext("Singular", "Plural", 0))
+        assert_equals_unicode("Singular", i18n.ungettext("Singular", "Plural", 1))
+        assert_equals_unicode("Plural", i18n.ungettext("Singular", "Plural", 2))
 
         when = datetime(2013, 2, 14, 22, 30, 17)
-        assert_equals_unicode(u"2013-02-14", i18n.strftime(when, "%Y-%m-%d"))
-        assert_equals_unicode(u"Feb 14, 2013", i18n.strftime(when, "SHORT_DATE"))
-        assert_equals_unicode(u"Thursday, February 14, 2013", i18n.strftime(when, "LONG_DATE"))
-        assert_equals_unicode(u"Feb 14, 2013 at 22:30", i18n.strftime(when, "DATE_TIME"))
-        assert_equals_unicode(u"10:30:17 PM", i18n.strftime(when, "TIME"))
+        assert_equals_unicode("2013-02-14", i18n.strftime(when, "%Y-%m-%d"))
+        assert_equals_unicode("Feb 14, 2013", i18n.strftime(when, "SHORT_DATE"))
+        assert_equals_unicode("Thursday, February 14, 2013", i18n.strftime(when, "LONG_DATE"))
+        assert_equals_unicode("Feb 14, 2013 at 22:30", i18n.strftime(when, "DATE_TIME"))
+        assert_equals_unicode("10:30:17 PM", i18n.strftime(when, "TIME"))
+        # check bytestring input (Python 2)
+        bytes_format = "%Y-%m-%d".encode("utf-8")
+        assert_equals_unicode("2013-02-14", i18n.strftime(when, bytes_format))
 
         # secret_service is available.
         assert_equals(self.runtime.service(self, "secret_service"), 17)

@@ -2,6 +2,7 @@
 Test xblock/core/plugin.py
 """
 
+from __future__ import unicode_literals
 from mock import patch, Mock
 
 from xblock.test.tools import assert_is, assert_raises_regexp, assert_equals

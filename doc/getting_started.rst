@@ -1,7 +1,7 @@
 .. topic:: Required Background Knowledge
 
-   To understand the contents of this document, you must understand the 
-   following concepts/ideas: Git, Github, Virtual environments in Python, 
+   To understand the contents of this document, you must understand the
+   following concepts/ideas: Git, Github, Virtual environments in Python,
    and Shell configuration files (ex: .bashrc/.bash_profile)
 
 Getting Started
@@ -14,9 +14,9 @@ Prerequisites
 
 You'll need some software installed in order to work with XBlock:
     * `Git <https://help.github.com/articles/set-up-git>`_ for source control
-    * Something to create Python virtual environments. Available options include: 
+    * Something to create Python virtual environments. Available options include:
         * `PyEnv <https://github.com/yyuu/pyenv>`_
-        * `VirtualEnv <http://www.virtualenv.org/en/latest/>`_ 
+        * `VirtualEnv <http://www.virtualenv.org/en/latest/>`_
           and `VirtualEnvWrapper <http://virtualenvwrapper.readthedocs.org/en/latest>`_
 
 Get and Configure the XBlock Repo
@@ -36,7 +36,7 @@ Create a new XBlock
 -------------------
 
 The simplest way to get started on a new XBlock is to use the
-``script/startnew.py`` script in the XBlock SDK repo: 
+``script/startnew.py`` script in the XBlock SDK repo:
 
     https://github.com/edx/xblock-sdk
 
@@ -135,20 +135,20 @@ Use pip to install your block::
 Testing with the workbench
 ..........................
 
-The simplest test environment is the XBlock workbench. It can be found in the 
+The simplest test environment is the XBlock workbench. It can be found in the
 `XBlock SDK <https://github.com/edx/xblock-sdk>`_.
 
 Testing with the edX LMS
 ........................
 
 See `testing documentation <https://github.com/edx/edx-platform/blob/master/
-docs/en_us/developers/source/xblocks.rst#testing>`_. 
+docs/en_us/developers/source/xblocks.rst#testing>`_.
 
 Deploying your XBlock
 ---------------------
 
 See `deployment documentation <https://github.com/edx/edx-platform/blob/master/
-docs/en_us/developers/source/xblocks.rst#deploying-your-xblock>`_.  
+docs/en_us/developers/source/xblocks.rst#deploying-your-xblock>`_.
 
 Submitting your XBlock to edX
 -----------------------------
@@ -158,7 +158,7 @@ If you would like your XBlock to be available on edx.org, please do the followin
 - Upload your XBlock to a public Git repository on a reliable host.  We
   recommend Github_.
 - Create a pull request against `edx-platform`_.  However, *do not include your
-  XBlock code in this request*.  Instead, add a line to the 
+  XBlock code in this request*.  Instead, add a line to the
   `requirements file`_, indicating which version of your XBlock you would like
   to use.  That line should be the only change in your pull request.
   Additionally, in your pull request description, please include a link to where

@@ -24,8 +24,11 @@ tests of the various operations), and test setup (which set up the
 particular combination of initial conditions that we want to test)
 """
 
+from __future__ import unicode_literals
 import copy
 from mock import Mock
+import six
+from six.moves import range
 
 from xblock.core import XBlock
 from xblock.fields import Integer, List
@@ -409,7 +412,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
 
     @property
     def default_iterator(self):
-        return iter(xrange(1000))
+        return iter(range(1000))
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
@@ -426,7 +429,7 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
 
     @property
     def default_iterator(self):
-        return ([None] * i for i in xrange(1000))
+        return ([None] * i for i in range(1000))
 
 
 # ~~~~~~~~~~~~~ Classes for testing noops before other tests ~~~~~~~~~~~~~~~~~~~~
@@ -489,6 +492,10 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
             if noop_prefix is not None:
                 test_name += "And" + noop_prefix.__name__
                 test_classes = (noop_prefix, ) + test_classes
+
+            if six.PY2:
+                # Python 2.x can't handle unicode as an argument to the type() function
+                test_name = test_name.encode('utf-8')
 
             vars()[test_name] = type(test_name, test_classes, {'__test__': True})
 

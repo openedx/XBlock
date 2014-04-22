@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Test XML parsing in XBlocks."""
 
+from __future__ import unicode_literals, print_function
 import re
-import StringIO
+import six
 import textwrap
 import unittest
 
@@ -59,9 +60,9 @@ class XmlTest(object):
 
     def export_xml_for_block(self, block):
         """A helper to return the XML string for a block."""
-        output = StringIO.StringIO()
+        output = six.BytesIO()
         self.runtime.export_to_xml(block, output)
-        return output.getvalue()
+        return output.getvalue().decode("utf-8")
 
 
 # Tests!
@@ -156,7 +157,7 @@ class ExportTest(XmlTest, unittest.TestCase):
         xml = self.export_xml_for_block(block)
         block_imported = self.parse_xml_to_block(xml)
 
-        print repr(xml)   # so if the test fails, we can see it.
+        print(repr(xml))  # so if the test fails, we can see it.
 
         # Crude checks that the XML is correct.  The exact form of the XML
         # isn't important.

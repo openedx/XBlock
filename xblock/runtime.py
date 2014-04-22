@@ -2,15 +2,16 @@
 Machinery to make the common case easy when building new runtimes
 """
 
+from __future__ import unicode_literals
 import functools
 import gettext
 import itertools
 import re
 import threading
 
+import six
 from abc import ABCMeta, abstractmethod
 from lxml import etree
-from StringIO import StringIO
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
@@ -25,10 +26,9 @@ from xblock.exceptions import (
 from xblock.core import XBlock
 
 
+@six.add_metaclass(ABCMeta)
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
-
-    __metaclass__ = ABCMeta
 
     # Keys are structured to retain information about the scope of the data.
     # Stores can use this information however they like to store and retrieve
@@ -72,7 +72,7 @@ class KeyValueStore(object):
 
         :update_dict: field_name, field_value pairs for all cached changes
         """
-        for key, value in update_dict.iteritems():
+        for key, value in six.iteritems(update_dict):
             self.set(key, value)
 
 
@@ -228,9 +228,9 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
+@six.add_metaclass(ABCMeta)
 class IdReader(object):
     """An abstract object that stores usages and definitions."""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_definition_id(self, usage_id):
@@ -257,9 +257,9 @@ class IdReader(object):
         pass
 
 
+@six.add_metaclass(ABCMeta)
 class IdGenerator(object):
     """An abstract object that creates usage and definition ids"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_usage(self, def_id):
@@ -329,12 +329,11 @@ class MemoryIdManager(IdReader, IdGenerator):
             raise NoSuchDefinition(repr(def_id))
 
 
+@six.add_metaclass(ABCMeta)
 class Runtime(object):
     """
     Access to the runtime environment for XBlocks.
     """
-
-    __metaclass__ = ABCMeta
 
     # Abstract methods
     @abstractmethod
@@ -497,7 +496,9 @@ class Runtime(object):
 
     def parse_xml_string(self, xml, id_generator):
         """Parse a string of XML, returning a usage id."""
-        return self.parse_xml_file(StringIO(xml), id_generator)
+        if isinstance(xml, six.text_type):
+            xml = xml.encode('utf-8')
+        return self.parse_xml_file(six.BytesIO(xml), id_generator)
 
     def parse_xml_file(self, fileobj, id_generator):
         """Parse an open XML file, returning a usage id."""
@@ -841,8 +842,12 @@ class Mixologist(object):
                 # Use setdefault so that if someone else has already
                 # created a class before we got the lock, we don't
                 # overwrite it
+                name = base_class.__name__ + 'WithMixins'
+                if six.PY2:
+                    # Python 2.x can't handle unicode as an argument to the type() function
+                    name = name.encode('utf-8')
                 return _CLASS_CACHE.setdefault(mixin_key, type(
-                    base_class.__name__ + 'WithMixins',
+                    name,
                     (base_class, ) + mixins,
                     {'unmixed_class': base_class}
                 ))
@@ -873,6 +878,11 @@ class NullI18nService(object):
         self._translations = gettext.NullTranslations()
 
     def __getattr__(self, name):
+        # when requesting unicode output, the function is "ugettext" on
+        # Python 2.x, but simply "gettext" on Python 3.x. Similarly,
+        # "ungettext" on Python 2.x becomes simply "ngettext" on Python 3.x,
+        if six.PY3 and name in ("ugettext", "ungettext"):
+            name = name[1:]
         return getattr(self._translations, name)
 
     STRFTIME_FORMATS = {
@@ -886,7 +896,10 @@ class NullI18nService(object):
         """
         Locale-aware strftime, with format short-cuts.
         """
+        if isinstance(format, six.binary_type):
+            format = format.decode("utf-8")
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if isinstance(format, unicode):
-            format = format.encode("utf8")
-        return dtime.strftime(format).decode("utf8")
+        ret = dtime.strftime(format)
+        if isinstance(ret, six.binary_type):
+            ret = ret.decode("utf-8")
+        return ret

@@ -1,9 +1,11 @@
 """Helpers for WebOb requests and responses."""
 
+from __future__ import unicode_literals
 import webob
 from collections import MutableMapping
 from lazy import lazy
-from itertools import chain, repeat, izip
+from itertools import chain, repeat
+from six.moves import zip
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
@@ -76,9 +78,13 @@ def querydict_to_multidict(query_dict, wrap=None):
 
     """
     wrap = wrap or (lambda val: val)
+    try:
+        iterlists = query_dict.iterlists
+    except AttributeError:
+        iterlists = query_dict.lists
     return MultiDict(chain.from_iterable(
-        izip(repeat(key), (wrap(v) for v in vals))
-        for key, vals in query_dict.iterlists()
+        zip(repeat(key), (wrap(v) for v in vals))
+        for key, vals in iterlists()
     ))
 
 

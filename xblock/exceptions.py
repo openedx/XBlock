@@ -1,6 +1,7 @@
 """
 Module for all xblock exception classes
 """
+from __future__ import unicode_literals
 
 
 class XBlockNotFoundError(Exception):

@@ -4,6 +4,7 @@ converting django requests to webob requests and webob responses to django
 responses.
 """
 
+from __future__ import unicode_literals
 # Set up Django settings
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xblock.test.settings")
@@ -66,9 +67,9 @@ class TestDjangoWebobResponse(TestCase):
         self.assertEquals(self._as_django(status=500).status_code, 500)
 
     def test_content(self):
-        self.assertEquals(self._as_django(body=u"foo").content, "foo")
-        self.assertEquals(self._as_django(app_iter=(c for c in u"foo")).content, "foo")
-        self.assertEquals(self._as_django(body="foo", charset="utf-8").content, "foo")
+        self.assertEquals(self._as_django(body=u"foo").content, b"foo")
+        self.assertEquals(self._as_django(app_iter=(c for c in u"foo")).content, b"foo")
+        self.assertEquals(self._as_django(body="foo", charset="utf-8").content, b"foo")
 
         encoded_snowman = u"\N{SNOWMAN}".encode('utf-8')
         self.assertEquals(self._as_django(body=encoded_snowman, charset="utf-8").content, encoded_snowman)

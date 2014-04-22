@@ -6,11 +6,13 @@ for each scope.
 
 """
 
+from __future__ import unicode_literals
 import datetime
 import copy
 from collections import namedtuple
 import pytz
 import dateutil.parser
+import six
 
 
 # __all__ controls what classes end up in the docs, and in what order.
@@ -192,6 +194,9 @@ class Scope(ScopeBase):
 
     def __eq__(self, other):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
+
+    def __hash__(self):
+        return hash((self.user, self.block))
 
 
 ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylint: disable=C0103
@@ -544,7 +549,7 @@ class Boolean(Field):
     # pylint: enable=W0622
 
     def from_json(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return value.lower() == 'true'
         else:
             return bool(value)
@@ -592,7 +597,7 @@ class String(Field):
     MUTABLE = False
 
     def from_json(self, value):
-        if value is None or isinstance(value, basestring):
+        if value is None or isinstance(value, six.string_types):
             return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
@@ -611,7 +616,7 @@ class DateTime(Field):
         """
         Parse the date from an ISO-formatted date string, or None.
         """
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
 
             # Parser interprets empty string as now by default
             if value == "":
@@ -745,6 +750,9 @@ class ChildrenModelMetaclass(type):
         return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+# This doesn't use the ChildrenModelMetaclass, because it doesn't seem
+# sensible to add children to a module not written to use them.
+@six.add_metaclass(ModelMetaclass)
 class XBlockMixin(object):
     """
     Base class for XBlock Mixin classes.
@@ -753,6 +761,4 @@ class XBlockMixin(object):
     created by a particular runtime.
 
     """
-    # This doesn't use the ChildrenModelMetaclass, because it doesn't seem
-    # sensible to add children to a module not written to use them.
-    __metaclass__ = ModelMetaclass
+    pass

@@ -42,7 +42,7 @@ to give us a virtual machine image which ran it.
 Installation
 ------------
 
-This code runs on Python 2.7.
+This code runs on Python 2.7 and Python 3.3+.
 
 1.  Get a local copy of this repo.
 

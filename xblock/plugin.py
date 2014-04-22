@@ -4,6 +4,7 @@ This code is in the Runtime layer.
 
 """
 
+from __future__ import unicode_literals
 import functools
 import itertools
 import logging

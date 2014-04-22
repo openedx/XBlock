@@ -2,6 +2,7 @@
 Tests for classes extending Field.
 """
 
+from __future__ import unicode_literals
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
 

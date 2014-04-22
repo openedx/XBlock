@@ -2,6 +2,7 @@
 Tests of the utility FieldData's defined by xblock
 """
 
+from __future__ import unicode_literals
 from mock import Mock
 
 from xblock.core import XBlock

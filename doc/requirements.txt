@@ -2,4 +2,4 @@
 # can install them.
 
 sphinx
-sphinxcontrib-napoleon==0.2.6
+sphinxcontrib-napoleon==0.2.7

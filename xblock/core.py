@@ -5,6 +5,7 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
+from __future__ import unicode_literals
 import functools
 import pkg_resources
 import re
@@ -13,6 +14,7 @@ try:
 except ImportError:
     import json
 from webob import Response
+import six
 
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
 from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope, Reference
@@ -77,7 +79,7 @@ class XBlockMetaclass(
 
 # -- Base Block
 
-
+@six.add_metaclass(XBlockMetaclass)
 class XBlock(Plugin):
     """Base class for XBlocks.
 
@@ -87,8 +89,6 @@ class XBlock(Plugin):
     Don't provide the ``__init__`` method when deriving from this class.
 
     """
-
-    __metaclass__ = XBlockMetaclass
 
     entry_point = 'xblock.v1'
 
@@ -111,7 +111,10 @@ class XBlock(Plugin):
         @functools.wraps(func)
         def wrapper(self, request, suffix=''):
             """The wrapper function `json_handler` returns."""
-            request_json = json.loads(request.body)
+            body = request.body
+            if isinstance(body, six.binary_type):
+                body = body.decode('utf-8')
+            request_json = json.loads(body)
             response_json = json.dumps(func(self, request_json, suffix))
             return Response(response_json, content_type='application/json')
         return wrapper
@@ -254,7 +257,7 @@ class XBlock(Plugin):
                 # Ensure we return a string, even if unanticipated exceptions.
                 attrs.append(" %s=???" % (field.name,))
             else:
-                if isinstance(value, basestring):
+                if isinstance(value, six.string_types):
                     value = value.strip()
                     if len(value) > 40:
                         value = value[:37] + "..."
@@ -374,7 +377,7 @@ class XBlock(Plugin):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                node.set(field_name, unicode(field.read_from(self)))
+                node.set(field_name, six.text_type(field.read_from(self)))
 
         # Add children for each of our children.
         if self.has_children:
