@@ -126,7 +126,10 @@ class Plugin(object):
             (entry_point for identifier, entry_point in cls.extra_entry_points),
         )
         for class_ in all_classes:
-            yield (class_.name, cls._load_class_entry_point(class_))
+            try:
+                yield (class_.name, cls._load_class_entry_point(class_))
+            except Exception:  # pylint: disable=broad-except
+                log.warning('Unable to load %s %r', cls.__name__, class_.name, exc_info=True)
 
     @classmethod
     def register_temp_plugin(cls, class_, identifier=None, dist='xblock'):
