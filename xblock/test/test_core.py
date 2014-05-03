@@ -5,10 +5,13 @@ metaclassing, field access, caching, serialization, and bulk saves.
 
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
+import json
 from mock import patch, MagicMock, Mock
 from datetime import datetime
+from webob import Request
 
 from xblock.core import XBlock
+from xblock.runtime import Runtime
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
 from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
     Integer, List, ModelMetaclass, Field, \
@@ -16,7 +19,7 @@ from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
 from xblock.field_data import FieldData, DictFieldData
 
 from xblock.test.tools import (
-    assert_equals, assert_raises,
+    assert_equals, assert_raises, unabc,
     assert_not_equals, assert_false, assert_is
 )
 
@@ -832,3 +835,28 @@ def test_cached_parent():
     parent2 = block.get_parent()
     assert parent2 is parent
     assert not runtime.get_block.called
+
+
+def test_json_handler():
+    test_json_request = {'json': 'request'}
+    test_json_response = {'json': 'response'}
+
+    class WithJsonHandler(XBlock):
+        @XBlock.json_handler
+        def a_json_handler(self, request_json, suffix=''):
+            assert_equals(request_json, test_json_request)
+            return test_json_response
+
+    runtime = unabc("{} shouldn't be used in tests")(Runtime)(Mock(), Mock())
+    block = WithJsonHandler(runtime, Mock(), Mock())
+
+    req = Request.blank('/test')
+    req.method = 'POST'
+    req.body = json.dumps(test_json_request)
+    res = block.handle('a_json_handler', req)
+    assert_equals(json.loads(res.body), test_json_response)
+
+    req = Request.blank('/test')
+    req.method = 'GET'
+    res = block.handle('a_json_handler', req)
+    assert_equals(res.status_code, 404)
