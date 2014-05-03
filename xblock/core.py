@@ -111,6 +111,9 @@ class XBlock(Plugin):
         @functools.wraps(func)
         def wrapper(self, request, suffix=''):
             """The wrapper function `json_handler` returns."""
+            if request.method == 'GET':
+                # A GET request to this handler does not make sense
+                return Response(status=404)
             request_json = json.loads(request.body)
             response_json = json.dumps(func(self, request_json, suffix))
             return Response(response_json, content_type='application/json')
