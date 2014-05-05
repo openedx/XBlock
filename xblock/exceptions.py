@@ -1,6 +1,11 @@
 """
 Module for all xblock exception classes
 """
+from webob import Response
+try:
+    import simplesjson as json  # pylint: disable=F0401
+except ImportError:
+    import json
 
 
 class XBlockNotFoundError(Exception):
@@ -92,3 +97,27 @@ class NoSuchUsage(Exception):
 class NoSuchDefinition(Exception):
     """Raised by :meth:`.IdReader.get_block_type` if the definition doesn't exist."""
     pass
+
+
+class JsonHandlerError(Exception):
+    """
+    Raised by a function decorated with XBlock.json_handler to indicate that an
+    error response should be returned.
+    """
+    def __init__(self, status_code, message):
+        self.status_code = status_code
+        self.message = message
+
+    def get_response(self, **kwargs):
+        """
+        Returns a Response object containing this object's status code and a
+        JSON object containing the key "error" with the value of this object's
+        error message in the body. Keyword args are passed through to
+        the Response.
+        """
+        return Response(
+            json.dumps({"error": self.message}),
+            status_code=self.status_code,
+            content_type="application/json",
+            **kwargs
+        )

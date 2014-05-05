@@ -7,9 +7,10 @@ metaclassing, field access, caching, serialization, and bulk saves.
 # pylint: disable=W0212
 from mock import patch, MagicMock, Mock
 from datetime import datetime
+import json
 
 from xblock.core import XBlock
-from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
+from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError
 from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
     Integer, List, ModelMetaclass, Field, \
     Scope
@@ -832,3 +833,77 @@ def test_cached_parent():
     parent2 = block.get_parent()
     assert parent2 is parent
     assert not runtime.get_block.called
+
+
+def test_json_handler_basic():
+    test_self = Mock()
+    test_data = {"foo": "bar", "baz": "quux"}
+    test_data_json = json.dumps(test_data)
+    test_suffix = "suff"
+    test_request = Mock(method="POST", body=test_data_json)
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):
+        assert_equals(self, test_self)
+        assert_equals(request, test_data)
+        assert_equals(suffix, test_suffix)
+        return request
+
+    response = test_func(test_self, test_request, test_suffix)
+    assert_equals(response.status_code, 200)
+    assert_equals(response.body, test_data_json)
+    assert_equals(response.content_type, "application/json")
+
+
+def test_json_handler_invalid_json():
+    test_request = Mock(method="POST", body="{")
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):
+        return {}
+
+    response = test_func(Mock(), test_request, "dummy_suffix")
+    assert_equals(response.status_code, 400)
+    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    assert_equals(response.content_type, "application/json")
+
+
+def test_json_handler_get():
+    test_request = Mock(method="GET")
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):
+        return {}
+
+    response = test_func(Mock(), test_request, "dummy_suffix")
+    assert_equals(response.status_code, 405)
+    assert_equals(json.loads(response.body), {"error": "Method must be POST"})
+    assert_equals(list(response.allow), ["POST"])
+
+
+def test_json_handler_empty_request():
+    test_request = Mock(method="POST", body="")
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):
+        return {}
+
+    response = test_func(Mock(), test_request, "dummy_suffix")
+    assert_equals(response.status_code, 400)
+    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    assert_equals(response.content_type, "application/json")
+
+
+def test_json_handler_error():
+    test_status_code = 418
+    test_message = "I'm a teapot"
+    test_request = Mock(method="POST", body="{}")
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):
+        raise JsonHandlerError(test_status_code, test_message)
+
+    response = test_func(Mock(), test_request, "dummy_suffix")
+    assert_equals(response.status_code, test_status_code)
+    assert_equals(json.loads(response.body), {"error": test_message})
+    assert_equals(response.content_type, "application/json")

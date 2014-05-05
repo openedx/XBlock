@@ -14,7 +14,7 @@ except ImportError:
     import json
 from webob import Response
 
-from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError
+from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError
 from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope, Reference
 from xblock.plugin import Plugin
 
@@ -106,13 +106,23 @@ class XBlock(Plugin):
         JSON-decoded body of the request.  Any data returned by the function
         will be JSON-encoded and returned as the response.
 
+        The wrapped function can raise JsonHandlerError to return an error
+        response with a non-200 status code.
         """
         @XBlock.handler
         @functools.wraps(func)
         def wrapper(self, request, suffix=''):
             """The wrapper function `json_handler` returns."""
-            request_json = json.loads(request.body)
-            response_json = json.dumps(func(self, request_json, suffix))
+            if request.method != "POST":
+                return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
+            try:
+                request_json = json.loads(request.body)
+            except ValueError:
+                return JsonHandlerError(400, "Invalid JSON").get_response()
+            try:
+                response_json = json.dumps(func(self, request_json, suffix))
+            except JsonHandlerError as e:
+                return e.get_response()
             return Response(response_json, content_type='application/json')
         return wrapper
 
