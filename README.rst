@@ -42,7 +42,9 @@ to give us a virtual machine image which ran it.
 Installation
 ------------
 
-This code runs on Python 2.7.
+This code runs on Python 2.7. If you prefer to use Python 3, there is `a fork
+of XBlock that provides Python 3 support`_, but this fork is not yet supported
+by edX.
 
 1.  Get a local copy of this repo.
 
@@ -52,6 +54,8 @@ This code runs on Python 2.7.
     need to sudo this if you don't use virtualenv):
 
         $ pip install -r requirements.txt
+
+.. _a fork of XBlock that provides Python 3 support: https://github.com/singingwolfboy/XBlock/tree/py3
 
 
 Testing
