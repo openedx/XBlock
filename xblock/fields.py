@@ -579,7 +579,7 @@ class List(Field):
         if value is None or isinstance(value, list):
             return value
         else:
-            raise TypeError('Value stored in an List must be None or a list, found %s' % type(value))
+            raise TypeError('Value stored in a List must be None or a list, found %s' % type(value))
 
 
 class String(Field):
