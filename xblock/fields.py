@@ -20,7 +20,7 @@ import warnings
 __all__ = [
     'BlockScope', 'UserScope', 'Scope', 'ScopeIds',
     'Field',
-    'Boolean', 'Dict', 'Float', 'Integer', 'List', 'String',
+    'Boolean', 'Dict', 'Float', 'Integer', 'List', 'Set', 'String',
     'XBlockMixin',
 ]
 
@@ -686,6 +686,34 @@ class List(JSONField):
             return value
         else:
             raise TypeError('Value stored in a List must be None or a list, found %s' % type(value))
+
+    enforce_type = from_json
+
+
+class Set(JSONField):
+    """
+    A field class for representing a set.
+
+    The stored value can either be None or a set.
+
+    """
+    _default = set()
+
+    def __init__(self, *args, **kwargs):
+        """
+        Set class constructor.
+
+        Redefined in order to convert default values to sets.
+        """
+        super(Set, self).__init__(*args, **kwargs)
+
+        self._default = set(self._default)
+
+    def from_json(self, value):
+        if value is None or isinstance(value, set):
+            return value
+        else:
+            return set(value)
 
     enforce_type = from_json
 
