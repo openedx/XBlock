@@ -22,7 +22,7 @@ from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
 from xblock.fields import (
     Any, Boolean, Dict, Field, Float,
-    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel,
+    Integer, List, Set, String, DateTime, Reference, ReferenceList, Sentinel,
     UNIQUE_ID
 )
 
@@ -317,6 +317,33 @@ class ListTest(FieldTest):
         self.assertJSONOrSetTypeError(3.7)
         self.assertJSONOrSetTypeError(True)
         self.assertJSONOrSetTypeError({})
+
+
+class SetTest(FieldTest):
+    """
+    Tests the Set Field.
+    """
+    FIELD_TO_TEST = Set
+
+    def test_json_equals(self):
+        self.assertJSONOrSetEquals(set(), set())
+        self.assertJSONOrSetEquals(set(['foo', 'bar']), set(['foo', 'bar']))
+        self.assertJSONOrSetEquals(set(['bar', 'foo']), set(['foo', 'bar']))
+        self.assertJSONOrSetEquals(set([1, 3.14]), set([1, 3.14]))
+        self.assertJSONOrSetEquals(set([1, 3.14]), set([1, 3.14, 1]))
+
+    def test_hashable_converts(self):
+        self.assertJSONOrSetEquals(set([1, 3.4]), [1, 3.4])
+        self.assertJSONOrSetEquals(set(['a', 'b']), 'ab')
+        self.assertJSONOrSetEquals(set(['k1', 'k2']), {'k1': 1, 'k2': '2'})
+
+    def test_none(self):
+        self.assertJSONOrSetEquals(None, None)
+
+    def test_error(self):
+        self.assertJSONOrSetTypeError(42)
+        self.assertJSONOrSetTypeError(3.7)
+        self.assertJSONOrSetTypeError(True)
 
 
 class ReferenceTest(FieldTest):
