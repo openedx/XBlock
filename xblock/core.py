@@ -166,7 +166,7 @@ class XBlock(Plugin):
         # jpg, jpeg, png, gif, js, css, json, html, svg, ttf, otf, eot or woff.
         extensions = r'(jpg|jpeg|png|gif|js|css|json|html|svg|ttf|otf|eot|woff)'
         assert re.match(
-            r'^public/([a-zA-Z0-9\-_]+/)*[a-zA-Z0-9\-\._]+\.'+ extensions + '$', uri
+            r'^public/([a-zA-Z0-9\-_]+/)*[a-zA-Z0-9\-\._]+\.' + extensions + '$', uri
         )
         return pkg_resources.resource_stream(cls.__module__, uri)
 
