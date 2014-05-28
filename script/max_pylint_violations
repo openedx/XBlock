@@ -1,6 +1,7 @@
 #!/bin/bash
+# Run once for display, and a second time to count (should be very quick)
 pylint xblock
-ERR=$?
+ERR=`pylint -f parseable xblock | wc -l`
 if [ $ERR -ge $1 ]; then
     echo "too many pylint violations: $ERR (max is $1)"
     exit 1
