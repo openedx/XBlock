@@ -4,4 +4,7 @@ ERR=`grep -v "\*\*\*\*\*\*\*\*\*\*" /tmp/pylint-xblock.log | wc -l`
 if [ $ERR -ge $1 ]; then
     echo "too many pylint violations: $ERR (max is $1)"
     exit 1
+else
+    echo "$ERR pylint violations in total (max is $1)"
+    exit 0
 fi
