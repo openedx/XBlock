@@ -7,14 +7,13 @@ and used by all runtimes.
 """
 import functools
 import pkg_resources
-import re
 try:
     import simplesjson as json  # pylint: disable=F0401
 except ImportError:
     import json
 from webob import Response
 
-from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError
+from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError
 from xblock.fields import ChildrenModelMetaclass, ModelMetaclass, String, List, Scope, Reference
 from xblock.plugin import Plugin
 
@@ -171,12 +170,12 @@ class XBlock(Plugin):
 
         """
         # Verify the URI is in whitelisted form before opening for serving.
-        # URI must begin with public/, all file/folder names must use only
-        # characters from [a-zA-Z0-9\-_], and the file type must be one of
-        # jpg, jpeg, png, gif, js, css, json or html
-        assert re.match(
-            r'^public/([a-zA-Z0-9\-_]+/)*[a-zA-Z0-9\-_]+\.(jpg|jpeg|png|gif|js|css|json|html)$', uri
-        )
+        # URI must begin with public/, and no file path component can start
+        # with a dot, which prevents ".." and ".hidden" files.
+        if not uri.startswith("public/"):
+            raise DisallowedFileError("Only files from public/ are allowed: %r" % uri)
+        if "/." in uri:
+            raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
         return pkg_resources.resource_stream(cls.__module__, uri)
 
     @staticmethod

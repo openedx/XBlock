@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests the fundamentals of XBlocks including - but not limited to -
 metaclassing, field access, caching, serialization, and bulk saves.
@@ -8,16 +9,20 @@ metaclassing, field access, caching, serialization, and bulk saves.
 from mock import patch, MagicMock, Mock
 from datetime import datetime
 import json
+import re
+import unittest
+
+import ddt
 
 from xblock.core import XBlock
-from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError
+from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError
 from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
     Integer, List, ModelMetaclass, Field, \
     Scope
 from xblock.field_data import FieldData, DictFieldData
 
 from xblock.test.tools import (
-    assert_equals, assert_raises,
+    assert_equals, assert_raises, assert_raises_regexp,
     assert_not_equals, assert_false, assert_is
 )
 
@@ -859,10 +864,11 @@ def test_json_handler_invalid_json():
     test_request = Mock(method="POST", body="{")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):
+    def test_func(self, request, suffix):   # pylint: disable=unused-argument
         return {}
 
     response = test_func(Mock(), test_request, "dummy_suffix")
+    # pylint: disable=no-member
     assert_equals(response.status_code, 400)
     assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
@@ -872,10 +878,11 @@ def test_json_handler_get():
     test_request = Mock(method="GET")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):
+    def test_func(self, request, suffix):   # pylint: disable=unused-argument
         return {}
 
     response = test_func(Mock(), test_request, "dummy_suffix")
+    # pylint: disable=no-member
     assert_equals(response.status_code, 405)
     assert_equals(json.loads(response.body), {"error": "Method must be POST"})
     assert_equals(list(response.allow), ["POST"])
@@ -885,10 +892,11 @@ def test_json_handler_empty_request():
     test_request = Mock(method="POST", body="")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):
+    def test_func(self, request, suffix):   # pylint: disable=unused-argument
         return {}
 
     response = test_func(Mock(), test_request, "dummy_suffix")
+    # pylint: disable=no-member
     assert_equals(response.status_code, 400)
     assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
@@ -900,10 +908,53 @@ def test_json_handler_error():
     test_request = Mock(method="POST", body="{}")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):
+    def test_func(self, request, suffix):   # pylint: disable=unused-argument
         raise JsonHandlerError(test_status_code, test_message)
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     assert_equals(response.status_code, test_status_code)
     assert_equals(json.loads(response.body), {"error": test_message})
     assert_equals(response.content_type, "application/json")
+
+
+@ddt.ddt
+class OpenLocalResourceTest(unittest.TestCase):
+    """Tests of `open_local_resource`."""
+
+    class LoadableXBlock(XBlock):
+        """Just something to load resources from."""
+        pass
+
+    def stub_resource_stream(self, module, name):
+        """Act like pkg_resources.resource_stream, for testing."""
+        assert module == "xblock.test.test_core"
+        return "!" + name + "!"
+
+    @ddt.data(
+        "public/hey.js",
+        "public/sub/hey.js",
+        "public/js/vendor/jNotify.jQuery.min.js",
+        "public/something.foo",         # Unknown file extension is fine
+        "public/a/long/PATH/no-problem=here$123.ext",
+        "public/ℓιвяαяу.js",
+    )
+    def test_open_good_local_resource(self, uri):
+        loadable = self.LoadableXBlock(None, None, None)
+        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+            assert loadable.open_local_resource(uri) == "!" + uri + "!"
+
+    @ddt.data(
+        "public/../secret.js",
+        "public/.git/secret.js",
+        "static/secret.js",
+        "../public/no-no.bad",
+        "image.png",
+        ".git/secret.js",
+        "static/ℓιвяαяу.js",
+    )
+    def test_open_bad_local_resource(self, uri):
+        loadable = self.LoadableXBlock(None, None, None)
+        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+            msg = ".*: %s" % re.escape(repr(uri))
+            with assert_raises_regexp(DisallowedFileError, msg):
+                loadable.open_local_resource(uri)

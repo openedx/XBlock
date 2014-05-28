@@ -380,6 +380,11 @@ class Runtime(object):
              get_local_resource(uri) method should be able to open the resource
              identified by this uri.
 
+        Typically, this function uses `open_local_resource` defined on the
+        XBlock class, which by default will only allow resources from the
+        "public/" directory of the kit.  Resources must be placed in "public/"
+        to be successfully served with this URL.
+
         The return value is a complete absolute URL which will locate the
         resource on your runtime.
         """
