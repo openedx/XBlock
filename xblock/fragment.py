@@ -247,15 +247,15 @@ class Fragment(object):
         """
         if resource.mimetype == "text/css":
             if resource.kind == "text":
-                return (u"<style type='text/css'>\n%s\n</style>" % resource.data)
+                return u"<style type='text/css'>\n%s\n</style>" % resource.data
             elif resource.kind == "url":
-                return (u"<link rel='stylesheet' href='%s' type='text/css'>" % resource.data)
+                return u"<link rel='stylesheet' href='%s' type='text/css'>" % resource.data
 
         elif resource.mimetype == "application/javascript":
             if resource.kind == "text":
-                return (u"<script>\n%s\n</script>" % resource.data)
+                return u"<script>\n%s\n</script>" % resource.data
             elif resource.kind == "url":
-                return (u"<script src='%s' type='application/javascript'></script>" % resource.data)
+                return u"<script src='%s' type='application/javascript'></script>" % resource.data
 
         elif resource.mimetype == "text/html":
             assert resource.kind == "text"

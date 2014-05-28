@@ -339,7 +339,7 @@ def test_default_values():
     assert_equals(['a'], field_tester.list1)
     assert_equals([1, 3], field_tester.list2)
     for fname in ['dic1', 'dic2', 'list1', 'list2']:
-        assert(field_tester._field_data.has(field_tester, fname))
+        assert field_tester._field_data.has(field_tester, fname)
 
     # Now delete each field
     del field_tester.dic1
