@@ -832,3 +832,73 @@ def test_cached_parent():
     parent2 = block.get_parent()
     assert parent2 is parent
     assert not runtime.get_block.called
+
+
+def test_valid_resource_types_access():
+    """
+    Ensure that the accepted file types can be accessed.
+    """
+
+    valid_resource_types = ['jpg', 'jpeg', 'png', 'gif', 'js', 'css', 'json', 'html', 'svg', 'ttf',
+                            'otf', 'eot', 'woff']
+    xblock = XBlock(MagicMock(), None, Mock())
+
+    for resource_type in valid_resource_types:
+        with assert_raises(IOError):  # We expect an IOError, since the file doesn't exist
+            xblock.open_local_resource('public/a/resource/file.' + resource_type)
+
+
+def test_invalid_resource_types_access():
+    """
+    Ensure that invalid file types cannot be accessed.
+    """
+
+    invalid_resource_types = ['txt', 'psd', 'pdf']
+    xblock = XBlock(MagicMock(), None, Mock())
+
+    for resource_type in invalid_resource_types:
+        with assert_raises(AssertionError):
+            xblock.open_local_resource('public/a/resource/file.' + resource_type)
+
+
+def test_valid_resource_filenames_access():
+    """
+    Ensure that valid resource filenames can be accessed.
+    """
+
+    xblock = XBlock(MagicMock(), None, Mock())
+
+    valid_resource_filenames = [
+        'public/a/resource/file.png',
+        'public/a/resource/FILE.png',
+        'public/a/long/path/to/the/file.png',
+        'public/a/resource/file.with.dots.js',
+        'public/a/resource/file_with_underscore.js',
+        'public/a/resource/file-with-dash.js'
+    ]
+
+    for filename in valid_resource_filenames:
+        with assert_raises(IOError):
+            xblock.open_local_resource(filename)
+
+
+def test_invalid_resource_filenames_access():
+    """
+    Ensure that invalid resource filenames cannot be accessed.
+    """
+
+    xblock = XBlock(MagicMock(), None, Mock())
+
+    invalid_resource_filenames = [
+        'public/a/resource/file_png',
+        r'public/a/resource/FILE\.png',
+        'public/a/path/with/double/slash//file.png',
+        'public/./file.js',
+        'public/../file.js',
+        'public/an/invalid/path+/file.js',
+        'public/an/invalid/filename+.js'
+    ]
+
+    for filename in invalid_resource_filenames:
+        with assert_raises(AssertionError):
+            xblock.open_local_resource(filename)
