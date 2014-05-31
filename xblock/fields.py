@@ -268,7 +268,7 @@ class Field(object):
         self._name = "unknown"
         self.help = help
         if default is not UNSET:
-            self._default = default
+            self._default = self.enforce_type(default)
         self.scope = scope
         self._display_name = display_name
         self._values = values

@@ -149,7 +149,7 @@ def test_db_model_keys():
     for field in tester.fields.values():
         new_value = 'new ' + field.name
         assert_false(field_data.has(tester, field.name))
-        if type(field) is List:
+        if isinstance(field, List):
             new_value = [new_value]
         setattr(tester, field.name, new_value)
 
@@ -363,7 +363,7 @@ class FieldTester(XBlock):
     """Test XBlock for field access testing"""
     field_a = Integer(scope=Scope.settings)
     field_b = Integer(scope=Scope.content, default=10)
-    field_c = Integer(scope=Scope.user_state, default='field c')
+    field_c = Integer(scope=Scope.user_state, default=42)
 
 
 # Test that access to fields from mixins works as expected
@@ -378,7 +378,7 @@ def test_mixin_field_access():
 
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
-    assert_equals('field c', field_tester.field_c)
+    assert_equals(42, field_tester.field_c)
     assert_equals([1, 2, 3], field_tester.field_x)
     assert_equals('default_value', field_tester.field_y)
 
