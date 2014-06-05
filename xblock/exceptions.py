@@ -105,6 +105,7 @@ class JsonHandlerError(Exception):
     error response should be returned.
     """
     def __init__(self, status_code, message):
+        super(JsonHandlerError, self).__init__()
         self.status_code = status_code
         self.message = message
 
@@ -121,3 +122,8 @@ class JsonHandlerError(Exception):
             content_type="application/json",
             **kwargs
         )
+
+
+class DisallowedFileError(Exception):
+    """Raised by :meth:`open_local_resource` if the requested file is not allowed."""
+    pass
