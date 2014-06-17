@@ -237,6 +237,9 @@ class Field(object):
             returns the specification. For example specification formats, see
             the values property definition.
 
+        kwargs: optional runtime-specific options/metadata. Will be stored as
+            runtime_options.
+
     """
     MUTABLE = True
     _default = None
@@ -244,7 +247,7 @@ class Field(object):
     # We're OK redefining built-in `help`
     # pylint: disable=W0622
     def __init__(self, help=None, default=UNSET, scope=Scope.content,
-                 display_name=None, values=None):
+                 display_name=None, values=None, **kwargs):
         self._name = "unknown"
         self.help = help
         if default is not UNSET:
@@ -252,6 +255,7 @@ class Field(object):
         self.scope = scope
         self._display_name = display_name
         self._values = values
+        self.runtime_options = kwargs
     # pylint: enable=W0622
 
     @property
@@ -537,10 +541,11 @@ class Boolean(Field):
     MUTABLE = False
 
     # pylint: disable=W0622
-    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None):
+    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None, **kwargs):
         super(Boolean, self).__init__(help, default, scope, display_name,
                                       values=({'display_name': "True", "value": True},
-                                              {'display_name': "False", "value": False}))
+                                              {'display_name': "False", "value": False}),
+                                      **kwargs)
     # pylint: enable=W0622
 
     def from_json(self, value):
