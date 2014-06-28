@@ -32,6 +32,7 @@ class Fragment(object):
         self._resources = []
         self.js_init_fn = None
         self.js_init_version = None
+        self.json_init_args = None
 
         if content is not None:
             self.add_content(content)
@@ -58,6 +59,7 @@ class Fragment(object):
             'resources': [r._asdict() for r in self.resources],  # pylint: disable=W0212
             'js_init_fn': self.js_init_fn,
             'js_init_version': self.js_init_version,
+            'json_init_args': self.json_init_args
         }
 
     @classmethod
@@ -179,7 +181,7 @@ class Fragment(object):
         for resource in frags:
             self.add_frag_resources(resource)
 
-    def initialize_js(self, js_func):
+    def initialize_js(self, js_func, json_args=None):
         """Register a Javascript function to initialize the Javascript resources.
 
         `js_func` is the name of a Javascript function defined by one of the
@@ -191,6 +193,8 @@ class Fragment(object):
         # This is version 1 of the interface.
         self.js_init_fn = js_func
         self.js_init_version = 1
+        if json_args:
+            self.json_init_args = json_args
 
     # Implementation methods: don't override
     # TODO: [rocha] should this go in the runtime?
