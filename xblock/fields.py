@@ -481,6 +481,34 @@ class Field(object):
         return hash(self.name)
 
 
+class Filesystem(Field):
+    '''
+    An enhanced pyfilesystem.
+
+    '''
+    MUTABLE = False
+
+    def __get__(self, xblock, xblock_class):
+        """
+        Gets the value of this xblock. Prioritizes the cached value over
+        obtaining the value from the _field_data. Thus if a cached value
+        exists, that is the value that will be returned.
+        """
+        # pylint: disable=protected-access
+        if xblock is None:
+            return self
+
+        value = self._get_cached_value(xblock)
+        if value is NO_CACHE_VALUE:
+            print xblock.__dict__
+            print xblock.runtime.__dict__
+            print xblock.runtime.service.__dict__
+            value = xblock.runtime.service(xblock, 'fs').load(self, xblock) 
+            self._set_cached_value(xblock, value)
+
+        return value
+
+
 class Integer(Field):
     """
     A field that contains an integer.
