@@ -508,6 +508,14 @@ class Filesystem(Field):
 
         return value
 
+    def __delete__(self, xblock):
+        ''' We don't support this until we figure out what this means '''
+        raise NotImplementedError
+
+    def __set__(self, xblock, value):
+        ''' We don't support this until we figure out what this means '''
+        raise NotImplementedError
+
 
 class Integer(Field):
     """
