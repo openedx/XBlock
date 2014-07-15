@@ -503,7 +503,7 @@ class Filesystem(Field):
             print xblock.__dict__
             print xblock.runtime.__dict__
             print xblock.runtime.service.__dict__
-            value = xblock.runtime.service(xblock, 'fs').load(self, xblock) 
+            value = xblock.runtime.service(xblock, 'fs').load(self, xblock)
             self._set_cached_value(xblock, value)
 
         return value
