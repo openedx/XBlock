@@ -485,6 +485,12 @@ class Filesystem(Field):
     '''
     An enhanced pyfilesystem.
 
+    This returns a file system provided by the runtime. The file
+    system has two additional methods over a normal pyfilesytem: 
+    1) get_url allows it to return a reference to a file on said
+    filesystem
+    2) expire allows it to create files which may be garbage 
+    collected after a preset period. 
     '''
     MUTABLE = False
 
@@ -492,7 +498,8 @@ class Filesystem(Field):
         """
         Gets the value of this xblock. Prioritizes the cached value over
         obtaining the value from the _field_data. Thus if a cached value
-        exists, that is the value that will be returned.
+        exists, that is the value that will be returned. Otherwise, it 
+        will get it from the fs service. 
         """
         # pylint: disable=protected-access
         if xblock is None:
