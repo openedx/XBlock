@@ -29,7 +29,7 @@ class FieldTest(unittest.TestCase):
         the test is testing."""
         return None
 
-    def set_and_get_field(self, arg):
+    def set_and_get_field(self, arg, enforce_type):
         """
         Set the field to arg in a Block, get it and return it
         """
@@ -37,7 +37,7 @@ class FieldTest(unittest.TestCase):
             """
             Block for testing
             """
-            field_x = self.field_totest()
+            field_x = self.field_totest(enforce_type=enforce_type)
 
         block = TestBlock(MagicMock(), DictFieldData({}), Mock())
         block.field_x = arg
@@ -48,13 +48,15 @@ class FieldTest(unittest.TestCase):
         Asserts the result of field.from_json and of setting field.
         """
         self.assertEqual(expected, self.field_totest().from_json(arg))
-        self.assertEqual(expected, self.set_and_get_field(arg))
+        self.assertEqual(expected, self.set_and_get_field(arg, True))
+        self.assertEqual(arg, self.set_and_get_field(arg, False))
 
     def assertSetEquals(self, expected, arg):
         """
         Asserts the result only of setting field.
         """
-        self.assertEqual(expected, self.set_and_get_field(arg))
+        self.assertEqual(expected, self.set_and_get_field(arg, True))
+        self.assertEqual(arg, self.set_and_get_field(arg, False))
 
     def assertToJSONEquals(self, expected, arg):
         """
@@ -70,7 +72,8 @@ class FieldTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.field_totest().from_json(arg)
         with self.assertRaises(ValueError):
-            self.set_and_get_field(arg)
+            self.set_and_get_field(arg, True)
+        self.set_and_get_field(arg, False)
 
     def assertJSONOrSetTypeError(self, arg):
         """
@@ -80,7 +83,8 @@ class FieldTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.field_totest().from_json(arg)
         with self.assertRaises(TypeError):
-            self.set_and_get_field(arg)
+            self.set_and_get_field(arg, True)
+        self.set_and_get_field(arg, False)
 
     # def assertSet
 
