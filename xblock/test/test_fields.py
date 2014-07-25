@@ -10,12 +10,15 @@ import unittest
 
 import datetime as dt
 import pytz
+import warnings
+from contextlib import contextmanager
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
 from xblock.fields import (
     Any, Boolean, Dict, Field, Float,
-    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel
+    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel,
+    FailingEnforceTypeWarning, ModifyingEnforceTypeWarning
 )
 
 from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
@@ -47,16 +50,27 @@ class FieldTest(unittest.TestCase):
         """
         Asserts the result of field.from_json and of setting field.
         """
+        # from_json(arg) -> expected
         self.assertEqual(expected, self.field_totest().from_json(arg))
+        # set+get with enforce_type arg -> expected
         self.assertEqual(expected, self.set_and_get_field(arg, True))
-        self.assertEqual(arg, self.set_and_get_field(arg, False))
+        # set+get without enforce_type arg -> arg
+        # provoking a warning unless arg == expected
+        count = 0 if arg == expected else 1
+        with self.assertDeprecationWarning(count):
+            self.assertEqual(arg, self.set_and_get_field(arg, False))
 
     def assertSetEquals(self, expected, arg):
         """
         Asserts the result only of setting field.
         """
+        # set+get with enforce_type arg -> expected
         self.assertEqual(expected, self.set_and_get_field(arg, True))
-        self.assertEqual(arg, self.set_and_get_field(arg, False))
+        # set+get without enforce_type arg -> arg
+        # provoking a warning unless arg == expected
+        count = 0 if arg == expected else 1
+        with self.assertDeprecationWarning(count):
+            self.assertEqual(arg, self.set_and_get_field(arg, False))
 
     def assertToJSONEquals(self, expected, arg):
         """
@@ -69,24 +83,36 @@ class FieldTest(unittest.TestCase):
         Asserts that field.from_json or setting the field throws a ValueError
         for the supplied value.
         """
+        # from_json and set+get with enforce_type -> ValueError
         with self.assertRaises(ValueError):
             self.field_totest().from_json(arg)
         with self.assertRaises(ValueError):
             self.set_and_get_field(arg, True)
-        self.set_and_get_field(arg, False)
+        # set+get without enforce_type -> warning
+        with self.assertDeprecationWarning():
+            self.set_and_get_field(arg, False)
 
     def assertJSONOrSetTypeError(self, arg):
         """
         Asserts that field.from_json or setting the field throws a TypeError
         for the supplied value.
         """
+        # from_json and set+get with enforce_type -> TypeError
         with self.assertRaises(TypeError):
             self.field_totest().from_json(arg)
         with self.assertRaises(TypeError):
             self.set_and_get_field(arg, True)
-        self.set_and_get_field(arg, False)
+        # set+get without enforce_type -> warning
+        with self.assertDeprecationWarning():
+            self.set_and_get_field(arg, False)
 
-    # def assertSet
+    @contextmanager
+    def assertDeprecationWarning(self, count=1):
+        """Asserts that the contained code raises `count` deprecation warnings"""
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", DeprecationWarning)
+            yield
+        self.assertEquals(count, len([warning for warning in caught if issubclass(warning.category, DeprecationWarning)]))
 
 
 class IntegerTest(FieldTest):

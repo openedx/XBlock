@@ -12,6 +12,9 @@ import datetime
 import dateutil.parser
 import logging
 import pytz
+import traceback
+import warnings
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -20,6 +23,20 @@ __all__ = [
     'Boolean', 'Dict', 'Float', 'Integer', 'List', 'String',
     'XBlockMixin',
 ]
+
+
+class FailingEnforceTypeWarning(DeprecationWarning):
+    """
+    A warning triggered when enforce_type would cause a exception if enabled
+    """
+    pass
+
+
+class ModifyingEnforceTypeWarning(DeprecationWarning):
+    """
+    A warning triggered when enforce_type would change a value if enabled
+    """
+    pass
 
 
 class Sentinel(object):
@@ -274,10 +291,7 @@ class Field(object):
         self.help = help
         self._enable_enforce_type = enforce_type
         if default is not UNSET:
-            if self._enable_enforce_type:
-                self._default = self.enforce_type(default)
-            else:
-                self._default = default
+            self._default = self._check_or_enforce_type(default)
         self.scope = scope
         self._display_name = display_name
         self._values = values
@@ -380,6 +394,33 @@ class Field(object):
         baseline = xblock._dirty_fields[self]
         return baseline is EXPLICITLY_SET or xblock._field_data_cache[self.name] != baseline
 
+    def _check_or_enforce_type(self, value):
+        """
+        Depending on whether enforce_type is enabled call self.enforce_type and
+        return the result or call it and trigger a silent warning if the result
+        is different or a Traceback
+
+        To aid with migration, enable the warnings with:
+            warnings.simplefilter("always", FailingEnforceTypeWarning)
+            warnings.simplefilter("always", ModifyingEnforceTypeWarning)
+        """
+        if self._enable_enforce_type:
+            return self.enforce_type(value)
+
+        try:
+            new_value = self.enforce_type(value)
+        except:
+            message = "The value {} could not be enforced ({})".format(
+                value, traceback.format_exc().splitlines()[-1])
+            warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
+        else:
+            if value != new_value:
+                message = "The value {} would be enforced to {}".format(
+                    value, new_value)
+                warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
+
+        return value
+
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
@@ -418,8 +459,7 @@ class Field(object):
         new value is kept in the cache and the xblock is marked as
         dirty until `save` is explicitly called.
         """
-        if self._enable_enforce_type:
-            value = self.enforce_type(value)
+        value = self._check_or_enforce_type(value)
         # Mark the field as dirty and update the cache:
         self._mark_dirty(xblock, EXPLICITLY_SET)
         self._set_cached_value(xblock, value)
@@ -483,7 +523,10 @@ class Field(object):
         Coerce the type of the value, if necessary
 
         Called on field sets to ensure that the stored type is consistent if the
-        field was initializated with enforce_type=True
+        field was initialized with enforce_type=True
+
+        This must not have side effects, since it will be executed to trigger
+        a DeprecationWarning even if enforce_type is disabled
         """
         return value
 
@@ -595,7 +638,7 @@ class Boolean(JSONField):
     MUTABLE = False
 
     # pylint: disable=W0622
-    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None, **kwargs):
+    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None, **kwargs):
         super(Boolean, self).__init__(help, default, scope, display_name,
                                       values=({'display_name': "True", "value": True},
                                               {'display_name': "False", "value": False}),
