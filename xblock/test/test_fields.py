@@ -17,8 +17,7 @@ from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
 from xblock.fields import (
     Any, Boolean, Dict, Field, Float,
-    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel,
-    FailingEnforceTypeWarning, ModifyingEnforceTypeWarning
+    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel
 )
 
 from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
@@ -112,7 +111,8 @@ class FieldTest(unittest.TestCase):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", DeprecationWarning)
             yield
-        self.assertEquals(count, len([warning for warning in caught if issubclass(warning.category, DeprecationWarning)]))
+        self.assertEquals(count, sum(1 for warning in caught
+                                     if issubclass(warning.category, DeprecationWarning)))
 
 
 class IntegerTest(FieldTest):
