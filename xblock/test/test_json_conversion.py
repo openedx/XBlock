@@ -38,7 +38,7 @@ class TestModel(DictFieldData):
         return {'$type': 'set', '$vals': [0, 1]}
 
 
-class TestJsonConversion():
+class TestJsonConversion(object):
     """
     Verify that all ModelType operations correctly convert
     the json that comes out of the ModelData to python objects

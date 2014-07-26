@@ -6,12 +6,12 @@ for each scope.
 
 """
 
-import datetime
-import copy
 from collections import namedtuple
-import pytz
+import copy
+import datetime
 import dateutil.parser
-
+import logging
+import pytz
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -38,12 +38,19 @@ class Sentinel(object):
 
     @property
     def attr_name(self):
+        """ TODO: Look into namespace collisions. block.name_space == block_name.space
+        """
         return self.name.lower().replace('.', '_')
 
     def __eq__(self, other):
+        """ Equality is based on being of the same class, and having same name
+        """
         return isinstance(other, Sentinel) and self.name == other.name
 
     def __hash__(self):
+        """
+        Use a hash of the name of the sentinel
+        """
         return hash(self.name)
 
 
@@ -74,6 +81,12 @@ class BlockScope(object):
 
     @classmethod
     def scopes(cls):
+        """
+        Return a list of valid/understood class scopes.
+        """
+        # Why do we need this? This should either
+        # * Be bubbled to the places where it is used (AcidXBlock).
+        # * Be automatic. Look for all members of a type.
         return [cls.USAGE, cls.DEFINITION, cls.TYPE, cls.ALL]
 
 
@@ -104,6 +117,10 @@ class UserScope(object):
 
     @classmethod
     def scopes(cls):
+        """
+        Return a list of valid/understood class scopes.
+        Why do we need this? I believe it is not used anywhere.
+        """
         return [cls.NONE, cls.ONE, cls.ALL]
 
 
@@ -488,9 +505,10 @@ class Field(object):
 
 
 class JSONField(Field):
-    ''' Field type which has a convenient JSON representation.
-    '''
-    jsonifiable = True
+    """
+    Field type which has a convenient JSON representation.
+    """
+    pass  # for now; we'll bubble functions down when we finish deprecation in Field
 
 
 class Integer(JSONField):
