@@ -10,7 +10,7 @@ python-dateutil
 mock
 nose
 coverage
-pylint == 1.1.0
+pylint == 1.3.0
 rednose
 pep8
 diff-cover >= 0.2.1
