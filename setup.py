@@ -8,6 +8,7 @@ setup(
     packages=[
         'xblock',
         'xblock.django',
+        'xblock.reference',
     ],
     install_requires=[
         'lxml',

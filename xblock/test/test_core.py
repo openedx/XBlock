@@ -815,6 +815,9 @@ def test_services_decorators_with_inheritance():
 
 def test_cached_parent():
     class HasParent(XBlock):
+        """
+        Dummy empty class
+        """
         pass
 
     runtime = Mock()

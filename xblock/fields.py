@@ -6,12 +6,12 @@ for each scope.
 
 """
 
-import datetime
-import copy
 from collections import namedtuple
-import pytz
+import copy
+import datetime
 import dateutil.parser
-
+import logging
+import pytz
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -38,12 +38,19 @@ class Sentinel(object):
 
     @property
     def attr_name(self):
+        """ TODO: Look into namespace collisions. block.name_space == block_name.space
+        """
         return self.name.lower().replace('.', '_')
 
     def __eq__(self, other):
+        """ Equality is based on being of the same class, and having same name
+        """
         return isinstance(other, Sentinel) and self.name == other.name
 
     def __hash__(self):
+        """
+        Use a hash of the name of the sentinel
+        """
         return hash(self.name)
 
 
@@ -74,6 +81,12 @@ class BlockScope(object):
 
     @classmethod
     def scopes(cls):
+        """
+        Return a list of valid/understood class scopes.
+        """
+        # Why do we need this? This should either
+        # * Be bubbled to the places where it is used (AcidXBlock).
+        # * Be automatic. Look for all members of a type.
         return [cls.USAGE, cls.DEFINITION, cls.TYPE, cls.ALL]
 
 
@@ -104,6 +117,10 @@ class UserScope(object):
 
     @classmethod
     def scopes(cls):
+        """
+        Return a list of valid/understood class scopes.
+        Why do we need this? I believe it is not used anywhere.
+        """
         return [cls.NONE, cls.ONE, cls.ALL]
 
 
@@ -435,6 +452,8 @@ class Field(object):
         This is called during field writes to convert the native python
         type to the value stored in the database
         """
+        if not isinstance(self, JSONField):
+            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
         return value
 
     def from_json(self, value):
@@ -444,6 +463,8 @@ class Field(object):
         Called during field reads to convert the stored value into a full featured python
         object
         """
+        if not isinstance(self, JSONField):
+            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
         return value
 
     def read_from(self, xblock):
@@ -456,6 +477,8 @@ class Field(object):
         """
         Retrieve the serialized value for this field from the specified xblock
         """
+        if not isinstance(self, JSONField):
+            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
         return self.to_json(self.read_from(xblock))
 
     def write_to(self, xblock, value):
@@ -481,7 +504,14 @@ class Field(object):
         return hash(self.name)
 
 
-class Integer(Field):
+class JSONField(Field):
+    """
+    Field type which has a convenient JSON representation.
+    """
+    pass  # for now; we'll bubble functions down when we finish deprecation in Field
+
+
+class Integer(JSONField):
     """
     A field that contains an integer.
 
@@ -501,7 +531,7 @@ class Integer(Field):
         return int(value)
 
 
-class Float(Field):
+class Float(JSONField):
     """
     A field that contains a float.
 
@@ -518,7 +548,7 @@ class Float(Field):
         return float(value)
 
 
-class Boolean(Field):
+class Boolean(JSONField):
     """
     A field class for representing a boolean.
 
@@ -555,7 +585,7 @@ class Boolean(Field):
             return bool(value)
 
 
-class Dict(Field):
+class Dict(JSONField):
     """
     A field class for representing a Python dict.
 
@@ -571,7 +601,7 @@ class Dict(Field):
             raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
 
 
-class List(Field):
+class List(JSONField):
     """
     A field class for representing a list.
 
@@ -587,7 +617,7 @@ class List(Field):
             raise TypeError('Value stored in a List must be None or a list, found %s' % type(value))
 
 
-class String(Field):
+class String(JSONField):
     """
     A field class for representing a string.
 
@@ -603,7 +633,7 @@ class String(Field):
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
 
-class DateTime(Field):
+class DateTime(JSONField):
     """
     A field for representing a datetime.
 
@@ -650,17 +680,18 @@ class DateTime(Field):
         raise TypeError("Value stored must be a datetime object, not {}".format(type(value)))
 
 
-class Any(Field):
+class Any(JSONField):
     """
     A field class for representing any piece of data; type is not enforced.
 
     All methods are inherited directly from `Field`.
 
+    THIS SHOULD BE DEPRECATED. THIS SHOULD EITHER BE ANY JSON DATA, OR IT MAKES NO SENSE
     """
     pass
 
 
-class Reference(Field):
+class Reference(JSONField):
     """
     An xblock reference. That is, a pointer to another xblock.
 

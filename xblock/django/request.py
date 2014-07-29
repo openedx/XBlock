@@ -112,6 +112,9 @@ class DjangoWebobRequest(webob.Request):
 
     @lazy
     def environ(self):
+        """
+        Add path_info to the request's META dictionary.
+        """
         environ = dict(self._request.META)
 
         environ['PATH_INFO'] = self._request.path_info
@@ -120,6 +123,9 @@ class DjangoWebobRequest(webob.Request):
 
     @property
     def GET(self):
+        """
+        Returns a new `webob.MultiDict` from the request's GET query.
+        """
         return querydict_to_multidict(self._request.GET)
 
     @property
@@ -137,10 +143,16 @@ class DjangoWebobRequest(webob.Request):
 
     @lazy
     def body(self):  # pylint: disable=method-hidden
+        """
+        Return the content of the request body.
+        """
         return self._request.body
 
     @lazy
     def body_file(self):  # pylint: disable=method-hidden
+        """
+        Input stream of the request
+        """
         return self._request
 
 
