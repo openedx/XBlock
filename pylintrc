@@ -55,8 +55,7 @@ disable=
     too-many-return-statements,
     too-many-branches,
     too-many-arguments,
-    too-many-locals,
-    bad-continuation
+    too-many-locals
 
 
 [REPORTS]
