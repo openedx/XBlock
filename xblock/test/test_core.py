@@ -914,7 +914,7 @@ def test_json_handler_error():
     def test_func(self, request, suffix):   # pylint: disable=unused-argument
         raise JsonHandlerError(test_status_code, test_message)
 
-    response = test_func(Mock(), test_request, "dummy_suffix")
+    response = test_func(Mock(), test_request, "dummy_suffix")  # pylint: disable=assignment-from-no-return
     assert_equals(response.status_code, test_status_code)
     assert_equals(json.loads(response.body), {"error": test_message})
     assert_equals(response.content_type, "application/json")
