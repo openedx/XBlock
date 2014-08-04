@@ -45,6 +45,15 @@ class FieldTest(unittest.TestCase):
         block.field_x = arg
         return block.field_x
 
+    @contextmanager
+    def assertDeprecationWarning(self, count=1):
+        """Asserts that the contained code raises `count` deprecation warnings"""
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", DeprecationWarning)
+            yield
+        self.assertEquals(count, sum(1 for warning in caught
+                                     if issubclass(warning.category, DeprecationWarning)))
+
     def assertJSONOrSetEquals(self, expected, arg):
         """
         Asserts the result of field.from_json and of setting field.
@@ -104,15 +113,6 @@ class FieldTest(unittest.TestCase):
         # set+get without enforce_type -> warning
         with self.assertDeprecationWarning():
             self.set_and_get_field(arg, False)
-
-    @contextmanager
-    def assertDeprecationWarning(self, count=1):
-        """Asserts that the contained code raises `count` deprecation warnings"""
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always", DeprecationWarning)
-            yield
-        self.assertEquals(count, sum(1 for warning in caught
-                                     if issubclass(warning.category, DeprecationWarning)))
 
 
 class IntegerTest(FieldTest):
