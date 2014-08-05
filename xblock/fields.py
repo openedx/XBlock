@@ -410,12 +410,12 @@ class Field(object):
         try:
             new_value = self.enforce_type(value)
         except:  # pylint: disable=bare-except
-            message = "The value {} could not be enforced ({})".format(
+            message = u"The value {} could not be enforced ({})".format(
                 value, traceback.format_exc().splitlines()[-1])
             warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
         else:
             if value != new_value:
-                message = "The value {} would be enforced to {}".format(
+                message = u"The value {} would be enforced to {}".format(
                     value, new_value)
                 warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
 

@@ -51,8 +51,10 @@ class FieldTest(unittest.TestCase):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", DeprecationWarning)
             yield
-        self.assertEquals(count, sum(1 for warning in caught
-                                     if issubclass(warning.category, DeprecationWarning)))
+        self.assertEquals(count, sum(
+            1 for warning in caught
+            if issubclass(warning.category, DeprecationWarning)
+        ))
 
     def assertJSONOrSetEquals(self, expected, arg):
         """
