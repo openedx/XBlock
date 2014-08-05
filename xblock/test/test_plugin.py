@@ -4,9 +4,11 @@ Test xblock/core/plugin.py
 
 from mock import patch, Mock
 
-from xblock.test.tools import assert_is, assert_raises_regexp, assert_equals
+from xblock.test.tools import (
+    assert_is, assert_raises_regexp, assert_equals)
 
 from xblock.core import XBlock
+from xblock import plugin
 from xblock.plugin import AmbiguousPluginError, PluginMissingError
 
 
@@ -71,3 +73,22 @@ def test_nosuch_plugin():
 def test_broken_plugin():
     plugins = XBlock.load_classes()
     assert_equals(list(plugins), [])
+
+
+def _num_plugins_cached():
+    """
+    Returns the number of plugins that have been cached.
+    """
+    return len(plugin.PLUGIN_CACHE.keys())
+
+
+@XBlock.register_temp_plugin(AmbiguousBlock1, "thumbs")
+def test_plugin_caching():
+    plugin.PLUGIN_CACHE = {}
+    assert_equals(_num_plugins_cached(), 0)
+
+    XBlock.load_class("thumbs")
+    assert_equals(_num_plugins_cached(), 1)
+
+    XBlock.load_class("thumbs")
+    assert_equals(_num_plugins_cached(), 1)
