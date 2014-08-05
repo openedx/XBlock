@@ -10,6 +10,8 @@ import unittest
 
 import datetime as dt
 import pytz
+import warnings
+from contextlib import contextmanager
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
@@ -29,11 +31,56 @@ class FieldTest(unittest.TestCase):
         the test is testing."""
         return None
 
-    def assertJSONEquals(self, expected, arg):
+    def set_and_get_field(self, arg, enforce_type):
         """
-        Asserts the result of field.from_json.
+        Set the field to arg in a Block, get it and return it
         """
+        class TestBlock(XBlock):
+            """
+            Block for testing
+            """
+            field_x = self.field_totest(enforce_type=enforce_type)
+
+        block = TestBlock(MagicMock(), DictFieldData({}), Mock())
+        block.field_x = arg
+        return block.field_x
+
+    @contextmanager
+    def assertDeprecationWarning(self, count=1):
+        """Asserts that the contained code raises `count` deprecation warnings"""
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", DeprecationWarning)
+            yield
+        self.assertEquals(count, sum(
+            1 for warning in caught
+            if issubclass(warning.category, DeprecationWarning)
+        ))
+
+    def assertJSONOrSetEquals(self, expected, arg):
+        """
+        Asserts the result of field.from_json and of setting field.
+        """
+        # from_json(arg) -> expected
         self.assertEqual(expected, self.field_totest().from_json(arg))
+        # set+get with enforce_type arg -> expected
+        self.assertEqual(expected, self.set_and_get_field(arg, True))
+        # set+get without enforce_type arg -> arg
+        # provoking a warning unless arg == expected
+        count = 0 if arg == expected else 1
+        with self.assertDeprecationWarning(count):
+            self.assertEqual(arg, self.set_and_get_field(arg, False))
+
+    def assertSetEquals(self, expected, arg):
+        """
+        Asserts the result only of setting field.
+        """
+        # set+get with enforce_type arg -> expected
+        self.assertEqual(expected, self.set_and_get_field(arg, True))
+        # set+get without enforce_type arg -> arg
+        # provoking a warning unless arg == expected
+        count = 0 if arg == expected else 1
+        with self.assertDeprecationWarning(count):
+            self.assertEqual(arg, self.set_and_get_field(arg, False))
 
     def assertToJSONEquals(self, expected, arg):
         """
@@ -41,19 +88,33 @@ class FieldTest(unittest.TestCase):
         """
         self.assertEqual(expected, self.field_totest().to_json(arg))
 
-    def assertJSONValueError(self, arg):
+    def assertJSONOrSetValueError(self, arg):
         """
-        Asserts that field.from_json throws a ValueError for the supplied value.
+        Asserts that field.from_json or setting the field throws a ValueError
+        for the supplied value.
         """
+        # from_json and set+get with enforce_type -> ValueError
         with self.assertRaises(ValueError):
             self.field_totest().from_json(arg)
+        with self.assertRaises(ValueError):
+            self.set_and_get_field(arg, True)
+        # set+get without enforce_type -> warning
+        with self.assertDeprecationWarning():
+            self.set_and_get_field(arg, False)
 
-    def assertJSONTypeError(self, arg):
+    def assertJSONOrSetTypeError(self, arg):
         """
-        Asserts that field.from_json throws a TypeError for the supplied value.
+        Asserts that field.from_json or setting the field throws a TypeError
+        for the supplied value.
         """
+        # from_json and set+get with enforce_type -> TypeError
         with self.assertRaises(TypeError):
             self.field_totest().from_json(arg)
+        with self.assertRaises(TypeError):
+            self.set_and_get_field(arg, True)
+        # set+get without enforce_type -> warning
+        with self.assertDeprecationWarning():
+            self.set_and_get_field(arg, False)
 
 
 class IntegerTest(FieldTest):
@@ -63,28 +124,28 @@ class IntegerTest(FieldTest):
     field_totest = Integer
 
     def test_integer(self):
-        self.assertJSONEquals(5, '5')
-        self.assertJSONEquals(0, '0')
-        self.assertJSONEquals(-1023, '-1023')
-        self.assertJSONEquals(7, 7)
-        self.assertJSONEquals(0, False)
-        self.assertJSONEquals(1, True)
+        self.assertJSONOrSetEquals(5, '5')
+        self.assertJSONOrSetEquals(0, '0')
+        self.assertJSONOrSetEquals(-1023, '-1023')
+        self.assertJSONOrSetEquals(7, 7)
+        self.assertJSONOrSetEquals(0, False)
+        self.assertJSONOrSetEquals(1, True)
 
     def test_float_converts(self):
-        self.assertJSONEquals(1, 1.023)
-        self.assertJSONEquals(-3, -3.8)
+        self.assertJSONOrSetEquals(1, 1.023)
+        self.assertJSONOrSetEquals(-3, -3.8)
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
-        self.assertJSONEquals(None, '')
+        self.assertJSONOrSetEquals(None, None)
+        self.assertJSONOrSetEquals(None, '')
 
     def test_error(self):
-        self.assertJSONValueError('abc')
-        self.assertJSONValueError('[1]')
-        self.assertJSONValueError('1.023')
+        self.assertJSONOrSetValueError('abc')
+        self.assertJSONOrSetValueError('[1]')
+        self.assertJSONOrSetValueError('1.023')
 
-        self.assertJSONTypeError([])
-        self.assertJSONTypeError({})
+        self.assertJSONOrSetTypeError([])
+        self.assertJSONOrSetTypeError({})
 
 
 class FloatTest(FieldTest):
@@ -94,26 +155,26 @@ class FloatTest(FieldTest):
     field_totest = Float
 
     def test_float(self):
-        self.assertJSONEquals(.23, '.23')
-        self.assertJSONEquals(5, '5')
-        self.assertJSONEquals(0, '0.0')
-        self.assertJSONEquals(-1023.22, '-1023.22')
-        self.assertJSONEquals(0, 0.0)
-        self.assertJSONEquals(4, 4)
-        self.assertJSONEquals(-0.23, -0.23)
-        self.assertJSONEquals(0, False)
-        self.assertJSONEquals(1, True)
+        self.assertJSONOrSetEquals(.23, '.23')
+        self.assertJSONOrSetEquals(5, '5')
+        self.assertJSONOrSetEquals(0, '0.0')
+        self.assertJSONOrSetEquals(-1023.22, '-1023.22')
+        self.assertJSONOrSetEquals(0, 0.0)
+        self.assertJSONOrSetEquals(4, 4)
+        self.assertJSONOrSetEquals(-0.23, -0.23)
+        self.assertJSONOrSetEquals(0, False)
+        self.assertJSONOrSetEquals(1, True)
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
-        self.assertJSONEquals(None, '')
+        self.assertJSONOrSetEquals(None, None)
+        self.assertJSONOrSetEquals(None, '')
 
     def test_error(self):
-        self.assertJSONValueError('abc')
-        self.assertJSONValueError('[1]')
+        self.assertJSONOrSetValueError('abc')
+        self.assertJSONOrSetValueError('[1]')
 
-        self.assertJSONTypeError([])
-        self.assertJSONTypeError({})
+        self.assertJSONOrSetTypeError([])
+        self.assertJSONOrSetTypeError({})
 
 
 class BooleanTest(FieldTest):
@@ -123,24 +184,24 @@ class BooleanTest(FieldTest):
     field_totest = Boolean
 
     def test_false(self):
-        self.assertJSONEquals(False, "false")
-        self.assertJSONEquals(False, "False")
-        self.assertJSONEquals(False, "")
-        self.assertJSONEquals(False, "any other string")
-        self.assertJSONEquals(False, False)
+        self.assertJSONOrSetEquals(False, "false")
+        self.assertJSONOrSetEquals(False, "False")
+        self.assertJSONOrSetEquals(False, "")
+        self.assertJSONOrSetEquals(False, "any other string")
+        self.assertJSONOrSetEquals(False, False)
 
     def test_true(self):
-        self.assertJSONEquals(True, "true")
-        self.assertJSONEquals(True, "TruE")
-        self.assertJSONEquals(True, True)
+        self.assertJSONOrSetEquals(True, "true")
+        self.assertJSONOrSetEquals(True, "TruE")
+        self.assertJSONOrSetEquals(True, True)
 
     def test_none(self):
-        self.assertJSONEquals(False, None)
+        self.assertJSONOrSetEquals(False, None)
 
     def test_everything_converts_to_bool(self):
-        self.assertJSONEquals(True, 123)
-        self.assertJSONEquals(True, ['a'])
-        self.assertJSONEquals(False, [])
+        self.assertJSONOrSetEquals(True, 123)
+        self.assertJSONOrSetEquals(True, ['a'])
+        self.assertJSONOrSetEquals(False, [])
 
 
 class StringTest(FieldTest):
@@ -150,21 +211,21 @@ class StringTest(FieldTest):
     field_totest = String
 
     def test_json_equals(self):
-        self.assertJSONEquals("false", "false")
-        self.assertJSONEquals("abba", "abba")
-        self.assertJSONEquals('"abba"', '"abba"')
-        self.assertJSONEquals('', '')
+        self.assertJSONOrSetEquals("false", "false")
+        self.assertJSONOrSetEquals("abba", "abba")
+        self.assertJSONOrSetEquals('"abba"', '"abba"')
+        self.assertJSONOrSetEquals('', '')
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
+        self.assertJSONOrSetEquals(None, None)
 
     def test_error(self):
-        self.assertJSONTypeError(['a'])
-        self.assertJSONTypeError(1.023)
-        self.assertJSONTypeError(3)
-        self.assertJSONTypeError([1])
-        self.assertJSONTypeError([])
-        self.assertJSONTypeError({})
+        self.assertJSONOrSetTypeError(['a'])
+        self.assertJSONOrSetTypeError(1.023)
+        self.assertJSONOrSetTypeError(3)
+        self.assertJSONOrSetTypeError([1])
+        self.assertJSONOrSetTypeError([])
+        self.assertJSONOrSetTypeError({})
 
 
 class DateTest(FieldTest):
@@ -174,17 +235,21 @@ class DateTest(FieldTest):
     field_totest = DateTime
 
     def test_json_equals(self):
-        self.assertJSONEquals(
+        self.assertJSONOrSetEquals(
             dt.datetime(2014, 4, 1, 2, 3, 4, 567890).replace(tzinfo=pytz.utc),
             '2014-04-01T02:03:04.567890'
         )
-        self.assertJSONEquals(
+        self.assertJSONOrSetEquals(
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
             '2014-04-01T02:03:04.000000'
         )
-        self.assertJSONEquals(
+        self.assertJSONOrSetEquals(
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
             '2014-04-01T02:03:04Z'
+        )
+        self.assertSetEquals(
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)
         )
 
     def test_serialize(self):
@@ -199,15 +264,14 @@ class DateTest(FieldTest):
         )
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
-        self.assertJSONEquals(None, '')
+        self.assertJSONOrSetEquals(None, None)
+        self.assertJSONOrSetEquals(None, '')
         self.assertEqual(DateTime().to_json(None), None)
 
     def test_error(self):
-        self.assertJSONTypeError(['a'])
-        self.assertJSONTypeError(dt.datetime.now())
-        self.assertJSONTypeError(5)
-        self.assertJSONTypeError(5.123)
+        self.assertJSONOrSetTypeError(['a'])
+        self.assertJSONOrSetTypeError(5)
+        self.assertJSONOrSetTypeError(5.123)
 
     def test_date_format_error(self):
         with self.assertRaises(ValueError):
@@ -225,15 +289,15 @@ class AnyTest(FieldTest):
     field_totest = Any
 
     def test_json_equals(self):
-        self.assertJSONEquals({'bar'}, {'bar'})
-        self.assertJSONEquals("abba", "abba")
-        self.assertJSONEquals('', '')
-        self.assertJSONEquals('3.2', '3.2')
-        self.assertJSONEquals(False, False)
-        self.assertJSONEquals([3, 4], [3, 4])
+        self.assertJSONOrSetEquals({'bar'}, {'bar'})
+        self.assertJSONOrSetEquals("abba", "abba")
+        self.assertJSONOrSetEquals('', '')
+        self.assertJSONOrSetEquals('3.2', '3.2')
+        self.assertJSONOrSetEquals(False, False)
+        self.assertJSONOrSetEquals([3, 4], [3, 4])
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
+        self.assertJSONOrSetEquals(None, None)
 
 
 class ListTest(FieldTest):
@@ -243,21 +307,21 @@ class ListTest(FieldTest):
     field_totest = List
 
     def test_json_equals(self):
-        self.assertJSONEquals([], [])
-        self.assertJSONEquals(['foo', 'bar'], ['foo', 'bar'])
-        self.assertJSONEquals([1, 3.4], [1, 3.4])
+        self.assertJSONOrSetEquals([], [])
+        self.assertJSONOrSetEquals(['foo', 'bar'], ['foo', 'bar'])
+        self.assertJSONOrSetEquals([1, 3.4], [1, 3.4])
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
+        self.assertJSONOrSetEquals(None, None)
 
     def test_error(self):
-        self.assertJSONTypeError('abc')
-        self.assertJSONTypeError('')
-        self.assertJSONTypeError('1.23')
-        self.assertJSONTypeError('true')
-        self.assertJSONTypeError(3.7)
-        self.assertJSONTypeError(True)
-        self.assertJSONTypeError({})
+        self.assertJSONOrSetTypeError('abc')
+        self.assertJSONOrSetTypeError('')
+        self.assertJSONOrSetTypeError('1.23')
+        self.assertJSONOrSetTypeError('true')
+        self.assertJSONOrSetTypeError(3.7)
+        self.assertJSONOrSetTypeError(True)
+        self.assertJSONOrSetTypeError({})
 
 
 class ReferenceTest(FieldTest):
@@ -267,15 +331,15 @@ class ReferenceTest(FieldTest):
     field_totest = Reference
 
     def test_json_equals(self):
-        self.assertJSONEquals({'id': 'bar', 'usage': 'baz'}, {'id': 'bar', 'usage': 'baz'})
-        self.assertJSONEquals("i4x://myu/mycourse/problem/myproblem", "i4x://myu/mycourse/problem/myproblem")
-        self.assertJSONEquals('', '')
-        self.assertJSONEquals(3.2, 3.2)
-        self.assertJSONEquals(False, False)
-        self.assertJSONEquals([3, 4], [3, 4])
+        self.assertJSONOrSetEquals({'id': 'bar', 'usage': 'baz'}, {'id': 'bar', 'usage': 'baz'})
+        self.assertJSONOrSetEquals("i4x://myu/mycourse/problem/myproblem", "i4x://myu/mycourse/problem/myproblem")
+        self.assertJSONOrSetEquals('', '')
+        self.assertJSONOrSetEquals(3.2, 3.2)
+        self.assertJSONOrSetEquals(False, False)
+        self.assertJSONOrSetEquals([3, 4], [3, 4])
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
+        self.assertJSONOrSetEquals(None, None)
 
 
 class ReferenceListTest(FieldTest):
@@ -285,21 +349,21 @@ class ReferenceListTest(FieldTest):
     field_totest = ReferenceList
 
     def test_json_equals(self):
-        self.assertJSONEquals([], [])
-        self.assertJSONEquals(['foo', 'bar'], ['foo', 'bar'])
-        self.assertJSONEquals([1, 3.4], [1, 3.4])
+        self.assertJSONOrSetEquals([], [])
+        self.assertJSONOrSetEquals(['foo', 'bar'], ['foo', 'bar'])
+        self.assertJSONOrSetEquals([1, 3.4], [1, 3.4])
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
+        self.assertJSONOrSetEquals(None, None)
 
     def test_error(self):
-        self.assertJSONTypeError('abc')
-        self.assertJSONTypeError('')
-        self.assertJSONTypeError('1.23')
-        self.assertJSONTypeError('true')
-        self.assertJSONTypeError(3.7)
-        self.assertJSONTypeError(True)
-        self.assertJSONTypeError({})
+        self.assertJSONOrSetTypeError('abc')
+        self.assertJSONOrSetTypeError('')
+        self.assertJSONOrSetTypeError('1.23')
+        self.assertJSONOrSetTypeError('true')
+        self.assertJSONOrSetTypeError(3.7)
+        self.assertJSONOrSetTypeError(True)
+        self.assertJSONOrSetTypeError({})
 
 
 class DictTest(FieldTest):
@@ -309,20 +373,20 @@ class DictTest(FieldTest):
     field_totest = Dict
 
     def test_json_equals(self):
-        self.assertJSONEquals({}, {})
-        self.assertJSONEquals({'a': 'b', 'c': 3}, {'a': 'b', 'c': 3})
+        self.assertJSONOrSetEquals({}, {})
+        self.assertJSONOrSetEquals({'a': 'b', 'c': 3}, {'a': 'b', 'c': 3})
 
     def test_none(self):
-        self.assertJSONEquals(None, None)
+        self.assertJSONOrSetEquals(None, None)
 
     def test_error(self):
-        self.assertJSONTypeError(['foo', 'bar'])
-        self.assertJSONTypeError([])
-        self.assertJSONTypeError('abc')
-        self.assertJSONTypeError('1.23')
-        self.assertJSONTypeError('true')
-        self.assertJSONTypeError(3.7)
-        self.assertJSONTypeError(True)
+        self.assertJSONOrSetTypeError(['foo', 'bar'])
+        self.assertJSONOrSetTypeError([])
+        self.assertJSONOrSetTypeError('abc')
+        self.assertJSONOrSetTypeError('1.23')
+        self.assertJSONOrSetTypeError('true')
+        self.assertJSONOrSetTypeError(3.7)
+        self.assertJSONOrSetTypeError(True)
 
 
 def test_field_name_defaults():

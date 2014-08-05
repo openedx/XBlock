@@ -12,6 +12,9 @@ import datetime
 import dateutil.parser
 import logging
 import pytz
+import traceback
+import warnings
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -20,6 +23,20 @@ __all__ = [
     'Boolean', 'Dict', 'Float', 'Integer', 'List', 'String',
     'XBlockMixin',
 ]
+
+
+class FailingEnforceTypeWarning(DeprecationWarning):
+    """
+    A warning triggered when enforce_type would cause a exception if enabled
+    """
+    pass
+
+
+class ModifyingEnforceTypeWarning(DeprecationWarning):
+    """
+    A warning triggered when enforce_type would change a value if enabled
+    """
+    pass
 
 
 class Sentinel(object):
@@ -254,6 +271,11 @@ class Field(object):
             returns the specification. For example specification formats, see
             the values property definition.
 
+        enforce_type: whether the type of the field value should be enforced
+            on set, using self.enforce_type, raising an exception if it's not
+            possible to convert it. This provides a guarantee on the stored
+            value type.
+
         kwargs: optional runtime-specific options/metadata. Will be stored as
             runtime_options.
 
@@ -264,11 +286,12 @@ class Field(object):
     # We're OK redefining built-in `help`
     # pylint: disable=W0622
     def __init__(self, help=None, default=UNSET, scope=Scope.content,
-                 display_name=None, values=None, **kwargs):
+                 display_name=None, values=None, enforce_type=False, **kwargs):
         self._name = "unknown"
         self.help = help
+        self._enable_enforce_type = enforce_type
         if default is not UNSET:
-            self._default = default
+            self._default = self._check_or_enforce_type(default)
         self.scope = scope
         self._display_name = display_name
         self._values = values
@@ -371,6 +394,33 @@ class Field(object):
         baseline = xblock._dirty_fields[self]
         return baseline is EXPLICITLY_SET or xblock._field_data_cache[self.name] != baseline
 
+    def _check_or_enforce_type(self, value):
+        """
+        Depending on whether enforce_type is enabled call self.enforce_type and
+        return the result or call it and trigger a silent warning if the result
+        is different or a Traceback
+
+        To aid with migration, enable the warnings with:
+            warnings.simplefilter("always", FailingEnforceTypeWarning)
+            warnings.simplefilter("always", ModifyingEnforceTypeWarning)
+        """
+        if self._enable_enforce_type:
+            return self.enforce_type(value)
+
+        try:
+            new_value = self.enforce_type(value)
+        except:  # pylint: disable=bare-except
+            message = u"The value {} could not be enforced ({})".format(
+                value, traceback.format_exc().splitlines()[-1])
+            warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
+        else:
+            if value != new_value:
+                message = u"The value {} would be enforced to {}".format(
+                    value, new_value)
+                warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
+
+        return value
+
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
@@ -409,6 +459,7 @@ class Field(object):
         new value is kept in the cache and the xblock is marked as
         dirty until `save` is explicitly called.
         """
+        value = self._check_or_enforce_type(value)
         # Mark the field as dirty and update the cache:
         self._mark_dirty(xblock, EXPLICITLY_SET)
         self._set_cached_value(xblock, value)
@@ -467,6 +518,18 @@ class Field(object):
             logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
         return value
 
+    def enforce_type(self, value):
+        """
+        Coerce the type of the value, if necessary
+
+        Called on field sets to ensure that the stored type is consistent if the
+        field was initialized with enforce_type=True
+
+        This must not have side effects, since it will be executed to trigger
+        a DeprecationWarning even if enforce_type is disabled
+        """
+        return value
+
     def read_from(self, xblock):
         """
         Retrieve the value for this field from the specified xblock
@@ -515,9 +578,9 @@ class Integer(JSONField):
     """
     A field that contains an integer.
 
-    The value, as stored, can be None, '' (which will be treated as None), a
-    Python integer, or a value that will parse as an integer, ie., something
-    for which int(value) does not throw an error.
+    The value, as loaded or enforced, can be None, '' (which will be treated as
+    None), a Python integer, or a value that will parse as an integer, ie.,
+    something for which int(value) does not throw an error.
 
     Note that a floating point value will convert to an integer, but a string
     containing a floating point number ('3.48') will throw an error.
@@ -530,14 +593,16 @@ class Integer(JSONField):
             return None
         return int(value)
 
+    enforce_type = from_json
+
 
 class Float(JSONField):
     """
     A field that contains a float.
 
-    The value, as stored, can be None, '' (which will be treated as None), a
-    Python float, or a value that will parse as an float, ie., something for
-    which float(value) does not throw an error.
+    The value, as loaded or enforced, can be None, '' (which will be treated as
+    None), a Python float, or a value that will parse as an float, ie.,
+    something for which float(value) does not throw an error.
 
     """
     MUTABLE = False
@@ -547,13 +612,15 @@ class Float(JSONField):
             return None
         return float(value)
 
+    enforce_type = from_json
+
 
 class Boolean(JSONField):
     """
     A field class for representing a boolean.
 
-    The stored value can be either a Python bool, a string, or any value that
-    will then be converted to a bool in the from_json method.
+    The value, as loaded or enforced, can be either a Python bool, a string, or
+    any value that will then be converted to a bool in the from_json method.
 
     Examples:
 
@@ -571,7 +638,7 @@ class Boolean(JSONField):
     MUTABLE = False
 
     # pylint: disable=W0622
-    def __init__(self, help=None, default=None, scope=Scope.content, display_name=None, **kwargs):
+    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None, **kwargs):
         super(Boolean, self).__init__(help, default, scope, display_name,
                                       values=({'display_name': "True", "value": True},
                                               {'display_name': "False", "value": False}),
@@ -584,12 +651,14 @@ class Boolean(JSONField):
         else:
             return bool(value)
 
+    enforce_type = from_json
+
 
 class Dict(JSONField):
     """
     A field class for representing a Python dict.
 
-    The stored value must be either be None or a dict.
+    The value, as loaded or enforced, must be either be None or a dict.
 
     """
     _default = {}
@@ -600,12 +669,14 @@ class Dict(JSONField):
         else:
             raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
 
+    enforce_type = from_json
+
 
 class List(JSONField):
     """
     A field class for representing a list.
 
-    The stored value can either be None or a list.
+    The value, as loaded or enforced, can either be None or a list.
 
     """
     _default = []
@@ -616,12 +687,14 @@ class List(JSONField):
         else:
             raise TypeError('Value stored in a List must be None or a list, found %s' % type(value))
 
+    enforce_type = from_json
+
 
 class String(JSONField):
     """
     A field class for representing a string.
 
-    The stored value can either be None or a basestring instance.
+    The value, as loaded or enforced, can either be None or a basestring instance.
 
     """
     MUTABLE = False
@@ -632,12 +705,15 @@ class String(JSONField):
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
+    enforce_type = from_json
+
 
 class DateTime(JSONField):
     """
     A field for representing a datetime.
 
-    The stored value is either a datetime or None.
+    The value, as loaded or enforced, can either be an ISO-formatted date string
+    or None.
     """
 
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
@@ -678,6 +754,12 @@ class DateTime(JSONField):
         if value is None:
             return None
         raise TypeError("Value stored must be a datetime object, not {}".format(type(value)))
+
+    def enforce_type(self, value):
+        if isinstance(value, datetime.datetime) or value is None:
+            return value
+
+        return self.from_json(value)
 
 
 class Any(JSONField):

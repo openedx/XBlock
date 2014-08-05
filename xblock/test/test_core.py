@@ -129,7 +129,7 @@ def test_field_access():
         """Test XBlock for field access testing"""
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.user_state, default='field c')
+        field_c = Integer(scope=Scope.user_state, default=42)
         float_a = Float(scope=Scope.settings, default=5.8)
         float_b = Float(scope=Scope.settings)
 
@@ -137,7 +137,7 @@ def test_field_access():
     # Verify that the fields have been set
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
-    assert_equals('field c', field_tester.field_c)
+    assert_equals(42, field_tester.field_c)
     assert_equals(6.1, field_tester.float_a)
     assert_equals(None, field_tester.float_b)
     assert not hasattr(field_tester, 'field_x')
@@ -159,7 +159,7 @@ def test_field_access():
     assert_equals(20, field_tester._field_data.get(field_tester, 'field_a'))
     assert_equals(20.5, field_tester._field_data.get(field_tester, 'float_a'))
     assert_equals(10, field_tester.field_b)
-    assert_equals('field c', field_tester.field_c)
+    assert_equals(42, field_tester.field_c)
     assert_equals(None, field_tester.float_b)
 
     # Deletes happen immediately (do not require a save)
@@ -598,7 +598,7 @@ def setup_save_failure(set_many):
         """
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
-        field_c = Integer(scope=Scope.user_state, default='field c')
+        field_c = Integer(scope=Scope.user_state, default=42)
 
     field_tester = FieldTester(MagicMock(), field_data, Mock())
     return field_tester
@@ -644,7 +644,7 @@ def test_xblock_save_failure_none():
     field_tester = setup_save_failure(fake_set_many)
     field_tester.field_a = 20
     field_tester.field_b = 30
-    field_tester.field_c = "hello world"
+    field_tester.field_c = 40
 
     with assert_raises(XBlockSaveError) as save_error:
         # This call should raise an XBlockSaveError
