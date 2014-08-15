@@ -14,7 +14,7 @@ import logging
 import pytz
 import traceback
 import warnings
-
+from opaque_keys.edx.locator import BlockUsageLocator
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -780,7 +780,30 @@ class Reference(JSONField):
     It's up to the runtime to know how to dereference this field type, but the field type enables the
     runtime to know that it must do the interpretation.
     """
-    pass
+
+    def from_json(self, value):
+        """
+        Return an object of BlockUsageLocator parsed from its deprecated `serialized` form.
+        """
+        if isinstance(value, basestring):
+            return BlockUsageLocator._from_deprecated_string(value)
+
+        return value
+
+    def to_json(self, value):
+        """
+        Parse the deprecated `serialized` form into BlockUsageLocator object.
+        """
+        if isinstance(value, BlockUsageLocator):
+            return value.to_deprecated_string()
+
+        return value
+
+    def enforce_type(self, value):
+        if isinstance(value, BlockUsageLocator) or value is None:
+            return value
+
+        return self.from_json(value)
 
 
 class ReferenceList(List):
