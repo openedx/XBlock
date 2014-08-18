@@ -70,18 +70,6 @@ class FieldTest(unittest.TestCase):
         with self.assertDeprecationWarning(count):
             self.assertEqual(arg, self.set_and_get_field(arg, False))
 
-    def assertSetEquals(self, expected, arg):
-        """
-        Asserts the result only of setting field.
-        """
-        # set+get with enforce_type arg -> expected
-        self.assertEqual(expected, self.set_and_get_field(arg, True))
-        # set+get without enforce_type arg -> arg
-        # provoking a warning unless arg == expected
-        count = 0 if arg == expected else 1
-        with self.assertDeprecationWarning(count):
-            self.assertEqual(arg, self.set_and_get_field(arg, False))
-
     def assertToJSONEquals(self, expected, arg):
         """
         Assert that serialization of `arg` to JSON equals `expected`.
@@ -247,7 +235,7 @@ class DateTest(FieldTest):
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
             '2014-04-01T02:03:04Z'
         )
-        self.assertSetEquals(
+        self.assertJSONOrSetEquals(
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)
         )

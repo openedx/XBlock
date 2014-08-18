@@ -712,7 +712,7 @@ class DateTime(JSONField):
     """
     A field for representing a datetime.
 
-    The value, as loaded or enforced, can either be an ISO-formatted date string
+    The value, as loaded or enforced, can either be an ISO-formatted date string, a native datetime,
     or None.
     """
 
@@ -742,6 +742,9 @@ class DateTime(JSONField):
 
         if value is None:
             return None
+
+        if isinstance(value, datetime.datetime):
+            return value
 
         raise TypeError("Value should be loaded from a string, not {}".format(type(value)))
 
