@@ -36,18 +36,18 @@ def scope_key(instance, xblock):
     if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
         pass
     elif instance.scope.user == UserScope.ONE:
-        scope_key_dict['user'] = xblock.scope_ids.user_id
+        scope_key_dict['user'] = unicode(xblock.scope_ids.user_id)
     else:
         raise NotImplementedError()
 
     if instance.scope.block == BlockScope.TYPE:
         # TODO: Is this correct? Was usage_id
-        scope_key_dict['block'] = xblock.scope_ids.block_type
+        scope_key_dict['block'] = unicode(xblock.scope_ids.block_type)
     elif instance.scope.block == BlockScope.USAGE:
         # TODO: Is this correct? was def_id. # Seems to be the same as usage?
-        scope_key_dict['block'] = xblock.scope_ids.usage_id
+        scope_key_dict['block'] = unicode(xblock.scope_ids.usage_id)
     elif instance.scope.block == BlockScope.DEFINITION:
-        scope_key_dict['block'] = xblock.scope_ids.def_id
+        scope_key_dict['block'] = unicode(xblock.scope_ids.def_id)
     elif instance.scope.block == BlockScope.ALL:
         pass
     else:
