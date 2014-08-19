@@ -920,6 +920,17 @@ def test_json_handler_error():
     assert_equals(response.content_type, "application/json")
 
 
+def test_json_handler_status_code():
+    test_request = Mock(method="POST", body="{}")
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):   # pylint: disable=unused-argument
+        return {}, 201
+
+    response = test_func(Mock(), test_request, "dummy_suffix")  # pylint: disable=assignment-from-no-return
+    assert_equals(response.status_code, 201)
+
+
 @ddt.ddt
 class OpenLocalResourceTest(unittest.TestCase):
     """Tests of `open_local_resource`."""
