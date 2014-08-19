@@ -119,10 +119,13 @@ class XBlock(Plugin):
             except ValueError:
                 return JsonHandlerError(400, "Invalid JSON").get_response()
             try:
-                response_json = json.dumps(func(self, request_json, suffix))
+                response = func(self, request_json, suffix)
             except JsonHandlerError as err:
                 return err.get_response()
-            return Response(response_json, content_type='application/json')
+            if isinstance(response, Response):
+                return response
+            else:
+                return Response(json.dumps(response), content_type='application/json')
         return wrapper
 
     @classmethod

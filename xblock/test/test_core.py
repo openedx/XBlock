@@ -13,6 +13,7 @@ import re
 import unittest
 
 import ddt
+from webob import Response
 
 from xblock.core import XBlock
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError
@@ -918,6 +919,19 @@ def test_json_handler_error():
     assert_equals(response.status_code, test_status_code)
     assert_equals(json.loads(response.body), {"error": test_message})
     assert_equals(response.content_type, "application/json")
+
+
+def test_json_handler_return_response():
+    test_request = Mock(method="POST", body="{}")
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):  # pylint: disable=unused-argument
+        return Response(body="not JSON", status=418, content_type="text/plain")
+
+    response = test_func(Mock(), test_request, "dummy_suffix")
+    assert_equals(response.body, "not JSON")
+    assert_equals(response.status_code, 418)
+    assert_equals(response.content_type, "text/plain")
 
 
 @ddt.ddt
