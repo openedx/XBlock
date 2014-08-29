@@ -21,6 +21,7 @@ from xblock.fields import (
 )
 
 from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
+from xblock.fields import scope_key, ScopeIds
 
 
 class FieldTest(unittest.TestCase):
@@ -390,6 +391,41 @@ def test_field_name_defaults():
         field_x = List()
 
     assert_equals("field_x", TestBlock.field_x.display_name)
+
+
+def test_scope_key():
+    # Tests field display name default values
+    class TestBlock(XBlock):
+        """
+        Block for testing
+        """
+        field_x = List(scope=Scope.settings, name='')
+        settings_lst = List(scope=Scope.settings, name='')
+        uss_lst = List(scope=Scope.user_state_summary, name='')
+        user_lst = List(scope=Scope.user_state, name='')
+        pref_lst = List(scope=Scope.preferences, name='')
+        user_info_lst = List(scope=Scope.user_info, name='')
+
+    sids = ScopeIds(user_id="_bob",
+                    block_type="b.12#ob",
+                    def_id="..",
+                    usage_id="..")
+
+    field_data = DictFieldData({})
+
+    from test_runtime import TestRuntime
+    runtime = TestRuntime(Mock(), field_data, [])
+    block = TestBlock(runtime, field_data, sids)
+
+    # Format: usage or block ID/field_name/user_id
+    for item, correct_key in [[TestBlock.field_x, "__..../field__x/NONE.NONE"],
+                              [TestBlock.user_info_lst, "NONE.NONE/user__info__lst/____bob"],
+                              [TestBlock.pref_lst, "b..12_35_ob/pref__lst/____bob"],
+                              [TestBlock.user_lst, "__..../user__lst/____bob"],
+                              [TestBlock.uss_lst, "__..../uss__lst/NONE.NONE"],
+                              [TestBlock.settings_lst, "__..../settings__lst/NONE.NONE"]]:
+        key = scope_key(item, block)
+        assert_equals(key, correct_key)
 
 
 def test_field_display_name():

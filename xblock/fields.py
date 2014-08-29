@@ -10,6 +10,7 @@ from collections import namedtuple
 import copy
 import datetime
 import dateutil.parser
+import itertools
 import logging
 import pytz
 import traceback
@@ -877,3 +878,99 @@ class XBlockMixin(object):
     # This doesn't use the ChildrenModelMetaclass, because it doesn't seem
     # sensible to add children to a module not written to use them.
     __metaclass__ = ModelMetaclass
+
+
+def scope_key(instance, xblock):
+    """Generate a unique key for a scope that can be used as a
+    filename, in a URL, or in a KVS.
+
+    Our goal is to have a pretty, human-readable 1:1 encoding.
+
+    This encoding is as good as we can do. It's reversable, but not
+    trivial to reverse.
+
+    Encoding scheme:
+    Posix allows [A-Z][a-z][0-9]._-
+    We'd like to have a _concise_ representation for common punctuation
+    We're okay with a _non-concise_ representation for repeated or uncommon characters
+    We keep [A-z][a-z][0-9] as is.
+    We encode other common punctuation as pairs of ._-. This gives a total of 3*3=9 combinations.
+    We're pretty careful to keep this nice. Where possible, we double characters. The most common
+    other character (' ' and ':') are encoded as _- and -_
+    We seperate field portions with /. This gives a natural directory
+    tree. This is nice in URLs and filenames (although not so nice in
+    urls.py)
+    If a field starts with punctuatation, we prefix a _. This prevents hidden files.
+
+    Uncommon characters, we encode as their ordinal value, surrounded by -.
+    For example, tilde would be -126-.
+
+    If a field is not used, we call it NONE.NONE. This does not
+    conflict with fields with the same name, since they are escaped to
+    NONE..NONE.
+
+    Sample keys:
+
+    Settings scope:
+      animationxblock..animation..d0..u0/settings__fs/NONE.NONE
+    User summary scope:
+      animationxblock..animation..d0..u0/uss__fs/NONE.NONE
+    User preferences, username is Aan.!a
+      animation/pref__fs/Aan.._33_a
+
+    """
+    scope_key_dict = {}
+    scope_key_dict['name'] = instance.name
+    if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
+        pass
+    elif instance.scope.user == UserScope.ONE:
+        scope_key_dict['user'] = unicode(xblock.scope_ids.user_id)
+    else:
+        raise NotImplementedError()
+
+    if instance.scope.block == BlockScope.TYPE:
+        scope_key_dict['block'] = unicode(xblock.scope_ids.block_type)
+    elif instance.scope.block == BlockScope.USAGE:
+        scope_key_dict['block'] = unicode(xblock.scope_ids.usage_id)
+    elif instance.scope.block == BlockScope.DEFINITION:
+        scope_key_dict['block'] = unicode(xblock.scope_ids.def_id)
+    elif instance.scope.block == BlockScope.ALL:
+        pass
+    else:
+        raise NotImplementedError()
+
+    replacements = list(itertools.product("._-", "._-"))
+    substitution_list = dict(zip("./\\,_ +:-", ("".join(x) for x in replacements)))
+    # Above runs in 4.7us, and generates a list of common substitutions:
+    # {' ': '_-', '+': '-.', '-': '--', ',': '_.', '/': '._', '.': '..', ':': '-_', '\\': '.-', '_': '__'}
+
+    key_list = []
+
+    def encode(char):
+        """
+        Replace all non-alphanumeric characters with -n- where n
+        is their UTF8 code.
+        TODO: Test for UTF8 which is not ASCII
+        """
+        if char.isalnum():
+            return char
+        elif char in substitution_list:
+            return substitution_list[char]
+        else:
+            return "_{}_".format(ord(char))
+
+    for item in ['block', 'name', 'user']:
+        if item in scope_key_dict:
+            field = scope_key_dict[item]
+            # Prevent injection of "..", hidden files, or similar.
+            # First part adds a prefix. Second part guarantees
+            # continued uniqueness.
+            if field.startswith(".") or field.startswith("_"):
+                field = "_" + field
+            field = "".join(encode(char) for char in field)
+        else:
+            field = "NONE.NONE"
+        key_list.append(field)
+
+    key = "/".join(key_list)
+    return key

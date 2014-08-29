@@ -7,66 +7,16 @@ The README file in this directory contains much more information.
 Much of this still needs to be organized.
 """
 
-
-import json
-
 from djpyfs import djpyfs
 
 from xblock.fields import Field, NO_CACHE_VALUE
 from xblock.fields import UserScope, BlockScope
+from xblock.fields import scope_key
 
 #  Finished services
 #    None yet
 #
 #  edX-internal prototype services
-
-
-#  TODO:
-#  * Move somewhere useful.
-#  * Clean up how key is generated
-#  * Include field name, if not there yet?
-#  * Test. This appears to work, but next PR will use this, and more
-#    rigorous verification.
-def scope_key(instance, xblock):
-    """
-    Generate a unique key for a scope that can be used as a
-    filename, in a URL, or in a KVS.
-    """
-    scope_key_dict = {}
-    if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
-        pass
-    elif instance.scope.user == UserScope.ONE:
-        scope_key_dict['user'] = unicode(xblock.scope_ids.user_id)
-    else:
-        raise NotImplementedError()
-
-    if instance.scope.block == BlockScope.TYPE:
-        # TODO: Is this correct? Was usage_id
-        scope_key_dict['block'] = unicode(xblock.scope_ids.block_type)
-    elif instance.scope.block == BlockScope.USAGE:
-        # TODO: Is this correct? was def_id. # Seems to be the same as usage?
-        scope_key_dict['block'] = unicode(xblock.scope_ids.usage_id)
-    elif instance.scope.block == BlockScope.DEFINITION:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.def_id)
-    elif instance.scope.block == BlockScope.ALL:
-        pass
-    else:
-        raise NotImplementedError()
-
-    basekey = json.dumps(scope_key_dict, sort_keys=True, separators=(',', ':'))
-
-    def encode(char):
-        """
-        Replace all non-alphanumeric characters with _n_ where n
-        is their ASCII code.
-        """
-        if char.isalnum():
-            return char
-        else:
-            return "_{}_".format(ord(char))
-    encodedkey = "".join(encode(char) for char in basekey)
-
-    return encodedkey
 
 
 def public(type=None, **kwargs):  # pylint disable=unused-argument
