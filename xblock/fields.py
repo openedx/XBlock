@@ -11,7 +11,6 @@ import copy
 import datetime
 import dateutil.parser
 import itertools
-import logging
 import pytz
 import traceback
 import warnings
@@ -295,6 +294,7 @@ class Field(Nameable):
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
                  xml_node=False, **kwargs):
+        self.warned = False
         self.help = help
         self._enable_enforce_type = enforce_type
         if default is not UNSET:
@@ -510,8 +510,13 @@ class Field(Nameable):
         This warning marks calls when the object is not
         derived from that class.
         """
-        if not isinstance(self, JSONField):
-            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
+        if not isinstance(self, JSONField) and not self.warned:
+            warnings.warn(
+                "Deprecated. JSONifiable fields should derive from JSONField ({name})".format(name=self.name),
+                DeprecationWarning,
+                stacklevel=3
+            )
+            self.warned = True
 
     def to_json(self, value):
         """
