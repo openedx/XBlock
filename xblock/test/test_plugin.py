@@ -2,8 +2,6 @@
 Test xblock/core/plugin.py
 """
 
-from mock import patch, Mock
-
 from xblock.test.tools import (
     assert_is, assert_raises_regexp, assert_equals)
 
@@ -69,10 +67,10 @@ def test_nosuch_plugin():
         XBlock.load_class("nosuch_block")
 
 
-@patch.object(XBlock, '_load_class_entry_point', Mock(side_effect=Exception))
+@XBlock.register_temp_plugin(object, "bad_xblock", load_error=StandardError)
 def test_broken_plugin():
-    plugins = XBlock.load_classes()
-    assert_equals(list(plugins), [])
+    failures = XBlock.failed_classes()
+    assert any([failure["name"] == "bad_xblock" for failure in failures])
 
 
 def _num_plugins_cached():
