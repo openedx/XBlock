@@ -7,6 +7,8 @@ These are notable changes in XBlock.
 0.4 - In Progress
 -----------------
 
+* Increased the awesome quotient by 200%.
+
 * Make Scope enums (UserScope.* and BlockScope.*) into Sentinels, rather than just ints,
   so that they can have more meaningful string representations.
 
