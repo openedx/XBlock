@@ -10,16 +10,20 @@ import warnings
 
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
+import xblock.mixins
 from xblock.mixins import (
     ScopedStorageMixin,
     HierarchyMixin,
     RuntimeServicesMixin,
     HandlersMixin,
-    XmlSerializationMixin,
+    XmlSerializationMixin
 )
 from xblock.plugin import Plugin
 from xblock.validation import Validation
 
+# exposing XML_NAMESPACES as a member of core, in order to avoid importing mixins where
+# XML_NAMESPACES are needed (e.g. runtime.py).
+XML_NAMESPACES = xblock.mixins.XML_NAMESPACES
 
 # __all__ controls what classes end up in the docs.
 __all__ = ['XBlock']
@@ -179,7 +183,6 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         method, as there is currently only a no-op implementation.
         """
         return Validation(self.scope_ids.usage_id)
-
 
 # Maintain backwards compatibility
 import xblock.exceptions
