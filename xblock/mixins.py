@@ -4,6 +4,9 @@ functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
 
 import functools
+import logging
+from lxml import etree
+
 try:
     import simplesjson as json  # pylint: disable=F0401
 except ImportError:
@@ -14,6 +17,12 @@ from webob import Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
 from xblock.fields import Field, Reference, Scope, ReferenceList
+
+
+XML_NAMESPACES = {
+    "option": "http://code.edx.org/xblock/option",
+    "block": "http://code.edx.org/xblock/block",
+}
 
 
 class HandlersMixin(object):
@@ -362,13 +371,20 @@ class XmlSerializationMixin(ScopedStorageMixin):
         block = runtime.construct_xblock_from_class(cls, keys)
 
         # The base implementation: child nodes become child blocks.
+        # Or fields, if they belong to the right namespace.
         for child in node:
-            block.runtime.add_node_as_child(block, child, id_generator)
+            qname = etree.QName(child)
+            tag = qname.localname
+            namespace = qname.namespace
+
+            if namespace == XML_NAMESPACES["option"]:
+                cls._set_field_if_present(block, tag, child.text)
+            else:
+                block.runtime.add_node_as_child(block, child, id_generator)
 
         # Attributes become fields.
         for name, value in node.items():
-            if name in block.fields:
-                setattr(block, name, value)
+            cls._set_field_if_present(block, name, value)
 
         # Text content becomes "content", if such a field exists.
         if "content" in block.fields and block.fields["content"].scope == Scope.content:
@@ -393,7 +409,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                node.set(field_name, unicode(field.read_from(self)))
+                self._add_field(node, field_name, field)
 
         # Add children for each of our children.
         if self.has_children:
@@ -417,3 +433,26 @@ class XmlSerializationMixin(ScopedStorageMixin):
             return self.content
         else:
             return None
+
+    @classmethod
+    def _set_field_if_present(cls, block, name, value):
+        """Sets the field block.name, if block have such a field."""
+        if name in block.fields:
+            value = (block.fields[name]).from_string(value)
+            setattr(block, name, value)
+        else:
+            logging.warn("XBlock %s does not contain field %s", type(block), name)
+
+    def _add_field(self, node, field_name, field):
+        """Add xml representation of field to node.
+
+        Depending on settings, it either stores the value of field
+        as an xml attribute or creates a separate child node.
+        """
+        if field.xml_node:
+            tag = etree.QName(XML_NAMESPACES["option"], field_name)
+            elem = node.makeelement(tag)
+            elem.text = field.to_string(field.read_from(self))
+            node.insert(0, elem)
+        else:
+            node.set(field_name, unicode(field.read_from(self)))
