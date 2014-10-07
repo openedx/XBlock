@@ -199,3 +199,50 @@ class ReadOnlyFieldData(FieldData):
 
     def default(self, block, name):
         return self._source.default(block, name)
+
+
+class OrderedLookupWithDefaultDictReadOnlyFieldData(FieldData):
+    """
+    A ReadonlyFieldData using multilevel dicts that lookups up first in a block type namespace, then a default one
+
+    raise :class:`~xblock.exceptions.InvalidScopeError`s.
+    """
+    def __init__(self, data):
+        """
+        instantiation method
+
+        example `data` dict is :
+        {
+            '_default': {
+                'key1': 'val1'
+                'key2': 'val2'
+            },
+            'thumbs': {
+                'key2': 'val3',
+            },
+        }
+
+        When `get`ing 'key2' up with an xblock with self.plugin_name == "thumbs", this FieldData will return
+        'val3'.  Other xblocks will `get` 'val2'.  `get`ting 'key1' will return 'val1'.
+        """
+        self._data = data
+
+    def get(self, block, name):
+        """
+        Does an ordered lookup, first in the block type namedspace, then in a default one
+        """
+        lookup_keys = (block.plugin_name, '_default')  # defined lookup order
+        for key in lookup_keys:
+            lookup_dict = self._data.get(key, {})
+            if name in lookup_dict:
+                return copy.deepcopy(lookup_dict[name])
+        return None
+
+    def set(self, block, name, value):
+        raise InvalidScopeError("{block}.{name} is read-only, cannot set".format(block=block, name=name))
+
+    def delete(self, block, name):
+        raise InvalidScopeError("{block}.{name} is read-only, cannot delete".format(block=block, name=name))
+
+    def has(self, block, name):
+        return name in self._data.get(block.plugin_name, {}) or name in self._data.get('_default', {})

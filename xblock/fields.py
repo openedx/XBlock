@@ -152,8 +152,14 @@ ScopeBase = namedtuple('ScopeBase', 'user block name')
 
 class Scope(ScopeBase):
     """
-    Defines six types of scopes to be used: `content`, `settings`,
-    `user_state`, `preferences`, `user_info`, and `user_state_summary`.
+    Defines seven types of scopes to be used: `configuration`, `content`,
+    `settings`, `user_state`, `preferences`, `user_info`, and
+    `user_state_summary`.
+
+    The `configuration` scope is used to save data for all users, for all
+    blocks, across all runs of a course on a particular platform instance. An
+    example would be the delivery of site-wide settings from django's
+    settings.conf to an xblock with some optional set of behavior.
 
     The `content` scope is used to save data for all users, for one particular
     block, across all runs of a course. An example might be an XBlock that
@@ -183,6 +189,7 @@ class Scope(ScopeBase):
     the points scored by all users attempting a problem.
 
     """
+    configuration = ScopeBase(UserScope.ALL, BlockScope.TYPE, u'configuration')
     content = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, u'content')
     settings = ScopeBase(UserScope.NONE, BlockScope.USAGE, u'settings')
     user_state = ScopeBase(UserScope.ONE, BlockScope.USAGE, u'user_state')
@@ -194,6 +201,7 @@ class Scope(ScopeBase):
     def named_scopes(cls):
         """Return all named Scopes."""
         return [
+            cls.configuration,
             cls.content,
             cls.settings,
             cls.user_state,
