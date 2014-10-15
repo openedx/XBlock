@@ -244,6 +244,7 @@ class XBlock(Plugin):
                 scopes.
 
         """
+        super(XBlock, self).__init__()
         self.runtime = runtime
         self._field_data = field_data
         self._field_data_cache = {}
