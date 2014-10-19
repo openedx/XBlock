@@ -259,7 +259,9 @@ class Field(object):
         help (str): documentation for the field, suitable for presenting to a
             user (defaults to None).
 
-        default: static value to default to if not otherwise specified
+        default: value to default to if not otherwise specified. Can be a static
+            value or a callable. If callable will be called when field is first
+            accessed and cached for the lifetime of the object or until deleted.
             (defaults to None).
 
         scope: this field's scope (defaults to Scope.content).
@@ -277,6 +279,10 @@ class Field(object):
             possible to convert it. This provides a guarantee on the stored
             value type.
 
+        persist_default: whether the default value should persist on save.
+            Ignored if no default value is provided. (defaults to False for
+            static defaults and True for callable defaults).
+
         kwargs: optional runtime-specific options/metadata. Will be stored as
             runtime_options.
 
@@ -287,12 +293,20 @@ class Field(object):
     # We're OK redefining built-in `help`
     # pylint: disable=W0622
     def __init__(self, help=None, default=UNSET, scope=Scope.content,
-                 display_name=None, values=None, enforce_type=False, **kwargs):
+                 display_name=None, values=None, enforce_type=False,
+                 persist_default=UNSET, **kwargs):
         self._name = "unknown"
         self.help = help
         self._enable_enforce_type = enforce_type
         if default is not UNSET:
-            self._default = self._check_or_enforce_type(default)
+            if callable(default):
+                self._default = default
+            else:
+                self._default = self._check_or_enforce_type(default)
+        if persist_default is not UNSET:
+            self._persist_default = persist_default
+        else:
+            self._persist_default = callable(default)
         self.scope = scope
         self._display_name = display_name
         self._values = values
@@ -302,10 +316,14 @@ class Field(object):
     @property
     def default(self):
         """Returns the static value that this defaults to."""
-        if self.MUTABLE:
-            return copy.deepcopy(self._default)
+        if callable(self._default):
+            value = self._check_or_enforce_type(self._default())
         else:
-            return self._default
+            value = self._default
+        if self.MUTABLE:
+            return copy.deepcopy(value)
+        else:
+            return value
 
     @property
     def name(self):
