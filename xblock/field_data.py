@@ -79,6 +79,18 @@ class FieldData(object):
         except KeyError:
             return False
 
+    @abstractmethod
+    def is_writable(self, block, name):
+        """
+        Return whether the field named `name` is writable on the XBlock `block`.
+
+        :param block: block to check
+        :type block: :class:`~xblock.core.XBlock`
+        :param name: field name
+        :type name: str
+        """
+        raise NotImplementedError
+
     def set_many(self, block, update_dict):
         """
         Update many fields on an XBlock simultaneously.
@@ -123,6 +135,9 @@ class DictFieldData(FieldData):
 
     def has(self, block, name):
         return name in self._data
+
+    def is_writable(self, block, name):
+        return True
 
     def set_many(self, block, update_dict):
         self._data.update(copy.deepcopy(update_dict))
@@ -173,6 +188,9 @@ class SplitFieldData(FieldData):
     def has(self, block, name):
         return self._field_data(block, name).has(block, name)
 
+    def is_writable(self, block, name):
+        return self._field_data(block, name).is_writable(block, name)
+
     def default(self, block, name):
         return self._field_data(block, name).default(block, name)
 
@@ -196,6 +214,9 @@ class ReadOnlyFieldData(FieldData):
 
     def has(self, block, name):
         return self._source.has(block, name)
+
+    def is_writable(self, block, name):
+        return False
 
     def default(self, block, name):
         return self._source.default(block, name)

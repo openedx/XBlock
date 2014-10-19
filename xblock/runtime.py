@@ -203,6 +203,9 @@ class KvsFieldData(FieldData):
         except KeyError:
             return False
 
+    def is_writable(self, block, name):
+        return True
+
     def set_many(self, block, update_dict):
         """Update the underlying model with the correct values."""
         updated_dict = {}
