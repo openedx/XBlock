@@ -367,6 +367,37 @@ def test_default_values():
         assert_false(field_tester._field_data.has(field_tester, fname))
 
 
+def test_callable_default_values():
+    # Check that values that are deleted are restored to their default values
+    values = [42, 84]
+
+    class FieldTester(XBlock):
+        """Test XBlock for testing callable defaults"""
+        field_a = Integer(scope=Scope.settings, default=lambda: values.pop())  # pylint: disable=W0108
+
+    field_tester = FieldTester(MagicMock(), DictFieldData({}), Mock())
+
+    # Callable default does not get called before first field access
+    assert_equals([42, 84], values)
+    # Callable default gets called on first field access
+    assert_equals(84, field_tester.field_a)
+    assert_equals([42], values)
+    # The generated value is cached
+    assert_equals(84, field_tester.field_a)
+    assert_equals([42], values)
+
+    # Test that after save, the generated defalt value exist and field is present in the underlying kvstore
+    field_tester.save()
+    assert_equals(84, field_tester.field_a)
+    assert field_tester._field_data.has(field_tester, 'field_a')
+
+    # Test that default values regenerated after a delete, but fields not actually
+    # in the underlying kvstore
+    del field_tester.field_a
+    assert_equals(42, field_tester.field_a)
+    assert_false(field_tester._field_data.has(field_tester, 'field_a'))
+
+
 def test_json_field_access():
     # Check that values are correctly converted to and from json in accessors.
 

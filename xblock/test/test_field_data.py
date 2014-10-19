@@ -62,6 +62,11 @@ class TestSplitFieldData(object):
         self.content.has.assert_called_once_with(self.block, 'content')
         assert_false(self.settings.has.called)
 
+    def test_is_writable(self):
+        self.split.is_writable(self.block, 'content')
+        self.content.is_writable.assert_called_once_with(self.block, 'content')
+        assert_false(self.settings.is_writable.called)
+
     def test_set_many(self):
         self.split.set_many(self.block, {'content': 'new content', 'settings': 'new settings'})
         self.content.set_many.assert_called_once_with(self.block, {'content': 'new content'})
@@ -113,3 +118,6 @@ class TestReadOnlyFieldData(object):
     def test_has(self):
         assert_equals(self.source.has.return_value, self.read_only.has(self.block, 'content'))
         self.source.has.assert_called_once_with(self.block, 'content')
+
+    def test_is_writable(self):
+        assert_false(self.read_only.is_writable(self.block, 'content'))
