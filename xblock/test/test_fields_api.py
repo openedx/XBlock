@@ -152,8 +152,11 @@ class UniversalProperties(object):
     def test_delete_with_save_writes(self):
         self.delete()
         self.block.save()
-        assert_false(self.field_data.has(self.block, 'field'))
-        assert_true(self.is_default())
+        if self.persist_default:
+            assert self.field_data.has(self.block, 'field')
+        else:
+            assert_false(self.field_data.has(self.block, 'field'))
+            assert_true(self.is_default())
 
 
 class MutationProperties(object):
@@ -238,7 +241,7 @@ class DefaultValueProperties(object):
         assert_false(self.field_data.has(self.block, 'field'))
         self.get()
         self.block.save()
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert_equals(self.persist_default, self.field_data.has(self.block, 'field'))
 
     def test_set_with_save_writes(self):
         assert_false(self.field_data.has(self.block, 'field'))
@@ -248,15 +251,13 @@ class DefaultValueProperties(object):
 
     def test_delete_without_save_succeeds(self):
         assert_false(self.field_data.has(self.block, 'field'))
-
         self.delete()
-
         assert_false(self.field_data.has(self.block, 'field'))
 
     def test_delete_with_save_succeeds(self):
         self.delete()
         self.block.save()
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert_equals(self.persist_default, self.field_data.has(self.block, 'field'))
 
 
 class DefaultValueMutationProperties(object):
@@ -339,13 +340,14 @@ class UniversalTestCases(UniversalProperties):
 
     Requires from subclasses:
         self.field_class  # The class of the field to test
-        self.field_default  # The static default value for the field
+        self.field_default  # The default value for the field
         self.get_field_data()  # A function that returns a new :class:`~xblock.field_data.FieldData` instance
     """
     def setUp(self):
         class TestBlock(XBlock):
             """Testing block for all field API tests"""
-            field = self.field_class(default=copy.deepcopy(self.field_default))
+            field = self.field_class(default=copy.deepcopy(self.field_default),
+                                     persist_default=self.persist_default)
 
         self.field_data = self.get_field_data()
         self.block = TestBlock(Mock(), self.field_data, Mock())
@@ -361,14 +363,14 @@ class DictFieldDataWithSequentialDefault(DictFieldData):
         return next(self._sequence)
 
 
-class StaticDefaultTestCases(UniversalTestCases, DefaultValueProperties):
+class StaticFieldDataDefaultTestCases(UniversalTestCases, DefaultValueProperties):
     """Set up tests of static default values"""
     def get_field_data(self):
         """Return a new :class:`~xblock.field_data.FieldData` for testing"""
         return DictFieldData({})
 
 
-class ComputedDefaultTestCases(UniversalTestCases, DefaultValueProperties):
+class ComputedFieldDataDefaultTestCases(UniversalTestCases, DefaultValueProperties):
     """Set up tests of computed default values"""
     def get_field_data(self):
         """Return a new :class:`~xblock.field_data.FieldData` for testing"""
@@ -395,7 +397,7 @@ class MutableTestCases(UniversalTestCases, MutationProperties):
 
 
 # pylint: disable=C0111
-class TestImmutableWithStaticDefault(ImmutableTestCases, StaticDefaultTestCases):
+class TestImmutableWithStaticFieldDataDefault(ImmutableTestCases, StaticFieldDataDefaultTestCases):
     __test__ = False
 
 
@@ -404,7 +406,7 @@ class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):
     initial_value = 75
 
 
-class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCases):
+class TestImmutableWithComputedFieldDataDefault(ImmutableTestCases, ComputedFieldDataDefaultTestCases):
     __test__ = False
 
     @property
@@ -412,7 +414,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
         return iter(xrange(1000))
 
 
-class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
+class TestMutableWithStaticFieldDataDefault(MutableTestCases, StaticFieldDataDefaultTestCases, DefaultValueMutationProperties):
     __test__ = False
 
 
@@ -421,12 +423,30 @@ class TestMutableWithInitialValue(MutableTestCases, InitialValueProperties, Init
     initial_value = [1, 2, 3]
 
 
-class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases, DefaultValueMutationProperties):
+class TestMutableWithComputedFieldDataDefault(MutableTestCases, ComputedFieldDataDefaultTestCases, DefaultValueMutationProperties):
     __test__ = False
 
     @property
     def default_iterator(self):
         return ([None] * i for i in xrange(1000))
+
+
+class TestImmutableWithCallableDefault(TestImmutableWithStaticFieldDataDefault):
+    __test__ = False
+
+    @property
+    def field_default(self):
+        sequence = iter(xrange(1000))
+        return lambda: next(sequence)
+
+
+class TestMutableWithCallableDefault(TestImmutableWithStaticFieldDataDefault):
+    __test__ = False
+
+    @property
+    def field_default(self):
+        sequence = ([None] * i for i in iter(xrange(1000)))
+        return lambda: next(sequence)
 
 
 # ~~~~~~~~~~~~~ Classes for testing noops before other tests ~~~~~~~~~~~~~~~~~~~~
@@ -478,19 +498,23 @@ class SaveNoopPrefix(object):
 # pylint: enable=E1101
 
 for operation_backend in (BlockFirstOperations, FieldFirstOperations):
-    for noop_prefix in (None, GetNoopPrefix, GetSaveNoopPrefix, SaveNoopPrefix):
-        for base_test_case in (
-            TestImmutableWithComputedDefault, TestImmutableWithInitialValue, TestImmutableWithStaticDefault,
-            TestMutableWithComputedDefault, TestMutableWithInitialValue, TestMutableWithStaticDefault
-        ):
+    for persist_default in (False, True):
+        for noop_prefix in (None, GetNoopPrefix, GetSaveNoopPrefix, SaveNoopPrefix):
+            for base_test_case in (TestImmutableWithComputedFieldDataDefault, TestImmutableWithInitialValue,
+                                   TestImmutableWithStaticFieldDataDefault, TestMutableWithComputedFieldDataDefault,
+                                   TestMutableWithInitialValue, TestMutableWithStaticFieldDataDefault,
+                                   TestImmutableWithCallableDefault, TestMutableWithCallableDefault):
 
-            test_name = base_test_case.__name__ + "With" + operation_backend.__name__
-            test_classes = (operation_backend, base_test_case)
-            if noop_prefix is not None:
-                test_name += "And" + noop_prefix.__name__
-                test_classes = (noop_prefix, ) + test_classes
+                test_name = base_test_case.__name__ + "With" + operation_backend.__name__
+                test_classes = (operation_backend, base_test_case)
+                if persist_default:
+                    test_name += "AndPersistDefault"
+                if not persist_default and noop_prefix is not None:
+                    test_name += "And" + noop_prefix.__name__
+                    test_classes = (noop_prefix, ) + test_classes
 
-            vars()[test_name] = type(test_name, test_classes, {'__test__': True})
+                vars()[test_name] = type(test_name, test_classes, {'__test__': True,
+                                                                   'persist_default': persist_default})
 
 # If we don't delete the loop variables, then they leak into the global namespace
 # and cause the last class looped through to be tested twice. Surprise!
@@ -498,3 +522,4 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
 del operation_backend
 del noop_prefix
 del base_test_case
+del persist_default

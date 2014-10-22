@@ -298,20 +298,18 @@ class XBlock(Plugin):
 
     def save(self):
         """Save all dirty fields attached to this XBlock."""
-        if not self._dirty_fields:
-            # nop if _dirty_fields attribute is empty
-            return
-        try:
-            fields_to_save = self._get_fields_to_save()
-            # Throws KeyValueMultiSaveError if things go wrong
-            self._field_data.set_many(self, fields_to_save)
+        fields_to_save = self._get_fields_to_save()
+        if fields_to_save:
+            try:
+                # Throws KeyValueMultiSaveError if things go wrong
+                self._field_data.set_many(self, fields_to_save)
 
-        except KeyValueMultiSaveError as save_error:
-            saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
-            for field in saved_fields:
-                # should only find one corresponding field
-                del self._dirty_fields[field]
-            raise XBlockSaveError(saved_fields, self._dirty_fields.keys())
+            except KeyValueMultiSaveError as save_error:
+                saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
+                for field in saved_fields:
+                    # should only find one corresponding field
+                    del self._dirty_fields[field]
+                raise XBlockSaveError(saved_fields, self._dirty_fields.keys())
 
         # Remove all dirty fields, since the save was successful
         self._clear_dirty_fields()
@@ -322,11 +320,16 @@ class XBlock(Plugin):
         A `field` is an instance of `Field`.
         """
         fields_to_save = {}
-        for field in self._dirty_fields.keys():
+
+        for field_name, field in self.fields.items():  # pylint: disable=no-member
             # If the field value isn't the same as the baseline we recorded
             # when it was read, then save it
-            if field._is_dirty(self):  # pylint: disable=protected-access
-                fields_to_save[field.name] = field.to_json(self._field_data_cache[field.name])
+            if field in self._dirty_fields and field._is_dirty(self):  # pylint: disable=protected-access
+                fields_to_save[field_name] = field.to_json(self._field_data_cache[field_name])
+            elif (field._persist_default and  # pylint: disable=protected-access
+                  self._field_data.is_writable(self, field_name) and not field.is_set_on(self)):
+                fields_to_save[field_name] = field.to_json(field.read_from(self))
+
         return fields_to_save
 
     def _clear_dirty_fields(self):
