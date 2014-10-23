@@ -174,6 +174,8 @@ If you would like to use ``init`` function for some reason, such as to implement
 more complicated logic for default field values, consider one of the following
 alternatives:
 
+- Use ``xblock.fields.UNIQUE_ID`` if you want the field to default to a unique
+  string value.
 - Use a lazy property decorator, so that when you first access an attribute, a
   function will be called to set that attribute.
 - Call the default-field-value logic in the view, instead of in ``init``.

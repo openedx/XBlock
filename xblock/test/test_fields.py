@@ -22,7 +22,8 @@ from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
 from xblock.fields import (
     Any, Boolean, Dict, Field, Float,
-    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel
+    Integer, List, String, DateTime, Reference, ReferenceList, Sentinel,
+    UNIQUE_ID
 )
 
 from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in, TestRuntime
@@ -445,6 +446,41 @@ def test_field_display_name():
         field_x = List(display_name="Field Known as X")
 
     assert_equals("Field Known as X", TestBlock.field_x.display_name)
+
+
+def test_unique_id_default():
+    class TestBlock(XBlock):
+        """
+        Block for testing
+        """
+        field_a = String(default=UNIQUE_ID, scope=Scope.settings)
+        field_b = String(default=UNIQUE_ID, scope=Scope.user_state)
+
+    sids = ScopeIds(user_id="bob",
+                    block_type="bobs-type",
+                    def_id="definition-id",
+                    usage_id="usage-id")
+
+    runtime = TestRuntime(services={'field-data': DictFieldData({})})
+    block = TestBlock(runtime, DictFieldData({}), sids)
+    unique_a = block.field_a
+    unique_b = block.field_b
+    # Create another instance of the same block. Unique ID defaults should not change.
+    runtime = TestRuntime(services={'field-data': DictFieldData({})})
+    block = TestBlock(runtime, DictFieldData({}), sids)
+    assert_equals(unique_a, block.field_a)
+    assert_equals(unique_b, block.field_b)
+    # Change the user id. Unique ID default should change for field_b with
+    # user_state scope, but not for field_a with scope=settings.
+    runtime = TestRuntime(services={'field-data': DictFieldData({})})
+    block = TestBlock(runtime, DictFieldData({}), sids._replace(user_id='alice'))
+    assert_equals(unique_a, block.field_a)
+    assert_not_equals(unique_b, block.field_b)
+    # Change the usage id. Unique ID default for both fields should change.
+    runtime = TestRuntime(services={'field-data': DictFieldData({})})
+    block = TestBlock(runtime, DictFieldData({}), sids._replace(usage_id='usage-2'))
+    assert_not_equals(unique_a, block.field_a)
+    assert_not_equals(unique_b, block.field_b)
 
 
 def test_values():
