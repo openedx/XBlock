@@ -189,7 +189,7 @@ class Scope(ScopeBase):
     the points scored by all users attempting a problem.
 
     """
-    configuration = ScopeBase(UserScope.ALL, BlockScope.TYPE, u'configuration')
+    configuration = ScopeBase(UserScope.NONE, BlockScope.TYPE, u'configuration')
     content = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, u'content')
     settings = ScopeBase(UserScope.NONE, BlockScope.USAGE, u'settings')
     user_state = ScopeBase(UserScope.ONE, BlockScope.USAGE, u'user_state')

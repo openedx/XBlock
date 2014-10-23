@@ -8,6 +8,7 @@ local_settings.py
 htmlcov
 *~
 .idea
+*,cover
 
 # Documentation
 doc/_build
