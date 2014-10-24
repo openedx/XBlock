@@ -412,7 +412,7 @@ class Runtime(object):
         raise NotImplementedError("Runtime needs to provide publish()")
 
     # Construction
-    def __init__(self, id_reader, field_data, mixins=(), services=None, default_class=None, select=None):
+    def __init__(self, id_reader, field_data, mixins=(), services=None, default_class=None, select=None, platform_settings={}):
         """
         Arguments:
             id_reader (IdReader): An object that allows the `Runtime` to
@@ -435,6 +435,8 @@ class Runtime(object):
                 when calling :meth:`.XBlock.load_class` to resolve a `block_type`.
                 This is the same `select` as used by :meth:`.Plugin.load_class`.
 
+            platform-settings (dictionary): a set of additional configuration
+                settings sent from our runtime into our xblock instances.
         """
         self.id_reader = id_reader
         self.field_data = field_data
@@ -449,6 +451,10 @@ class Runtime(object):
         self.user_id = None
         self.mixologist = Mixologist(mixins)
         self._view_name = None
+
+        # The XBlock configuration directives passed in from wherever this
+        # Runtime is embedded
+        self.platform_settings = platform_settings
 
     # Block operations
 
