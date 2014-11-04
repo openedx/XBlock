@@ -17,112 +17,15 @@ from webob import Response
 
 from xblock.core import XBlock
 from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError
-from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
-    Integer, List, ModelMetaclass, Field, \
-    Scope
+from xblock.fields import Dict, Float, Integer, List, Field, Scope, ScopeIds
 from xblock.field_data import FieldData, DictFieldData
+from xblock.mixins import ScopedStorageMixin
+from xblock.runtime import Runtime
 
 from xblock.test.tools import (
     assert_equals, assert_raises, assert_raises_regexp,
     assert_not_equals, assert_false, assert_is
 )
-
-
-def test_model_metaclass():
-    class ModelMetaclassTester(object):
-        """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
-
-        field_a = Integer(scope=Scope.settings)
-        field_b = Integer(scope=Scope.content)
-
-        def __init__(self, field_data):
-            self._field_data = field_data
-
-    class ChildClass(ModelMetaclassTester):
-        """Toy class for ModelMetaclass testing"""
-        pass
-
-    # `ModelMetaclassTester` and `ChildClass` both obtain the `fields` attribute
-    # from the `ModelMetaclass`. Since this is not understood by static analysis,
-    # silence this error for the duration of this test.
-    # pylint: disable=E1101
-    assert hasattr(ModelMetaclassTester, 'field_a')
-    assert hasattr(ModelMetaclassTester, 'field_b')
-
-    assert_is(ModelMetaclassTester.field_a, ModelMetaclassTester.fields['field_a'])
-    assert_is(ModelMetaclassTester.field_b, ModelMetaclassTester.fields['field_b'])
-
-    assert hasattr(ChildClass, 'field_a')
-    assert hasattr(ChildClass, 'field_b')
-
-    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
-    assert_is(ChildClass.field_b, ChildClass.fields['field_b'])
-
-
-def test_with_mixins():
-    # Testing model metaclass with mixins
-    class FieldsMixin(object):
-        """Toy class for field testing"""
-        field_a = Integer(scope=Scope.settings)
-
-    class BaseClass(object):
-        """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
-
-    class ChildClass(FieldsMixin, BaseClass):
-        """Toy class for ModelMetaclass and field testing"""
-        pass
-
-    class GrandchildClass(ChildClass):
-        """Toy class for ModelMetaclass and field testing"""
-        pass
-
-    # `ChildClass` and `GrandchildClass` both obtain the `fields` attribute
-    # from the `ModelMetaclass`. Since this is not understood by static analysis,
-    # silence this error for the duration of this test.
-    # pylint: disable=E1101
-
-    assert hasattr(ChildClass, 'field_a')
-    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
-
-    assert hasattr(GrandchildClass, 'field_a')
-    assert_is(GrandchildClass.field_a, GrandchildClass.fields['field_a'])
-
-
-def test_children_metaclass():
-
-    class HasChildren(object):
-        """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
-
-        has_children = True
-
-    class WithoutChildren(object):
-        """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
-
-    class InheritedChildren(HasChildren):
-        """Toy class for ChildrenModelMetaclass testing"""
-        pass
-
-    # `HasChildren` and `WithoutChildren` both obtain the `children` attribute and
-    # the `has_children` method from the `ChildrenModelMetaclass`. Since this is not
-    # understood by static analysis, silence this error for the duration of this test.
-    # pylint: disable=E1101
-
-    assert HasChildren.has_children
-    assert not WithoutChildren.has_children
-    assert InheritedChildren.has_children
-
-    assert hasattr(HasChildren, 'children')
-    assert not hasattr(WithoutChildren, 'children')
-    assert hasattr(InheritedChildren, 'children')
-
-    assert isinstance(HasChildren.children, List)
-    assert_equals(Scope.children, HasChildren.children.scope)
-    assert isinstance(InheritedChildren.children, List)
-    assert_equals(Scope.children, InheritedChildren.children.scope)
 
 
 def test_field_access():
@@ -380,18 +283,13 @@ def test_json_field_access():
             """Convert a datetime object to a string"""
             return value.strftime("%m/%d/%Y")
 
-    class FieldTester(object):
+    class FieldTester(ScopedStorageMixin):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
 
         field_a = Date(scope=Scope.settings)
         field_b = Date(scope=Scope.content, default=datetime(2013, 4, 1))
 
-        def __init__(self, field_data):
-            self._field_data = field_data
-            self._dirty_fields = {}
-
-    field_tester = FieldTester(DictFieldData({}))
+    field_tester = FieldTester(DictFieldData({}), MagicMock(spec=ScopeIds))
 
     # Check initial values
     assert_equals(None, field_tester.field_a)
@@ -431,22 +329,16 @@ def test_defaults_not_shared():
 
 def test_object_identity():
     # Check that values that are modified are what is returned
-    class FieldTester(object):
+    class FieldTester(ScopedStorageMixin):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
-
         field_a = List(scope=Scope.settings)
-
-        def __init__(self, field_data):
-            self._field_data = field_data
-            self._dirty_fields = {}
 
     # Make sure that field_data always returns a different object
     # each time it's actually queried, so that the caching is
     # doing the work to maintain object identity.
     field_data = MagicMock(spec=FieldData)
     field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
-    field_tester = FieldTester(field_data)
+    field_tester = FieldTester(field_data, MagicMock(spec=ScopeIds))
 
     value = field_tester.field_a
     assert_equals(value, field_tester.field_a)
@@ -467,15 +359,9 @@ def test_object_identity():
 
 def test_caching_is_per_instance():
     # Test that values cached for one instance do not appear on another
-    class FieldTester(object):
+    class FieldTester(ScopedStorageMixin):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
-
         field_a = List(scope=Scope.settings)
-
-        def __init__(self, field_data):
-            self._field_data = field_data
-            self._dirty_fields = {}
 
     field_data = MagicMock(spec=FieldData)
     field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
@@ -483,8 +369,8 @@ def test_caching_is_per_instance():
     # Same field_data used in different objects should result
     # in separately-cached values, so that changing a value
     # in one instance doesn't affect values stored in others.
-    field_tester_a = FieldTester(field_data)
-    field_tester_b = FieldTester(field_data)
+    field_tester_a = FieldTester(field_data, MagicMock(spec=ScopeIds))
+    field_tester_b = FieldTester(field_data, MagicMock(spec=ScopeIds))
     value = field_tester_a.field_a
     assert_equals(value, field_tester_a.field_a)
     field_tester_a.field_a.append(1)

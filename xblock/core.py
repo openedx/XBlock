@@ -1,26 +1,32 @@
 """
-Core classes for XBlocks.
+Core classes for the XBlock family.
 
 This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
-import functools
 import pkg_resources
-try:
-    import simplesjson as json  # pylint: disable=F0401
-except ImportError:
-    import json
-from webob import Response
 
-from xblock.exceptions import JsonHandlerError, DisallowedFileError
-from xblock.fields import ScopedStorageMixin, HierarchyMixin, String, List, Scope
+from xblock.exceptions import DisallowedFileError
+from xblock.fields import String, List, Scope
+from xblock.mixins import ScopedStorageMixin, HierarchyMixin, HandlersMixin
 from xblock.plugin import Plugin
 from xblock.validation import Validation
 
 
 # __all__ controls what classes end up in the docs.
 __all__ = ['XBlock']
+
+
+class XBlockMixin(ScopedStorageMixin):
+    """
+    Base class for XBlock Mixin classes.
+
+    XBlockMixin classes can add new fields and new properties to all XBlocks
+    created by a particular runtime.
+
+    """
+    pass
 
 
 class TagCombiningMetaclass(type):
@@ -73,53 +79,6 @@ class XBlockMetaclass(
 
     """
     pass
-
-
-class HandlersMixin(object):
-    """
-    A mixin responsible for providing all of the machinery needed for working with XBlock-style handlers.
-    """
-
-    @classmethod
-    def json_handler(cls, func):
-        """Wrap a handler to consume and produce JSON.
-
-        Rather than a Request object, the method will now be passed the
-        JSON-decoded body of the request.  Any data returned by the function
-        will be JSON-encoded and returned as the response.
-
-        The wrapped function can raise JsonHandlerError to return an error
-        response with a non-200 status code.
-        """
-        @XBlock.handler
-        @functools.wraps(func)
-        def wrapper(self, request, suffix=''):
-            """The wrapper function `json_handler` returns."""
-            if request.method != "POST":
-                return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
-            try:
-                request_json = json.loads(request.body)
-            except ValueError:
-                return JsonHandlerError(400, "Invalid JSON").get_response()
-            try:
-                response = func(self, request_json, suffix)
-            except JsonHandlerError as err:
-                return err.get_response()
-            if isinstance(response, Response):
-                return response
-            else:
-                return Response(json.dumps(response), content_type='application/json')
-        return wrapper
-
-    @classmethod
-    def handler(cls, func):
-        """A decorator to indicate a function is usable as a handler."""
-        func._is_xblock_handler = True      # pylint: disable=protected-access
-        return func
-
-    def handle(self, handler_name, request, suffix=''):
-        """Handle `request` with this block's runtime."""
-        return self.runtime.handle(self, handler_name, request, suffix)
 
 
 # -- Base Block
