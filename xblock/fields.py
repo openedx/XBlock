@@ -16,6 +16,8 @@ import pytz
 import traceback
 import warnings
 
+from xblock.exceptions import KeyValueMultiSaveError, XBlockSaveError
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -145,7 +147,7 @@ class UserScope(object):
 UNSET = Sentinel("fields.UNSET")
 
 
-ScopeBase = namedtuple('ScopeBase', 'user block name')  # pylint: disable=C0103
+ScopeBase = namedtuple('ScopeBase', 'user block name')
 
 
 class Scope(ScopeBase):
@@ -229,7 +231,7 @@ class Scope(ScopeBase):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
 
-ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylint: disable=C0103
+ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')
 
 
 # define a placeholder ('nil') value to indicate when nothing has been stored
@@ -285,8 +287,7 @@ class Field(object):
     _default = None
 
     # We're OK redefining built-in `help`
-    # pylint: disable=W0622
-    def __init__(self, help=None, default=UNSET, scope=Scope.content,
+    def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False, **kwargs):
         self._name = "unknown"
         self.help = help
@@ -297,7 +298,6 @@ class Field(object):
         self._display_name = display_name
         self._values = values
         self.runtime_options = kwargs
-    # pylint: enable=W0622
 
     @property
     def default(self):
@@ -638,13 +638,12 @@ class Boolean(JSONField):
     """
     MUTABLE = False
 
-    # pylint: disable=W0622
-    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None, **kwargs):
+    # We're OK redefining built-in `help`
+    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None, **kwargs):  # pylint: disable=redefined-builtin
         super(Boolean, self).__init__(help, default, scope, display_name,
                                       values=({'display_name': "True", "value": True},
                                               {'display_name': "False", "value": False}),
                                       **kwargs)
-    # pylint: enable=W0622
 
     def from_json(self, value):
         if isinstance(value, basestring):
@@ -849,7 +848,7 @@ class ModelMetaclass(type):
         return new_class
 
 
-class ChildrenModelMetaclass(type):
+class ChildrenModelMetaclass(ModelMetaclass):
     """
     A metaclass that transforms the attribute `has_children = True` into a List
     field with a children scope.
@@ -865,6 +864,108 @@ class ChildrenModelMetaclass(type):
             attrs['has_children'] = False
 
         return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
+
+
+class ScopedStorageMixin(object):
+    """
+    This mixin provides scope for Fields and the associated Scoped storage.
+    """
+    __metaclass__ = ModelMetaclass
+
+    def __init__(self, field_data, scope_ids, *args, **kwargs):
+        self._field_data = field_data
+        self._field_data_cache = {}
+        self._dirty_fields = {}
+        self.scope_ids = scope_ids
+
+        super(ScopedStorageMixin, self).__init__(*args, **kwargs)
+
+    def save(self):
+        """Save all dirty fields attached to this XBlock."""
+        if not self._dirty_fields:
+            # nop if _dirty_fields attribute is empty
+            return
+        try:
+            fields_to_save = self._get_fields_to_save()
+            # Throws KeyValueMultiSaveError if things go wrong
+            self._field_data.set_many(self, fields_to_save)
+
+        except KeyValueMultiSaveError as save_error:
+            saved_fields = [field for field in self._dirty_fields if field.name in save_error.saved_field_names]
+            for field in saved_fields:
+                # should only find one corresponding field
+                del self._dirty_fields[field]
+            raise XBlockSaveError(saved_fields, self._dirty_fields.keys())
+
+        # Remove all dirty fields, since the save was successful
+        self._clear_dirty_fields()
+
+    def _get_fields_to_save(self):
+        """
+        Create dictionary mapping between dirty fields and data cache values.
+        A `field` is an instance of `Field`.
+        """
+        fields_to_save = {}
+        for field in self._dirty_fields.keys():
+            # If the field value isn't the same as the baseline we recorded
+            # when it was read, then save it
+            if field._is_dirty(self):  # pylint: disable=protected-access
+                fields_to_save[field.name] = field.to_json(self._field_data_cache[field.name])
+        return fields_to_save
+
+    def _clear_dirty_fields(self):
+        """
+        Remove all dirty fields from an XBlock.
+        """
+        self._dirty_fields.clear()
+
+    def __repr__(self):
+        # `ScopedStorageMixin` obtains the `fields` attribute from the `ModelMetaclass`.
+        # Since this is not understood by static analysis, silence this error.
+        attrs = []
+        for field in self.fields.values():
+            try:
+                value = getattr(self, field.name)
+            except Exception:  # pylint: disable=broad-except
+                # Ensure we return a string, even if unanticipated exceptions.
+                attrs.append(" %s=???" % (field.name,))
+            else:
+                if isinstance(value, basestring):
+                    value = value.strip()
+                    if len(value) > 40:
+                        value = value[:37] + "..."
+                attrs.append(" %s=%r" % (field.name, value))
+        return "<%s @%04X%s>" % (
+            self.__class__.__name__,
+            id(self) % 0xFFFF,
+            ','.join(attrs)
+        )
+
+
+class HierarchyMixin(ScopedStorageMixin):
+    """
+    This adds Fields for parents and children.
+    """
+    __metaclass__ = ChildrenModelMetaclass
+
+    parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
+
+    def __init__(self, *args, **kwargs):
+        # A cache of the parent block, retrieved from .parent
+        self._parent_block = None
+        self._parent_block_id = None
+
+        super(HierarchyMixin, self).__init__(*args, **kwargs)
+
+    def get_parent(self):
+        """Return the parent block of this block, or None if there isn't one."""
+        if self._parent_block_id != self.parent:
+            if self.parent is not None:
+                self._parent_block = self.runtime.get_block(self.parent)
+            else:
+                self._parent_block = None
+            self._parent_block_id = self.parent
+        return self._parent_block
 
 
 class XBlockMixin(object):
