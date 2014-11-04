@@ -61,6 +61,67 @@ class HandlersMixin(object):
         return self.runtime.handle(self, handler_name, request, suffix)
 
 
+class RuntimeServicesMixin(object):
+    """
+    This mixin provides all of the machinery needed for an XBlock-style object
+    to declare dependencies on particular runtime services.
+    """
+    def __init__(self, runtime, *args, **kwargs):
+        """
+        Arguments:
+
+            runtime (:class:`.Runtime`): Use it to access the environment.
+                It is available in XBlock code as ``self.runtime``.
+        """
+        self.runtime = runtime
+        super(RuntimeServicesMixin, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def needs(cls, service_name):
+        """A class decorator to indicate that an XBlock class needs a particular service."""
+        def _decorator(cls_):                                # pylint: disable=missing-docstring
+            cls_._services_requested[service_name] = "need"  # pylint: disable=protected-access
+            return cls_
+        return _decorator
+
+    @classmethod
+    def wants(cls, service_name):
+        """A class decorator to indicate that an XBlock class wants a particular service."""
+        def _decorator(cls_):                                # pylint: disable=missing-docstring
+            cls_._services_requested[service_name] = "want"  # pylint: disable=protected-access
+            return cls_
+        return _decorator
+
+    @classmethod
+    def service_declaration(cls, service_name):
+        """
+        Find and return a service declaration.
+
+        XBlocks declare their service requirements with @XBlock.needs and
+        @XBlock.wants decorators.  These store information on the class.
+        This function finds those declarations for a block.
+
+        Arguments:
+            service_name (string): the name of the service requested.
+
+        Returns:
+            One of "need", "want", or None.
+
+        """
+        # The class declares what services it desires. To deal with subclasses,
+        # especially mixins, properly, we have to walk up the inheritance
+        # hierarchy, and combine all the declared services into one dictionary.
+        # We do this once per class, then store the result on the class.
+        if "_combined_services" not in cls.__dict__:
+            # Walk the MRO chain, collecting all the services together.
+            combined = {}
+            for parent in reversed(cls.__mro__):
+                combined.update(getattr(parent, "_services_requested", {}))
+            cls._combined_services = combined
+        declaration = cls._combined_services.get(service_name)
+        return declaration
+
+
 class ModelMetaclass(type):
     """
     A metaclass for using Fields as class attributes to define data access.
