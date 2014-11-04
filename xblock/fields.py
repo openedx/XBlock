@@ -147,7 +147,7 @@ class UserScope(object):
 UNSET = Sentinel("fields.UNSET")
 
 
-ScopeBase = namedtuple('ScopeBase', 'user block name')  # pylint: disable=C0103
+ScopeBase = namedtuple('ScopeBase', 'user block name')
 
 
 class Scope(ScopeBase):
@@ -231,7 +231,7 @@ class Scope(ScopeBase):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
 
-ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')  # pylint: disable=C0103
+ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')
 
 
 # define a placeholder ('nil') value to indicate when nothing has been stored
@@ -287,8 +287,7 @@ class Field(object):
     _default = None
 
     # We're OK redefining built-in `help`
-    # pylint: disable=W0622
-    def __init__(self, help=None, default=UNSET, scope=Scope.content,
+    def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False, **kwargs):
         self._name = "unknown"
         self.help = help
@@ -299,7 +298,6 @@ class Field(object):
         self._display_name = display_name
         self._values = values
         self.runtime_options = kwargs
-    # pylint: enable=W0622
 
     @property
     def default(self):
@@ -640,13 +638,12 @@ class Boolean(JSONField):
     """
     MUTABLE = False
 
-    # pylint: disable=W0622
-    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None, **kwargs):
+    # We're OK redefining built-in `help`
+    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None, **kwargs):  # pylint: disable=redefined-builtin
         super(Boolean, self).__init__(help, default, scope, display_name,
                                       values=({'display_name': "True", "value": True},
                                               {'display_name': "False", "value": False}),
                                       **kwargs)
-    # pylint: enable=W0622
 
     def from_json(self, value):
         if isinstance(value, basestring):
@@ -925,12 +922,11 @@ class ScopedStorageMixin(object):
     def __repr__(self):
         # `ScopedStorageMixin` obtains the `fields` attribute from the `ModelMetaclass`.
         # Since this is not understood by static analysis, silence this error.
-        # pylint: disable=E1101
         attrs = []
         for field in self.fields.values():
             try:
                 value = getattr(self, field.name)
-            except Exception:  # pylint: disable=W0703
+            except Exception:  # pylint: disable=broad-except
                 # Ensure we return a string, even if unanticipated exceptions.
                 attrs.append(" %s=???" % (field.name,))
             else:

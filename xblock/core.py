@@ -14,7 +14,7 @@ except ImportError:
 from webob import Response
 
 from xblock.exceptions import JsonHandlerError, DisallowedFileError
-from xblock.fields import ScopedStorageMixin, HierarchyMixin, String, List, Scope, Reference
+from xblock.fields import ScopedStorageMixin, HierarchyMixin, String, List, Scope
 from xblock.plugin import Plugin
 
 
@@ -55,10 +55,10 @@ class ServiceRequestedMetaclass(type):
 
 
 class XBlockMetaclass(
-    HierarchyMixin.__metaclass__,
-    ScopedStorageMixin.__metaclass__,
-    TagCombiningMetaclass,
-    ServiceRequestedMetaclass,
+        HierarchyMixin.__metaclass__,
+        ScopedStorageMixin.__metaclass__,
+        TagCombiningMetaclass,
+        ServiceRequestedMetaclass,
 ):
     """
     Metaclass for XBlock.
