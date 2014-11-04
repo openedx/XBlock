@@ -74,27 +74,10 @@ class XBlockMetaclass(
     pass
 
 
-# -- Base Block
-
-
-class XBlock(HierarchyMixin, ScopedStorageMixin, Plugin):
-    """Base class for XBlocks.
-
-    Derive from this class to create a new kind of XBlock.  There are no
-    required methods, but you will probably need at least one view.
-
-    Don't provide the ``__init__`` method when deriving from this class.
-
+class HandlersMixin(object):
     """
-
-    __metaclass__ = XBlockMetaclass
-
-    entry_point = 'xblock.v1'
-
-    name = String(help="Short name for the block", scope=Scope.settings)
-    tags = List(help="Tags for this block", scope=Scope.settings)
-
-    _class_tags = set()
+    A mixin responsible for providing all of the machinery needed for working with XBlock-style handlers.
+    """
 
     @classmethod
     def json_handler(cls, func):
@@ -132,6 +115,31 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, Plugin):
         """A decorator to indicate a function is usable as a handler."""
         func._is_xblock_handler = True      # pylint: disable=protected-access
         return func
+
+    def handle(self, handler_name, request, suffix=''):
+        """Handle `request` with this block's runtime."""
+        return self.runtime.handle(self, handler_name, request, suffix)
+
+
+# -- Base Block
+class XBlock(HierarchyMixin, ScopedStorageMixin, HandlersMixin, Plugin):
+    """Base class for XBlocks.
+
+    Derive from this class to create a new kind of XBlock.  There are no
+    required methods, but you will probably need at least one view.
+
+    Don't provide the ``__init__`` method when deriving from this class.
+
+    """
+
+    __metaclass__ = XBlockMetaclass
+
+    entry_point = 'xblock.v1'
+
+    name = String(help="Short name for the block", scope=Scope.settings)
+    tags = List(help="Tags for this block", scope=Scope.settings)
+
+    _class_tags = set()
 
     @staticmethod
     def tag(tags):
@@ -249,10 +257,6 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, Plugin):
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""
         return self.runtime.render(self, view, context)
-
-    def handle(self, handler_name, request, suffix=''):
-        """Handle `request` with this block's runtime."""
-        return self.runtime.handle(self, handler_name, request, suffix)
 
     @classmethod
     def parse_xml(cls, node, runtime, keys, id_generator):
