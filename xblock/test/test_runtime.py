@@ -16,6 +16,7 @@ from xblock.exceptions import (
     NoSuchServiceError,
     NoSuchUsage,
     NoSuchViewError,
+    FieldDataDeprecationWarning,
 )
 from xblock.runtime import (
     DictKeyValueStore,
@@ -31,7 +32,8 @@ from xblock.field_data import DictFieldData, FieldData
 
 from xblock.test.tools import (
     assert_equals, assert_false, assert_true, assert_raises,
-    assert_raises_regexp, assert_is, assert_is_not, unabc
+    assert_raises_regexp, assert_is, assert_is_not, unabc,
+    WarningTestMixin
 )
 
 
@@ -643,3 +645,23 @@ class TestRuntimeGetBlock(TestCase):
         # If we don't have a definition, then the usage doesn't exist
         with self.assertRaises(NoSuchUsage):
             self.runtime.get_block(self.usage_id)
+
+
+class TestRuntimeDeprecation(WarningTestMixin, TestCase):
+    """
+    Tests to make sure that deprecated Runtime apis stay usable,
+    but raise warnings.
+    """
+
+    def test_passed_field_data(self):
+        field_data = Mock(spec=FieldData)
+        with self.assertWarns(FieldDataDeprecationWarning):
+            runtime = TestRuntime(Mock(spec=IdReader), field_data)
+        self.assertEquals(runtime.field_data, field_data)
+
+    def test_set_field_data(self):
+        field_data = Mock(spec=FieldData)
+        runtime = TestRuntime(Mock(spec=IdReader), None)
+        with self.assertWarns(FieldDataDeprecationWarning):
+            runtime.field_data = field_data
+        self.assertEquals(runtime.field_data, field_data)

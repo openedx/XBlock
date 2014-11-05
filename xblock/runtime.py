@@ -7,6 +7,7 @@ import gettext
 import itertools
 import re
 import threading
+import warnings
 
 from abc import ABCMeta, abstractmethod
 from lxml import etree
@@ -21,6 +22,7 @@ from xblock.exceptions import (
     NoSuchServiceError,
     NoSuchUsage,
     NoSuchDefinition,
+    FieldDataDeprecationWarning,
 )
 from xblock.core import XBlock
 
@@ -412,7 +414,7 @@ class Runtime(object):
         raise NotImplementedError("Runtime needs to provide publish()")
 
     # Construction
-    def __init__(self, id_reader, field_data, mixins=(), services=None, default_class=None, select=None):
+    def __init__(self, id_reader, field_data=None, mixins=(), services=None, default_class=None, select=None):
         """
         Arguments:
             id_reader (IdReader): An object that allows the `Runtime` to
@@ -437,11 +439,19 @@ class Runtime(object):
 
         """
         self.id_reader = id_reader
-        self.field_data = field_data
         self._services = services or {}
 
         # Provide some default implementations
         self._services.setdefault("i18n", NullI18nService())
+
+        self.__field_data = field_data
+        if field_data:
+            warnings.warn(
+                "Passing field_data as a constructor argument to Runtimes is deprecated",
+                FieldDataDeprecationWarning,
+                stacklevel=2
+            )
+            self._services.setdefault("field-data", field_data)
 
         self.default_class = default_class
         self.select = select
@@ -451,6 +461,26 @@ class Runtime(object):
         self._view_name = None
 
     # Block operations
+
+    @property
+    def field_data(self):
+        """
+        Access the FieldData passed in the constructor.
+
+        Deprecated in favor of a 'field-data' service.
+        """
+        warnings.warn("Runtime.field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
+        return self.__field_data
+
+    @field_data.setter
+    def field_data(self, field_data):
+        """
+        Set field_data.
+
+        Deprecated in favor of a 'field-data' service.
+        """
+        warnings.warn("Runtime.field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
+        self.__field_data = field_data
 
     def load_block_type(self, block_type):
         """
@@ -477,7 +507,7 @@ class Runtime(object):
         """
         return self.mixologist.mix(cls)(
             runtime=self,
-            field_data=field_data or self.field_data,
+            field_data=field_data,
             scope_ids=scope_ids,
             *args, **kwargs
         )

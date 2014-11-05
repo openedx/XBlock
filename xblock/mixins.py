@@ -12,7 +12,7 @@ import warnings
 
 from webob import Response
 
-from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError
+from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
 from xblock.fields import Field, Reference, Scope, ReferenceList
 
 
@@ -174,11 +174,6 @@ class ModelMetaclass(ServiceRequestedMetaclass):
         new_class.fields = fields
 
         return new_class
-
-
-class FieldDataDeprecationWarning(DeprecationWarning):
-    """Warning for use of deprecated _field_data accessor"""
-    pass
 
 
 @RuntimeServicesMixin.needs('field-data')

@@ -16,7 +16,7 @@ import ddt
 from webob import Response
 
 from xblock.core import XBlock
-from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError
+from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError, FieldDataDeprecationWarning
 from xblock.fields import Dict, Float, Integer, List, Field, Scope, ScopeIds
 from xblock.field_data import FieldData, DictFieldData
 from xblock.mixins import ScopedStorageMixin
@@ -24,7 +24,8 @@ from xblock.runtime import Runtime
 
 from xblock.test.tools import (
     assert_equals, assert_raises, assert_raises_regexp,
-    assert_not_equals, assert_false, assert_is
+    assert_not_equals, assert_false, assert_is,
+    WarningTestMixin,
 )
 
 
@@ -889,3 +890,26 @@ class OpenLocalResourceTest(unittest.TestCase):
             msg = ".*: %s" % re.escape(repr(uri))
             with assert_raises_regexp(DisallowedFileError, msg):
                 loadable.open_local_resource(uri)
+
+
+class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
+    """
+    Tests various pieces of XBlock that have been (or will be) deprecated.
+    """
+
+    class TestBlock(XBlock):
+        """An empty XBlock for testing"""
+        pass
+
+    def test_field_data_paramater(self):
+        field_data = Mock(spec=FieldData)
+        with self.assertWarns(FieldDataDeprecationWarning):
+            block = XBlock(Mock(spec=Runtime), field_data, Mock(spec=ScopeIds))
+        self.assertEqual(field_data, block._field_data)
+
+    def test_assign_field_data(self):
+        field_data = Mock(spec=FieldData)
+        block = XBlock(Mock(spec=Runtime), None, Mock(spec=ScopeIds))
+        with self.assertWarns(FieldDataDeprecationWarning):
+            block._field_data = field_data
+        self.assertEqual(field_data, block._field_data)

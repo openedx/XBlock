@@ -16,6 +16,7 @@ from xblock.validation import Validation
 
 # __all__ controls what classes end up in the docs.
 __all__ = ['XBlock']
+UNSET = object()
 
 
 class XBlockMixin(ScopedStorageMixin):
@@ -136,7 +137,7 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersM
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
         return pkg_resources.resource_stream(cls.__module__, uri)
 
-    def __init__(self, runtime, field_data, scope_ids):
+    def __init__(self, runtime, field_data=None, scope_ids=UNSET):
         """
         Construct a new XBlock.
 
@@ -149,11 +150,15 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersM
 
             field_data (:class:`.FieldData`): Interface used by the XBlock
                 fields to access their data from wherever it is persisted.
+                Deprecated.
 
             scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
                 scopes.
 
         """
+        if scope_ids is UNSET:
+            raise TypeError('scope_ids are required')
+
         # Provide backwards compatibility for external access through _field_data
         super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data)
 
