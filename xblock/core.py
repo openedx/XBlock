@@ -16,6 +16,7 @@ from webob import Response
 from xblock.exceptions import JsonHandlerError, DisallowedFileError
 from xblock.fields import ScopedStorageMixin, HierarchyMixin, String, List, Scope
 from xblock.plugin import Plugin
+from xblock.validation import Validation
 
 
 # __all__ controls what classes end up in the docs.
@@ -334,3 +335,10 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, HandlersMixin, Plugin):
             return self.content
         else:
             return None
+
+    def validate(self):
+        """
+        Ask this xblock to validate itself. Subclasses are expected to override this
+        method, as there is currently only a no-op implementation.
+        """
+        return Validation(self.scope_ids.usage_id)
