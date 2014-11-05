@@ -8,6 +8,8 @@ try:
     import simplesjson as json  # pylint: disable=F0401
 except ImportError:
     import json
+import warnings
+
 from webob import Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError
@@ -61,12 +63,26 @@ class HandlersMixin(object):
         return self.runtime.handle(self, handler_name, request, suffix)
 
 
+class ServiceRequestedMetaclass(type):
+    """
+    Creates the _services_requested dict on the class.
+
+    Keys are service names, values are "need" or "want".
+
+    """
+    def __new__(mcs, name, bases, attrs):
+        attrs['_services_requested'] = {}
+        return super(ServiceRequestedMetaclass, mcs).__new__(mcs, name, bases, attrs)
+
+
 class RuntimeServicesMixin(object):
     """
     This mixin provides all of the machinery needed for an XBlock-style object
     to declare dependencies on particular runtime services.
     """
-    def __init__(self, runtime, *args, **kwargs):
+    __metaclass__ = ServiceRequestedMetaclass
+
+    def __init__(self, runtime, **kwargs):
         """
         Arguments:
 
@@ -74,7 +90,7 @@ class RuntimeServicesMixin(object):
                 It is available in XBlock code as ``self.runtime``.
         """
         self.runtime = runtime
-        super(RuntimeServicesMixin, self).__init__(*args, **kwargs)
+        super(RuntimeServicesMixin, self).__init__(**kwargs)
 
     @classmethod
     def needs(cls, service_name):
@@ -122,7 +138,7 @@ class RuntimeServicesMixin(object):
         return declaration
 
 
-class ModelMetaclass(type):
+class ModelMetaclass(ServiceRequestedMetaclass):
     """
     A metaclass for using Fields as class attributes to define data access.
 
@@ -160,13 +176,19 @@ class ModelMetaclass(type):
         return new_class
 
 
-class ScopedStorageMixin(object):
+class FieldDataDeprecationWarning(DeprecationWarning):
+    """Warning for use of deprecated _field_data accessor"""
+    pass
+
+
+@RuntimeServicesMixin.needs('field-data')
+class ScopedStorageMixin(RuntimeServicesMixin):
     """
     This mixin provides scope for Fields and the associated Scoped storage.
     """
     __metaclass__ = ModelMetaclass
 
-    def __init__(self, field_data, scope_ids, *args, **kwargs):
+    def __init__(self, scope_ids, field_data=None, **kwargs):
         """
         Arguments:
             field_data (:class:`.FieldData`): Interface used by the XBlock
@@ -175,12 +197,42 @@ class ScopedStorageMixin(object):
             scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
                 scopes.
         """
-        self._field_data = field_data
+        # This is used to store a directly passed field data
+        # for backwards compatibility
+        if field_data:
+            warnings.warn(
+                "Setting _field_data via the constructor is deprecated, please use a Runtime service",
+                FieldDataDeprecationWarning,
+                stacklevel=2
+            )
+        self.__field_data = field_data
+
         self._field_data_cache = {}
         self._dirty_fields = {}
         self.scope_ids = scope_ids
 
-        super(ScopedStorageMixin, self).__init__(*args, **kwargs)
+        super(ScopedStorageMixin, self).__init__(**kwargs)
+
+    @property
+    def _field_data(self):
+        """
+        Return the FieldData for this XBlock (either as passed in the constructor
+        or from retrieving the 'field-data' service).
+        """
+        if self.__field_data:
+            return self.__field_data
+        else:
+            return self.runtime.service(self, 'field-data')
+
+    @_field_data.setter
+    def _field_data(self, field_data):
+        """
+        Set _field_data.
+
+        Deprecated.
+        """
+        warnings.warn("Setting _field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
+        self.__field_data = field_data
 
     def save(self):
         """Save all dirty fields attached to this XBlock."""
@@ -271,12 +323,12 @@ class HierarchyMixin(ScopedStorageMixin):
 
     parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         # A cache of the parent block, retrieved from .parent
         self._parent_block = None
         self._parent_block_id = None
 
-        super(HierarchyMixin, self).__init__(*args, **kwargs)
+        super(HierarchyMixin, self).__init__(**kwargs)
 
     def get_parent(self):
         """Return the parent block of this block, or None if there isn't one."""

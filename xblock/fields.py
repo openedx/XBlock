@@ -251,7 +251,7 @@ class Field(object):
     class will want to refer to.
 
     When the class is instantiated, it will be available as an instance
-    attribute of the same name, by proxying through to self._field_data on
+    attribute of the same name, by proxying through to the field-data service on
     the containing object.
 
     Parameters:
@@ -423,21 +423,23 @@ class Field(object):
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
-        obtaining the value from the _field_data. Thus if a cached value
+        obtaining the value from the field-data service. Thus if a cached value
         exists, that is the value that will be returned.
         """
         # pylint: disable=protected-access
         if xblock is None:
             return self
 
+        field_data = xblock._field_data
+
         value = self._get_cached_value(xblock)
         if value is NO_CACHE_VALUE:
-            if xblock._field_data.has(xblock, self.name):
-                value = self.from_json(xblock._field_data.get(xblock, self.name))
+            if field_data.has(xblock, self.name):
+                value = self.from_json(field_data.get(xblock, self.name))
             elif self.name not in NO_GENERATED_DEFAULTS:
                 # Cache default value
                 try:
-                    value = self.from_json(xblock._field_data.default(xblock, self.name))
+                    value = self.from_json(field_data.default(xblock, self.name))
                 except KeyError:
                     value = self.default
             else:

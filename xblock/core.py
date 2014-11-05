@@ -49,23 +49,11 @@ class TagCombiningMetaclass(type):
         return super(TagCombiningMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
-class ServiceRequestedMetaclass(type):
-    """
-    Creates the _services_requested dict on the class.
-
-    Keys are service names, values are "need" or "want".
-
-    """
-    def __new__(mcs, name, bases, attrs):
-        attrs['_services_requested'] = {}
-        return super(ServiceRequestedMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-
 class XBlockMetaclass(
         HierarchyMixin.__metaclass__,
         ScopedStorageMixin.__metaclass__,
+        RuntimeServicesMixin.__metaclass__,
         TagCombiningMetaclass,
-        ServiceRequestedMetaclass,
 ):
     """
     Metaclass for XBlock.
@@ -82,7 +70,7 @@ class XBlockMetaclass(
 
 
 # -- Base Block
-class XBlock(RuntimeServicesMixin, HierarchyMixin, ScopedStorageMixin, HandlersMixin, Plugin):
+class XBlock(HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
     """Base class for XBlocks.
 
     Derive from this class to create a new kind of XBlock.  There are no
@@ -166,7 +154,8 @@ class XBlock(RuntimeServicesMixin, HierarchyMixin, ScopedStorageMixin, HandlersM
                 scopes.
 
         """
-        super(XBlock, self).__init__(runtime=runtime, field_data=field_data, scope_ids=scope_ids)
+        # Provide backwards compatibility for external access through _field_data
+        super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data)
 
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""

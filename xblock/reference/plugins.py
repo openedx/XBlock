@@ -142,7 +142,7 @@ class Filesystem(Field):
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
-        obtaining the value from the _field_data. Thus if a cached value
+        obtaining the value from the field-data service. Thus if a cached value
         exists, that is the value that will be returned. Otherwise, it
         will get it from the fs service.
         """
