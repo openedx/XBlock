@@ -114,5 +114,5 @@ class Validation(object):
         return {
             "xblock_id": unicode(self.xblock_id),
             "messages": [message.to_json() for message in self.messages],
-            "is_empty": self.empty
+            "empty": self.empty
         }

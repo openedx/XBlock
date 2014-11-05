@@ -88,7 +88,7 @@ class ValidationTest(unittest.TestCase):
         expected = {
             "xblock_id": "id",
             "messages": [],
-            "is_empty": True
+            "empty": True
         }
         self.assertEqual(expected, validation.to_json())
 
@@ -101,6 +101,6 @@ class ValidationTest(unittest.TestCase):
                 {"type": ValidationMessage.ERROR, "text": u"Error message"},
                 {"type": ValidationMessage.WARNING, "text": u"Warning message"}
             ],
-            "is_empty": False
+            "empty": False
         }
         self.assertEqual(expected, validation.to_json())
