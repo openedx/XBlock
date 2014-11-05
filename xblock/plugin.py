@@ -8,6 +8,7 @@ import functools
 import itertools
 import logging
 import pkg_resources
+import traceback
 
 log = logging.getLogger(__name__)
 
@@ -138,8 +139,9 @@ class Plugin(object):
                 cls.successful_loads.append((class_.name, cls._load_class_entry_point(class_)))
             except Exception as exc:  # pylint: disable=broad-except
                 cls.failed_loads.append({
-                    "name": class_.name,
-                    "exception": exc
+                    "name": class_.__name__,
+                    "exception": exc,
+                    "traceback": traceback.format_exc(),
                 })
 
     @classmethod
