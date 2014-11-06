@@ -54,7 +54,7 @@ class Plugin(object):
 
     entry_point = None  # Should be overwritten by children classes
 
-    failed_loads, successful_loads = None, None
+    __failed_loads, __successful_loads = None, None
 
     # Temporary entry points, for register_temp_plugin.  A list of pairs,
     # (identifier, entry_point):
@@ -125,19 +125,19 @@ class Plugin(object):
         of dictionaries for all of the failed instances of this plugin.
 
         """
-        if not (update or cls.successful_loads is None):
+        if not (update or cls.__successful_loads is None):
             return  # If we've loaded, and aren't forcing an update, use the old list.
 
-        cls.failed_loads, cls.successful_loads = [], []
+        cls.__failed_loads, cls.__successful_loads = [], []
         all_classes = itertools.chain(
             pkg_resources.iter_entry_points(cls.entry_point),
             (entry_point for identifier, entry_point in cls.extra_entry_points),
         )
         for class_ in all_classes:
             try:
-                cls.successful_loads.append((class_.name, cls._load_class_entry_point(class_)))
+                cls.__successful_loads.append((class_.name, cls._load_class_entry_point(class_)))
             except Exception as exc:  # pylint: disable=broad-except
-                cls.failed_loads.append({
+                cls.__failed_loads.append({
                     "name": class_.name,
                     "exception": exc
                 })
@@ -148,7 +148,7 @@ class Plugin(object):
         Returns sequence of tuples of successfully loaded instances (name, class)
         """
         cls._load_entry_points()
-        return cls.successful_loads
+        return cls.__successful_loads
 
     @classmethod
     def failed_classes(cls):
@@ -157,7 +157,7 @@ class Plugin(object):
         attributes "name" and "exception" accordingly.
         """
         cls._load_entry_points()
-        return cls.failed_loads
+        return cls.__failed_loads
 
     @classmethod
     def register_temp_plugin(cls, class_, identifier=None, dist='xblock', load_error=None):
