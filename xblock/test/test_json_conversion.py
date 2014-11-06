@@ -7,10 +7,10 @@ with ModelDatas
 from mock import Mock
 
 from xblock.core import XBlock
-from xblock.fields import Field, Scope
+from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import DictFieldData
 
-from xblock.test.tools import assert_equals, assert_is_instance
+from xblock.test.tools import assert_equals, assert_is_instance, TestRuntime
 
 
 class TestJSONConversionField(Field):
@@ -45,13 +45,11 @@ class TestJsonConversion(object):
     """
 
     def setUp(self):
-        self.block = TestBlock(
-            Mock(),
-            TestModel({
-                'field_a': {'$type': 'set', '$vals': [1, 2, 3]}
-            }),
-            Mock()
-        )
+        field_data = TestModel({
+            'field_a': {'$type': 'set', '$vals': [1, 2, 3]}
+        })
+        runtime = TestRuntime(services={'field-data': field_data})
+        self.block = TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
 
     def test_get(self):
         # Test field with a value

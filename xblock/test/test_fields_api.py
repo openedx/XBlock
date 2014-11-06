@@ -28,10 +28,10 @@ import copy
 from mock import Mock
 
 from xblock.core import XBlock
-from xblock.fields import Integer, List
+from xblock.fields import Integer, List, ScopeIds
 from xblock.field_data import DictFieldData
 
-from xblock.test.tools import assert_is, assert_is_not, assert_equals, assert_not_equals, assert_true, assert_false
+from xblock.test.tools import assert_is, assert_is_not, assert_equals, assert_not_equals, assert_true, assert_false, TestRuntime
 
 # Ignore statements that 'have no effect', since the effect is to read
 # from the descriptor
@@ -348,7 +348,8 @@ class UniversalTestCases(UniversalProperties):
             field = self.field_class(default=copy.deepcopy(self.field_default))
 
         self.field_data = self.get_field_data()
-        self.block = TestBlock(Mock(), self.field_data, Mock())
+        self.runtime = TestRuntime(services={'field-data': self.field_data})
+        self.block = TestBlock(self.runtime, scope_ids=Mock(spec=ScopeIds))
 
 
 class DictFieldDataWithSequentialDefault(DictFieldData):

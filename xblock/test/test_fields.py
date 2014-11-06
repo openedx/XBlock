@@ -20,7 +20,7 @@ from xblock.fields import (
     Integer, List, String, DateTime, Reference, ReferenceList, Sentinel
 )
 
-from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in
+from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in, TestRuntime
 from xblock.fields import scope_key, ScopeIds
 
 
@@ -42,7 +42,8 @@ class FieldTest(unittest.TestCase):
             """
             field_x = self.field_totest(enforce_type=enforce_type)
 
-        block = TestBlock(MagicMock(), DictFieldData({}), Mock())
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        block = TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
         block.field_x = arg
         return block.field_x
 
@@ -413,9 +414,8 @@ def test_scope_key():
 
     field_data = DictFieldData({})
 
-    from test_runtime import TestRuntime
-    runtime = TestRuntime(Mock(), field_data, [])
-    block = TestBlock(runtime, field_data, sids)
+    runtime = TestRuntime(Mock(), services={'field-data': field_data})
+    block = TestBlock(runtime, None, sids)
 
     # Format: usage or block ID/field_name/user_id
     for item, correct_key in [[TestBlock.field_x, "__..../field__x/NONE.NONE"],
@@ -492,7 +492,8 @@ def test_twofaced_field_access():
         how_many = TwoFacedField(scope=Scope.settings)
 
     original_json = "YYY"
-    field_tester = FieldTester(MagicMock(), DictFieldData({'how_many': original_json}), Mock())
+    runtime = TestRuntime(services={'field-data': DictFieldData({'how_many': original_json})})
+    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # Test that the native value isn't equal to the original json we specified.
     assert_not_equals(field_tester.how_many, original_json)

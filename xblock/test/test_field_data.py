@@ -9,7 +9,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, String
 from xblock.field_data import SplitFieldData, ReadOnlyFieldData
 
-from xblock.test.tools import assert_false, assert_raises, assert_equals
+from xblock.test.tools import assert_false, assert_raises, assert_equals, TestRuntime
 
 
 class TestingBlock(XBlock):
@@ -36,9 +36,9 @@ class TestSplitFieldData(object):
             Scope.content: self.content,
             Scope.settings: self.settings
         })
+        self.runtime = TestRuntime(services={'field-data': self.split})
         self.block = TestingBlock(
-            runtime=Mock(),
-            field_data=self.split,
+            runtime=self.runtime,
             scope_ids=Mock(),
         )
 
@@ -84,9 +84,9 @@ class TestReadOnlyFieldData(object):
     def setUp(self):
         self.source = Mock()
         self.read_only = ReadOnlyFieldData(self.source)
+        self.runtime = TestRuntime(services={'field-data': self.read_only})
         self.block = TestingBlock(
-            runtime=Mock(),
-            field_data=self.read_only,
+            runtime=self.runtime,
             scope_ids=Mock(),
         )
 
