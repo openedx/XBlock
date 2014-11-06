@@ -1,7 +1,9 @@
 """
 Tools for testing XBlocks
 """
+import warnings
 
+from contextlib import contextmanager
 from functools import partial
 
 # nose.tools has convenient assert methods, but it defines them in a clever way
@@ -93,3 +95,20 @@ def unabc(msg):
         return _unabc(msg)
     else:
         return partial(_unabc, msg=msg)
+
+
+class WarningTestMixin(object):
+    """
+    Add the ability to assert on warnings raised by a chunk of code.
+    """
+    @contextmanager
+    def assertWarns(self, warning_class):
+        """
+        Assert that at least one warning of class `warning_class` is
+        logged during the surrounded context.
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter("always")
+            yield
+            self.assertGreaterEqual(len(warns), 1)
+            self.assertTrue(any(issubclass(warning.category, warning_class) for warning in warns))

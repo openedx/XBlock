@@ -16,113 +16,17 @@ import ddt
 from webob import Response
 
 from xblock.core import XBlock
-from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError
-from xblock.fields import ChildrenModelMetaclass, Dict, Float, \
-    Integer, List, ModelMetaclass, Field, \
-    Scope
+from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError, FieldDataDeprecationWarning
+from xblock.fields import Dict, Float, Integer, List, Field, Scope, ScopeIds
 from xblock.field_data import FieldData, DictFieldData
+from xblock.mixins import ScopedStorageMixin
+from xblock.runtime import Runtime
 
 from xblock.test.tools import (
     assert_equals, assert_raises, assert_raises_regexp,
-    assert_not_equals, assert_false, assert_is
+    assert_not_equals, assert_false, assert_is,
+    WarningTestMixin,
 )
-
-
-def test_model_metaclass():
-    class ModelMetaclassTester(object):
-        """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
-
-        field_a = Integer(scope=Scope.settings)
-        field_b = Integer(scope=Scope.content)
-
-        def __init__(self, field_data):
-            self._field_data = field_data
-
-    class ChildClass(ModelMetaclassTester):
-        """Toy class for ModelMetaclass testing"""
-        pass
-
-    # `ModelMetaclassTester` and `ChildClass` both obtain the `fields` attribute
-    # from the `ModelMetaclass`. Since this is not understood by static analysis,
-    # silence this error for the duration of this test.
-    # pylint: disable=E1101
-    assert hasattr(ModelMetaclassTester, 'field_a')
-    assert hasattr(ModelMetaclassTester, 'field_b')
-
-    assert_is(ModelMetaclassTester.field_a, ModelMetaclassTester.fields['field_a'])
-    assert_is(ModelMetaclassTester.field_b, ModelMetaclassTester.fields['field_b'])
-
-    assert hasattr(ChildClass, 'field_a')
-    assert hasattr(ChildClass, 'field_b')
-
-    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
-    assert_is(ChildClass.field_b, ChildClass.fields['field_b'])
-
-
-def test_with_mixins():
-    # Testing model metaclass with mixins
-    class FieldsMixin(object):
-        """Toy class for field testing"""
-        field_a = Integer(scope=Scope.settings)
-
-    class BaseClass(object):
-        """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
-
-    class ChildClass(FieldsMixin, BaseClass):
-        """Toy class for ModelMetaclass and field testing"""
-        pass
-
-    class GrandchildClass(ChildClass):
-        """Toy class for ModelMetaclass and field testing"""
-        pass
-
-    # `ChildClass` and `GrandchildClass` both obtain the `fields` attribute
-    # from the `ModelMetaclass`. Since this is not understood by static analysis,
-    # silence this error for the duration of this test.
-    # pylint: disable=E1101
-
-    assert hasattr(ChildClass, 'field_a')
-    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
-
-    assert hasattr(GrandchildClass, 'field_a')
-    assert_is(GrandchildClass.field_a, GrandchildClass.fields['field_a'])
-
-
-def test_children_metaclass():
-
-    class HasChildren(object):
-        """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
-
-        has_children = True
-
-    class WithoutChildren(object):
-        """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
-
-    class InheritedChildren(HasChildren):
-        """Toy class for ChildrenModelMetaclass testing"""
-        pass
-
-    # `HasChildren` and `WithoutChildren` both obtain the `children` attribute and
-    # the `has_children` method from the `ChildrenModelMetaclass`. Since this is not
-    # understood by static analysis, silence this error for the duration of this test.
-    # pylint: disable=E1101
-
-    assert HasChildren.has_children
-    assert not WithoutChildren.has_children
-    assert InheritedChildren.has_children
-
-    assert hasattr(HasChildren, 'children')
-    assert not hasattr(WithoutChildren, 'children')
-    assert hasattr(InheritedChildren, 'children')
-
-    assert isinstance(HasChildren.children, List)
-    assert_equals(Scope.children, HasChildren.children.scope)
-    assert isinstance(InheritedChildren.children, List)
-    assert_equals(Scope.children, InheritedChildren.children.scope)
 
 
 def test_field_access():
@@ -134,7 +38,9 @@ def test_field_access():
         float_a = Float(scope=Scope.settings, default=5.8)
         float_b = Float(scope=Scope.settings)
 
-    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': 5, 'float_a': 6.1, 'field_x': 15}), Mock())
+    field_data = DictFieldData({'field_a': 5, 'float_a': 6.1, 'field_x': 15})
+
+    field_tester = FieldTester(MagicMock(), field_data, Mock())
     # Verify that the fields have been set
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
@@ -149,16 +55,16 @@ def test_field_access():
     # field_a should be updated in the cache, but /not/ in the underlying db.
     assert_equals(20, field_tester.field_a)
     assert_equals(20.5, field_tester.float_a)
-    assert_equals(5, field_tester._field_data.get(field_tester, 'field_a'))
-    assert_equals(6.1, field_tester._field_data.get(field_tester, 'float_a'))
+    assert_equals(5, field_data.get(field_tester, 'field_a'))
+    assert_equals(6.1, field_data.get(field_tester, 'float_a'))
     # save the XBlock
     field_tester.save()
     # verify that the fields have been updated correctly
     assert_equals(20, field_tester.field_a)
     assert_equals(20.5, field_tester.float_a)
     # Now, field_a should be updated in the underlying db
-    assert_equals(20, field_tester._field_data.get(field_tester, 'field_a'))
-    assert_equals(20.5, field_tester._field_data.get(field_tester, 'float_a'))
+    assert_equals(20, field_data.get(field_tester, 'field_a'))
+    assert_equals(20.5, field_data.get(field_tester, 'float_a'))
     assert_equals(10, field_tester.field_b)
     assert_equals(42, field_tester.field_c)
     assert_equals(None, field_tester.float_b)
@@ -172,11 +78,11 @@ def test_field_access():
     assert_equals(5.8, field_tester.float_a)
     # But the fields should not actually be present in the underlying kvstore
     with assert_raises(KeyError):
-        field_tester._field_data.get(field_tester, 'field_a')
-    assert_false(field_tester._field_data.has(field_tester, 'field_a'))
+        field_data.get(field_tester, 'field_a')
+    assert_false(field_data.has(field_tester, 'field_a'))
     with assert_raises(KeyError):
-        field_tester._field_data.get(field_tester, 'float_a')
-    assert_false(field_tester._field_data.has(field_tester, 'float_a'))
+        field_data.get(field_tester, 'float_a')
+    assert_false(field_data.has(field_tester, 'float_a'))
 
 
 def test_list_field_access():
@@ -188,7 +94,8 @@ def test_list_field_access():
         field_c = List(scope=Scope.content, default=[4, 5, 6])
         field_d = List(scope=Scope.settings)
 
-    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]}), Mock())
+    field_data = DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]})
+    field_tester = FieldTester(MagicMock(), field_data, Mock())
 
     # Check initial values have been set properly
     assert_equals([200], field_tester.field_a)
@@ -210,11 +117,11 @@ def test_list_field_access():
 
     # Examine model data directly
     #  Caveat: there's not a clean way to copy the originally provided values for `field_a` and `field_b`
-    #  when we instantiate the XBlock. So, the values for those two in both `_field_data` and `_field_data_cache`
+    #  when we instantiate the XBlock. So, the values for those two in both `field_data` and `_field_data_cache`
     #  point at the same object. Thus, `field_a` and `field_b` actually have the correct values in
-    #  `_field_data` right now. `field_c` does not, because it has never been written to the `_field_data`.
-    assert_false(field_tester._field_data.has(field_tester, 'field_c'))
-    assert_false(field_tester._field_data.has(field_tester, 'field_d'))
+    #  `field_data` right now. `field_c` does not, because it has never been written to the `field_data`.
+    assert_false(field_data.has(field_tester, 'field_c'))
+    assert_false(field_data.has(field_tester, 'field_d'))
 
     # save the XBlock
     field_tester.save()
@@ -226,10 +133,10 @@ def test_list_field_access():
     assert_equals([1], field_tester.field_d)
     # Now, the fields should be updated in the underlying kvstore
 
-    assert_equals([200, 1], field_tester._field_data.get(field_tester, 'field_a'))
-    assert_equals([11, 12, 13, 14], field_tester._field_data.get(field_tester, 'field_b'))
-    assert_equals([4, 5, 6, 7], field_tester._field_data.get(field_tester, 'field_c'))
-    assert_equals([1], field_tester._field_data.get(field_tester, 'field_d'))
+    assert_equals([200, 1], field_data.get(field_tester, 'field_a'))
+    assert_equals([11, 12, 13, 14], field_data.get(field_tester, 'field_b'))
+    assert_equals([4, 5, 6, 7], field_data.get(field_tester, 'field_c'))
+    assert_equals([1], field_data.get(field_tester, 'field_d'))
 
 
 def test_mutable_none_values():
@@ -270,12 +177,14 @@ def test_dict_field_access():
         field_c = Dict(scope=Scope.content, default={'a': 4, 'b': 5, 'c': 6})
         field_d = Dict(scope=Scope.settings)
 
+    field_data = DictFieldData({
+        'field_a': {'a': 200},
+        'field_b': {'a': 11, 'b': 12, 'c': 13}
+    })
+
     field_tester = FieldTester(
         MagicMock(),
-        DictFieldData({
-            'field_a': {'a': 200},
-            'field_b': {'a': 11, 'b': 12, 'c': 13}
-        }),
+        field_data,
         Mock()
     )
 
@@ -299,11 +208,11 @@ def test_dict_field_access():
 
     # Examine model data directly
     #  Caveat: there's not a clean way to copy the originally provided values for `field_a` and `field_b`
-    #  when we instantiate the XBlock. So, the values for those two in both `_field_data` and `_field_data_cache`
+    #  when we instantiate the XBlock. So, the values for those two in both `field_data` and `_field_data_cache`
     #  point at the same object. Thus, `field_a` and `field_b` actually have the correct values in
-    #  `_field_data` right now. `field_c` does not, because it has never been written to the `_field_data`.
-    assert_false(field_tester._field_data.has(field_tester, 'field_c'))
-    assert_false(field_tester._field_data.has(field_tester, 'field_d'))
+    #  `field_data` right now. `field_c` does not, because it has never been written to the `field_data`.
+    assert_false(field_data.has(field_tester, 'field_c'))
+    assert_false(field_data.has(field_tester, 'field_d'))
 
     field_tester.save()
     # verify that the fields have been updated correctly
@@ -313,10 +222,10 @@ def test_dict_field_access():
     assert_equals({'new': 'value'}, field_tester.field_d)
 
     # Now, the fields should be updated in the underlying kvstore
-    assert_equals({'a': 250}, field_tester._field_data.get(field_tester, 'field_a'))
-    assert_equals({'a': 11, 'b': 12, 'c': 13, 'd': 14}, field_tester._field_data.get(field_tester, 'field_b'))
-    assert_equals({'a': 0, 'b': 5, 'c': 6}, field_tester._field_data.get(field_tester, 'field_c'))
-    assert_equals({'new': 'value'}, field_tester._field_data.get(field_tester, 'field_d'))
+    assert_equals({'a': 250}, field_data.get(field_tester, 'field_a'))
+    assert_equals({'a': 11, 'b': 12, 'c': 13, 'd': 14}, field_data.get(field_tester, 'field_b'))
+    assert_equals({'a': 0, 'b': 5, 'c': 6}, field_data.get(field_tester, 'field_c'))
+    assert_equals({'new': 'value'}, field_data.get(field_tester, 'field_d'))
 
 
 def test_default_values():
@@ -328,7 +237,9 @@ def test_default_values():
         list1 = List(scope=Scope.settings)
         list2 = List(scope=Scope.content, default=[1, 2, 3])
 
-    field_tester = FieldTester(MagicMock(), DictFieldData({'dic1': {'a': 200}, 'list1': ['a', 'b']}), Mock())
+    field_data = DictFieldData({'dic1': {'a': 200}, 'list1': ['a', 'b']})
+    field_tester = FieldTester(MagicMock(), field_data, Mock())
+
     assert_equals({'a': 200}, field_tester.dic1)
     assert_equals({'a': 1, 'b': 2, 'c': 3}, field_tester.dic2)
     assert_equals(['a', 'b'], field_tester.list1)
@@ -346,7 +257,7 @@ def test_default_values():
     assert_equals(['a'], field_tester.list1)
     assert_equals([1, 3], field_tester.list2)
     for fname in ['dic1', 'dic2', 'list1', 'list2']:
-        assert field_tester._field_data.has(field_tester, fname)
+        assert field_data.has(field_tester, fname)
 
     # Now delete each field
     del field_tester.dic1
@@ -364,7 +275,7 @@ def test_default_values():
     assert_equals({'a': 1, 'b': 2, 'c': 3}, field_tester.dic2)
     assert_equals([1, 2, 3], field_tester.list2)
     for fname in ['dic1', 'dic2', 'list1', 'list2']:
-        assert_false(field_tester._field_data.has(field_tester, fname))
+        assert_false(field_data.has(field_tester, fname))
 
 
 def test_json_field_access():
@@ -380,18 +291,17 @@ def test_json_field_access():
             """Convert a datetime object to a string"""
             return value.strftime("%m/%d/%Y")
 
-    class FieldTester(object):
+    class FieldTester(ScopedStorageMixin):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
 
         field_a = Date(scope=Scope.settings)
         field_b = Date(scope=Scope.content, default=datetime(2013, 4, 1))
 
-        def __init__(self, field_data):
-            self._field_data = field_data
-            self._dirty_fields = {}
-
-    field_tester = FieldTester(DictFieldData({}))
+    field_tester = FieldTester(
+        runtime=Mock(spec=Runtime),
+        field_data=DictFieldData({}),
+        scope_ids=MagicMock(spec=ScopeIds)
+    )
 
     # Check initial values
     assert_equals(None, field_tester.field_a)
@@ -431,22 +341,20 @@ def test_defaults_not_shared():
 
 def test_object_identity():
     # Check that values that are modified are what is returned
-    class FieldTester(object):
+    class FieldTester(ScopedStorageMixin):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
-
         field_a = List(scope=Scope.settings)
-
-        def __init__(self, field_data):
-            self._field_data = field_data
-            self._dirty_fields = {}
 
     # Make sure that field_data always returns a different object
     # each time it's actually queried, so that the caching is
     # doing the work to maintain object identity.
     field_data = MagicMock(spec=FieldData)
     field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
-    field_tester = FieldTester(field_data)
+    field_tester = FieldTester(
+        runtime=Mock(spec=Runtime),
+        field_data=field_data,
+        scope_ids=MagicMock(spec=ScopeIds)
+    )
 
     value = field_tester.field_a
     assert_equals(value, field_tester.field_a)
@@ -467,15 +375,9 @@ def test_object_identity():
 
 def test_caching_is_per_instance():
     # Test that values cached for one instance do not appear on another
-    class FieldTester(object):
+    class FieldTester(ScopedStorageMixin):
         """Toy class for ModelMetaclass and field access testing"""
-        __metaclass__ = ModelMetaclass
-
         field_a = List(scope=Scope.settings)
-
-        def __init__(self, field_data):
-            self._field_data = field_data
-            self._dirty_fields = {}
 
     field_data = MagicMock(spec=FieldData)
     field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
@@ -483,8 +385,16 @@ def test_caching_is_per_instance():
     # Same field_data used in different objects should result
     # in separately-cached values, so that changing a value
     # in one instance doesn't affect values stored in others.
-    field_tester_a = FieldTester(field_data)
-    field_tester_b = FieldTester(field_data)
+    field_tester_a = FieldTester(
+        runtime=Mock(spec=Runtime),
+        field_data=field_data,
+        scope_ids=MagicMock(spec=ScopeIds)
+    )
+    field_tester_b = FieldTester(
+        runtime=Mock(spec=Runtime),
+        field_data=field_data,
+        scope_ids=MagicMock(spec=ScopeIds)
+    )
     value = field_tester_a.field_a
     assert_equals(value, field_tester_a.field_a)
     field_tester_a.field_a.append(1)
@@ -510,18 +420,20 @@ def test_field_serialization():
         """Test XBlock for field serialization testing"""
         field = CustomField()
 
+    field_data = DictFieldData({
+        'field': {'value': 4}
+    })
+
     field_tester = FieldTester(
         MagicMock(),
-        DictFieldData({
-            'field': {'value': 4}
-        }),
+        field_data,
         Mock(),
     )
 
     assert_equals(4, field_tester.field)
     field_tester.field = 5
     field_tester.save()
-    assert_equals({'value': 5}, field_tester._field_data.get(field_tester, 'field'))
+    assert_equals({'value': 5}, field_data.get(field_tester, 'field'))
 
 
 def test_class_tags():
@@ -665,7 +577,8 @@ def test_xblock_write_then_delete():
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content, default=10)
 
-    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': 5}), Mock())
+    field_data = DictFieldData({'field_a': 5})
+    field_tester = FieldTester(MagicMock(), field_data, Mock())
 
     # Verify that the fields have been set correctly
     assert_equals(5, field_tester.field_a)
@@ -680,9 +593,9 @@ def test_xblock_write_then_delete():
     assert_equals(20, field_tester.field_b)
 
     # Before saving, delete all the fields. Deletes are performed immediately for now,
-    # so the field should immediately not be present in the _field_data after the delete.
+    # so the field should immediately not be present in the field_data after the delete.
     # However, we copy the default values into the cache, so after the delete we expect the
-    # cached values to be the default values, but the fields to be removed from the _field_data.
+    # cached values to be the default values, but the fields to be removed from the field_data.
     del field_tester.field_a
     del field_tester.field_b
 
@@ -700,10 +613,10 @@ def test_xblock_write_then_delete():
     assert_equals(10, field_tester.field_b)
 
     # Additionally assert that in the model data, we don't have any values actually set for these fields.
-    # Basically, we want to ensure that the `save` didn't overwrite anything in the actual _field_data
-    # Note this test directly accessess _field_data and is thus somewhat fragile.
-    assert_false(field_tester._field_data.has(field_tester, 'field_a'))
-    assert_false(field_tester._field_data.has(field_tester, 'field_b'))
+    # Basically, we want to ensure that the `save` didn't overwrite anything in the actual field_data
+    # Note this test directly accessess field_data and is thus somewhat fragile.
+    assert_false(field_data.has(field_tester, 'field_a'))
+    assert_false(field_data.has(field_tester, 'field_b'))
 
 
 def test_get_mutable_mark_dirty():
@@ -743,21 +656,23 @@ def test_change_mutable_default():
         """Test class with mutable fields."""
         list_field = List()
 
-    mutable_test_a = MutableTester(MagicMock(), DictFieldData({}), Mock())
-    mutable_test_b = MutableTester(MagicMock(), DictFieldData({}), Mock())
+    field_data_a = DictFieldData({})
+    mutable_test_a = MutableTester(MagicMock(), field_data_a, Mock())
+    field_data_b = DictFieldData({})
+    mutable_test_b = MutableTester(MagicMock(), field_data_b, Mock())
 
-    # Saving without changing the default value shouldn't write to _field_data
+    # Saving without changing the default value shouldn't write to field_data
     mutable_test_a.list_field  # pylint: disable=W0104
     mutable_test_a.save()
     with assert_raises(KeyError):
-        mutable_test_a._field_data.get(mutable_test_a, 'list_field')
+        field_data_a.get(mutable_test_a, 'list_field')
 
     mutable_test_a.list_field.append(1)
     mutable_test_a.save()
 
-    assert_equals([1], mutable_test_a._field_data.get(mutable_test_a, 'list_field'))
+    assert_equals([1], field_data_a.get(mutable_test_a, 'list_field'))
     with assert_raises(KeyError):
-        mutable_test_b._field_data.get(mutable_test_b, 'list_field')
+        field_data_b.get(mutable_test_b, 'list_field')
 
 
 def test_handle_shortcut():
@@ -975,3 +890,26 @@ class OpenLocalResourceTest(unittest.TestCase):
             msg = ".*: %s" % re.escape(repr(uri))
             with assert_raises_regexp(DisallowedFileError, msg):
                 loadable.open_local_resource(uri)
+
+
+class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
+    """
+    Tests various pieces of XBlock that have been (or will be) deprecated.
+    """
+
+    class TestBlock(XBlock):
+        """An empty XBlock for testing"""
+        pass
+
+    def test_field_data_paramater(self):
+        field_data = Mock(spec=FieldData)
+        with self.assertWarns(FieldDataDeprecationWarning):
+            block = XBlock(Mock(spec=Runtime), field_data, Mock(spec=ScopeIds))
+        self.assertEqual(field_data, block._field_data)
+
+    def test_assign_field_data(self):
+        field_data = Mock(spec=FieldData)
+        block = XBlock(Mock(spec=Runtime), None, Mock(spec=ScopeIds))
+        with self.assertWarns(FieldDataDeprecationWarning):
+            block._field_data = field_data
+        self.assertEqual(field_data, block._field_data)

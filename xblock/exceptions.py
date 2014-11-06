@@ -127,3 +127,8 @@ class JsonHandlerError(Exception):
 class DisallowedFileError(Exception):
     """Raised by :meth:`open_local_resource` if the requested file is not allowed."""
     pass
+
+
+class FieldDataDeprecationWarning(DeprecationWarning):
+    """Warning for use of deprecated _field_data accessor"""
+    pass

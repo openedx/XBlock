@@ -1,26 +1,33 @@
 """
-Core classes for XBlocks.
+Core classes for the XBlock family.
 
 This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
-import functools
 import pkg_resources
-try:
-    import simplesjson as json  # pylint: disable=F0401
-except ImportError:
-    import json
-from webob import Response
 
-from xblock.exceptions import JsonHandlerError, DisallowedFileError
-from xblock.fields import ScopedStorageMixin, HierarchyMixin, String, List, Scope
+from xblock.exceptions import DisallowedFileError
+from xblock.fields import String, List, Scope
+from xblock.mixins import ScopedStorageMixin, HierarchyMixin, RuntimeServicesMixin, HandlersMixin
 from xblock.plugin import Plugin
 from xblock.validation import Validation
 
 
 # __all__ controls what classes end up in the docs.
 __all__ = ['XBlock']
+UNSET = object()
+
+
+class XBlockMixin(ScopedStorageMixin):
+    """
+    Base class for XBlock Mixin classes.
+
+    XBlockMixin classes can add new fields and new properties to all XBlocks
+    created by a particular runtime.
+
+    """
+    pass
 
 
 class TagCombiningMetaclass(type):
@@ -43,23 +50,11 @@ class TagCombiningMetaclass(type):
         return super(TagCombiningMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
-class ServiceRequestedMetaclass(type):
-    """
-    Creates the _services_requested dict on the class.
-
-    Keys are service names, values are "need" or "want".
-
-    """
-    def __new__(mcs, name, bases, attrs):
-        attrs['_services_requested'] = {}
-        return super(ServiceRequestedMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-
 class XBlockMetaclass(
         HierarchyMixin.__metaclass__,
         ScopedStorageMixin.__metaclass__,
+        RuntimeServicesMixin.__metaclass__,
         TagCombiningMetaclass,
-        ServiceRequestedMetaclass,
 ):
     """
     Metaclass for XBlock.
@@ -75,55 +70,8 @@ class XBlockMetaclass(
     pass
 
 
-class HandlersMixin(object):
-    """
-    A mixin responsible for providing all of the machinery needed for working with XBlock-style handlers.
-    """
-
-    @classmethod
-    def json_handler(cls, func):
-        """Wrap a handler to consume and produce JSON.
-
-        Rather than a Request object, the method will now be passed the
-        JSON-decoded body of the request.  Any data returned by the function
-        will be JSON-encoded and returned as the response.
-
-        The wrapped function can raise JsonHandlerError to return an error
-        response with a non-200 status code.
-        """
-        @XBlock.handler
-        @functools.wraps(func)
-        def wrapper(self, request, suffix=''):
-            """The wrapper function `json_handler` returns."""
-            if request.method != "POST":
-                return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
-            try:
-                request_json = json.loads(request.body)
-            except ValueError:
-                return JsonHandlerError(400, "Invalid JSON").get_response()
-            try:
-                response = func(self, request_json, suffix)
-            except JsonHandlerError as err:
-                return err.get_response()
-            if isinstance(response, Response):
-                return response
-            else:
-                return Response(json.dumps(response), content_type='application/json')
-        return wrapper
-
-    @classmethod
-    def handler(cls, func):
-        """A decorator to indicate a function is usable as a handler."""
-        func._is_xblock_handler = True      # pylint: disable=protected-access
-        return func
-
-    def handle(self, handler_name, request, suffix=''):
-        """Handle `request` with this block's runtime."""
-        return self.runtime.handle(self, handler_name, request, suffix)
-
-
 # -- Base Block
-class XBlock(HierarchyMixin, ScopedStorageMixin, HandlersMixin, Plugin):
+class XBlock(HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
     """Base class for XBlocks.
 
     Derive from this class to create a new kind of XBlock.  There are no
@@ -189,52 +137,7 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, HandlersMixin, Plugin):
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
         return pkg_resources.resource_stream(cls.__module__, uri)
 
-    @staticmethod
-    def needs(service_name):
-        """A class decorator to indicate that an XBlock class needs a particular service."""
-        def _decorator(cls):                                # pylint: disable=missing-docstring
-            cls._services_requested[service_name] = "need"  # pylint: disable=protected-access
-            return cls
-        return _decorator
-
-    @staticmethod
-    def wants(service_name):
-        """A class decorator to indicate that an XBlock class wants a particular service."""
-        def _decorator(cls):                                # pylint: disable=missing-docstring
-            cls._services_requested[service_name] = "want"  # pylint: disable=protected-access
-            return cls
-        return _decorator
-
-    @classmethod
-    def service_declaration(cls, service_name):
-        """
-        Find and return a service declaration.
-
-        XBlocks declare their service requirements with @XBlock.needs and
-        @XBlock.wants decorators.  These store information on the class.
-        This function finds those declarations for a block.
-
-        Arguments:
-            service_name (string): the name of the service requested.
-
-        Returns:
-            One of "need", "want", or None.
-
-        """
-        # The class declares what services it desires. To deal with subclasses,
-        # especially mixins, properly, we have to walk up the inheritance
-        # hierarchy, and combine all the declared services into one dictionary.
-        # We do this once per class, then store the result on the class.
-        if "_combined_services" not in cls.__dict__:
-            # Walk the MRO chain, collecting all the services together.
-            combined = {}
-            for parent in reversed(cls.__mro__):
-                combined.update(getattr(parent, "_services_requested", {}))
-            cls._combined_services = combined
-        declaration = cls._combined_services.get(service_name)
-        return declaration
-
-    def __init__(self, runtime, field_data, scope_ids):
+    def __init__(self, runtime, field_data=None, scope_ids=UNSET):
         """
         Construct a new XBlock.
 
@@ -247,13 +150,17 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, HandlersMixin, Plugin):
 
             field_data (:class:`.FieldData`): Interface used by the XBlock
                 fields to access their data from wherever it is persisted.
+                Deprecated.
 
             scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
                 scopes.
 
         """
-        self.runtime = runtime
-        super(XBlock, self).__init__(field_data=field_data, scope_ids=scope_ids)
+        if scope_ids is UNSET:
+            raise TypeError('scope_ids are required')
+
+        # Provide backwards compatibility for external access through _field_data
+        super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data)
 
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""
