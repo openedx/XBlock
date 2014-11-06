@@ -25,7 +25,7 @@ from xblock.runtime import Runtime
 from xblock.test.tools import (
     assert_equals, assert_raises, assert_raises_regexp,
     assert_not_equals, assert_false, assert_is,
-    WarningTestMixin,
+    WarningTestMixin, TestRuntime,
 )
 
 
@@ -40,7 +40,7 @@ def test_field_access():
 
     field_data = DictFieldData({'field_a': 5, 'float_a': 6.1, 'field_x': 15})
 
-    field_tester = FieldTester(MagicMock(), field_data, Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock())
     # Verify that the fields have been set
     assert_equals(5, field_tester.field_a)
     assert_equals(10, field_tester.field_b)
@@ -95,7 +95,7 @@ def test_list_field_access():
         field_d = List(scope=Scope.settings)
 
     field_data = DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]})
-    field_tester = FieldTester(MagicMock(), field_data, Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock(spec=ScopeIds))
 
     # Check initial values have been set properly
     assert_equals([200], field_tester.field_a)
@@ -148,7 +148,7 @@ def test_mutable_none_values():
         field_b = List(scope=Scope.settings)
         field_c = List(scope=Scope.content, default=None)
 
-    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': None}), Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': DictFieldData({'field_a': None})}), scope_ids=Mock(spec=ScopeIds))
     # Set fields b & c to None
     field_tester.field_b = None
     field_tester.field_c = None
@@ -183,8 +183,8 @@ def test_dict_field_access():
     })
 
     field_tester = FieldTester(
-        MagicMock(),
-        field_data,
+        TestRuntime(services={'field-data': field_data}),
+        None,
         Mock()
     )
 
@@ -238,7 +238,7 @@ def test_default_values():
         list2 = List(scope=Scope.content, default=[1, 2, 3])
 
     field_data = DictFieldData({'dic1': {'a': 200}, 'list1': ['a', 'b']})
-    field_tester = FieldTester(MagicMock(), field_data, Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock(spec=ScopeIds))
 
     assert_equals({'a': 200}, field_tester.dic1)
     assert_equals({'a': 1, 'b': 2, 'c': 3}, field_tester.dic2)
@@ -298,8 +298,7 @@ def test_json_field_access():
         field_b = Date(scope=Scope.content, default=datetime(2013, 4, 1))
 
     field_tester = FieldTester(
-        runtime=Mock(spec=Runtime),
-        field_data=DictFieldData({}),
+        runtime=TestRuntime(services={'field-data': DictFieldData({})}),
         scope_ids=MagicMock(spec=ScopeIds)
     )
 
@@ -326,8 +325,8 @@ def test_defaults_not_shared():
 
         field_a = List(scope=Scope.settings)
 
-    field_tester_a = FieldTester(MagicMock(), DictFieldData({}), Mock())
-    field_tester_b = FieldTester(MagicMock(), DictFieldData({}), Mock())
+    field_tester_a = FieldTester(TestRuntime(services={'field-data': DictFieldData({})}), scope_ids=Mock(spec=ScopeIds))
+    field_tester_b = FieldTester(TestRuntime(services={'field-data': DictFieldData({})}), scope_ids=Mock(spec=ScopeIds))
 
     field_tester_a.field_a.append(1)
     assert_equals([1], field_tester_a.field_a)
@@ -351,8 +350,7 @@ def test_object_identity():
     field_data = MagicMock(spec=FieldData)
     field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
     field_tester = FieldTester(
-        runtime=Mock(spec=Runtime),
-        field_data=field_data,
+        runtime=TestRuntime(services={'field-data': field_data}),
         scope_ids=MagicMock(spec=ScopeIds)
     )
 
@@ -386,13 +384,11 @@ def test_caching_is_per_instance():
     # in separately-cached values, so that changing a value
     # in one instance doesn't affect values stored in others.
     field_tester_a = FieldTester(
-        runtime=Mock(spec=Runtime),
-        field_data=field_data,
+        runtime=TestRuntime(services={'field-data': field_data}),
         scope_ids=MagicMock(spec=ScopeIds)
     )
     field_tester_b = FieldTester(
-        runtime=Mock(spec=Runtime),
-        field_data=field_data,
+        runtime=TestRuntime(services={'field-data': field_data}),
         scope_ids=MagicMock(spec=ScopeIds)
     )
     value = field_tester_a.field_a
@@ -425,8 +421,8 @@ def test_field_serialization():
     })
 
     field_tester = FieldTester(
-        MagicMock(),
-        field_data,
+        TestRuntime(services={'field-data': field_data}),
+        None,
         Mock(),
     )
 
@@ -513,7 +509,7 @@ def setup_save_failure(set_many):
         field_b = Integer(scope=Scope.content, default=10)
         field_c = Integer(scope=Scope.user_state, default=42)
 
-    field_tester = FieldTester(MagicMock(), field_data, Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock(spec=ScopeIds))
     return field_tester
 
 
@@ -578,7 +574,7 @@ def test_xblock_write_then_delete():
         field_b = Integer(scope=Scope.content, default=10)
 
     field_data = DictFieldData({'field_a': 5})
-    field_tester = FieldTester(MagicMock(), field_data, Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock(spec=ScopeIds))
 
     # Verify that the fields have been set correctly
     assert_equals(5, field_tester.field_a)
@@ -629,7 +625,7 @@ def test_get_mutable_mark_dirty():
         """Test class with mutable fields."""
         list_field = List(default=[])
 
-    mutable_test = MutableTester(MagicMock(), DictFieldData({}), Mock())
+    mutable_test = MutableTester(TestRuntime(services={'field-data': DictFieldData({})}), scope_ids=Mock(spec=ScopeIds))
 
     # Test get/set with a default value.
     assert_equals(len(mutable_test._dirty_fields), 0)
@@ -657,9 +653,9 @@ def test_change_mutable_default():
         list_field = List()
 
     field_data_a = DictFieldData({})
-    mutable_test_a = MutableTester(MagicMock(), field_data_a, Mock())
+    mutable_test_a = MutableTester(TestRuntime(services={'field-data': field_data_a}), scope_ids=Mock(spec=ScopeIds))
     field_data_b = DictFieldData({})
-    mutable_test_b = MutableTester(MagicMock(), field_data_b, Mock())
+    mutable_test_b = MutableTester(TestRuntime(services={'field-data': field_data_b}), scope_ids=Mock(spec=ScopeIds))
 
     # Saving without changing the default value shouldn't write to field_data
     mutable_test_a.list_field  # pylint: disable=W0104
@@ -677,10 +673,9 @@ def test_change_mutable_default():
 
 def test_handle_shortcut():
     runtime = Mock(spec=['handle'])
-    field_data = Mock(spec=[])
     scope_ids = Mock(spec=[])
     request = Mock(spec=[])
-    block = XBlock(runtime, field_data, scope_ids)
+    block = XBlock(runtime, None, scope_ids)
 
     block.handle('handler_name', request)
     runtime.handle.assert_called_with(block, 'handler_name', request, '')
@@ -703,7 +698,7 @@ def test_services_decorators():
         """XBlock using some services."""
         pass
 
-    service_using_block = ServiceUsingBlock(None, None, None)
+    service_using_block = ServiceUsingBlock(None, scope_ids=None)
     assert_equals(ServiceUsingBlock._services_requested, {'n': 'need', 'w': 'want'})
     assert_equals(service_using_block._services_requested, {'n': 'need', 'w': 'want'})
 
@@ -721,7 +716,7 @@ def test_services_decorators_with_inheritance():
         """Does this class properly inherit services from ServiceUsingBlock?"""
         pass
 
-    sub_service_using_block = SubServiceUsingBlock(None, None, None)
+    sub_service_using_block = SubServiceUsingBlock(None, scope_ids=None)
     assert_equals(sub_service_using_block.service_declaration("n1"), "need")
     assert_equals(sub_service_using_block.service_declaration("w1"), "want")
     assert_equals(sub_service_using_block.service_declaration("n2"), "need")
@@ -736,8 +731,9 @@ def test_cached_parent():
         """
         pass
 
-    runtime = Mock()
-    block = HasParent(runtime, DictFieldData({}), Mock())
+    runtime = TestRuntime(services={'field-data': DictFieldData({})})
+    runtime.get_block = Mock()
+    block = HasParent(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # block has no parent yet, and we don't need to call the runtime to find
     # that out.
@@ -753,7 +749,7 @@ def test_cached_parent():
 
     # Get the parent again.  It will be the same parent, and we didn't call the
     # runtime.
-    runtime.reset_mock()
+    runtime.get_block.reset_mock()
     parent2 = block.get_parent()
     assert parent2 is parent
     assert not runtime.get_block.called
@@ -871,7 +867,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "public/ℓιвяαяу.js",
     )
     def test_open_good_local_resource(self, uri):
-        loadable = self.LoadableXBlock(None, None, None)
+        loadable = self.LoadableXBlock(None, scope_ids=None)
         with patch('pkg_resources.resource_stream', self.stub_resource_stream):
             assert loadable.open_local_resource(uri) == "!" + uri + "!"
 
@@ -885,7 +881,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "static/ℓιвяαяу.js",
     )
     def test_open_bad_local_resource(self, uri):
-        loadable = self.LoadableXBlock(None, None, None)
+        loadable = self.LoadableXBlock(None, scope_ids=None)
         with patch('pkg_resources.resource_stream', self.stub_resource_stream):
             msg = ".*: %s" % re.escape(repr(uri))
             with assert_raises_regexp(DisallowedFileError, msg):
@@ -909,7 +905,7 @@ class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
 
     def test_assign_field_data(self):
         field_data = Mock(spec=FieldData)
-        block = XBlock(Mock(spec=Runtime), None, Mock(spec=ScopeIds))
+        block = XBlock(Mock(spec=Runtime), scope_ids=Mock(spec=ScopeIds))
         with self.assertWarns(FieldDataDeprecationWarning):
             block._field_data = field_data
         self.assertEqual(field_data, block._field_data)

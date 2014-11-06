@@ -5,6 +5,7 @@ import warnings
 
 from contextlib import contextmanager
 from functools import partial
+from mock import Mock
 
 # nose.tools has convenient assert methods, but it defines them in a clever way
 # that baffles pylint.  Import them all here so we can keep the pylint clutter
@@ -17,6 +18,8 @@ from nose.tools import (                        # pylint: disable=W0611,E0611
     assert_in, assert_not_in,
     assert_raises, assert_raises_regexp,
 )
+
+from xblock.runtime import Runtime, IdReader
 
 
 def blocks_are_equivalent(block1, block2):
@@ -112,3 +115,17 @@ class WarningTestMixin(object):
             yield
             self.assertGreaterEqual(len(warns), 1)
             self.assertTrue(any(issubclass(warning.category, warning_class) for warning in warns))
+
+
+@unabc("{} shouldn't be used in tests")
+class TestRuntime(Runtime):
+    """
+    An empty runtime to be used in tests
+    """
+    # unabc doesn't squash pylint errors
+    # pylint: disable=abstract-method
+    def __init__(self, *args, **kwargs):
+        # Provide a mock IdReader if one isn't already passed to the runtime.
+        if not args:
+            kwargs.setdefault('id_reader', Mock(spec=IdReader))
+        super(TestRuntime, self).__init__(*args, **kwargs)

@@ -33,13 +33,8 @@ from xblock.field_data import DictFieldData, FieldData
 from xblock.test.tools import (
     assert_equals, assert_false, assert_true, assert_raises,
     assert_raises_regexp, assert_is, assert_is_not, unabc,
-    WarningTestMixin
+    WarningTestMixin, TestRuntime
 )
-
-
-@unabc("{} shouldn't be used in tests")
-class TestRuntime(Runtime):
-    pass
 
 
 class TestMixin(object):
@@ -143,7 +138,7 @@ def test_db_model_keys():
     # and that the keys have been constructed correctly
     key_store = DictKeyValueStore()
     field_data = KvsFieldData(key_store)
-    runtime = TestRuntime(Mock(), field_data, [TestMixin])
+    runtime = TestRuntime(Mock(), mixins=[TestMixin], services={'field-data': field_data})
     tester = runtime.construct_xblock_from_class(TestXBlock, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
 
     assert_false(field_data.has(tester, 'not a field'))
@@ -215,17 +210,15 @@ def test_db_model_keys():
 @unabc("{} shouldn't be used in tests")
 class MockRuntimeForQuerying(Runtime):
     """Mock out a runtime for querypath_parsing test"""
-    # OK for this mock class to not override abstract methods or call base __init__
-    # pylint: disable=W0223, W0231
-    def __init__(self):
-        super(MockRuntimeForQuerying, self).__init__(field_data=Mock(), id_reader=Mock())
+    # unabc doesn't squash pylint errors
+    # pylint: disable=abstract-method
+    def __init__(self, **kwargs):
         self.mock_query = Mock()
+        kwargs.setdefault('id_reader', Mock(spec=IdReader))
+        super(MockRuntimeForQuerying, self).__init__(**kwargs)
 
     def query(self, block):
         return self.mock_query
-
-    def get_block(self, usage_id):
-        raise Exception("Not Used By Tests")
 
 
 def test_querypath_parsing():
@@ -242,8 +235,9 @@ def test_runtime_handle():
     # Test a simple handler and a fallback handler
 
     key_store = DictKeyValueStore()
-    db_model = KvsFieldData(key_store)
-    tester = TestXBlock(Mock(), db_model, Mock())
+    field_data = KvsFieldData(key_store)
+    runtime = TestRuntime(services={'field-data': field_data})
+    tester = TestXBlock(runtime, scope_ids=Mock(spec=ScopeIds))
     runtime = MockRuntimeForQuerying()
     # string we want to update using the handler
     update_string = "user state update"
@@ -265,7 +259,7 @@ def test_runtime_handle():
     assert_equals(tester.user_state, new_update_string)
 
     # handler can't be found & no fallback handler supplied, should throw an exception
-    tester = TestXBlockNoFallback(Mock(), db_model, Mock())
+    tester = TestXBlockNoFallback(runtime, scope_ids=Mock(spec=ScopeIds))
     ultimate_string = "ultimate update"
     with assert_raises(NoSuchHandlerError):
         runtime.handle(tester, 'test_nonexistant_fallback_handler', ultimate_string)
@@ -278,9 +272,9 @@ def test_runtime_handle():
 
 def test_runtime_render():
     key_store = DictKeyValueStore()
-    db_model = KvsFieldData(key_store)
-    runtime = MockRuntimeForQuerying()
-    tester = TestXBlock(runtime, db_model, Mock())
+    field_data = KvsFieldData(key_store)
+    runtime = MockRuntimeForQuerying(services={'field-data': field_data})
+    tester = TestXBlock(runtime, scope_ids=Mock(spec=ScopeIds))
     # string we want to update using the handler
     update_string = u"user state update"
 
@@ -303,7 +297,7 @@ def test_runtime_render():
 
     # test against the no-fallback XBlock
     update_string = u"ultimate update"
-    tester = TestXBlockNoFallback(Mock(), db_model, Mock())
+    tester = TestXBlockNoFallback(Mock(), scope_ids=Mock(spec=ScopeIds))
     with assert_raises(NoSuchViewError):
         runtime.render(tester, 'test_nonexistant_view', [update_string])
 
@@ -327,21 +321,22 @@ class TestIntegerXblock(XBlock):
 
 def test_default_fn():
     key_store = SerialDefaultKVS()
-    db_model = KvsFieldData(key_store)
-    tester = TestIntegerXblock(Mock(), db_model, Mock())
-    tester2 = TestIntegerXblock(Mock(), db_model, Mock())
+    field_data = KvsFieldData(key_store)
+    runtime = TestRuntime(Mock(spec=IdReader), services={'field-data': field_data})
+    tester = TestIntegerXblock(runtime, scope_ids=Mock(spec=ScopeIds))
+    tester2 = TestIntegerXblock(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # ensure value is not in tester before any actions
-    assert_false(db_model.has(tester, 'counter'))
+    assert_false(field_data.has(tester, 'counter'))
     # ensure value is same over successive calls for same DbModel
     first_call = tester.counter
     assert_equals(first_call, 1)
     assert_equals(first_call, tester.counter)
     # ensure the value is not saved in the object
-    assert_false(db_model.has(tester, 'counter'))
+    assert_false(field_data.has(tester, 'counter'))
     # ensure save does not save the computed default back to the object
     tester.save()
-    assert_false(db_model.has(tester, 'counter'))
+    assert_false(field_data.has(tester, 'counter'))
 
     # ensure second object gets another value
     second_call = tester2.counter
@@ -374,7 +369,7 @@ def test_mixin_field_access():
         'field_a': 5,
         'field_x': [1, 2, 3],
     })
-    runtime = TestRuntime(Mock(), field_data, [TestSimpleMixin])
+    runtime = TestRuntime(Mock(), mixins=[TestSimpleMixin], services={'field-data': field_data})
 
     field_tester = runtime.construct_xblock_from_class(FieldTester, Mock())
 
@@ -568,8 +563,8 @@ class XBlockWithServices(XBlock):
 
 
 def test_service():
-    runtime = TestRuntime(Mock(), Mock(), (), services={'secret_service': 17})
-    tester = XBlockWithServices(runtime, Mock(), Mock())
+    runtime = TestRuntime(Mock(), services={'secret_service': 17})
+    tester = XBlockWithServices(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # Call the student_view to run its assertions.
     runtime.render(tester, 'student_view')
@@ -597,8 +592,8 @@ class SubXBlockWithServices(XBlockWithServices):
 
 
 def test_sub_service():
-    runtime = TestRuntime(Mock(), Mock(), (), services={'secret_service': 17})
-    tester = SubXBlockWithServices(runtime, Mock(), Mock())
+    runtime = TestRuntime(id_reader=Mock(), services={'secret_service': 17})
+    tester = SubXBlockWithServices(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # Call the student_view to run its assertions.
     runtime.render(tester, 'student_view')
@@ -613,7 +608,7 @@ class TestRuntimeGetBlock(TestCase):
         self.id_reader = Mock(IdReader)
         self.user_id = Mock()
         self.field_data = Mock(FieldData)
-        self.runtime = TestRuntime(self.id_reader, self.field_data)
+        self.runtime = TestRuntime(self.id_reader, services={'field-data': self.field_data})
         self.runtime.user_id = self.user_id
 
         self.usage_id = 'usage_id'
@@ -657,11 +652,13 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
         field_data = Mock(spec=FieldData)
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime = TestRuntime(Mock(spec=IdReader), field_data)
-        self.assertEquals(runtime.field_data, field_data)
+        with self.assertWarns(FieldDataDeprecationWarning):
+            self.assertEquals(runtime.field_data, field_data)
 
     def test_set_field_data(self):
         field_data = Mock(spec=FieldData)
         runtime = TestRuntime(Mock(spec=IdReader), None)
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime.field_data = field_data
-        self.assertEquals(runtime.field_data, field_data)
+        with self.assertWarns(FieldDataDeprecationWarning):
+            self.assertEquals(runtime.field_data, field_data)

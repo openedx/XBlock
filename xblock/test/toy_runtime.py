@@ -98,7 +98,7 @@ class ToyRuntime(Runtime):
     """
 
     def __init__(self, user_id=None):
-        super(ToyRuntime, self).__init__(ID_MANAGER, KvsFieldData(TOYRUNTIME_KVS))
+        super(ToyRuntime, self).__init__(ID_MANAGER, services={'field-data': KvsFieldData(TOYRUNTIME_KVS)})
         self.id_generator = ID_MANAGER
         self.user_id = user_id
 
