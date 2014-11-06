@@ -6,6 +6,7 @@ and used by all runtimes.
 
 """
 import pkg_resources
+import warnings
 
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
@@ -249,3 +250,25 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersM
         method, as there is currently only a no-op implementation.
         """
         return Validation(self.scope_ids.usage_id)
+
+
+# Maintain backwards compatibility
+import xblock.exceptions
+
+
+class KeyValueMultiSaveError(xblock.exceptions.KeyValueMultiSaveError):
+    """
+    Backwards compatibility class wrapper around :class:`.KeyValueMultiSaveError`.
+    """
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Please use xblock.exceptions.KeyValueMultiSaveError", DeprecationWarning, stacklevel=2)
+        super(KeyValueMultiSaveError, self).__init__(*args, **kwargs)
+
+
+class XBlockSaveError(xblock.exceptions.XBlockSaveError):
+    """
+    Backwards compatibility class wrapper around :class:`.XBlockSaveError`.
+    """
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Please use xblock.exceptions.XBlockSaveError", DeprecationWarning, stacklevel=2)
+        super(XBlockSaveError, self).__init__(*args, **kwargs)
