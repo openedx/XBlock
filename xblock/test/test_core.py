@@ -16,7 +16,13 @@ import ddt
 from webob import Response
 
 from xblock.core import XBlock
-from xblock.exceptions import XBlockSaveError, KeyValueMultiSaveError, JsonHandlerError, DisallowedFileError, FieldDataDeprecationWarning
+from xblock.exceptions import (
+    XBlockSaveError,
+    KeyValueMultiSaveError,
+    JsonHandlerError,
+    DisallowedFileError,
+    FieldDataDeprecationWarning,
+)
 from xblock.fields import Dict, Float, Integer, List, Field, Scope, ScopeIds
 from xblock.field_data import FieldData, DictFieldData
 from xblock.mixins import ScopedStorageMixin
@@ -24,7 +30,7 @@ from xblock.runtime import Runtime
 
 from xblock.test.tools import (
     assert_equals, assert_raises, assert_raises_regexp,
-    assert_not_equals, assert_false, assert_is,
+    assert_not_equals, assert_false,
     WarningTestMixin, TestRuntime,
 )
 
@@ -148,7 +154,10 @@ def test_mutable_none_values():
         field_b = List(scope=Scope.settings)
         field_c = List(scope=Scope.content, default=None)
 
-    field_tester = FieldTester(TestRuntime(services={'field-data': DictFieldData({'field_a': None})}), scope_ids=Mock(spec=ScopeIds))
+    field_tester = FieldTester(
+        TestRuntime(services={'field-data': DictFieldData({'field_a': None})}),
+        scope_ids=Mock(spec=ScopeIds)
+    )
     # Set fields b & c to None
     field_tester.field_b = None
     field_tester.field_c = None
@@ -516,13 +525,10 @@ def setup_save_failure(set_many):
 def test_xblock_save_one():
     # Mimics a save failure when we only manage to save one of the values
 
-    # Pylint, please allow this method to accept arguments.
-    # pylint: disable=W0613
-    def fake_set_many(block, update_dict):
+    def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
         raise KeyValueMultiSaveError([update_dict.keys()[0]])
-    # pylint: enable=W0613
 
     field_tester = setup_save_failure(fake_set_many)
 
@@ -542,13 +548,10 @@ def test_xblock_save_one():
 def test_xblock_save_failure_none():
     # Mimics a save failure when we don't manage to save any of the values
 
-    # Pylint, please allow this method to accept arguments.
-    # pylint: disable=W0613
-    def fake_set_many(block, update_dict):
+    def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that no fields were correctly saved."""
         raise KeyValueMultiSaveError([])
-    # pylint: enable=W0613
 
     field_tester = setup_save_failure(fake_set_many)
     field_tester.field_a = 20

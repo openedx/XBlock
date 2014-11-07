@@ -31,7 +31,15 @@ from xblock.core import XBlock
 from xblock.fields import Integer, List, ScopeIds
 from xblock.field_data import DictFieldData
 
-from xblock.test.tools import assert_is, assert_is_not, assert_equals, assert_not_equals, assert_true, assert_false, TestRuntime
+from xblock.test.tools import (
+    assert_is,
+    assert_is_not,
+    assert_equals,
+    assert_not_equals,
+    assert_true,
+    assert_false,
+    TestRuntime,
+)
 
 # Ignore statements that 'have no effect', since the effect is to read
 # from the descriptor
@@ -40,7 +48,7 @@ from xblock.test.tools import assert_is, assert_is_not, assert_equals, assert_no
 
 # Allow base classes to leave out class attributes and that they access
 # without pylint complaining
-# pylint: disable=E1101
+# pylint: disable=no-member
 # ~~~~~~~~~~~~~ Classes defining test operations ~~~~~~~~~~~~~~~~~~~~~~
 class BlockFirstOperations(object):
     """
@@ -392,7 +400,7 @@ class MutableTestCases(UniversalTestCases, MutationProperties):
     def mutate(self, value):
         """Modify the supplied value"""
         value.append('foo')
-# pylint: enable=E1101
+# pylint: enable=no-member
 
 
 # pylint: disable=C0111
@@ -434,7 +442,7 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
 
 # Allow base classes to leave out class attributes and that they access
 # without pylint complaining
-# pylint: disable=E1101
+# pylint: disable=no-member
 class GetNoopPrefix(object):
     """
     Mixin that prefixes existing field tests with a call to `self.block.field`.
@@ -476,13 +484,13 @@ class SaveNoopPrefix(object):
     def setUp(self):
         super(SaveNoopPrefix, self).setUp()
         self.block.save()
-# pylint: enable=E1101
+# pylint: enable=no-member
 
 for operation_backend in (BlockFirstOperations, FieldFirstOperations):
     for noop_prefix in (None, GetNoopPrefix, GetSaveNoopPrefix, SaveNoopPrefix):
         for base_test_case in (
-            TestImmutableWithComputedDefault, TestImmutableWithInitialValue, TestImmutableWithStaticDefault,
-            TestMutableWithComputedDefault, TestMutableWithInitialValue, TestMutableWithStaticDefault
+                TestImmutableWithComputedDefault, TestImmutableWithInitialValue, TestImmutableWithStaticDefault,
+                TestMutableWithComputedDefault, TestMutableWithInitialValue, TestMutableWithStaticDefault
         ):
 
             test_name = base_test_case.__name__ + "With" + operation_backend.__name__
