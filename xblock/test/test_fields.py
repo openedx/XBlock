@@ -5,7 +5,7 @@ Tests for classes extending Field.
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
 
-from mock import MagicMock, Mock
+from mock import Mock
 import unittest
 
 import datetime as dt
@@ -27,10 +27,7 @@ from xblock.fields import scope_key, ScopeIds
 class FieldTest(unittest.TestCase):
     """ Base test class for Fields. """
 
-    def field_totest(self):
-        """Child classes should override this with the type of field
-        the test is testing."""
-        return None
+    FIELD_TO_TEST = Mock()
 
     def set_and_get_field(self, arg, enforce_type):
         """
@@ -40,7 +37,7 @@ class FieldTest(unittest.TestCase):
             """
             Block for testing
             """
-            field_x = self.field_totest(enforce_type=enforce_type)
+            field_x = self.FIELD_TO_TEST(enforce_type=enforce_type)
 
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
         block = TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
@@ -63,7 +60,7 @@ class FieldTest(unittest.TestCase):
         Asserts the result of field.from_json and of setting field.
         """
         # from_json(arg) -> expected
-        self.assertEqual(expected, self.field_totest().from_json(arg))
+        self.assertEqual(expected, self.FIELD_TO_TEST().from_json(arg))
         # set+get with enforce_type arg -> expected
         self.assertEqual(expected, self.set_and_get_field(arg, True))
         # set+get without enforce_type arg -> arg
@@ -76,7 +73,7 @@ class FieldTest(unittest.TestCase):
         """
         Assert that serialization of `arg` to JSON equals `expected`.
         """
-        self.assertEqual(expected, self.field_totest().to_json(arg))
+        self.assertEqual(expected, self.FIELD_TO_TEST().to_json(arg))
 
     def assertJSONOrSetValueError(self, arg):
         """
@@ -85,7 +82,7 @@ class FieldTest(unittest.TestCase):
         """
         # from_json and set+get with enforce_type -> ValueError
         with self.assertRaises(ValueError):
-            self.field_totest().from_json(arg)
+            self.FIELD_TO_TEST().from_json(arg)
         with self.assertRaises(ValueError):
             self.set_and_get_field(arg, True)
         # set+get without enforce_type -> warning
@@ -99,7 +96,7 @@ class FieldTest(unittest.TestCase):
         """
         # from_json and set+get with enforce_type -> TypeError
         with self.assertRaises(TypeError):
-            self.field_totest().from_json(arg)
+            self.FIELD_TO_TEST().from_json(arg)
         with self.assertRaises(TypeError):
             self.set_and_get_field(arg, True)
         # set+get without enforce_type -> warning
@@ -111,7 +108,7 @@ class IntegerTest(FieldTest):
     """
     Tests the Integer Field.
     """
-    field_totest = Integer
+    FIELD_TO_TEST = Integer
 
     def test_integer(self):
         self.assertJSONOrSetEquals(5, '5')
@@ -142,7 +139,7 @@ class FloatTest(FieldTest):
     """
     Tests the Float Field.
     """
-    field_totest = Float
+    FIELD_TO_TEST = Float
 
     def test_float(self):
         self.assertJSONOrSetEquals(.23, '.23')
@@ -171,7 +168,7 @@ class BooleanTest(FieldTest):
     """
     Tests the Boolean Field.
     """
-    field_totest = Boolean
+    FIELD_TO_TEST = Boolean
 
     def test_false(self):
         self.assertJSONOrSetEquals(False, "false")
@@ -198,7 +195,7 @@ class StringTest(FieldTest):
     """
     Tests the String Field.
     """
-    field_totest = String
+    FIELD_TO_TEST = String
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals("false", "false")
@@ -222,7 +219,7 @@ class DateTest(FieldTest):
     """
     Tests of the Date field.
     """
-    field_totest = DateTime
+    FIELD_TO_TEST = DateTime
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals(
@@ -276,7 +273,7 @@ class AnyTest(FieldTest):
     """
     Tests the Any Field.
     """
-    field_totest = Any
+    FIELD_TO_TEST = Any
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals({'bar'}, {'bar'})
@@ -294,7 +291,7 @@ class ListTest(FieldTest):
     """
     Tests the List Field.
     """
-    field_totest = List
+    FIELD_TO_TEST = List
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals([], [])
@@ -318,7 +315,7 @@ class ReferenceTest(FieldTest):
     """
     Tests the Reference Field.
     """
-    field_totest = Reference
+    FIELD_TO_TEST = Reference
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals({'id': 'bar', 'usage': 'baz'}, {'id': 'bar', 'usage': 'baz'})
@@ -336,7 +333,7 @@ class ReferenceListTest(FieldTest):
     """
     Tests the ReferenceList Field.
     """
-    field_totest = ReferenceList
+    FIELD_TO_TEST = ReferenceList
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals([], [])
@@ -360,7 +357,7 @@ class DictTest(FieldTest):
     """
     Tests the Dict Field.
     """
-    field_totest = Dict
+    FIELD_TO_TEST = Dict
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals({}, {})

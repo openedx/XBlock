@@ -10,6 +10,7 @@ from xblock.fields import Scope
 from xblock.runtime import (
     KvsFieldData, KeyValueStore, Runtime, MemoryIdManager
 )
+from xblock.test.tools import unabc
 
 log = logging.getLogger(__name__)
 
@@ -88,6 +89,7 @@ class ToyRuntimeKeyValueStore(KeyValueStore):
             self.set(key, value)
 
 
+@unabc("{} is unavailable in ToyRuntime")
 class ToyRuntime(Runtime):
     """
     Access to the toy runtime environment for XBlocks.
@@ -96,13 +98,14 @@ class ToyRuntime(Runtime):
     `self.runtime`.
 
     """
+    # pylint: disable=abstract-method
 
     def __init__(self, user_id=None):
         super(ToyRuntime, self).__init__(ID_MANAGER, services={'field-data': KvsFieldData(TOYRUNTIME_KVS)})
         self.id_generator = ID_MANAGER
         self.user_id = user_id
 
-    def render_template(self, template_name, **kwargs):
+    def render_template(self, template_name, **kwargs):  # pylint: disable=unused-argument
         """Mock for rendering templates"""
         return template_name
 
@@ -131,10 +134,14 @@ class ToyRuntime(Runtime):
     def local_resource_url(self, block, uri):
         return ''
 
-    def publish(self, block, event):
-        log.info("XBlock event for {block_type} (usage_id={usage_id}):".format(
-            block_type=block.scope_ids.block_type, usage_id=block.scope_ids.usage_id))
-        log.info(event)
+    def publish(self, block, event_type, event_data):
+        log.info(
+            "XBlock '%s' event for %s (usage_id={%s}): %r",
+            event_type,
+            block.scope_ids.block_type,
+            block.scope_ids.usage_id,
+            event_data
+        )
 
 
 # Our global state (the "database").

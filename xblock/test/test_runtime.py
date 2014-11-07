@@ -316,6 +316,9 @@ class SerialDefaultKVS(DictKeyValueStore):
 
 
 class TestIntegerXblock(XBlock):
+    """
+    XBlock with an integer field, for testing.
+    """
     counter = Integer(scope=Scope.content)
 
 
@@ -600,6 +603,9 @@ def test_sub_service():
 
 
 class TestRuntimeGetBlock(TestCase):
+    """
+    Test the get_block default method on Runtime.
+    """
     def setUp(self):
         patcher = patch.object(TestRuntime, 'construct_xblock')
         self.construct_block = patcher.start()
