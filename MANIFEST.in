@@ -1,0 +1,2 @@
+include versioneer.py
+include xblock/_version.py
