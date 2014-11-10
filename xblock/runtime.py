@@ -245,7 +245,7 @@ class IdReader(object):
         Returns:
             The `usage_id` of the usage the aside is commenting on.
         """
-        pass
+        raise NotImplementedError()
 
     def get_definition_id_from_aside(self, aside_id):
         """
@@ -269,7 +269,7 @@ class IdReader(object):
         Returns:
             The `definition_id` the usage is derived from
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def get_block_type(self, def_id):
@@ -281,7 +281,7 @@ class IdReader(object):
         Returns:
             The `block_type` of the definition
         """
-        pass
+        raise NotImplementedError()
 
 
 class IdGenerator(object):
@@ -297,7 +297,7 @@ class IdGenerator(object):
         Returns:
             (aside_definition_id, aside_usage_id)
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def create_usage(self, def_id):
@@ -305,7 +305,7 @@ class IdGenerator(object):
 
         Returns the newly-created usage id.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def create_definition(self, block_type, slug=None):
@@ -317,7 +317,7 @@ class IdGenerator(object):
         Returns the newly-created definition id.
 
         """
-        pass
+        raise NotImplementedError()
 
 
 class MemoryIdManager(IdReader, IdGenerator):
