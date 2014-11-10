@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# This pre-push hook verifies that there are no unexpected pylint/pep8 errors before pushing
+echo "Checking for quality violations..."
+pep8 --exclude="doc/*"
+script/max_pylint_violations
