@@ -11,6 +11,6 @@ script:
   - make html
   - cd ..
   - pep8 --exclude="doc/*"
-  - script/max_pylint_violations 6
+  - script/max_pylint_violations
 after_success:
   - coveralls
