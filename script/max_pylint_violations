@@ -1,10 +1,13 @@
 #!/bin/bash
+DEFAULT_MAX=6
+
 pylint xblock | tee /tmp/pylint-xblock.log
 ERR=`grep -E "^[C|R|W|E]:" /tmp/pylint-xblock.log | wc -l`
-if [ $ERR -ge $1 ]; then
-    echo "too many pylint violations: $ERR (max is $1)"
+MAX=${1-$DEFAULT_MAX}
+if [ $ERR -ge $MAX ]; then
+    echo "too many pylint violations: $ERR (max is $MAX)"
     exit 1
 else
-    echo "$ERR pylint violations in total (max is $1)"
+    echo "$ERR pylint violations in total (max is $MAX)"
     exit 0
 fi

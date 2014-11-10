@@ -109,6 +109,14 @@ by checking your code with these tools.
 .. _pylintrc: https://github.com/edx/XBlock/blob/master/pylintrc
 .. _setup.cfg: https://github.com/edx/XBlock/blob/master/setup.cfg
 
+You can run these tests automatically before pushing code to github (and running
+the validation in Travis) by activating the `pre-push` script
+
+    cd .git/hooks
+    ln -s ../../script/pre-push
+    cd -
+
+
 Using the XBlock-SDK
 -------------------
 
