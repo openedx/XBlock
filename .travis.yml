@@ -6,11 +6,6 @@ install:
   - pip install -r django_requirements.txt
   - pip install coveralls
 script:
-  - coverage run -m nose
-  - cd doc
-  - make html
-  - cd ..
-  - pep8 --exclude="doc/*"
-  - script/max_pylint_violations
+  - make test doc quality
 after_success:
   - coveralls
