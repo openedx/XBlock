@@ -5,7 +5,6 @@ import warnings
 
 from contextlib import contextmanager
 from functools import partial
-from mock import Mock
 
 # nose.tools has convenient assert methods, but it defines them in a clever way
 # that baffles pylint.  Import them all here so we can keep the pylint clutter
@@ -19,7 +18,7 @@ from nose.tools import (                        # pylint: disable=W0611,E0611
     assert_raises, assert_raises_regexp,
 )
 
-from xblock.runtime import Runtime, IdReader
+from xblock.runtime import Runtime, MemoryIdManager
 
 
 def blocks_are_equivalent(block1, block2):
@@ -125,7 +124,9 @@ class TestRuntime(Runtime):
     # unabc doesn't squash pylint errors
     # pylint: disable=abstract-method
     def __init__(self, *args, **kwargs):
-        # Provide a mock IdReader if one isn't already passed to the runtime.
+        memory_id_manager = MemoryIdManager()
+        # Provide an IdReader if one isn't already passed to the runtime.
         if not args:
-            kwargs.setdefault('id_reader', Mock(spec=IdReader))
+            kwargs.setdefault('id_reader', memory_id_manager)
+        kwargs.setdefault('id_generator', memory_id_manager)
         super(TestRuntime, self).__init__(*args, **kwargs)
