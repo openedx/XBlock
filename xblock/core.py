@@ -10,7 +10,13 @@ import warnings
 
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
-from xblock.mixins import ScopedStorageMixin, HierarchyMixin, RuntimeServicesMixin, HandlersMixin
+from xblock.mixins import (
+    ScopedStorageMixin,
+    HierarchyMixin,
+    RuntimeServicesMixin,
+    HandlersMixin,
+    XmlSerializationMixin,
+)
 from xblock.plugin import Plugin
 from xblock.validation import Validation
 
@@ -72,7 +78,7 @@ class XBlockMetaclass(
 
 
 # -- Base Block
-class XBlock(HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
+class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
     """Base class for XBlocks.
 
     Derive from this class to create a new kind of XBlock.  There are no
@@ -166,83 +172,6 @@ class XBlock(HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersM
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""
         return self.runtime.render(self, view, context)
-
-    @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
-        """
-        Use `node` to construct a new block.
-
-        Arguments:
-            node (etree.Element): The xml node to parse into an xblock.
-
-            runtime (:class:`.Runtime`): The runtime to use while parsing.
-
-            keys (:class:`.ScopeIds`): The keys identifying where this block
-                will store its data.
-
-            id_generator (:class:`.IdGenerator`): An object that will allow the
-                runtime to generate correct definition and usage ids for
-                children of this block.
-
-        """
-        block = runtime.construct_xblock_from_class(cls, keys)
-
-        # The base implementation: child nodes become child blocks.
-        for child in node:
-            block.runtime.add_node_as_child(block, child, id_generator)
-
-        # Attributes become fields.
-        for name, value in node.items():
-            if name in block.fields:
-                setattr(block, name, value)
-
-        # Text content becomes "content", if such a field exists.
-        if "content" in block.fields and block.fields["content"].scope == Scope.content:
-            text = node.text
-            if text:
-                text = text.strip()
-                if text:
-                    block.content = text
-
-        return block
-
-    def add_xml_to_node(self, node):
-        """
-        For exporting, set data on `node` from ourselves.
-        """
-        # pylint: disable=E1101
-        # Set node.tag based on our class name.
-        node.tag = self.xml_element_name()
-
-        # Set node attributes based on our fields.
-        for field_name, field in self.fields.items():
-            if field_name in ('children', 'parent', 'content'):
-                continue
-            if field.is_set_on(self):
-                node.set(field_name, unicode(field.read_from(self)))
-
-        # Add children for each of our children.
-        if self.has_children:
-            for child_id in self.children:
-                child = self.runtime.get_block(child_id)
-                self.runtime.add_block_as_child_node(child, node)
-
-        # A content field becomes text content.
-        text = self.xml_text_content()
-        if text is not None:
-            node.text = text
-
-    def xml_element_name(self):
-        """What XML element name should be used for this block?"""
-        return self.scope_ids.block_type
-
-    def xml_text_content(self):
-        """What is the text content for this block's XML node?"""
-        # pylint: disable=E1101
-        if 'content' in self.fields and self.content:
-            return self.content
-        else:
-            return None
 
     def validate(self):
         """
