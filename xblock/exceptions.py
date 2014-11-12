@@ -53,9 +53,34 @@ class KeyValueMultiSaveError(Exception):
         self.saved_field_names = saved_field_names
 
 
-class InvalidScopeError(Exception):
+class FieldDataError(Exception):
     """
-    Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
+    Parent class for exceptions raised by FieldDatas (or KeyValueStores)
+    """
+    pass
+
+
+class InvalidScopeError(FieldDataError):
+    """
+    Raised to indicate that operating on the supplied scope isn't allowed by a FieldData
+    """
+    pass
+
+
+class InvalidXBlockForRoutingError(FieldDataError):
+    """
+    Raised to indicate that operating on the supplied xblock Type isn't allowed by a FieldData.
+
+    Possibly because its type identifier isn't defined in the mapping in XBlockRoutedFieldData
+    """
+    pass
+
+
+class BadFieldDataComponent(FieldDataError):
+    """
+    Raised to indicate that a Composite FieldData wasn't properly formed
+
+    E.G. an OrderFieldDataList was instantiated with an empty list
     """
     pass
 
