@@ -1,5 +1,7 @@
+#!/bin/bash
+
 # Compute coverage
-coverage run manage.py test
+coverage run -m nose
 coverage html
 coverage xml -o coverage.xml
 if [ "$1" == "html" ]; then
