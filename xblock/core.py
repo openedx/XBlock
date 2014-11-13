@@ -19,7 +19,7 @@ from xblock.mixins import (
     HandlersMixin,
     XmlSerializationMixin,
 )
-from xblock.plugin import Plugin
+from xblock.plugin import Plugin, PluginMetaclass
 from xblock.validation import Validation
 
 
@@ -64,6 +64,7 @@ class XBlockMetaclass(
         ScopedStorageMixin.__metaclass__,
         RuntimeServicesMixin.__metaclass__,
         TagCombiningMetaclass,
+        PluginMetaclass,
 ):
     """
     Metaclass for XBlock.
@@ -182,10 +183,30 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         return Validation(self.scope_ids.usage_id)
 
 
+class AsideMetaclass(
+        ScopedStorageMixin.__metaclass__,
+        RuntimeServicesMixin.__metaclass__,
+        PluginMetaclass,
+):
+    """
+    Metaclass for XBlock.
+
+    Combines all the metaclasses XBlocks needs:
+
+    * `ChildrenModelMetaclass`
+    * `ModelMetaclass`
+    * `TagCombiningMetaclass`
+
+    """
+    pass
+
+
 class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
     """
     This mixin allows Xblock-like class to declare that it provides aside functionality.
     """
+    __metaclass__ = AsideMetaclass
+
     entry_point = "xblock_asides.v1"
 
     @classmethod
