@@ -22,3 +22,4 @@ exclude_lines =
 omit =
     versioneer.py
     xblock/_versions.py
+    setup.py
