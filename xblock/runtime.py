@@ -27,6 +27,11 @@ from xblock.exceptions import (
 )
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 
+import logging
+import json
+
+log = logging.getLogger(__name__)
+
 
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
@@ -285,6 +290,18 @@ class IdReader(object):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    def get_aside_type(self, aside_def_id):
+        """Retrieve the asiode_type of a particular definition
+
+        Args:
+            aside_def_id: The id of the definition to query
+
+        Returns:
+            The `block_type` of the aside
+        """
+        raise NotImplementedError()
+
 
 class IdGenerator(object):
     """An abstract object that creates usage and definition ids"""
@@ -384,7 +401,14 @@ class MemoryIdManager(IdReader, IdGenerator):
         try:
             return self._definitions[def_id]
         except KeyError:
-            raise NoSuchDefinition(repr(def_id))
+            try:
+                return def_id.aside_type
+            except AttributeError:
+                raise NoSuchDefinition(repr(def_id))
+
+    def get_aside_type(self, aside_def_id):
+        """Get an aside's type by its definition id."""
+        return aside_def_id.aside_type
 
 
 class Runtime(object):
@@ -583,7 +607,6 @@ class Runtime(object):
         Create an XBlock instance in this runtime.
 
         The `usage_id` is used to find the XBlock class and data.
-
         """
         def_id = self.id_reader.get_definition_id(usage_id)
         try:
@@ -592,6 +615,21 @@ class Runtime(object):
             raise NoSuchUsage(repr(usage_id))
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
         block = self.construct_xblock(block_type, keys)
+        return block
+
+    def get_aside(self, aside_id):
+        """
+        Create an XBlockAside in this runtime.
+
+        The `aside_id` is used to find the Aside class and data.
+        """
+        def_id = self.id_reader.get_definition_id_from_aside(aside_id)
+        try:
+            block_type = self.id_reader.get_aside_type(def_id)
+        except NoSuchDefinition:
+            raise NoSuchUsage(repr(aside_id))
+        keys = ScopeIds(self.user_id, block_type, def_id, aside_id)
+        block = self.create_aside(block_type, keys)
         return block
 
     # Parsing XML
@@ -702,7 +740,7 @@ class Runtime(object):
 
             # Explicitly save because render action may have changed state
             block.save()
-            updated_frag = self.wrap_child(block, view_name, frag, context)
+            updated_frag = self.wrap_xblock(block, view_name, frag, context)
             return self.render_asides(block, view_name, updated_frag, context)
         finally:
             # Reset the active view to what it was before entering this method
@@ -736,16 +774,79 @@ class Runtime(object):
             results.append(result)
         return results
 
-    def wrap_child(self, block, view, frag, context):  # pylint: disable=W0613
+    def wrap_xblock(self, block, view, frag, context):  # pylint: disable=W0613
         """
-        Wraps the fragment with any necessary HTML, informed by
-        the block, view being rendered, and the context. This default implementation
-        simply returns the fragment.
+        Creates a div which identifies the xblock and writes out the json_init_args into a script tag.
+
+        If there's a `wrap_child` method, it calls that with a deprecation warning.
+
+        The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
+        javascript, you'll need to override this impl
         """
-        # By default, just return the fragment itself.
-        return frag
+        if hasattr(self, 'wrap_child'):
+            log.warning("wrap_child is deprecated in favor of wrap_xblock and wrap_aside %s", self.__class__)
+            return self.wrap_child(block, view, frag, context)  # pylint: disable=no-member
+
+        extra_data = {'name': block.name} if block.name else {}
+        return self._wrap_ele(block, frag, extra_data)
+
+    def wrap_aside(self, block, aside, view, frag, context):  # pylint: disable=unused-argument
+        """
+        Creates a div which identifies the aside, points to the original block,
+        and writes out the json_init_args into a script tag.
+
+        The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
+        javascript, you'll need to override this impl
+        """
+        return self._wrap_ele(
+            aside, frag, {
+                'block_id': block.scope_ids.usage_id,
+                'url_selector': 'asideBaseUrl',
+            })
+
+    def _wrap_ele(self, block, frag, extra_data=None):
+        """
+        Does the guts of the wrapping the same way for both xblocks and asides. Their
+        wrappers provide other info in extra_data which gets put into the dom data- attrs.
+        """
+        wrapped = Fragment()
+        data = {
+            'usage': block.scope_ids.usage_id,
+            'block-type': block.scope_ids.block_type,
+        }
+        data.update(extra_data)
+
+        if frag.js_init_fn:
+            data['init'] = frag.js_init_fn
+            data['runtime-version'] = frag.js_init_version
+
+        json_init = ""
+        # TODO/Note: We eventually want to remove: hasattr(frag, 'json_init_args')
+        # However, I'd like to maintain backwards-compatibility with older XBlock
+        # for at least a little while so as not to adversely effect developers.
+        # pmitros/Jun 28, 2014.
+        if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
+            json_init = u'<script type="json/xblock-args" class="xblock_json_init_args">' + \
+                u'{data}</script>'.format(data=json.dumps(frag.json_init_args))
+
+        html = u"<div class='{}'{properties}>{body}{js}</div>".format(
+            block.entry_point.replace('.', '-'),
+            properties="".join(" data-%s='%s'" % item for item in data.items()),
+            body=frag.body_html(),
+            js=json_init)
+
+        wrapped.add_content(html)
+        wrapped.add_frag_resources(frag)
+        return wrapped
 
     # Asides
+
+    def create_aside(self, block_type, keys):
+        """
+        The aside version of construct_xblock: take a type and key. Return an instance
+        """
+        aside_cls = XBlockAside.load_class(block_type)
+        return aside_cls(runtime=self, scope_ids=keys)
 
     def get_asides(self, block):
         """
@@ -781,29 +882,31 @@ class Runtime(object):
         for aside in self.get_asides(block):
             aside_view_fn = aside.aside_view_declaration(view_name)
             if aside_view_fn is not None:
-                aside_frag_fns.append(aside_view_fn)
+                aside_frag_fns.append((aside, aside_view_fn))
         if aside_frag_fns:
             # layout (overideable by other runtimes)
-            return self.layout_asides(block, context, frag, aside_frag_fns)
+            return self.layout_asides(block, context, frag, view_name, aside_frag_fns)
         return frag
 
-    def layout_asides(self, block, context, frag, aside_frag_fns):
+    def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
         """
         Execute and layout the aside_frags wrt the block's frag. Runtimes should feel free to override this
         method to control execution, place, and style the asides appropriately for their application
 
-        This default method appends the aside_frags after frag
+        This default method appends the aside_frags after frag. If you override this, you must
+        call wrap_aside around each aside as per this function.
 
         Args:
             block (XBlock): the block being rendered
             frag (html): The result from rendering the block
-            aside_frags list(html): The result from rendering each aside in some arbitrary order
+            aside_frag_fns list((aside, aside_fn)): The asides and closures for rendering to call
         """
         result = Fragment(frag.content)
         result.add_frag_resources(frag)
 
-        for aside_fn in aside_frag_fns:
-            aside_frag = aside_fn(block, context)
+        for aside, aside_fn in aside_frag_fns:
+            aside_frag = self.wrap_aside(block, aside, view_name, aside_fn(block, context), context)
+            aside.save()
             result.add_content(aside_frag.content)
             result.add_frag_resources(aside_frag)
 
