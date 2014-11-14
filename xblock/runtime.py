@@ -16,6 +16,7 @@ from StringIO import StringIO
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
+from xblock.fragment import Fragment
 from xblock.exceptions import (
     NoSuchViewError,
     NoSuchHandlerError,
@@ -24,7 +25,7 @@ from xblock.exceptions import (
     NoSuchDefinition,
     FieldDataDeprecationWarning,
 )
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlockAside
 
 
 class KeyValueStore(object):
@@ -247,6 +248,7 @@ class IdReader(object):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def get_definition_id_from_aside(self, aside_id):
         """
         Retrieve the XBlock `definition_id` associated with this aside definition id.
@@ -468,11 +470,17 @@ class Runtime(object):
         raise NotImplementedError("Runtime needs to provide publish()")
 
     # Construction
-    def __init__(self, id_reader, field_data=None, mixins=(), services=None, default_class=None, select=None):
+    def __init__(
+            self, id_reader, field_data=None, mixins=(), services=None,
+            default_class=None, select=None, id_generator=None
+    ):
         """
         Arguments:
             id_reader (IdReader): An object that allows the `Runtime` to
                 map between *usage_ids*, *definition_ids*, and *block_types*.
+
+            id_generator (IdGenerator): The :class:`.IdGenerator` to use
+                for creating ids when importing XML or loading XBlockAsides.
 
             field_data (FieldData): The :class:`.FieldData` to use by default when
                 constructing an :class:`.XBlock` from this `Runtime`.
@@ -513,6 +521,10 @@ class Runtime(object):
         self.user_id = None
         self.mixologist = Mixologist(mixins)
         self._view_name = None
+
+        self.id_generator = id_generator
+        if id_generator is None:
+            warnings.warn("IdGenerator will be required in the future in order to support XBlockAsides", FutureWarning)
 
     # Block operations
 
@@ -584,17 +596,26 @@ class Runtime(object):
 
     # Parsing XML
 
-    def parse_xml_string(self, xml, id_generator):
+    def parse_xml_string(self, xml, id_generator=None):
         """Parse a string of XML, returning a usage id."""
+        if id_generator is not None:
+            warnings.warn(
+                "Passing an id_generator directly is deprecated "
+                "in favor of constructing the Runtime with the id_generator",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
+        id_generator = id_generator or self.id_generator
         return self.parse_xml_file(StringIO(xml), id_generator)
 
-    def parse_xml_file(self, fileobj, id_generator):
+    def parse_xml_file(self, fileobj, id_generator=None):
         """Parse an open XML file, returning a usage id."""
         root = etree.parse(fileobj).getroot()
         usage_id = self._usage_id_from_node(root, None, id_generator)
         return usage_id
 
-    def _usage_id_from_node(self, node, parent_id, id_generator):
+    def _usage_id_from_node(self, node, parent_id, id_generator=None):
         """Create a new usage id from an XML dom node.
 
         Args:
@@ -603,6 +624,16 @@ class Runtime(object):
             id_generator (IdGenerator): The :class:`.IdGenerator` to use
                 for creating ids
         """
+        if id_generator is not None:
+            warnings.warn(
+                "Passing an id_generator directly is deprecated "
+                "in favor of constructing the Runtime with the id_generator",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+
+        id_generator = id_generator or self.id_generator
+
         block_type = node.tag
         # TODO: a way for this node to be a usage to an existing definition?
         def_id = id_generator.create_definition(block_type)
@@ -614,7 +645,7 @@ class Runtime(object):
         block.save()
         return usage_id
 
-    def add_node_as_child(self, block, node, id_generator):
+    def add_node_as_child(self, block, node, id_generator=None):
         """
         Called by XBlock.parse_xml to treat a child node as a child block.
         """
@@ -671,7 +702,8 @@ class Runtime(object):
 
             # Explicitly save because render action may have changed state
             block.save()
-            return self.wrap_child(block, view_name, frag, context)
+            updated_frag = self.wrap_child(block, view_name, frag, context)
+            return self.render_asides(block, view_name, updated_frag, context)
         finally:
             # Reset the active view to what it was before entering this method
             self._view_name = old_view_name
@@ -712,6 +744,70 @@ class Runtime(object):
         """
         # By default, just return the fragment itself.
         return frag
+
+    # Asides
+
+    def get_asides(self, block):
+        """
+        Return all of the asides which might be decorating this `block`.
+
+        Arguments:
+            block (:class:`.XBlock`): The block to render retrieve asides for.
+        """
+        # TODO: This function will need to be extended if we want to allow:
+        #   a) XBlockAsides to statically indicated which types of blocks they can comment on
+        #   b) XBlockRuntimes to limit the selection of asides to a subset of the installed asides
+        #   c) Optimize by only loading asides that actually decorate a particular view
+
+        if self.id_generator is None:
+            raise Exception("Runtimes must be supplied with an IdGenerator to load XBlockAsides.")
+
+        usage_id = block.scope_ids.usage_id
+
+        asides = []
+        for aside_type, aside_cls in XBlockAside.load_classes():
+            definition_id = self.id_reader.get_definition_id(usage_id)
+            aside_def_id, aside_usage_id = self.id_generator.create_aside(definition_id, usage_id, aside_type)
+            scope_ids = ScopeIds(self.user_id, aside_type, aside_def_id, aside_usage_id)
+            asides.append(aside_cls(runtime=self, scope_ids=scope_ids))
+        return asides
+
+    def render_asides(self, block, view_name, frag, context):
+        """
+        Collect all of the asides' add ons and format them into the frag. The frag already
+        has the given block's rendering.
+        """
+        aside_frag_fns = []
+        for aside in self.get_asides(block):
+            aside_view_fn = aside.aside_view_declaration(view_name)
+            if aside_view_fn is not None:
+                aside_frag_fns.append(aside_view_fn)
+        if aside_frag_fns:
+            # layout (overideable by other runtimes)
+            return self.layout_asides(block, context, frag, aside_frag_fns)
+        return frag
+
+    def layout_asides(self, block, context, frag, aside_frag_fns):
+        """
+        Execute and layout the aside_frags wrt the block's frag. Runtimes should feel free to override this
+        method to control execution, place, and style the asides appropriately for their application
+
+        This default method appends the aside_frags after frag
+
+        Args:
+            block (XBlock): the block being rendered
+            frag (html): The result from rendering the block
+            aside_frags list(html): The result from rendering each aside in some arbitrary order
+        """
+        result = Fragment(frag.content)
+        result.add_frag_resources(frag)
+
+        for aside_fn in aside_frag_fns:
+            aside_frag = aside_fn(block, context)
+            result.add_content(aside_frag.content)
+            result.add_frag_resources(aside_frag)
+
+        return result
 
     # Handlers
 

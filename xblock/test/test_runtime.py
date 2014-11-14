@@ -25,7 +25,6 @@ from xblock.runtime import (
     KvsFieldData,
     Mixologist,
     ObjectAggregator,
-    Runtime,
 )
 from xblock.fragment import Fragment
 from xblock.field_data import DictFieldData, FieldData
@@ -106,6 +105,8 @@ class TestXBlock(TestXBlockNoFallback):
         self.preferences = context[0]
         if view_name == 'test_fallback_view':
             return Fragment(self.preferences)
+        else:
+            return Fragment(u"{} default".format(view_name))
 
 
 # Allow this tuple to be named as if it were a class
@@ -208,13 +209,12 @@ def test_db_model_keys():
 
 
 @unabc("{} shouldn't be used in tests")
-class MockRuntimeForQuerying(Runtime):
+class MockRuntimeForQuerying(TestRuntime):
     """Mock out a runtime for querypath_parsing test"""
     # unabc doesn't squash pylint errors
     # pylint: disable=abstract-method
     def __init__(self, **kwargs):
         self.mock_query = Mock()
-        kwargs.setdefault('id_reader', Mock(spec=IdReader))
         super(MockRuntimeForQuerying, self).__init__(**kwargs)
 
     def query(self, block):
@@ -325,7 +325,7 @@ class TestIntegerXblock(XBlock):
 def test_default_fn():
     key_store = SerialDefaultKVS()
     field_data = KvsFieldData(key_store)
-    runtime = TestRuntime(Mock(spec=IdReader), services={'field-data': field_data})
+    runtime = TestRuntime(services={'field-data': field_data})
     tester = TestIntegerXblock(runtime, scope_ids=Mock(spec=ScopeIds))
     tester2 = TestIntegerXblock(runtime, scope_ids=Mock(spec=ScopeIds))
 
@@ -566,7 +566,7 @@ class XBlockWithServices(XBlock):
 
 
 def test_service():
-    runtime = TestRuntime(Mock(), services={'secret_service': 17})
+    runtime = TestRuntime(services={'secret_service': 17})
     tester = XBlockWithServices(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # Call the student_view to run its assertions.

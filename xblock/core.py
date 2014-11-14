@@ -7,6 +7,8 @@ and used by all runtimes.
 """
 import pkg_resources
 import warnings
+from collections import defaultdict
+from lazy import lazy
 
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
@@ -17,7 +19,7 @@ from xblock.mixins import (
     HandlersMixin,
     XmlSerializationMixin,
 )
-from xblock.plugin import Plugin
+from xblock.plugin import Plugin, PluginMetaclass
 from xblock.validation import Validation
 
 
@@ -62,6 +64,7 @@ class XBlockMetaclass(
         ScopedStorageMixin.__metaclass__,
         RuntimeServicesMixin.__metaclass__,
         TagCombiningMetaclass,
+        PluginMetaclass,
 ):
     """
     Metaclass for XBlock.
@@ -71,7 +74,6 @@ class XBlockMetaclass(
     * `ChildrenModelMetaclass`
     * `ModelMetaclass`
     * `TagCombiningMetaclass`
-    * `ServiceRequestedMetaclass`
 
     """
     pass
@@ -179,6 +181,89 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         method, as there is currently only a no-op implementation.
         """
         return Validation(self.scope_ids.usage_id)
+
+
+class AsideMetaclass(
+        ScopedStorageMixin.__metaclass__,
+        RuntimeServicesMixin.__metaclass__,
+        PluginMetaclass,
+):
+    """
+    Metaclass for XBlock.
+
+    Combines all the metaclasses XBlocks needs:
+
+    * `ChildrenModelMetaclass`
+    * `ModelMetaclass`
+    * `TagCombiningMetaclass`
+
+    """
+    pass
+
+
+class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
+    """
+    This mixin allows Xblock-like class to declare that it provides aside functionality.
+    """
+    __metaclass__ = AsideMetaclass
+
+    entry_point = "xblock_asides.v1"
+
+    @classmethod
+    def aside_for(cls, view_name):
+        """
+        A decorator to indicate a function is the aside view for the given view_name.
+
+        Aside views should have a signature like:
+
+            @XBlockAside.aside_for('student_view')
+            def student_aside(self, block, context=None):
+                ...
+                return Fragment(...)
+        """
+        # pylint: disable=protected-access
+        def _decorator(func):  # pylint: disable=missing-docstring
+            if not hasattr(func, '_aside_for'):
+                func._aside_for = []
+
+            func._aside_for.append(view_name)  # pylint: disable=protected-access
+            return func
+        return _decorator
+
+    @lazy
+    def _combined_asides(self):
+        """
+        A dictionary mapping XBlock view names to the aside method that
+        decorates them (or None, if there is no decorator for the specified view).
+        """
+        # The method declares what views it decorates. We rely on `dir`
+        # to handle subclasses and overrides.
+        combined_asides = defaultdict(None)
+        for attr in dir(self):
+            # Avoid infinite recursion
+            if attr == '_combined_asides':
+                continue
+
+            view_func = getattr(self, attr)
+            aside_for = getattr(view_func, '_aside_for', [])
+            for view in aside_for:
+                combined_asides[view] = view_func
+        return combined_asides
+
+    def aside_view_declaration(self, view_name):
+        """
+        Find and return a function object if one is an aside_view for the given view_name
+
+        Aside methods declare their view provision via @XBlockAside.aside_for(view_name)
+        This function finds those declarations for a block.
+
+        Arguments:
+            view_name (string): the name of the view requested.
+
+        Returns:
+            either the function or None
+        """
+        return self._combined_asides.get(view_name, None)
 
 
 # Maintain backwards compatibility
