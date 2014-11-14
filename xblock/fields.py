@@ -15,6 +15,8 @@ import logging
 import pytz
 import traceback
 import warnings
+import json
+import yaml
 
 
 # __all__ controls what classes end up in the docs, and in what order.
@@ -277,6 +279,9 @@ class Field(object):
             possible to convert it. This provides a guarantee on the stored
             value type.
 
+        xml_node: if set, the field will be serialized as a
+            separate node instead of an xml attribute (default: False).
+
         kwargs: optional runtime-specific options/metadata. Will be stored as
             runtime_options.
 
@@ -286,7 +291,8 @@ class Field(object):
 
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
-                 display_name=None, values=None, enforce_type=False, **kwargs):
+                 display_name=None, values=None, enforce_type=False,
+                 xml_node=False, **kwargs):
         self._name = "unknown"
         self.help = help
         self._enable_enforce_type = enforce_type
@@ -296,6 +302,7 @@ class Field(object):
         self._display_name = display_name
         self._values = values
         self.runtime_options = kwargs
+        self.xml_node = xml_node
 
     @property
     def default(self):
@@ -496,6 +503,15 @@ class Field(object):
     def __repr__(self):
         return "<{0.__class__.__name__} {0._name}>".format(self)
 
+    def _warn_deprecated_outside_JSONField(self):  # pylint: disable=invalid-name
+        """Certain methods will be moved to JSONField.
+
+        This warning marks calls when the object is not
+        derived from that class.
+        """
+        if not isinstance(self, JSONField):
+            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
+
     def to_json(self, value):
         """
         Return value in the form of nested lists and dictionaries (suitable
@@ -504,8 +520,7 @@ class Field(object):
         This is called during field writes to convert the native python
         type to the value stored in the database
         """
-        if not isinstance(self, JSONField):
-            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
+        self._warn_deprecated_outside_JSONField()
         return value
 
     def from_json(self, value):
@@ -515,9 +530,27 @@ class Field(object):
         Called during field reads to convert the stored value into a full featured python
         object
         """
-        if not isinstance(self, JSONField):
-            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
+        self._warn_deprecated_outside_JSONField()
         return value
+
+    def to_string(self, value):
+        """
+        Return a JSON serialized string representation of the value.
+        """
+        self._warn_deprecated_outside_JSONField()
+        value = json.dumps(
+            self.to_json(value), indent=2,
+            sort_keys=True, separators=(',', ': '))
+        return value
+
+    def from_string(self, serialized):
+        """
+        Returns a native value from a YAML serialized string representation.
+        Since YAML is a superset of JSON, this is the inverse of to_string.)
+        """
+        self._warn_deprecated_outside_JSONField()
+        value = yaml.safe_load(serialized)
+        return self._check_or_enforce_type(value)
 
     def enforce_type(self, value):
         """
@@ -541,8 +574,7 @@ class Field(object):
         """
         Retrieve the serialized value for this field from the specified xblock
         """
-        if not isinstance(self, JSONField):
-            logging.warn("Deprecated. JSONifiable fields should derive from JSONField")
+        self._warn_deprecated_outside_JSONField()
         return self.to_json(self.read_from(xblock))
 
     def write_to(self, xblock, value):
@@ -704,6 +736,14 @@ class String(JSONField):
             return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
+
+    def from_string(self, value):
+        """String gets serialized and deserialized without quote marks."""
+        return self.from_json(value)
+
+    def to_string(self, value):
+        """String gets serialized and deserialized without quote marks."""
+        return self.to_json(value)
 
     enforce_type = from_json
 
