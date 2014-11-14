@@ -186,6 +186,20 @@ Reporting Security Issues
 
 Please do not report security issues in public. Please email security@edx.org
 
+Packaging
+---------
+
+To package a new release, first tag the commit to be released
+
+    $VERSION=0.5
+    git tag -a -m "XBlock version $VERSION" xblock-$VERSION
+
+then upload to PyPI
+
+    make package
+
+All of the heavy lifting is handled by python-versioneer (https://github.com/warner/python-versioneer)
+
 
 Mailing List and IRC Channel
 ----------------------------
