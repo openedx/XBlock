@@ -182,7 +182,9 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
     def validate(self):
         """
         Ask this xblock to validate itself. Subclasses are expected to override this
-        method, as there is currently only a no-op implementation.
+        method, as there is currently only a no-op implementation. Any overriding method
+        should call super to collect validation results from its superclasses, and then
+        add any additional results as necessary.
         """
         return Validation(self.scope_ids.usage_id)
 
