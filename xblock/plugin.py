@@ -8,6 +8,7 @@ import functools
 import itertools
 import logging
 import pkg_resources
+from six import add_metaclass
 
 log = logging.getLogger(__name__)
 
@@ -58,6 +59,7 @@ class PluginMetaclass(type):
         return super(PluginMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+@add_metaclass(PluginMetaclass)
 class Plugin(object):
     """Base class for a system that uses entry_points to load plugins.
 
@@ -66,7 +68,6 @@ class Plugin(object):
         `entry_point`: The name of the entry point to load plugins from.
 
     """
-    __metaclass__ = PluginMetaclass
 
     entry_point = None  # Should be overwritten by children classes
 

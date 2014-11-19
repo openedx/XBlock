@@ -11,7 +11,7 @@ import warnings
 
 from abc import ABCMeta, abstractmethod
 from lxml import etree
-from StringIO import StringIO
+from six import add_metaclass, BytesIO, text_type, PY2
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
@@ -28,11 +28,9 @@ from xblock.exceptions import (
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 
 
+@add_metaclass(ABCMeta)
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
-
-    __metaclass__ = ABCMeta
-
     # Keys are structured to retain information about the scope of the data.
     # Stores can use this information however they like to store and retrieve
     # data.
@@ -231,9 +229,9 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
+@add_metaclass(ABCMeta)
 class IdReader(object):
     """An abstract object that stores usages and definitions."""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_usage_id_from_aside(self, aside_id):
@@ -286,9 +284,9 @@ class IdReader(object):
         raise NotImplementedError()
 
 
+@add_metaclass(ABCMeta)
 class IdGenerator(object):
     """An abstract object that creates usage and definition ids"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_aside(self, definition_id, usage_id, aside_type):
@@ -387,12 +385,11 @@ class MemoryIdManager(IdReader, IdGenerator):
             raise NoSuchDefinition(repr(def_id))
 
 
+@add_metaclass(ABCMeta)
 class Runtime(object):
     """
     Access to the runtime environment for XBlocks.
     """
-
-    __metaclass__ = ABCMeta
 
     # Abstract methods
     @abstractmethod
@@ -607,7 +604,7 @@ class Runtime(object):
             )
 
         id_generator = id_generator or self.id_generator
-        return self.parse_xml_file(StringIO(xml), id_generator)
+        return self.parse_xml_file(BytesIO(xml), id_generator)
 
     def parse_xml_file(self, fileobj, id_generator=None):
         """Parse an open XML file, returning a usage id."""
@@ -1070,8 +1067,22 @@ class NullI18nService(object):
     def strftime(self, dtime, format):      # pylint: disable=redefined-builtin
         """
         Locale-aware strftime, with format short-cuts.
+
+        Arguments:
+            dtime (:class:`datetime.datetime`): The date to format
+            format (string): The format string
+
+        Returns:
+            unicode: The formatted date string
         """
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if isinstance(format, unicode):
-            format = format.encode("utf8")
-        return dtime.strftime(format).decode("utf8")
+
+        if PY2 and isinstance(format, text_type):
+            format = format.encode('utf-8')
+
+        formatted = dtime.strftime(format)
+
+        if PY2:
+            return formatted.decode("utf-8")
+        else:
+            return formatted

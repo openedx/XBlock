@@ -2,11 +2,12 @@
 """Test XML parsing in XBlocks."""
 
 import re
-import StringIO
 import textwrap
 import unittest
 import ddt
 import mock
+
+from six import BytesIO
 
 from xblock.core import XBlock, XML_NAMESPACES
 from xblock.fields import Scope, String, Integer, Dict, List
@@ -71,7 +72,7 @@ class XmlTest(object):
         self.runtime = ToyRuntime()
 
     def parse_xml_to_block(self, xml):
-        """A helper to get a block from some XML."""
+        """A helper to get a block from some XML bytes."""
 
         # ToyRuntime has an id_generator, but most runtimes won't
         # (because the generator will be contextual), so we
@@ -82,7 +83,7 @@ class XmlTest(object):
 
     def export_xml_for_block(self, block):
         """A helper to return the XML string for a block."""
-        output = StringIO.StringIO()
+        output = BytesIO()
         self.runtime.export_to_xml(block, output)
         return output.getvalue()
 
@@ -94,7 +95,7 @@ class ParsingTest(XmlTest, unittest.TestCase):
 
     @XBlock.register_temp_plugin(Leaf)
     def test_parsing(self):
-        block = self.parse_xml_to_block("<leaf data2='parsed'/>")
+        block = self.parse_xml_to_block(b"<leaf data2='parsed'/>")
 
         self.assertIsInstance(block, Leaf)
         self.assertEqual(block.data1, "default_value")
@@ -103,7 +104,7 @@ class ParsingTest(XmlTest, unittest.TestCase):
 
     @XBlock.register_temp_plugin(Leaf)
     def test_parsing_content(self):
-        block = self.parse_xml_to_block("<leaf>my text!</leaf>")
+        block = self.parse_xml_to_block(b"<leaf>my text!</leaf>")
 
         self.assertIsInstance(block, Leaf)
         self.assertEqual(block.content, "my text!")
@@ -111,7 +112,7 @@ class ParsingTest(XmlTest, unittest.TestCase):
     @XBlock.register_temp_plugin(Leaf)
     @XBlock.register_temp_plugin(Container)
     def test_parsing_children(self):
-        block = self.parse_xml_to_block("""\
+        block = self.parse_xml_to_block(b"""\
                     <container>
                         <leaf data1='child1'/>
                         <leaf data1='child2'/>
@@ -133,7 +134,7 @@ class ParsingTest(XmlTest, unittest.TestCase):
     @XBlock.register_temp_plugin(Leaf)
     @XBlock.register_temp_plugin(Specialized)
     def test_customized_parsing(self):
-        block = self.parse_xml_to_block("""\
+        block = self.parse_xml_to_block(b"""\
                     <specialized>
                         <leaf/><leaf/><leaf/>
                     </specialized>
@@ -143,7 +144,7 @@ class ParsingTest(XmlTest, unittest.TestCase):
 
     @XBlock.register_temp_plugin(Leaf)
     def test_parse_unicode(self):
-        block = self.parse_xml_to_block(u"<leaf data1='\u2603' />")
+        block = self.parse_xml_to_block(u"<leaf data1='\u2603' />".encode('utf-8'))
         self.assertIsInstance(block, Leaf)
         self.assertEqual(block.data1, u'\u2603')
 
@@ -154,17 +155,17 @@ class ExportTest(XmlTest, unittest.TestCase):
 
     @XBlock.register_temp_plugin(Leaf)
     def test_dead_simple_export(self):
-        block = self.parse_xml_to_block("<leaf/>")
+        block = self.parse_xml_to_block(b"<leaf/>")
         xml = self.export_xml_for_block(block)
         self.assertRegexpMatches(
-            xml.strip(),
+            xml.decode('utf-8').strip(),
             r"\<\?xml version='1.0' encoding='UTF8'\?\>\n\<leaf .*/\>"
         )
 
     @XBlock.register_temp_plugin(Leaf)
     @XBlock.register_temp_plugin(Container)
     def test_export_then_import(self):
-        block = self.parse_xml_to_block(textwrap.dedent("""\
+        block = self.parse_xml_to_block(textwrap.dedent(u"""\
             <?xml version='1.0' encoding='utf-8'?>
             <container>
                 <leaf data1='child1' data2='I&#39;m also child1' />
@@ -176,17 +177,19 @@ class ExportTest(XmlTest, unittest.TestCase):
                 </container>
                 <leaf>Some text content.</leaf>
             </container>
-            """))
+            """).encode('utf-8'))
         xml = self.export_xml_for_block(block)
         block_imported = self.parse_xml_to_block(xml)
 
+        xml_text = xml.decode('utf-8')
+
         # Crude checks that the XML is correct.  The exact form of the XML
         # isn't important.
-        self.assertEqual(xml.count("container"), 4)
-        self.assertEqual(xml.count("child1"), 2)
-        self.assertEqual(xml.count("child2"), 1)
-        self.assertEqual(xml.count("ʇxǝʇ uʍop-ǝpısdn"), 1)
-        self.assertEqual(xml.count("ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!"), 1)
+        self.assertEqual(xml_text.count("container"), 4)
+        self.assertEqual(xml_text.count("child1"), 2)
+        self.assertEqual(xml_text.count("child2"), 1)
+        self.assertEqual(xml_text.count(u"ʇxǝʇ uʍop-ǝpısdn"), 1)
+        self.assertEqual(xml_text.count(u"ᵾnɨȼøđɇ ȼȺn ƀɇ ŧɍɨȼꝁɏ!"), 1)
 
         # The important part: exporting then importing a block should give
         # you an equivalent block.
@@ -194,19 +197,19 @@ class ExportTest(XmlTest, unittest.TestCase):
 
     @XBlock.register_temp_plugin(LeafWithDictAndList)
     def test_dict_and_list_as_attribute(self):
-        block = self.parse_xml_to_block(textwrap.dedent("""\
+        block = self.parse_xml_to_block(textwrap.dedent(u"""\
             <?xml version='1.0' encoding='utf-8'?>
             <leafwithdictandlist
                 dictionary='{"foo": "bar"}'
                 sequence='["one", "two", "three"]' />
-            """))
+            """).encode('utf-8'))
 
         self.assertEquals(block.dictionary, {"foo": "bar"})
         self.assertEquals(block.sequence, ["one", "two", "three"])
 
     @XBlock.register_temp_plugin(LeafWithOption)
     def test_export_then_import_with_options(self):
-        block = self.parse_xml_to_block(textwrap.dedent("""\
+        block = self.parse_xml_to_block(textwrap.dedent(u"""\
             <?xml version='1.0' encoding='utf-8'?>
             <leafwithoption xmlns:option="http://code.edx.org/xblock/option"
                 data1="child1" data2='with a dict'>
@@ -220,7 +223,7 @@ class ExportTest(XmlTest, unittest.TestCase):
                     - some string
                 </option:data4>
             </leafwithoption>
-            """))
+            """).encode('utf-8'))
         xml = self.export_xml_for_block(block)
 
         block_imported = self.parse_xml_to_block(xml)
@@ -228,12 +231,12 @@ class ExportTest(XmlTest, unittest.TestCase):
         self.assertEqual(block_imported.data3, {"child": 1, "with custom option": True})
         self.assertEqual(block_imported.data4, [1.23, True, "some string"])
 
-        self.assertEqual(xml.count("child1"), 1)
+        self.assertEqual(xml.decode('utf-8').count("child1"), 1)
         self.assertTrue(blocks_are_equivalent(block, block_imported))
 
     @XBlock.register_temp_plugin(LeafWithOption)
     def test_dict_and_list_export_format(self):
-        xml = textwrap.dedent("""\
+        xml = textwrap.dedent(u"""\
             <?xml version='1.0' encoding='UTF8'?>
             <leafwithoption %s>
               <option:data3>{
@@ -247,6 +250,7 @@ class ExportTest(XmlTest, unittest.TestCase):
             ]</option:data4>
             </leafwithoption>
             """) % get_namespace_attrs()
+        xml = xml.encode('utf-8')
         block = self.parse_xml_to_block(xml)
         exported_xml = self.export_xml_for_block(block)
 
@@ -261,7 +265,8 @@ class ExportTest(XmlTest, unittest.TestCase):
     )
     def test_unknown_field_as_attribute_raises_warning(self, parameter_name):
         with mock.patch('logging.warn') as patched_warn:
-            block = self.parse_xml_to_block("<leaf {0}='something irrelevant'></leaf>".format(parameter_name))
+            xml = u"<leaf {0}='something irrelevant'></leaf>".format(parameter_name).encode('utf-8')
+            block = self.parse_xml_to_block(xml)
             patched_warn.assert_called_once_with("XBlock %s does not contain field %s", type(block), parameter_name)
 
     @XBlock.register_temp_plugin(LeafWithOption)
@@ -272,11 +277,12 @@ class ExportTest(XmlTest, unittest.TestCase):
         "eccentricity"
     )
     def test_unknown_field_as_node_raises_warning(self, parameter_name):
-        xml = textwrap.dedent("""\
+        xml = textwrap.dedent(u"""\
             <leafwithoption %s>
                 <option:%s>Some completely irrelevant data</option:%s>
             </leafwithoption>
         """) % (get_namespace_attrs(), parameter_name, parameter_name)
+        xml = xml.encode('utf-8')
         with mock.patch('logging.warn') as patched_warn:
             block = self.parse_xml_to_block(xml)
             patched_warn.assert_called_once_with("XBlock %s does not contain field %s", type(block), parameter_name)
