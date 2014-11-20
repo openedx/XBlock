@@ -80,7 +80,7 @@ Examples of runtimes:
 * `XBlock workbench`__
 * `XBlock Runtime for Google App Engine`__
 
-__ https://github.com/edx/XBlock/blob/master/workbench/runtime.py
+__ https://github.com/edx/xblock-sdk/tree/master/workbench
 __ https://github.com/google/appengine_xblock_runtime
 
 .. todo::
