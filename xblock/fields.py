@@ -5,12 +5,14 @@ The hosting runtime application decides what actual storage mechanism to use
 for each scope.
 
 """
+import ast
 
 from collections import namedtuple
 import copy
 import datetime
 import dateutil.parser
 import itertools
+import json
 import logging
 import pytz
 import traceback
@@ -604,7 +606,27 @@ class JSONField(Field):
     """
     Field type which has a convenient JSON representation.
     """
-    pass  # for now; we'll bubble functions down when we finish deprecation in Field
+    @classmethod
+    def coerce_value(cls, value, goal_types):
+        """
+        When loading from XML, a more complex data structure may be serialized
+        into a string. Attempt to load the value both from a JSON parser and
+        from an AST literal, since some export functions just run str() on the
+        values.
+
+        If the result is not the right type, throw an error.
+        """
+        try:
+            value = json.loads(value)
+        except ValueError:
+            try:
+                value = ast.literal_eval(value)
+            except (SyntaxError, ValueError):
+                raise TypeError("Could not deserialize string {0}. Please ensure it is valid JSON.".format(repr(value)))
+        if not isinstance(value, goal_types):
+            raise TypeError("Value stored on {0} must be of types: {1}. Found {2}.".format(
+                cls.__name__, repr(goal_types), type(value)))
+        return value
 
 
 class Integer(JSONField):
@@ -698,8 +720,11 @@ class Dict(JSONField):
     def from_json(self, value):
         if value is None or isinstance(value, dict):
             return value
+        elif isinstance(value, basestring):
+            value = self.coerce_value(value, (dict, type(None)))
         else:
             raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
+        return value
 
     enforce_type = from_json
 
@@ -716,8 +741,11 @@ class List(JSONField):
     def from_json(self, value):
         if value is None or isinstance(value, list):
             return value
+        elif isinstance(value, basestring):
+            value = self.coerce_value(value, (list, type(None)))
         else:
             raise TypeError('Value stored in a List must be None or a list, found %s' % type(value))
+        return value
 
     enforce_type = from_json
 
