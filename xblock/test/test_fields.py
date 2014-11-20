@@ -83,6 +83,13 @@ class FieldTest(unittest.TestCase):
         """
         self.assertEqual(expected, self.FIELD_TO_TEST().to_json(arg))
 
+    def assertFromJSONOrLitEquals(self, expected, arg):
+        """
+        Assert that deserialization of `arg` from stringified JSON or
+        Python Literal equals `expected`.
+        """
+        self.assertEqual(expected, self.FIELD_TO_TEST().from_json(arg))
+
     def assertJSONOrSetValueError(self, arg):
         """
         Asserts that field.from_json or setting the field throws a ValueError
@@ -306,6 +313,10 @@ class ListTest(FieldTest):
         self.assertJSONOrSetEquals(['foo', 'bar'], ['foo', 'bar'])
         self.assertJSONOrSetEquals([1, 3.4], [1, 3.4])
 
+    def test_json_lit_coersion(self):
+        self.assertFromJSONOrLitEquals([1, 2, None, "hello"], '[1, 2, null, "hello"]')
+        self.assertFromJSONOrLitEquals([None, 3, 4, True], "[None, 3, 4, True]")
+
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)
 
@@ -370,6 +381,10 @@ class DictTest(FieldTest):
     def test_json_equals(self):
         self.assertJSONOrSetEquals({}, {})
         self.assertJSONOrSetEquals({'a': 'b', 'c': 3}, {'a': 'b', 'c': 3})
+
+    def test_json_lit_coersion(self):
+        self.assertFromJSONOrLitEquals({'d': "e", "f": 4}, '{"d": "e", "f": 4}')
+        self.assertFromJSONOrLitEquals({'g': "h", "i": None}, "{'g': 'h', 'i': None}")
 
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)
