@@ -39,7 +39,6 @@ class XBlockCourse(object):
     def __init__(
         self,
         id=None,
-        title=None,
         display_name=None,
         key=None,
         org=None,
@@ -47,7 +46,6 @@ class XBlockCourse(object):
     ):
         # Set standardized attributes
         self.id = id
-        self.title = title
         self.display_name = display_name
         self.key = key
         self.org = org
