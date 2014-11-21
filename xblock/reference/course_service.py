@@ -27,7 +27,9 @@ class XBlockCourse(object):
 
     This is just to tell xblock authors what fields they can expect from this service, and how to reference them
         - id
-        - name
+        - title
+        - display_name
+        - key
         - org
         - number
 
@@ -37,12 +39,16 @@ class XBlockCourse(object):
     def __init__(
         self,
         id=None,
-        name=None,
+        title=None,
+        display_name=None,
+        key=None,
         org=None,
         number=None
     ):
         # Set standardized attributes
         self.id = id
-        self.name = name
+        self.title = title
+        self.display_name = display_name
+        self.key = key
         self.org = org
         self.number = number
