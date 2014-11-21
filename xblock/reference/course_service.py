@@ -30,7 +30,6 @@ class XBlockCourse(object):
         - name
         - org
         - number
-        - run
 
     Runtimes are not required to conform to this standard and can always
     patch attributes dynamically.
@@ -40,12 +39,10 @@ class XBlockCourse(object):
         id=None,
         name=None,
         org=None,
-        number=None,
-        run=None
+        number=None
     ):
         # Set standardized attributes
         self.id = id
         self.name = name
         self.org = org
         self.number = number
-        self.run = run
