@@ -7,10 +7,12 @@ The README file in this directory contains much more information.
 Much of this still needs to be organized.
 """
 
-from djpyfs import djpyfs
+try:
+    from djpyfs import djpyfs  # pylint: disable=import-error
+except ImportError:
+    djpyfs = None  # pylint: disable=invalid-name
 
 from xblock.fields import Field, NO_CACHE_VALUE
-from xblock.fields import UserScope, BlockScope
 from xblock.fields import scope_key
 
 #  Finished services
@@ -19,7 +21,7 @@ from xblock.fields import scope_key
 #  edX-internal prototype services
 
 
-def public(type=None, **kwargs):  # pylint disable=unused-argument
+def public(type=None, **kwargs):  # pylint: disable=unused-argument, redefined-builtin
     """
     Mark a function as public. In the future, this will inform the XBlocks services
     framework to make the function remotable. For now, this is a placeholder.
@@ -86,41 +88,42 @@ class Service(object):
         return self._runtime
 
 
-class FSService(Service):
-    """
-    This is a PROTOTYPE service for storing files in XBlock fields.
-
-    It returns a file system as per:
-      https://github.com/pmitros/django-pyfs
-
-    1) The way this service is initialized and used is likely
-    wrong. We'll want to fix it.
-    2) There is discussion as to whether we want this service at
-    all. Specifically:
-    - It is unclear if XBlocks ought to have filesystem-as-a-service,
-      or just as a field, as per below. Below requires an FS service,
-      but it is not clear XBlocks should know about it.
-
-    - It is unclear if pyfilesystem has performance properties we
-      want.  Our goal is to try this in a limited roll-out, and see if
-      whether we run into limitations, and if so, which ones. This is
-      not intended as part of the XBlock standard until we've built up
-      more experience and comfort with it. See:
-
-      https://groups.google.com/forum/#!topic/edx-code/4VadWwqeMNI
-    """
-
-    @public()
-    def load(self, instance, xblock):
+if djpyfs:
+    class FSService(Service):
         """
-        Get the filesystem for the field specified in 'instance' and the xblock in 'xblock'
-        It is locally scoped.
-        """
-        # TODO: Get xblock from context, once the plumbing is piped through
-        return djpyfs.get_filesystem(scope_key(instance, xblock))
+        This is a PROTOTYPE service for storing files in XBlock fields.
 
-    def __repr__(self):
-        return "File system object"
+        It returns a file system as per:
+          https://github.com/pmitros/django-pyfs
+
+        1) The way this service is initialized and used is likely
+        wrong. We'll want to fix it.
+        2) There is discussion as to whether we want this service at
+        all. Specifically:
+        - It is unclear if XBlocks ought to have filesystem-as-a-service,
+          or just as a field, as per below. Below requires an FS service,
+          but it is not clear XBlocks should know about it.
+
+        - It is unclear if pyfilesystem has performance properties we
+          want.  Our goal is to try this in a limited roll-out, and see if
+          whether we run into limitations, and if so, which ones. This is
+          not intended as part of the XBlock standard until we've built up
+          more experience and comfort with it. See:
+
+          https://groups.google.com/forum/#!topic/edx-code/4VadWwqeMNI
+        """
+
+        @public()
+        def load(self, instance, xblock):
+            """
+            Get the filesystem for the field specified in 'instance' and the xblock in 'xblock'
+            It is locally scoped.
+            """
+            # TODO: Get xblock from context, once the plumbing is piped through
+            return djpyfs.get_filesystem(scope_key(instance, xblock))
+
+        def __repr__(self):
+            return "File system object"
 
 
 class Filesystem(Field):
@@ -142,7 +145,7 @@ class Filesystem(Field):
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
-        obtaining the value from the _field_data. Thus if a cached value
+        obtaining the value from the field-data service. Thus if a cached value
         exists, that is the value that will be returned. Otherwise, it
         will get it from the fs service.
         """
