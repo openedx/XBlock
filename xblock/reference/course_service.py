@@ -34,15 +34,9 @@ class XBlockCourse(object):
     Runtimes are not required to conform to this standard and can always
     patch attributes dynamically.
     """
-    def __init__(
-        self,
-        id=None,
-        display_name=None,
-        org=None,
-        number=None
-    ):
+    def __init__(self, **kwargs):
         # Set standardized attributes
-        self.id = id
-        self.display_name = display_name
-        self.org = org
-        self.number = number
+        self.id = kwargs.get('id')
+        self.display_name = kwargs.get('display_name')
+        self.org = kwargs.get('org')
+        self.number = kwargs.get('number')
