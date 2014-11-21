@@ -26,6 +26,7 @@ particular combination of initial conditions that we want to test)
 
 import copy
 from mock import Mock
+from six.moves import xrange
 
 from xblock.core import XBlock
 from xblock.fields import Integer, List, ScopeIds

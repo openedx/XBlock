@@ -9,6 +9,7 @@ import pkg_resources
 import warnings
 from collections import defaultdict
 from lazy import lazy
+from six import with_metaclass
 
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
@@ -64,11 +65,14 @@ class TagCombiningMetaclass(type):
 
 
 class XBlockMetaclass(
-        HierarchyMixin.__metaclass__,
-        ScopedStorageMixin.__metaclass__,
-        RuntimeServicesMixin.__metaclass__,
         TagCombiningMetaclass,
-        PluginMetaclass,
+        HierarchyMixin.__class__,
+        # This duplicates the HierarchyMixin, so we can't include it here
+        # XmlSerializationMixin.__class__,
+        ScopedStorageMixin.__class__,
+        RuntimeServicesMixin.__class__,
+        Plugin.__class__,
+        HandlersMixin.__class__,
 ):
     """
     Metaclass for XBlock.
@@ -84,7 +88,7 @@ class XBlockMetaclass(
 
 
 # -- Base Block
-class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
+class XBlock(with_metaclass(XBlockMetaclass, HierarchyMixin, XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixin, Plugin, HandlersMixin)):
     """Base class for XBlocks.
 
     Derive from this class to create a new kind of XBlock.  There are no
@@ -93,15 +97,12 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
     Don't provide the ``__init__`` method when deriving from this class.
 
     """
-
-    __metaclass__ = XBlockMetaclass
-
     entry_point = 'xblock.v1'
 
     name = String(help="Short name for the block", scope=Scope.settings)
     tags = List(help="Tags for this block", scope=Scope.settings)
 
-    _class_tags = set()
+    _class_tags = []
 
     @staticmethod
     def tag(tags):
@@ -188,8 +189,8 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
 
 
 class AsideMetaclass(
-        ScopedStorageMixin.__metaclass__,
-        RuntimeServicesMixin.__metaclass__,
+        ScopedStorageMixin.__class__,
+        RuntimeServicesMixin.__class__,
         PluginMetaclass,
 ):
     """
@@ -205,11 +206,10 @@ class AsideMetaclass(
     pass
 
 
-class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin):
+class XBlockAside(with_metaclass(AsideMetaclass, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Plugin)):
     """
     This mixin allows Xblock-like class to declare that it provides aside functionality.
     """
-    __metaclass__ = AsideMetaclass
 
     entry_point = "xblock_asides.v1"
 

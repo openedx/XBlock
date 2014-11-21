@@ -1,6 +1,7 @@
 """
 Tests of the XBlock-family functionality mixins
 """
+from six import add_metaclass
 
 from xblock.test.tools import assert_equals, assert_is
 
@@ -9,9 +10,9 @@ from xblock.mixins import ChildrenModelMetaclass, ModelMetaclass
 
 
 def test_model_metaclass():
+    @add_metaclass(ModelMetaclass)
     class ModelMetaclassTester(object):
         """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content)
@@ -46,9 +47,9 @@ def test_with_mixins():
         """Toy class for field testing"""
         field_a = Integer(scope=Scope.settings)
 
+    @add_metaclass(ModelMetaclass)
     class BaseClass(object):
         """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
 
     class ChildClass(FieldsMixin, BaseClass):
         """Toy class for ModelMetaclass and field testing"""
@@ -72,15 +73,15 @@ def test_with_mixins():
 
 def test_children_metaclass():
 
+    @add_metaclass(ChildrenModelMetaclass)
     class HasChildren(object):
         """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
 
         has_children = True
 
+    @add_metaclass(ChildrenModelMetaclass)
     class WithoutChildren(object):
         """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
 
     class InheritedChildren(HasChildren):
         """Toy class for ChildrenModelMetaclass testing"""
