@@ -6,6 +6,7 @@ functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 import functools
 import logging
 from lxml import etree
+from six import add_metaclass, string_types, text_type
 
 try:
     import simplesjson as json  # pylint: disable=F0401
@@ -84,12 +85,12 @@ class ServiceRequestedMetaclass(type):
         return super(ServiceRequestedMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+@add_metaclass(ServiceRequestedMetaclass)
 class RuntimeServicesMixin(object):
     """
     This mixin provides all of the machinery needed for an XBlock-style object
     to declare dependencies on particular runtime services.
     """
-    __metaclass__ = ServiceRequestedMetaclass
 
     def __init__(self, runtime, **kwargs):
         """
@@ -186,11 +187,11 @@ class ModelMetaclass(ServiceRequestedMetaclass):
 
 
 @RuntimeServicesMixin.needs('field-data')
+@add_metaclass(ModelMetaclass)
 class ScopedStorageMixin(RuntimeServicesMixin):
     """
     This mixin provides scope for Fields and the associated Scoped storage.
     """
-    __metaclass__ = ModelMetaclass
 
     def __init__(self, scope_ids, field_data=None, **kwargs):
         """
@@ -289,7 +290,7 @@ class ScopedStorageMixin(RuntimeServicesMixin):
                 # Ensure we return a string, even if unanticipated exceptions.
                 attrs.append(" %s=???" % (field.name,))
             else:
-                if isinstance(value, basestring):
+                if isinstance(value, string_types):
                     value = value.strip()
                     if len(value) > 40:
                         value = value[:37] + "..."
@@ -319,11 +320,11 @@ class ChildrenModelMetaclass(ModelMetaclass):
         return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+@add_metaclass(ChildrenModelMetaclass)
 class HierarchyMixin(ScopedStorageMixin):
     """
     This adds Fields for parents and children.
     """
-    __metaclass__ = ChildrenModelMetaclass
 
     parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
 
@@ -405,7 +406,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         node.tag = self.xml_element_name()
 
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.items():
+        for field_name, field in sorted(self.fields.items()):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
@@ -453,6 +454,6 @@ class XmlSerializationMixin(ScopedStorageMixin):
             tag = etree.QName(XML_NAMESPACES["option"], field_name)
             elem = node.makeelement(tag)
             elem.text = field.to_string(field.read_from(self))
-            node.insert(0, elem)
+            node.append(elem)
         else:
-            node.set(field_name, unicode(field.read_from(self)))
+            node.set(field_name, text_type(field.read_from(self)))

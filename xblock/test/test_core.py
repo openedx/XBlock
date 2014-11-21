@@ -528,7 +528,7 @@ def test_xblock_save_one():
     def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
-        raise KeyValueMultiSaveError([update_dict.keys()[0]])
+        raise KeyValueMultiSaveError([list(update_dict.keys())[0]])
 
     field_tester = setup_save_failure(fake_set_many)
 
@@ -774,7 +774,7 @@ def test_json_handler_basic():
 
     response = test_func(test_self, test_request, test_suffix)
     assert_equals(response.status_code, 200)
-    assert_equals(response.body, test_data_json)
+    assert_equals(response.json_body, test_data)
     assert_equals(response.content_type, "application/json")
 
 
@@ -788,7 +788,7 @@ def test_json_handler_invalid_json():
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 400)
-    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    assert_equals(response.json_body, {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
 
 
@@ -802,7 +802,7 @@ def test_json_handler_get():
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 405)
-    assert_equals(json.loads(response.body), {"error": "Method must be POST"})
+    assert_equals(response.json_body, {"error": "Method must be POST"})
     assert_equals(list(response.allow), ["POST"])
 
 
@@ -816,7 +816,7 @@ def test_json_handler_empty_request():
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 400)
-    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    assert_equals(response.json_body, {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
 
 
@@ -831,7 +831,7 @@ def test_json_handler_error():
 
     response = test_func(Mock(), test_request, "dummy_suffix")  # pylint: disable=assignment-from-no-return
     assert_equals(response.status_code, test_status_code)
-    assert_equals(json.loads(response.body), {"error": test_message})
+    assert_equals(response.json_body, {"error": test_message})
     assert_equals(response.content_type, "application/json")
 
 
@@ -843,7 +843,7 @@ def test_json_handler_return_response():
         return Response(body="not JSON", status=418, content_type="text/plain")
 
     response = test_func(Mock(), test_request, "dummy_suffix")
-    assert_equals(response.body, "not JSON")
+    assert_equals(response.text, "not JSON")
     assert_equals(response.status_code, 418)
     assert_equals(response.content_type, "text/plain")
 

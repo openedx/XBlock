@@ -3,7 +3,8 @@
 import webob
 from collections import MutableMapping
 from lazy import lazy
-from itertools import chain, repeat, izip
+from itertools import chain, repeat
+from six.moves import zip
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
@@ -76,9 +77,14 @@ def querydict_to_multidict(query_dict, wrap=None):
 
     """
     wrap = wrap or (lambda val: val)
+
+    # Python 2/3 support. In Python 3, only .lists is defined,
+    # and iterates by default
+    iterlists = getattr(query_dict, 'iterlists', query_dict.lists)
+
     return MultiDict(chain.from_iterable(
-        izip(repeat(key), (wrap(v) for v in vals))
-        for key, vals in query_dict.iterlists()
+        zip(repeat(key), (wrap(v) for v in vals))
+        for key, vals in iterlists()
     ))
 
 

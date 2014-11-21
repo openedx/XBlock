@@ -7,6 +7,8 @@ for each scope.
 """
 
 from collections import namedtuple
+from six import text_type, string_types
+
 import copy
 import datetime
 import dateutil.parser
@@ -183,6 +185,7 @@ class Scope(ScopeBase):
     the points scored by all users attempting a problem.
 
     """
+    __slots__ = ()
     content = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, u'content')
     settings = ScopeBase(UserScope.NONE, BlockScope.USAGE, u'settings')
     user_state = ScopeBase(UserScope.ONE, BlockScope.USAGE, u'user_state')
@@ -229,6 +232,9 @@ class Scope(ScopeBase):
 
     def __eq__(self, other):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
+
+    def __hash__(self):
+        return hash((self.user, self.block))
 
 
 ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')
@@ -678,7 +684,7 @@ class Boolean(JSONField):
                                       **kwargs)
 
     def from_json(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, string_types):
             return value.lower() == 'true'
         else:
             return bool(value)
@@ -732,7 +738,7 @@ class String(JSONField):
     MUTABLE = False
 
     def from_json(self, value):
-        if value is None or isinstance(value, basestring):
+        if value is None or isinstance(value, string_types):
             return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
@@ -762,7 +768,7 @@ class DateTime(JSONField):
         """
         Parse the date from an ISO-formatted date string, or None.
         """
-        if isinstance(value, basestring):
+        if isinstance(value, string_types):
 
             # Parser interprets empty string as now by default
             if value == "":
@@ -894,16 +900,16 @@ def scope_key(instance, xblock):
     if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
         pass
     elif instance.scope.user == UserScope.ONE:
-        scope_key_dict['user'] = unicode(xblock.scope_ids.user_id)
+        scope_key_dict['user'] = text_type(xblock.scope_ids.user_id)
     else:
         raise NotImplementedError()
 
     if instance.scope.block == BlockScope.TYPE:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.block_type)
+        scope_key_dict['block'] = text_type(xblock.scope_ids.block_type)
     elif instance.scope.block == BlockScope.USAGE:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.usage_id)
+        scope_key_dict['block'] = text_type(xblock.scope_ids.usage_id)
     elif instance.scope.block == BlockScope.DEFINITION:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.def_id)
+        scope_key_dict['block'] = text_type(xblock.scope_ids.def_id)
     elif instance.scope.block == BlockScope.ALL:
         pass
     else:
