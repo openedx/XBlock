@@ -25,14 +25,13 @@ class XBlockCourse(object):
     """
     A model representation of course data returned by the CourseService.
 
-    This is just to tell xblock authors what fields they can expect from this service, and how to reference them
+    This is just to tell XBlock authors what fields they can expect from this service, and how to reference them
         - id
         - display_name
         - org
         - number
 
-    Runtimes are not required to conform to this standard and can always
-    patch attributes dynamically.
+    All of these fields will exist in an instantiated object of this class, but those fields may return None.
     """
     def __init__(self, **kwargs):
         # Set standardized attributes
