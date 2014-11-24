@@ -8,8 +8,8 @@ from datetime import datetime
 from mock import Mock, patch
 from unittest import TestCase
 
-from xblock.core import XBlock
-from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, XBlockMixin, Integer
+from xblock.core import XBlock, XBlockMixin
+from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, Integer
 from xblock.exceptions import (
     NoSuchDefinition,
     NoSuchHandlerError,
@@ -31,7 +31,7 @@ from xblock.field_data import DictFieldData, FieldData
 
 from xblock.test.tools import (
     assert_equals, assert_false, assert_true, assert_raises,
-    assert_raises_regexp, assert_is, assert_is_not, unabc,
+    assert_raises_regexp, assert_is, assert_is_not, assert_in, unabc,
     WarningTestMixin, TestRuntime
 )
 
@@ -274,25 +274,28 @@ def test_runtime_render():
     key_store = DictKeyValueStore()
     field_data = KvsFieldData(key_store)
     runtime = MockRuntimeForQuerying(services={'field-data': field_data})
-    tester = TestXBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+    block_type = 'test'
+    def_id = runtime.id_generator.create_definition(block_type)
+    usage_id = runtime.id_generator.create_usage(def_id)
+    tester = TestXBlock(runtime, scope_ids=ScopeIds('user', block_type, def_id, usage_id))
     # string we want to update using the handler
     update_string = u"user state update"
 
     # test against the student view
     frag = runtime.render(tester, 'student_view', [update_string])
-    assert_equals(frag.body_html(), update_string)
+    assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
     # test against the fallback view
     update_string = u"new update"
     frag = runtime.render(tester, 'test_fallback_view', [update_string])
-    assert_equals(frag.body_html(), update_string)
+    assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
     # test block-first
     update_string = u"penultimate update"
     frag = tester.render('student_view', [update_string])
-    assert_equals(frag.body_html(), update_string)
+    assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
     # test against the no-fallback XBlock
@@ -563,11 +566,18 @@ class XBlockWithServices(XBlock):
         # another_not_service is not available, and returns None, because we
         # didn't need it, we only wanted it.
         assert_is(self.runtime.service(self, "another_not_service"), None)
+        return Fragment()
 
 
 def test_service():
-    runtime = TestRuntime(services={'secret_service': 17})
-    tester = XBlockWithServices(runtime, scope_ids=Mock(spec=ScopeIds))
+    runtime = TestRuntime(services={
+        'secret_service': 17,
+        'field-data': DictFieldData({}),
+    })
+    block_type = 'test'
+    def_id = runtime.id_generator.create_definition(block_type)
+    usage_id = runtime.id_generator.create_usage(def_id)
+    tester = XBlockWithServices(runtime, scope_ids=ScopeIds('user', block_type, def_id, usage_id))
 
     # Call the student_view to run its assertions.
     runtime.render(tester, 'student_view')
@@ -592,10 +602,14 @@ class SubXBlockWithServices(XBlockWithServices):
         # another_not_service_sub is not available, and returns None,
         # because we didn't need it, we only wanted it.
         assert_is(self.runtime.service(self, "another_not_service_sub"), None)
+        return Fragment()
 
 
 def test_sub_service():
-    runtime = TestRuntime(id_reader=Mock(), services={'secret_service': 17})
+    runtime = TestRuntime(id_reader=Mock(), services={
+        'secret_service': 17,
+        'field-data': DictFieldData({}),
+    })
     tester = SubXBlockWithServices(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # Call the student_view to run its assertions.
