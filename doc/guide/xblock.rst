@@ -318,7 +318,59 @@ unified whole.  Perhaps they need to be implemented specially, or integrated
 into the full application.
 
 XBlocks can request services from their runtime to get the best integration.
-TODO: finish describing the service() method.
+This can be done on a class with the ``needs`` or the ``wants`` command.
+
+The ``wants`` command tries to import the service but won't break the XBlock when it can't find it::
+
+    @XBlock.wants('someservice')
+    class SomeXBlock(XBlock):
+        ...
+
+The ``needs`` command does break the XBlock if the service can't be found::
+
+    @XBlock.needs('someservice')
+    class SomeXBlock(XBlock):
+        ...
+
+Of course the XBlock model has to be imported from xblock.core to be able to use this function::
+
+    from xblock.core import XBlock
+
+Now in the view method you can retrieve the service as following::
+
+    def student_view(self, context=None):
+        service = self.runtime.service(self, 'someservice')
+        ...
+
+**UserService**
+
+The user service can be used to request details about the user. The user service only has a ``get_current_user()`` method right now. An example::
+
+    @XBlock.needs('user')
+    class UserXBlock(XBlock):
+        def student_view(self, context=None):
+            user = self.runtime.service(self, 'user').get_current_user()
+            doSomething(user.email)
+
+The user only provides the following properties:
+
+- ``user_id``
+- ``username``
+- ``full_name``
+- ``email``
+- ``is_authenticated``
+
+If no user is authenticated only the ``is_authenticated`` attribute will be available
+
+**CourseService**
+
+Just like the user service there is the course service with only one method: ``get_current_course()``.
+The attributes provided are:
+
+- ``id``
+- ``number``
+- ``display_name``
+- ``org``
 
 ..
     Querying
