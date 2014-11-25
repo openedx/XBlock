@@ -8,6 +8,7 @@ import functools
 import itertools
 import logging
 import pkg_resources
+from xblock.internal import class_lazy
 
 log = logging.getLogger(__name__)
 
@@ -43,21 +44,6 @@ def default_select(identifier, all_entry_points):
         raise AmbiguousPluginError(all_entry_points)
 
 
-class PluginMetaclass(type):
-    """
-    Initialize class vars per subclass
-    """
-    def __new__(mcs, name, bases, attrs):
-        """
-        Init the class vars
-        """
-        # Temporary entry points, for register_temp_plugin.  A list of pairs,
-        # (identifier, entry_point):
-        #   [('test1', test1_entrypoint), ('test2', test2_entrypoint), ...]
-        attrs['extra_entry_points'] = []
-        return super(PluginMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-
 class Plugin(object):
     """Base class for a system that uses entry_points to load plugins.
 
@@ -66,9 +52,17 @@ class Plugin(object):
         `entry_point`: The name of the entry point to load plugins from.
 
     """
-    __metaclass__ = PluginMetaclass
-
     entry_point = None  # Should be overwritten by children classes
+
+    @class_lazy
+    def extra_entry_points(cls):  # pylint: disable=no-self-argument
+        """
+        Temporary entry points, for register_temp_plugin.  A list of pairs,
+        (identifier, entry_point):
+
+        [('test1', test1_entrypoint), ('test2', test2_entrypoint), ...]
+        """
+        return []
 
     @classmethod
     def _load_class_entry_point(cls, entry_point):

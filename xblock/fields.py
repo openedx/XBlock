@@ -18,6 +18,8 @@ import warnings
 import json
 import yaml
 
+from xblock.internal import Nameable
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -247,7 +249,7 @@ EXPLICITLY_SET = Sentinel("fields.EXPLICITLY_SET")
 NO_GENERATED_DEFAULTS = ('parent', 'children')
 
 
-class Field(object):
+class Field(Nameable):
     """
     A field class that can be used as a class attribute to define what data the
     class will want to refer to.
@@ -293,7 +295,6 @@ class Field(object):
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
                  xml_node=False, **kwargs):
-        self._name = "unknown"
         self.help = help
         self._enable_enforce_type = enforce_type
         if default is not UNSET:
@@ -316,7 +317,7 @@ class Field(object):
     def name(self):
         """Returns the name of this field."""
         # This is set by ModelMetaclass
-        return self._name
+        return self.__name__ or 'unknown'
 
     @property
     def values(self):
@@ -501,7 +502,7 @@ class Field(object):
         self._set_cached_value(xblock, copy.deepcopy(self.default))
 
     def __repr__(self):
-        return "<{0.__class__.__name__} {0._name}>".format(self)
+        return "<{0.__class__.__name__} {0.name}>".format(self)
 
     def _warn_deprecated_outside_JSONField(self):  # pylint: disable=invalid-name
         """Certain methods will be moved to JSONField.

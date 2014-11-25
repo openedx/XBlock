@@ -2,104 +2,119 @@
 Tests of the XBlock-family functionality mixins
 """
 
-from xblock.test.tools import assert_equals, assert_is
+from unittest import TestCase
 
 from xblock.fields import List, Scope, Integer
-from xblock.mixins import ChildrenModelMetaclass, ModelMetaclass
+from xblock.mixins import ScopedStorageMixin, HierarchyMixin
 
 
-def test_model_metaclass():
-    class ModelMetaclassTester(object):
-        """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
+class AttrAssertionMixin(TestCase):
+    """
+    A mixin to add attribute assertion methods to TestCases.
+    """
+    def assertHasAttr(self, obj, attr):
+        "Assert that `obj` has the attribute named `attr`."
+        self.assertTrue(hasattr(obj, attr), "{!r} doesn't have attribute {!r}".format(obj, attr))
+
+    def assertNotHasAttr(self, obj, attr):
+        "Assert that `obj` doesn't have the attribute named `attr`."
+        self.assertFalse(hasattr(obj, attr), "{!r} has attribute {!r}".format(obj, attr))
+
+
+class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
+    "Tests of the ScopedStorageMixin."
+
+    class ScopedStorageMixinTester(ScopedStorageMixin):
+        """Toy class for ScopedStorageMixin testing"""
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content)
 
-        def __init__(self, field_data):
-            self._field_data = field_data
-
-    class ChildClass(ModelMetaclassTester):
+    class ChildClass(ScopedStorageMixinTester):
         """Toy class for ModelMetaclass testing"""
         pass
 
-    # `ModelMetaclassTester` and `ChildClass` both obtain the `fields` attribute
-    # from the `ModelMetaclass`. Since this is not understood by static analysis,
-    # silence this error for the duration of this test.
-    # pylint: disable=E1101
-    assert hasattr(ModelMetaclassTester, 'field_a')
-    assert hasattr(ModelMetaclassTester, 'field_b')
-
-    assert_is(ModelMetaclassTester.field_a, ModelMetaclassTester.fields['field_a'])
-    assert_is(ModelMetaclassTester.field_b, ModelMetaclassTester.fields['field_b'])
-
-    assert hasattr(ChildClass, 'field_a')
-    assert hasattr(ChildClass, 'field_b')
-
-    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
-    assert_is(ChildClass.field_b, ChildClass.fields['field_b'])
-
-
-def test_with_mixins():
-    # Testing model metaclass with mixins
     class FieldsMixin(object):
-        """Toy class for field testing"""
-        field_a = Integer(scope=Scope.settings)
+        """Toy mixin for field testing"""
+        field_c = Integer(scope=Scope.settings)
 
-    class BaseClass(object):
-        """Toy class for ModelMetaclass testing"""
-        __metaclass__ = ModelMetaclass
-
-    class ChildClass(FieldsMixin, BaseClass):
-        """Toy class for ModelMetaclass and field testing"""
+    class MixinChildClass(FieldsMixin, ScopedStorageMixinTester):
+        """Toy class for ScopedStorageMixin testing with mixed-in fields"""
         pass
 
-    class GrandchildClass(ChildClass):
-        """Toy class for ModelMetaclass and field testing"""
+    class MixinGrandchildClass(MixinChildClass):
+        """Toy class for ScopedStorageMixin testing with inherited mixed-in fields"""
         pass
 
-    # `ChildClass` and `GrandchildClass` both obtain the `fields` attribute
-    # from the `ModelMetaclass`. Since this is not understood by static analysis,
-    # silence this error for the duration of this test.
-    # pylint: disable=E1101
+    def test_scoped_storage_mixin(self):
 
-    assert hasattr(ChildClass, 'field_a')
-    assert_is(ChildClass.field_a, ChildClass.fields['field_a'])
+        # `ModelMetaclassTester` and `ChildClass` both obtain the `fields` attribute
+        # from the `ModelMetaclass`. Since this is not understood by static analysis,
+        # silence this error for the duration of this test.
+        # pylint: disable=E1101
+        self.assertIsNot(self.ScopedStorageMixinTester.fields, self.ChildClass.fields)
 
-    assert hasattr(GrandchildClass, 'field_a')
-    assert_is(GrandchildClass.field_a, GrandchildClass.fields['field_a'])
+        self.assertHasAttr(self.ScopedStorageMixinTester, 'field_a')
+        self.assertHasAttr(self.ScopedStorageMixinTester, 'field_b')
+
+        self.assertIs(self.ScopedStorageMixinTester.field_a, self.ScopedStorageMixinTester.fields['field_a'])
+        self.assertIs(self.ScopedStorageMixinTester.field_b, self.ScopedStorageMixinTester.fields['field_b'])
+
+        self.assertHasAttr(self.ChildClass, 'field_a')
+        self.assertHasAttr(self.ChildClass, 'field_b')
+
+        self.assertIs(self.ChildClass.field_a, self.ChildClass.fields['field_a'])
+        self.assertIs(self.ChildClass.field_b, self.ChildClass.fields['field_b'])
+
+    def test_with_mixins(self):
+        # Testing model metaclass with mixins
+
+        # `MixinChildClass` and `MixinGrandchildClass` both obtain the `fields` attribute
+        # from the `ScopedStorageMixin`. Since this is not understood by static analysis,
+        # silence this error for the duration of this test.
+        # pylint: disable=E1101
+
+        self.assertHasAttr(self.MixinChildClass, 'field_a')
+        self.assertHasAttr(self.MixinChildClass, 'field_c')
+        self.assertIs(self.MixinChildClass.field_a, self.MixinChildClass.fields['field_a'])
+        self.assertIs(self.FieldsMixin.field_c, self.MixinChildClass.fields['field_c'])
+
+        self.assertHasAttr(self.MixinGrandchildClass, 'field_a')
+        self.assertHasAttr(self.MixinGrandchildClass, 'field_c')
+        self.assertIs(self.MixinGrandchildClass.field_a, self.MixinGrandchildClass.fields['field_a'])
+        self.assertIs(self.MixinGrandchildClass.field_c, self.MixinGrandchildClass.fields['field_c'])
 
 
-def test_children_metaclass():
+class TestHierarchyMixin(AttrAssertionMixin, TestCase):
+    "Tests of the HierarchyMixin."
 
-    class HasChildren(object):
+    class HasChildren(HierarchyMixin):
         """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
-
         has_children = True
 
-    class WithoutChildren(object):
+    class WithoutChildren(HierarchyMixin):
         """Toy class for ChildrenModelMetaclass testing"""
-        __metaclass__ = ChildrenModelMetaclass
+        pass
 
     class InheritedChildren(HasChildren):
         """Toy class for ChildrenModelMetaclass testing"""
         pass
 
-    # `HasChildren` and `WithoutChildren` both obtain the `children` attribute and
-    # the `has_children` method from the `ChildrenModelMetaclass`. Since this is not
-    # understood by static analysis, silence this error for the duration of this test.
-    # pylint: disable=E1101
+    def test_children_metaclass(self):
+        # `HasChildren` and `WithoutChildren` both obtain the `children` attribute and
+        # the `has_children` method from the `ChildrenModelMetaclass`. Since this is not
+        # understood by static analysis, silence this error for the duration of this test.
+        # pylint: disable=E1101
 
-    assert HasChildren.has_children
-    assert not WithoutChildren.has_children
-    assert InheritedChildren.has_children
+        self.assertTrue(self.HasChildren.has_children)
+        self.assertFalse(self.WithoutChildren.has_children)
+        self.assertTrue(self.InheritedChildren.has_children)
 
-    assert hasattr(HasChildren, 'children')
-    assert not hasattr(WithoutChildren, 'children')
-    assert hasattr(InheritedChildren, 'children')
+        self.assertHasAttr(self.HasChildren, 'children')
+        self.assertNotHasAttr(self.WithoutChildren, 'children')
+        self.assertHasAttr(self.InheritedChildren, 'children')
 
-    assert isinstance(HasChildren.children, List)
-    assert_equals(Scope.children, HasChildren.children.scope)
-    assert isinstance(InheritedChildren.children, List)
-    assert_equals(Scope.children, InheritedChildren.children.scope)
+        self.assertIsInstance(self.HasChildren.children, List)
+        self.assertEqual(Scope.children, self.HasChildren.children.scope)
+        self.assertIsInstance(self.InheritedChildren.children, List)
+        self.assertEqual(Scope.children, self.InheritedChildren.children.scope)
