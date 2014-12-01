@@ -5,13 +5,14 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
+import inspect
 import pkg_resources
 import warnings
 from collections import defaultdict
-from lazy import lazy
 
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
+from xblock.internal import class_lazy
 import xblock.mixins
 from xblock.mixins import (
     ScopedStorageMixin,
@@ -20,7 +21,7 @@ from xblock.mixins import (
     HandlersMixin,
     XmlSerializationMixin
 )
-from xblock.plugin import Plugin, PluginMetaclass
+from xblock.plugin import Plugin
 from xblock.validation import Validation
 
 # exposing XML_NAMESPACES as a member of core, in order to avoid importing mixins where
@@ -38,46 +39,6 @@ class XBlockMixin(ScopedStorageMixin):
 
     XBlockMixin classes can add new fields and new properties to all XBlocks
     created by a particular runtime.
-
-    """
-    pass
-
-
-class TagCombiningMetaclass(type):
-    """
-    Collects and combines `._class_tags` from all base classes and
-    puts them together in one `.class_tags` attribute.
-    """
-    def __new__(mcs, name, bases, attrs):
-        # Allow this method to access the `_class_tags`
-        # pylint: disable=W0212
-        class_tags = set([])
-        # Collect the tags from all base classes.
-        for base in bases:
-            try:
-                class_tags.update(base._class_tags)
-            except AttributeError:
-                # Base classes may have no ._class_tags, that's ok.
-                pass
-        attrs['_class_tags'] = class_tags
-        return super(TagCombiningMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-
-class XBlockMetaclass(
-        HierarchyMixin.__metaclass__,
-        ScopedStorageMixin.__metaclass__,
-        RuntimeServicesMixin.__metaclass__,
-        TagCombiningMetaclass,
-        PluginMetaclass,
-):
-    """
-    Metaclass for XBlock.
-
-    Combines all the metaclasses XBlocks needs:
-
-    * `ChildrenModelMetaclass`
-    * `ModelMetaclass`
-    * `TagCombiningMetaclass`
 
     """
     pass
@@ -127,15 +88,22 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
     Don't provide the ``__init__`` method when deriving from this class.
 
     """
-
-    __metaclass__ = XBlockMetaclass
-
     entry_point = 'xblock.v1'
 
     name = String(help="Short name for the block", scope=Scope.settings)
     tags = List(help="Tags for this block", scope=Scope.settings)
 
-    _class_tags = set()
+    @class_lazy
+    def _class_tags(cls):  # pylint: disable=no-self-argument
+        """
+        Collect the tags from all base classes.
+        """
+        class_tags = set()
+
+        for base in cls.mro()[1:]:  # pylint: disable=no-member
+            class_tags.update(getattr(base, '_class_tags', set()))
+
+        return class_tags
 
     @staticmethod
     def tag(tags):
@@ -195,29 +163,10 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         return Validation(self.scope_ids.usage_id)
 
 
-class AsideMetaclass(
-        ScopedStorageMixin.__metaclass__,
-        RuntimeServicesMixin.__metaclass__,
-        PluginMetaclass,
-):
-    """
-    Metaclass for XBlock.
-
-    Combines all the metaclasses XBlocks needs:
-
-    * `ChildrenModelMetaclass`
-    * `ModelMetaclass`
-    * `TagCombiningMetaclass`
-
-    """
-    pass
-
-
 class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, SharedBlockBase):
     """
     This mixin allows Xblock-like class to declare that it provides aside functionality.
     """
-    __metaclass__ = AsideMetaclass
 
     entry_point = "xblock_asides.v1"
 
@@ -242,8 +191,8 @@ class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Share
             return func
         return _decorator
 
-    @lazy
-    def _combined_asides(self):
+    @class_lazy
+    def _combined_asides(cls):  # pylint: disable=no-self-argument
         """
         A dictionary mapping XBlock view names to the aside method that
         decorates them (or None, if there is no decorator for the specified view).
@@ -251,15 +200,10 @@ class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Share
         # The method declares what views it decorates. We rely on `dir`
         # to handle subclasses and overrides.
         combined_asides = defaultdict(None)
-        for attr in dir(self):
-            # Avoid infinite recursion
-            if attr == '_combined_asides':
-                continue
-
-            view_func = getattr(self, attr)
+        for _view_name, view_func in inspect.getmembers(cls, lambda attr: hasattr(attr, '_aside_for')):
             aside_for = getattr(view_func, '_aside_for', [])
             for view in aside_for:
-                combined_asides[view] = view_func
+                combined_asides[view] = view_func.__name__
         return combined_asides
 
     def aside_view_declaration(self, view_name):
@@ -275,7 +219,10 @@ class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Share
         Returns:
             either the function or None
         """
-        return self._combined_asides.get(view_name, None)
+        if view_name in self._combined_asides:
+            return getattr(self, self._combined_asides[view_name])
+        else:
+            return None
 
 
 # Maintain backwards compatibility

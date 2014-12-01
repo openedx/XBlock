@@ -384,7 +384,7 @@ class DictTest(FieldTest):
 def test_field_name_defaults():
     # Tests field display name default values
     attempts = Integer()
-    attempts._name = "max_problem_attempts"
+    attempts.__name__ = "max_problem_attempts"
     assert_equals('max_problem_attempts', attempts.display_name)
 
     class TestBlock(XBlock):

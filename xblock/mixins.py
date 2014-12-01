@@ -4,6 +4,7 @@ functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
 
 import functools
+import inspect
 import logging
 from lxml import etree
 
@@ -17,6 +18,7 @@ from webob import Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
 from xblock.fields import Field, Reference, Scope, ReferenceList
+from xblock.internal import class_lazy, NamedAttributesMetaclass
 
 
 XML_NAMESPACES = {
@@ -72,24 +74,29 @@ class HandlersMixin(object):
         return self.runtime.handle(self, handler_name, request, suffix)
 
 
-class ServiceRequestedMetaclass(type):
-    """
-    Creates the _services_requested dict on the class.
-
-    Keys are service names, values are "need" or "want".
-
-    """
-    def __new__(mcs, name, bases, attrs):
-        attrs['_services_requested'] = {}
-        return super(ServiceRequestedMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-
 class RuntimeServicesMixin(object):
     """
     This mixin provides all of the machinery needed for an XBlock-style object
     to declare dependencies on particular runtime services.
     """
-    __metaclass__ = ServiceRequestedMetaclass
+
+    @class_lazy
+    def _services_requested(cls):  # pylint: disable=no-self-argument
+        """A per-class dictionary to store the services requested by a particular XBlock."""
+        return {}
+
+    @class_lazy
+    def _combined_services(cls):  # pylint: disable=no-self-argument
+        """
+        A dictionary that collects all _services_requested by all ancestors of this XBlock class.
+        """
+        # The class declares what services it desires. To deal with subclasses,
+        # especially mixins, properly, we have to walk up the inheritance
+        # hierarchy, and combine all the declared services into one dictionary.
+        combined = {}
+        for parent in reversed(cls.mro()):
+            combined.update(getattr(parent, "_services_requested", {}))
+        return combined
 
     def __init__(self, runtime, **kwargs):
         """
@@ -131,58 +138,8 @@ class RuntimeServicesMixin(object):
 
         Returns:
             One of "need", "want", or None.
-
         """
-        # The class declares what services it desires. To deal with subclasses,
-        # especially mixins, properly, we have to walk up the inheritance
-        # hierarchy, and combine all the declared services into one dictionary.
-        # We do this once per class, then store the result on the class.
-        if "_combined_services" not in cls.__dict__:
-            # Walk the MRO chain, collecting all the services together.
-            combined = {}
-            for parent in reversed(cls.__mro__):
-                combined.update(getattr(parent, "_services_requested", {}))
-            cls._combined_services = combined
-        declaration = cls._combined_services.get(service_name)
-        return declaration
-
-
-class ModelMetaclass(ServiceRequestedMetaclass):
-    """
-    A metaclass for using Fields as class attributes to define data access.
-
-    All class attributes that are Fields will be added to the 'fields'
-    attribute on the class.
-
-    """
-    def __new__(mcs, name, bases, attrs):
-        new_class = super(ModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-        fields = {}
-        # Pylint tries to do fancy inspection for class methods/properties, and
-        # in this case, gets it wrong
-
-        # Loop through all of the baseclasses of cls, in
-        # the order that methods are resolved (Method Resolution Order / mro)
-        # and find all of their defined fields.
-        #
-        # Only save the first such defined field (as expected for method resolution)
-        for base_class in new_class.mro():  # pylint: disable=E1101
-            # We can't use inspect.getmembers() here, because that would
-            # call the fields property again, and generate an infinite loop.
-            # Instead, we loop through all of the attribute names, exclude the
-            # 'fields' attribute, and then retrieve the value
-            for attr_name in dir(base_class):
-                attr_value = getattr(base_class, attr_name)
-                if isinstance(attr_value, Field):
-                    fields.setdefault(attr_name, attr_value)
-
-                    # Allow the field to know what its name is
-                    attr_value._name = attr_name  # pylint: disable=protected-access
-
-        new_class.fields = fields
-
-        return new_class
+        return cls._combined_services.get(service_name)
 
 
 @RuntimeServicesMixin.needs('field-data')
@@ -190,7 +147,35 @@ class ScopedStorageMixin(RuntimeServicesMixin):
     """
     This mixin provides scope for Fields and the associated Scoped storage.
     """
-    __metaclass__ = ModelMetaclass
+    __metaclass__ = NamedAttributesMetaclass
+
+    @class_lazy
+    def fields(cls):  # pylint: disable=no-self-argument
+        """
+        A dictionary mapping the attribute name to the Field object for all
+        Field attributes of the class.
+        """
+        fields = {}
+        # Loop through all of the baseclasses of cls, in
+        # the order that methods are resolved (Method Resolution Order / mro)
+        # and find all of their defined fields.
+        #
+        # Only save the first such defined field (as expected for method resolution)
+
+        bases = cls.mro()
+        local = bases.pop(0)
+
+        # First, descend the MRO from the top down, updating the 'fields' dictionary
+        # so that the dictionary always has the most specific version of fields in it
+        for base in reversed(bases):
+            fields.update(getattr(base, 'fields', {}))
+
+        # For this class, loop through all attributes not named 'fields',
+        # find those of type Field, and save them to the 'fields' dict
+        for attr_name, attr_value in inspect.getmembers(local, lambda attr: isinstance(attr, Field)):
+            fields[attr_name] = attr_value
+
+        return fields
 
     def __init__(self, scope_ids, field_data=None, **kwargs):
         """
@@ -301,7 +286,7 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         )
 
 
-class ChildrenModelMetaclass(ModelMetaclass):
+class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
     """
     A metaclass that transforms the attribute `has_children = True` into a List
     field with a children scope.

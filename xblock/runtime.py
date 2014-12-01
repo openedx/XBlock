@@ -291,14 +291,30 @@ class IdReader(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_aside_type(self, aside_def_id):
-        """Retrieve the asiode_type of a particular definition
+    def get_aside_type_from_usage(self, aside_id):
+        """
+        Retrieve the XBlockAside `aside_type` associated with this aside
+        usage id.
 
         Args:
-            aside_def_id: The id of the definition to query
+            aside_id: The usage id of the XBlockAside.
 
         Returns:
-            The `block_type` of the aside
+            The `aside_type` of the aside.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_aside_type_from_definition(self, aside_id):
+        """
+        Retrieve the XBlockAside `aside_type` associated with this aside
+        definition id.
+
+        Args:
+            aside_id: The definition id of the XBlockAside.
+
+        Returns:
+            The `aside_type` of the aside.
         """
         raise NotImplementedError()
 
@@ -406,9 +422,13 @@ class MemoryIdManager(IdReader, IdGenerator):
             except AttributeError:
                 raise NoSuchDefinition(repr(def_id))
 
-    def get_aside_type(self, aside_def_id):
-        """Get an aside's type by its definition id."""
-        return aside_def_id.aside_type
+    def get_aside_type_from_definition(self, aside_id):
+        """Get an aside's type from its definition id."""
+        return aside_id.aside_type
+
+    def get_aside_type_from_usage(self, aside_id):
+        """Get an aside's type from its usage id."""
+        return aside_id.aside_type
 
 
 class Runtime(object):
