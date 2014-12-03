@@ -388,9 +388,10 @@ class XmlSerializationMixin(ScopedStorageMixin):
         # pylint: disable=E1101
         # Set node.tag based on our class name.
         node.tag = self.xml_element_name()
+        node.set('xblock-family', self.entry_point)
 
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.items():
+        for field_name, field in self.fields.iteritems():
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):

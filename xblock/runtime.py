@@ -259,10 +259,10 @@ class IdReader(object):
         Retrieve the XBlock `definition_id` associated with this aside definition id.
 
         Args:
-            aside_id: The usage id of the XBlockAside.
+            aside_id: The definition id of the XBlockAside.
 
         Returns:
-            The `definition_id` of the usage the aside is commenting on.
+            The `definition_id` of the xblock the aside is commenting on.
         """
         raise NotImplementedError()
 
@@ -383,11 +383,11 @@ class MemoryIdManager(IdReader, IdGenerator):
         )
 
     def get_usage_id_from_aside(self, aside_id):
-        """Extract the usage_id from the aside_id."""
+        """Extract the usage_id from the aside's usage_id."""
         return aside_id.usage_id
 
     def get_definition_id_from_aside(self, aside_id):
-        """Extract the definition_id from an aside definition_id."""
+        """Extract the original xblock's definition_id from an aside's definition_id."""
         return aside_id.definition_id
 
     def create_usage(self, def_id):
@@ -598,6 +598,12 @@ class Runtime(object):
         """
         return XBlock.load_class(block_type, self.default_class, self.select)
 
+    def load_aside_type(self, aside_type):
+        """
+        Returns a subclass of :class:`.XBlockAside` that corresponds to the specified `aside_type`.
+        """
+        return XBlockAside.load_class(aside_type, select=self.select)
+
     def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
         r"""
         Construct a new xblock of the type identified by block_type,
@@ -637,19 +643,19 @@ class Runtime(object):
         block = self.construct_xblock(block_type, keys)
         return block
 
-    def get_aside(self, aside_id):
+    def get_aside(self, aside_usage_id):
         """
         Create an XBlockAside in this runtime.
 
-        The `aside_id` is used to find the Aside class and data.
+        The `aside_usage_id` is used to find the Aside class and data.
         """
-        def_id = self.id_reader.get_definition_id_from_aside(aside_id)
-        try:
-            block_type = self.id_reader.get_aside_type(def_id)
-        except NoSuchDefinition:
-            raise NoSuchUsage(repr(aside_id))
-        keys = ScopeIds(self.user_id, block_type, def_id, aside_id)
-        block = self.create_aside(block_type, keys)
+        aside_type = self.id_reader.get_aside_type_from_usage(aside_usage_id)
+        xblock_usage = self.id_reader.get_usage_id_from_aside(aside_usage_id)
+        xblock_def = self.id_reader.get_definition_id(xblock_usage)
+        aside_def_id, aside_usage_id = self.id_generator.create_aside(xblock_def, xblock_usage, aside_type)
+
+        keys = ScopeIds(self.user_id, aside_type, aside_def_id, aside_usage_id)
+        block = self.create_aside(aside_type, keys)
         return block
 
     # Parsing XML
@@ -693,15 +699,43 @@ class Runtime(object):
         id_generator = id_generator or self.id_generator
 
         block_type = node.tag
+        # remove xblock-family from elements
+        node.attrib.pop('xblock-family', None)
         # TODO: a way for this node to be a usage to an existing definition?
         def_id = id_generator.create_definition(block_type)
         usage_id = id_generator.create_usage(def_id)
         keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
+        # pull the asides out of the xml payload
+        aside_children = []
+        for child in node.iterchildren():
+            # get xblock-family from node
+            xblock_family = child.attrib.pop('xblock-family', None)
+            if xblock_family:
+                xblock_family = self._family_id_to_superclass(xblock_family)
+                if issubclass(xblock_family, XBlockAside):
+                    aside_children.append(child)
+        # now process them & remove them from the xml payload
+        for child in aside_children:
+            self._aside_from_xml(child, def_id, usage_id, id_generator)
+            node.remove(child)
         block = block_class.parse_xml(node, self, keys, id_generator)
         block.parent = parent_id
         block.save()
         return usage_id
+
+    def _aside_from_xml(self, node, block_def_id, block_usage_id, id_generator):
+        """
+        Create an aside from the xml and attach it to the given block
+        """
+        id_generator = id_generator or self.id_generator
+
+        aside_type = node.tag
+        aside_class = self.load_aside_type(aside_type)
+        aside_def_id, aside_usage_id = id_generator.create_aside(block_def_id, block_usage_id, aside_type)
+        keys = ScopeIds(None, aside_type, aside_def_id, aside_usage_id)
+        aside = aside_class.parse_xml(node, self, keys, id_generator)
+        aside.save()
 
     def add_node_as_child(self, block, node, id_generator=None):
         """
@@ -719,6 +753,12 @@ class Runtime(object):
         root = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
         tree = etree.ElementTree(root)
         block.add_xml_to_node(root)
+        # write asides as children
+        for aside in self.get_asides(block):
+            if aside.needs_serialization():
+                aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
+                aside.add_xml_to_node(aside_node)
+                block.append(aside_node)
         tree.write(xmlfile, xml_declaration=True, pretty_print=True, encoding="utf8")
 
     def add_block_as_child_node(self, block, node):
@@ -883,15 +923,31 @@ class Runtime(object):
         if self.id_generator is None:
             raise Exception("Runtimes must be supplied with an IdGenerator to load XBlockAsides.")
 
+        return [
+            self.get_aside_of_type(block, aside_type)
+            for aside_type, __
+            in XBlockAside.load_classes()
+        ]
+
+    def get_aside_of_type(self, block, aside_type):
+        """
+        Return the aside of the given aside_type which might be decorating this `block`.
+
+        Arguments:
+            block (:class:`.XBlock`): The block to retrieve asides for.
+            aside_type (`str`): the type of the aside
+        """
+        # TODO: This function will need to be extended if we want to allow:
+        #   a) XBlockAsides to statically indicated which types of blocks they can comment on
+        #   b) XBlockRuntimes to limit the selection of asides to a subset of the installed asides
+        #   c) Optimize by only loading asides that actually decorate a particular view
         usage_id = block.scope_ids.usage_id
 
-        asides = []
-        for aside_type, aside_cls in XBlockAside.load_classes():
-            definition_id = self.id_reader.get_definition_id(usage_id)
-            aside_def_id, aside_usage_id = self.id_generator.create_aside(definition_id, usage_id, aside_type)
-            scope_ids = ScopeIds(self.user_id, aside_type, aside_def_id, aside_usage_id)
-            asides.append(aside_cls(runtime=self, scope_ids=scope_ids))
-        return asides
+        aside_cls = self.load_aside_type(aside_type)
+        definition_id = self.id_reader.get_definition_id(usage_id)
+        aside_def_id, aside_usage_id = self.id_generator.create_aside(definition_id, usage_id, aside_type)
+        scope_ids = ScopeIds(self.user_id, aside_type, aside_def_id, aside_usage_id)
+        return aside_cls(runtime=self, scope_ids=scope_ids)
 
     def render_asides(self, block, view_name, frag, context):
         """
@@ -1068,6 +1124,15 @@ class Runtime(object):
             else:
                 raise BadPath("Invalid thing: %r" % toktext)
         return results
+
+    def _family_id_to_superclass(self, family_id):
+        """
+        Temporary hardcoded mapping from serialized family id to either `class :XBlock:` or `:XBlockAside`
+        """
+        for family in [XBlock, XBlockAside]:
+            if family_id == family.entry_point:
+                return family
+        raise ValueError(u'No such family: {}'.format(family_id))
 
 
 class ObjectAggregator(object):

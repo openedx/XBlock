@@ -163,7 +163,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         return Validation(self.scope_ids.usage_id)
 
 
-class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, SharedBlockBase):
+class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, SharedBlockBase):
     """
     This mixin allows Xblock-like class to declare that it provides aside functionality.
     """
@@ -223,6 +223,15 @@ class XBlockAside(ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, Share
             return getattr(self, self._combined_asides[view_name])
         else:
             return None
+
+    def needs_serialization(self):
+        """
+        Return True if the aside has any data to serialize to XML.
+
+        If all of the aside's data is empty or a default value, then the aside shouldn't
+        be serialized as XML at all.
+        """
+        return any([field.is_set_on(self) for field in self.fields.itervalues()])
 
 
 # Maintain backwards compatibility
