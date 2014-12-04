@@ -25,7 +25,7 @@ def test_dummy_course_service_current_course():
     course_service = SingleCourseService(course)
     current_course = course_service.get_current_course()
     assert_equals(current_course, course)
-    assert_equals(current_user.course_id, "tester")
+    assert_equals(current_course.course_id, "tester")
 
 
 def test_dummy_course_service_exception():
