@@ -10,6 +10,7 @@ class SingleCourseService(CourseService):
     This is a dummy course service for testing that always returns a single course.
     """
     def __init__(self, course):
+        super(SingleCourseService, self).__init__()
         self.course = course
 
     def get_current_course(self):
@@ -22,7 +23,9 @@ def test_dummy_course_service_current_course():
     """
     course = XBlockCourse(course_id="tester")
     course_service = SingleCourseService(course)
-    assert_equals(course_service.get_current_course(), course)
+    current_course = course_service.get_current_course()
+    assert_equals(current_course, course)
+    assert_equals(current_user.course_id, "tester")
 
 
 def test_dummy_course_service_exception():
