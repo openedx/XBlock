@@ -21,11 +21,11 @@ def test_dummy_course_service_current_course():
     """
     Tests that get_current_course() works on a dummy course service.
     """
-    course = XBlockCourse(course_id="tester")
+    course = XBlockCourse(display_name="testcourse")
     course_service = SingleCourseService(course)
     current_course = course_service.get_current_course()
     assert_equals(current_course, course)
-    assert_equals(current_course.course_id, "tester")
+    assert_equals(current_course.display_name, "testcourse")
 
 
 def test_dummy_course_service_exception():

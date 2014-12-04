@@ -367,7 +367,7 @@ If no user is authenticated only the ``is_authenticated`` attribute will be avai
 Just like the user service there is the course service with only one method: ``get_current_course()``.
 The attributes provided are:
 
-- ``id``
+- ``course_id``
 - ``number``
 - ``display_name``
 - ``org``

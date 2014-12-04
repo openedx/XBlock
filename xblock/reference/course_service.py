@@ -26,7 +26,7 @@ class XBlockCourse(object):
     A model representation of course data returned by the CourseService.
 
     This is just to tell XBlock authors what fields they can expect from this service, and how to reference them
-        - id
+        - course_id
         - display_name
         - org
         - number
@@ -35,7 +35,7 @@ class XBlockCourse(object):
     """
     def __init__(self, **kwargs):
         # Set standardized attributes
-        self.id = kwargs.get('id')
+        self.course_id = kwargs.get('course_id')
         self.display_name = kwargs.get('display_name')
         self.org = kwargs.get('org')
         self.number = kwargs.get('number')
