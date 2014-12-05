@@ -63,20 +63,14 @@ class Specialized(XBlock):
 # Helpers
 
 
-class XmlTest(object):
-    """Helpful things for XML tests."""
-
-    def setUp(self):
-        super(XmlTest, self).setUp()
-        self.runtime = ToyRuntime()
-
+class XmlTestMixin(object):
+    """
+    Wraps parsing and exporting and other things to return more useful values. Does not define
+    a runtime (thus calling it a mixin)
+    """
     def parse_xml_to_block(self, xml):
         """A helper to get a block from some XML."""
-
-        # ToyRuntime has an id_generator, but most runtimes won't
-        # (because the generator will be contextual), so we
-        # pass it explicitly to parse_xml_string.
-        usage_id = self.runtime.parse_xml_string(xml, self.runtime.id_generator)
+        usage_id = self.runtime.parse_xml_string(xml)
         block = self.runtime.get_block(usage_id)
         return block
 
@@ -85,6 +79,13 @@ class XmlTest(object):
         output = StringIO.StringIO()
         self.runtime.export_to_xml(block, output)
         return output.getvalue()
+
+
+class XmlTest(XmlTestMixin):
+    """Helpful things for XML tests."""
+    def setUp(self):
+        super(XmlTest, self).setUp()
+        self.runtime = ToyRuntime()
 
 
 # Tests!
@@ -235,7 +236,7 @@ class ExportTest(XmlTest, unittest.TestCase):
     def test_dict_and_list_export_format(self):
         xml = textwrap.dedent("""\
             <?xml version='1.0' encoding='UTF8'?>
-            <leafwithoption %s>
+            <leafwithoption %s xblock-family="xblock.v1">
               <option:data3>{
               "child": 1,
               "with custom option": true
