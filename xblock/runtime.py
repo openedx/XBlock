@@ -921,14 +921,6 @@ class Runtime(object):
         Arguments:
             block (:class:`.XBlock`): The block to render retrieve asides for.
         """
-        # TODO: This function will need to be extended if we want to allow:
-        #   a) XBlockAsides to statically indicated which types of blocks they can comment on
-        #   b) XBlockRuntimes to limit the selection of asides to a subset of the installed asides
-        #   c) Optimize by only loading asides that actually decorate a particular view
-
-        if self.id_generator is None:
-            raise Exception("Runtimes must be supplied with an IdGenerator to load XBlockAsides.")
-
         return [
             self.get_aside_of_type(block, aside_type)
             for aside_type, __
@@ -947,6 +939,10 @@ class Runtime(object):
         #   a) XBlockAsides to statically indicated which types of blocks they can comment on
         #   b) XBlockRuntimes to limit the selection of asides to a subset of the installed asides
         #   c) Optimize by only loading asides that actually decorate a particular view
+
+        if self.id_generator is None:
+            raise Exception("Runtimes must be supplied with an IdGenerator to load XBlockAsides.")
+
         usage_id = block.scope_ids.usage_id
 
         aside_cls = self.load_aside_type(aside_type)
