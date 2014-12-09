@@ -925,9 +925,18 @@ class Runtime(object):
 
         return [
             self.get_aside_of_type(block, aside_type)
-            for aside_type, __
-            in XBlockAside.load_classes()
+            for aside_type
+            in self.applicable_aside_types(block)
         ]
+
+    # pylint: disable=unused-argument
+    def applicable_aside_types(self, block):
+        """
+        Return the set of applicable aside types for this runtime and block. This method allows the runtime
+        to filter the set of asides it wants to support or to provide even block-level or block_type level
+        filtering. We may extend this in the future to also take the user or user roles.
+        """
+        return [aside_type for aside_type, __ in XBlockAside.load_classes()]
 
     def get_aside_of_type(self, block, aside_type):
         """
