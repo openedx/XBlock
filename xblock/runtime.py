@@ -556,7 +556,7 @@ class Runtime(object):
         # Provide some default implementations
         self._services.setdefault("i18n", NullI18nService())
 
-        self.__field_data = field_data
+        self._deprecated_per_instance_field_data = field_data  # pylint: disable=invalid-name
         if field_data:
             warnings.warn(
                 "Passing field_data as a constructor argument to Runtimes is deprecated",
@@ -586,7 +586,7 @@ class Runtime(object):
         Deprecated in favor of a 'field-data' service.
         """
         warnings.warn("Runtime.field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
-        return self.__field_data
+        return self._deprecated_per_instance_field_data
 
     @field_data.setter
     def field_data(self, field_data):
@@ -596,7 +596,7 @@ class Runtime(object):
         Deprecated in favor of a 'field-data' service.
         """
         warnings.warn("Runtime.field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
-        self.__field_data = field_data
+        self._deprecated_per_instance_field_data = field_data
 
     def load_block_type(self, block_type):
         """
