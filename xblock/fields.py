@@ -232,7 +232,14 @@ class Scope(ScopeBase):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
 
-ScopeIds = namedtuple('ScopeIds', 'user_id block_type def_id usage_id')
+class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
+    """
+    A simple wrapper to collect all of the ids needed to correctly identify an XBlock
+    (or other classes deriving from ScopedStorageMixin) to a FieldData.
+    These identifiers match up with BlockScope and UserScope attributes, so that,
+    for instance, the `def_id` identifies scopes that use BlockScope.DEFINITION.
+    """
+    __slots__ = ()
 
 
 # define a placeholder ('nil') value to indicate when nothing has been stored
