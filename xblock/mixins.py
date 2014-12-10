@@ -458,3 +458,18 @@ class XmlSerializationMixin(ScopedStorageMixin):
             node.insert(0, elem)
         else:
             node.set(field_name, unicode(field.read_from(self)))
+
+
+class IndexInfoMixin(object):
+    """
+    This mixin provides interface for classes that wish to provide index
+    information which might be used within a search index
+    """
+
+    def index_dictionary(self):
+        """
+        return key/value fields to feed an index within in a Python dict object
+        values may be numeric / string or dict
+        default implementation is an empty dict
+        """
+        return {}

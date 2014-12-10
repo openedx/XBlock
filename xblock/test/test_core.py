@@ -912,3 +912,43 @@ class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
         with self.assertWarns(FieldDataDeprecationWarning):
             block._field_data = field_data
         self.assertEqual(field_data, block._field_data)
+
+
+class TestIndexResults(unittest.TestCase):
+    """
+    Tests to confirm that default block has empty index, and that XBlocks can provide custom index dictionary
+    """
+
+    class TestXBlock(XBlock):
+        """
+        Class to test default Xblock provides a dictionary
+        """
+        pass
+
+    class TestIndexedXBlock(XBlock):
+        """
+        Class to test when an Xblock provides a dictionary
+        """
+
+        def index_dictionary(self):
+            return {
+                "test_field": "ABC123",
+                "text_block": "Here is some text that was indexed",
+            }
+
+    def test_default_index_view(self):
+        test_runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        test_xblock = self.TestXBlock(test_runtime, scope_ids=Mock(spec=ScopeIds))
+
+        index_info = test_xblock.index_dictionary()
+        self.assertFalse(index_info)
+        self.assertTrue(isinstance(index_info, dict))
+
+    def test_override_index_view(self):
+        test_runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        test_xblock = self.TestIndexedXBlock(test_runtime, scope_ids=Mock(spec=ScopeIds))
+
+        index_info = test_xblock.index_dictionary()
+        self.assertTrue(index_info)
+        self.assertTrue(isinstance(index_info, dict))
+        self.assertEqual(index_info["test_field"], "ABC123")

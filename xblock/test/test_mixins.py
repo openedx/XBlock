@@ -5,7 +5,7 @@ Tests of the XBlock-family functionality mixins
 from unittest import TestCase
 
 from xblock.fields import List, Scope, Integer
-from xblock.mixins import ScopedStorageMixin, HierarchyMixin
+from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin
 
 
 class AttrAssertionMixin(TestCase):
@@ -118,3 +118,18 @@ class TestHierarchyMixin(AttrAssertionMixin, TestCase):
         self.assertEqual(Scope.children, self.HasChildren.children.scope)
         self.assertIsInstance(self.InheritedChildren.children, List)
         self.assertEqual(Scope.children, self.InheritedChildren.children.scope)
+
+
+class TestIndexInfoMixin(AttrAssertionMixin):
+    """
+    Tests for Index
+    """
+    class IndexInfoMixinTester(IndexInfoMixin):
+        """Test class for index mixin"""
+        pass
+
+    def test_index_info(self):
+        self.assertHasAttr(self.IndexInfoMixinTester, 'index_dictionary')
+        with_index_info = self.IndexInfoMixinTester().index_dictionary()
+        self.assertFalse(with_index_info)
+        self.assertTrue(isinstance(with_index_info, dict))
