@@ -5,6 +5,7 @@ webob
 simplejson
 pytz
 python-dateutil
+markupsafe
 
 # For Tests
 mock

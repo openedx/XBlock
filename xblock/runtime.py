@@ -5,6 +5,7 @@ Machinery to make the common case easy when building new runtimes
 import functools
 import gettext
 import itertools
+import markupsafe
 import re
 import threading
 import warnings
@@ -854,7 +855,7 @@ class Runtime(object):
             return self.wrap_child(block, view, frag, context)  # pylint: disable=no-member
 
         extra_data = {'name': block.name} if block.name else {}
-        return self._wrap_ele(block, frag, extra_data)
+        return self._wrap_ele(block, view, frag, extra_data)
 
     def wrap_aside(self, block, aside, view, frag, context):  # pylint: disable=unused-argument
         """
@@ -865,12 +866,12 @@ class Runtime(object):
         javascript, you'll need to override this impl
         """
         return self._wrap_ele(
-            aside, frag, {
+            aside, view, frag, {
                 'block_id': block.scope_ids.usage_id,
                 'url_selector': 'asideBaseUrl',
             })
 
-    def _wrap_ele(self, block, frag, extra_data=None):
+    def _wrap_ele(self, block, view, frag, extra_data=None):
         """
         Does the guts of the wrapping the same way for both xblocks and asides. Their
         wrappers provide other info in extra_data which gets put into the dom data- attrs.
@@ -895,8 +896,14 @@ class Runtime(object):
             json_init = u'<script type="json/xblock-args" class="xblock_json_init_args">' + \
                 u'{data}</script>'.format(data=json.dumps(frag.json_init_args))
 
+        block_css_entrypoint = block.entry_point.replace('.', '-')
+        css_classes = [
+            block_css_entrypoint,
+            '{}-{}'.format(block_css_entrypoint, view),
+        ]
+
         html = u"<div class='{}'{properties}>{body}{js}</div>".format(
-            block.entry_point.replace('.', '-'),
+            markupsafe.escape(' '.join(css_classes)),
             properties="".join(" data-%s='%s'" % item for item in data.items()),
             body=frag.body_html(),
             js=json_init)
