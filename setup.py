@@ -20,8 +20,9 @@ setup(
     ],
     install_requires=[
         'lxml',
-        'webob',
-        'pytz',
+        'markupsafe',
         'python-dateutil',
+        'pytz',
+        'webob',
     ]
 )

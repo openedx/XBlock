@@ -194,7 +194,12 @@ class ScopedStorageMixin(RuntimeServicesMixin):
                 FieldDataDeprecationWarning,
                 stacklevel=2
             )
-        self.__field_data = field_data
+            # Storing _field_data instead of _deprecated_per_instance_field_data allows subclasses to
+            # continue to override this behavior (for instance, the way that edx-platform's XModule does
+            # in order to proxy to XBlock).
+            self._field_data = field_data
+        else:
+            self._deprecated_per_instance_field_data = None  # pylint: disable=invalid-name
 
         self._field_data_cache = {}
         self._dirty_fields = {}
@@ -208,8 +213,8 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         Return the FieldData for this XBlock (either as passed in the constructor
         or from retrieving the 'field-data' service).
         """
-        if self.__field_data:
-            return self.__field_data
+        if self._deprecated_per_instance_field_data:
+            return self._deprecated_per_instance_field_data
         else:
             return self.runtime.service(self, 'field-data')
 
@@ -221,7 +226,7 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         Deprecated.
         """
         warnings.warn("Setting _field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
-        self.__field_data = field_data
+        self._deprecated_per_instance_field_data = field_data
 
     def save(self):
         """Save all dirty fields attached to this XBlock."""

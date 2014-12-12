@@ -5,6 +5,7 @@ Machinery to make the common case easy when building new runtimes
 import functools
 import gettext
 import itertools
+import markupsafe
 import re
 import threading
 import warnings
@@ -38,10 +39,14 @@ class KeyValueStore(object):
 
     __metaclass__ = ABCMeta
 
-    # Keys are structured to retain information about the scope of the data.
-    # Stores can use this information however they like to store and retrieve
-    # data.
-    Key = namedtuple("Key", "scope, user_id, block_scope_id, field_name")
+    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
+        """
+        Keys are structured to retain information about the scope of the data.
+        Stores can use this information however they like to store and retrieve
+        data.
+        """
+        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1'):
+            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family)
 
     @abstractmethod
     def get(self, key):
@@ -149,7 +154,8 @@ class KvsFieldData(FieldData):
             scope=field.scope,
             user_id=student_id,
             block_scope_id=block_id,
-            field_name=name
+            field_name=name,
+            block_family=block.entry_point,
         )
         """
         field = self._getfield(block, name)
@@ -177,7 +183,8 @@ class KvsFieldData(FieldData):
             scope=field.scope,
             user_id=user_id,
             block_scope_id=block_id,
-            field_name=name
+            field_name=name,
+            block_family=block.entry_point,
         )
         return key
 
@@ -550,7 +557,7 @@ class Runtime(object):
         # Provide some default implementations
         self._services.setdefault("i18n", NullI18nService())
 
-        self.__field_data = field_data
+        self._deprecated_per_instance_field_data = field_data  # pylint: disable=invalid-name
         if field_data:
             warnings.warn(
                 "Passing field_data as a constructor argument to Runtimes is deprecated",
@@ -580,7 +587,7 @@ class Runtime(object):
         Deprecated in favor of a 'field-data' service.
         """
         warnings.warn("Runtime.field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
-        return self.__field_data
+        return self._deprecated_per_instance_field_data
 
     @field_data.setter
     def field_data(self, field_data):
@@ -590,7 +597,7 @@ class Runtime(object):
         Deprecated in favor of a 'field-data' service.
         """
         warnings.warn("Runtime.field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
-        self.__field_data = field_data
+        self._deprecated_per_instance_field_data = field_data
 
     def load_block_type(self, block_type):
         """
@@ -848,7 +855,7 @@ class Runtime(object):
             return self.wrap_child(block, view, frag, context)  # pylint: disable=no-member
 
         extra_data = {'name': block.name} if block.name else {}
-        return self._wrap_ele(block, frag, extra_data)
+        return self._wrap_ele(block, view, frag, extra_data)
 
     def wrap_aside(self, block, aside, view, frag, context):  # pylint: disable=unused-argument
         """
@@ -859,12 +866,12 @@ class Runtime(object):
         javascript, you'll need to override this impl
         """
         return self._wrap_ele(
-            aside, frag, {
+            aside, view, frag, {
                 'block_id': block.scope_ids.usage_id,
                 'url_selector': 'asideBaseUrl',
             })
 
-    def _wrap_ele(self, block, frag, extra_data=None):
+    def _wrap_ele(self, block, view, frag, extra_data=None):
         """
         Does the guts of the wrapping the same way for both xblocks and asides. Their
         wrappers provide other info in extra_data which gets put into the dom data- attrs.
@@ -889,8 +896,14 @@ class Runtime(object):
             json_init = u'<script type="json/xblock-args" class="xblock_json_init_args">' + \
                 u'{data}</script>'.format(data=json.dumps(frag.json_init_args))
 
+        block_css_entrypoint = block.entry_point.replace('.', '-')
+        css_classes = [
+            block_css_entrypoint,
+            '{}-{}'.format(block_css_entrypoint, view),
+        ]
+
         html = u"<div class='{}'{properties}>{body}{js}</div>".format(
-            block.entry_point.replace('.', '-'),
+            markupsafe.escape(' '.join(css_classes)),
             properties="".join(" data-%s='%s'" % item for item in data.items()),
             body=frag.body_html(),
             js=json_init)
@@ -915,14 +928,6 @@ class Runtime(object):
         Arguments:
             block (:class:`.XBlock`): The block to render retrieve asides for.
         """
-        # TODO: This function will need to be extended if we want to allow:
-        #   a) XBlockAsides to statically indicated which types of blocks they can comment on
-        #   b) XBlockRuntimes to limit the selection of asides to a subset of the installed asides
-        #   c) Optimize by only loading asides that actually decorate a particular view
-
-        if self.id_generator is None:
-            raise Exception("Runtimes must be supplied with an IdGenerator to load XBlockAsides.")
-
         return [
             self.get_aside_of_type(block, aside_type)
             for aside_type
@@ -950,6 +955,10 @@ class Runtime(object):
         #   a) XBlockAsides to statically indicated which types of blocks they can comment on
         #   b) XBlockRuntimes to limit the selection of asides to a subset of the installed asides
         #   c) Optimize by only loading asides that actually decorate a particular view
+
+        if self.id_generator is None:
+            raise Exception("Runtimes must be supplied with an IdGenerator to load XBlockAsides.")
+
         usage_id = block.scope_ids.usage_id
 
         aside_cls = self.load_aside_type(aside_type)
