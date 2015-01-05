@@ -116,11 +116,22 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         return dec
 
     @classmethod
-    def load_tagged_classes(cls, tag):
-        """Produce a sequence of all XBlock classes tagged with `tag`."""
+    def load_tagged_classes(cls, tag, fail_silently=True):
+        """
+        Produce a sequence of all XBlock classes tagged with `tag`.
+
+        fail_silently causes the code to simply log warnings if a
+        plugin cannot import. The goal is to be able to use part of
+        libraries from an XBlock (and thus have it installed), even if
+        the overall XBlock cannot be used (e.g. depends on Django in a
+        non-Django application). There is diagreement about whether
+        this is a good idea, or whether we should see failures early
+        (e.g. on startup or first page load), and in what
+        contexts. Hence, the flag.
+        """
         # Allow this method to access the `_class_tags`
         # pylint: disable=W0212
-        for name, class_ in cls.load_classes():
+        for name, class_ in cls.load_classes(fail_silently):
             if tag in class_._class_tags:
                 yield name, class_
 
