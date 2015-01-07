@@ -44,6 +44,7 @@ The concepts of XBlock, in depth.
     concepts
     guide/xblock
     guide/runtimes
+    guide/javascript
     guide/fragment
 
 API
