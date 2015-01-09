@@ -34,14 +34,21 @@ class HandlersMixin(object):
 
     @classmethod
     def json_handler(cls, func):
-        """Wrap a handler to consume and produce JSON.
+        """
+        Wrap a handler to consume and produce JSON.
 
         Rather than a Request object, the method will now be passed the
-        JSON-decoded body of the request.  Any data returned by the function
+        JSON-decoded body of the request. The request should be a POST request
+        in order to use this method. Any data returned by the function
         will be JSON-encoded and returned as the response.
 
         The wrapped function can raise JsonHandlerError to return an error
         response with a non-200 status code.
+
+        This decorator will return a 405 HTTP status code if the method is not
+        POST.
+        This decorator will return a 400 status code if the body contains
+        invalid JSON.
         """
         @cls.handler
         @functools.wraps(func)
@@ -65,7 +72,11 @@ class HandlersMixin(object):
 
     @classmethod
     def handler(cls, func):
-        """A decorator to indicate a function is usable as a handler."""
+        """
+        A decorator to indicate a function is usable as a handler.
+
+        The wrapped function must return a `webob.Response` object.
+        """
         func._is_xblock_handler = True      # pylint: disable=protected-access
         return func
 
@@ -129,8 +140,8 @@ class RuntimeServicesMixin(object):
         """
         Find and return a service declaration.
 
-        XBlocks declare their service requirements with @XBlock.needs and
-        @XBlock.wants decorators.  These store information on the class.
+        XBlocks declare their service requirements with `@XBlock.needs` and
+        `@XBlock.wants` decorators.  These store information on the class.
         This function finds those declarations for a block.
 
         Arguments:

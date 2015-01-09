@@ -2,5 +2,6 @@
 XBlock
 ======
 
-.. automodule:: xblock.core
+.. autoclass:: xblock.core.XBlock
     :members:
+    :inherited-members:
