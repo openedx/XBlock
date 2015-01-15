@@ -19,7 +19,8 @@ from xblock.mixins import (
     HierarchyMixin,
     RuntimeServicesMixin,
     HandlersMixin,
-    XmlSerializationMixin
+    XmlSerializationMixin,
+    IndexInfoMixin
 )
 from xblock.plugin import Plugin
 from xblock.validation import Validation
@@ -79,7 +80,7 @@ class SharedBlockBase(Plugin):
 
 # -- Base Block
 class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin,
-             SharedBlockBase):
+             IndexInfoMixin, SharedBlockBase):
     """Base class for XBlocks.
 
     Derive from this class to create a new kind of XBlock.  There are no
