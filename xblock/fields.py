@@ -10,6 +10,7 @@ from collections import namedtuple
 import copy
 import datetime
 import dateutil.parser
+import hashlib
 import itertools
 import pytz
 import traceback
@@ -242,6 +243,11 @@ class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     __slots__ = ()
 
 
+# Define special reference that can be used as a field's default in field
+# definition to signal that the field should default to a unique string value
+# calculated at runtime.
+UNIQUE_ID = Sentinel("fields.UNIQUE_ID")
+
 # define a placeholder ('nil') value to indicate when nothing has been stored
 # in the cache ("None" may be a valid value in the cache, so we cannot use it).
 NO_CACHE_VALUE = Sentinel("fields.NO_CACHE_VALUE")
@@ -269,8 +275,10 @@ class Field(Nameable):
         help (str): documentation for the field, suitable for presenting to a
             user (defaults to None).
 
-        default: static value to default to if not otherwise specified
-            (defaults to None).
+        default: field's default value. Can be a static value or the special
+            xblock.fields.UNIQUE_ID reference. When set to xblock.fields.UNIQUE_ID,
+            the field defaults to a unique string that is deterministically calculated
+            for the field in the given scope (defaults to None).
 
         scope: this field's scope (defaults to Scope.content).
 
@@ -305,7 +313,10 @@ class Field(Nameable):
         self.help = help
         self._enable_enforce_type = enforce_type
         if default is not UNSET:
-            self._default = self._check_or_enforce_type(default)
+            if default is UNIQUE_ID:
+                self._default = UNIQUE_ID
+            else:
+                self._default = self._check_or_enforce_type(default)
         self.scope = scope
         self._display_name = display_name
         self._values = values
@@ -435,6 +446,16 @@ class Field(Nameable):
 
         return value
 
+    def _calculate_unique_id(self, xblock):
+        """
+        Provide a default value for fields with `default=UNIQUE_ID`.
+
+        Returned string is a SHA1 hex digest that is deterministically calculated
+        for the field in its given scope.
+        """
+        key = scope_key(self, xblock)
+        return hashlib.sha1(key).hexdigest()
+
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
@@ -456,7 +477,10 @@ class Field(Nameable):
                 try:
                     value = self.from_json(field_data.default(xblock, self.name))
                 except KeyError:
-                    value = self.default
+                    if self._default is UNIQUE_ID:
+                        value = self._check_or_enforce_type(self._calculate_unique_id(xblock))
+                    else:
+                        value = self.default
             else:
                 value = self.default
             self._set_cached_value(xblock, value)

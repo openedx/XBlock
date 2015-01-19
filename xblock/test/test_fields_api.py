@@ -28,7 +28,7 @@ import copy
 from mock import Mock
 
 from xblock.core import XBlock
-from xblock.fields import Integer, List, ScopeIds
+from xblock.fields import Integer, List, String, ScopeIds, UNIQUE_ID
 from xblock.field_data import DictFieldData
 
 from xblock.test.tools import (
@@ -400,6 +400,13 @@ class MutableTestCases(UniversalTestCases, MutationProperties):
     def mutate(self, value):
         """Modify the supplied value"""
         value.append('foo')
+
+
+class UniqueIdTestCases(ImmutableTestCases):
+    """Set up tests for field with UNIQUE_ID default"""
+    field_class = String
+    field_default = UNIQUE_ID
+    new_value = 'user-assigned ID'
 # pylint: enable=no-member
 
 
@@ -408,9 +415,8 @@ class TestImmutableWithStaticDefault(ImmutableTestCases, StaticDefaultTestCases)
     __test__ = False
 
 
-class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):
+class TestImmutableWithUniqueIdDefault(UniqueIdTestCases, StaticDefaultTestCases):
     __test__ = False
-    initial_value = 75
 
 
 class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCases):
@@ -436,6 +442,16 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
     @property
     def default_iterator(self):
         return ([None] * i for i in xrange(1000))
+
+
+class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):
+    __test__ = False
+    initial_value = 75
+
+
+class TestImmutableWithInitialValueAndUniqueIdDefault(UniqueIdTestCases, InitialValueProperties):
+    __test__ = False
+    initial_value = 'initial unique ID'
 
 
 # ~~~~~~~~~~~~~ Classes for testing noops before other tests ~~~~~~~~~~~~~~~~~~~~
@@ -490,7 +506,8 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
     for noop_prefix in (None, GetNoopPrefix, GetSaveNoopPrefix, SaveNoopPrefix):
         for base_test_case in (
                 TestImmutableWithComputedDefault, TestImmutableWithInitialValue, TestImmutableWithStaticDefault,
-                TestMutableWithComputedDefault, TestMutableWithInitialValue, TestMutableWithStaticDefault
+                TestMutableWithComputedDefault, TestMutableWithInitialValue, TestMutableWithStaticDefault,
+                TestImmutableWithUniqueIdDefault, TestImmutableWithInitialValueAndUniqueIdDefault
         ):
 
             test_name = base_test_case.__name__ + "With" + operation_backend.__name__
