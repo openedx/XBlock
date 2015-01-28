@@ -682,7 +682,8 @@ class Runtime(object):
 
     def parse_xml_file(self, fileobj, id_generator=None):
         """Parse an open XML file, returning a usage id."""
-        root = etree.parse(fileobj).getroot()
+        parser = etree.XMLParser(remove_comments=True)
+        root = etree.parse(fileobj, parser=parser).getroot()
         usage_id = self._usage_id_from_node(root, None, id_generator)
         return usage_id
 

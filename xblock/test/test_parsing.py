@@ -132,6 +132,20 @@ class ParsingTest(XmlTest, unittest.TestCase):
         self.assertEqual(child2.parent, block.scope_ids.usage_id)
 
     @XBlock.register_temp_plugin(Leaf)
+    @XBlock.register_temp_plugin(Container)
+    def test_xml_with_comments(self):
+        block = self.parse_xml_to_block("""\
+                    <!-- This is a comment -->
+                    <container>
+                        <leaf data1='child1'/>
+                        <!-- <leaf data1='ignore'/> -->
+                        <leaf data1='child2'/>
+                    </container>
+                    """)
+        self.assertIsInstance(block, Container)
+        self.assertEqual(len(block.children), 2)
+
+    @XBlock.register_temp_plugin(Leaf)
     @XBlock.register_temp_plugin(Specialized)
     def test_customized_parsing(self):
         block = self.parse_xml_to_block("""\
