@@ -374,6 +374,8 @@ class XmlSerializationMixin(ScopedStorageMixin):
         # The base implementation: child nodes become child blocks.
         # Or fields, if they belong to the right namespace.
         for child in node:
+            if child.tag is etree.Comment:
+                continue
             qname = etree.QName(child)
             tag = qname.localname
             namespace = qname.namespace
