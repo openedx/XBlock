@@ -7,6 +7,7 @@ import textwrap
 import unittest
 import ddt
 import mock
+from lxml import etree
 
 from xblock.core import XBlock, XML_NAMESPACES
 from xblock.fields import Scope, String, Integer, Dict, List
@@ -59,6 +60,33 @@ class Specialized(XBlock):
         block = runtime.construct_xblock_from_class(cls, keys)
         block.num_children = len(node)
         return block
+
+
+class CustomXml(XBlock):
+    """A block that does its own XML parsing and preserves comments"""
+    inner_xml = String(default='', scope=Scope.content)
+    has_children = True
+
+    @classmethod
+    def parse_xml(cls, node, runtime, keys, id_generator):
+        """Parse the XML node and save it as a string"""
+        block = runtime.construct_xblock_from_class(cls, keys)
+        for child in node:
+            if child.tag is not etree.Comment:
+                block.runtime.add_node_as_child(block, child, id_generator)
+        # Now build self.inner_xml from the XML of node's children
+        # We can't just call tostring() on each child because it adds xmlns: attributes
+        xml_str = etree.tostring(node)
+        block.inner_xml = xml_str[xml_str.index('>') + 1:xml_str.rindex('<')]
+        return block
+
+    def add_xml_to_node(self, node):
+        """ For exporting, set data on `node` from ourselves. """
+        node.tag = self.xml_element_name()
+        parsed_inner_xml = etree.XML('<x>{}</x>'.format(self.inner_xml))
+        node.text = parsed_inner_xml.text
+        for child in parsed_inner_xml:
+            node.append(child)
 
 # Helpers
 
@@ -130,6 +158,41 @@ class ParsingTest(XmlTest, unittest.TestCase):
         self.assertIsInstance(child2, Leaf)
         self.assertEqual(child2.data1, "child2")
         self.assertEqual(child2.parent, block.scope_ids.usage_id)
+
+    @XBlock.register_temp_plugin(Leaf)
+    @XBlock.register_temp_plugin(Container)
+    def test_xml_with_comments(self):
+        block = self.parse_xml_to_block("""\
+                    <!-- This is a comment -->
+                    <container>
+                        <leaf data1='child1'/>
+                        <!-- <leaf data1='ignore'/> -->
+                        <leaf data1='child2'/>
+                    </container>
+                    """)
+        self.assertIsInstance(block, Container)
+        self.assertEqual(len(block.children), 2)
+
+    @XBlock.register_temp_plugin(Leaf)
+    @XBlock.register_temp_plugin(CustomXml)
+    def test_comments_in_field_preserved(self):
+        """
+        Check that comments made by users inside field data are preserved.
+        """
+        block = self.parse_xml_to_block("""\
+                    <!-- This is a comment outside a block - it can be lost -->
+                    <customxml>A<!--B--><leaf/>C<leaf/><!--D-->E</customxml>
+                    """)
+        self.assertIsInstance(block, CustomXml)
+        self.assertEqual(len(block.children), 2)
+
+        xml = self.export_xml_for_block(block)
+        self.assertIn('A<!--B--><leaf/>C<leaf/><!--D-->E', xml)
+        block_imported = self.parse_xml_to_block(xml)
+        self.assertEqual(
+            block_imported.inner_xml,
+            "A<!--B--><leaf/>C<leaf/><!--D-->E"
+        )
 
     @XBlock.register_temp_plugin(Leaf)
     @XBlock.register_temp_plugin(Specialized)
