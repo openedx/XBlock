@@ -173,11 +173,18 @@ class Plugin(object):
         def _decorator(func):                           # pylint: disable=C0111
             @functools.wraps(func)
             def _inner(*args, **kwargs):                # pylint: disable=C0111
+                global PLUGIN_CACHE
+
                 old = list(cls.extra_entry_points)
+                old_cache = PLUGIN_CACHE
+
                 cls.extra_entry_points.append((identifier, entry_point))
+                PLUGIN_CACHE = {}
+
                 try:
                     return func(*args, **kwargs)
                 finally:
                     cls.extra_entry_points = old
+                    PLUGIN_CACHE = old_cache
             return _inner
         return _decorator
