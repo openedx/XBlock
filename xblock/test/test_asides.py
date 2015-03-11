@@ -1,6 +1,7 @@
 """
 Test XBlock Aside
 """
+from __future__ import unicode_literals
 from unittest import TestCase
 from xblock.core import XBlockAside, XBlock
 from xblock.fields import ScopeIds, Scope, String
@@ -16,13 +17,13 @@ class TestAside(XBlockAside):
     """
     Test xblock aside class
     """
-    FRAG_CONTENT = u"<p>Aside rendered</p>"
+    FRAG_CONTENT = "<p>Aside rendered</p>"
 
     content = String(default="default_value", scope=Scope.content)
     data2 = String(default="default_value", scope=Scope.user_state)
 
     @XBlockAside.aside_for('student_view')
-    def student_view_aside(self, block, context):  # pylint: disable=unused-argument
+    def student_view_aside(self, block, context):
         """Add to the student view"""
         return Fragment(self.FRAG_CONTENT)
 
@@ -31,7 +32,7 @@ class TestInheritedAside(TestAside):
     """
     XBlock Aside that inherits an aside view function from its parent.
     """
-    FRAG_CONTENT = u"<p>Inherited aside rendered</p>"
+    FRAG_CONTENT = "<p>Inherited aside rendered</p>"
 
 
 class AsideRuntimeSetup(TestCase):
@@ -61,10 +62,10 @@ class TestAsides(AsideRuntimeSetup):
         Test that rendering the xblock renders its aside
         """
 
-        frag = self.runtime.render(self.tester, 'student_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'student_view', ["ignore"])
         self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
 
-        frag = self.runtime.render(self.tester, 'author_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
 
     @XBlockAside.register_temp_plugin(TestAside)
@@ -74,11 +75,11 @@ class TestAsides(AsideRuntimeSetup):
         Test that rendering the xblock renders its aside (when the aside view is
         inherited).
         """
-        frag = self.runtime.render(self.tester, 'student_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'student_view', ["ignore"])
         self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
         self.assertIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
 
-        frag = self.runtime.render(self.tester, 'author_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
         self.assertNotIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
 

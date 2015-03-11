@@ -2,6 +2,7 @@
 Machinery to make the common case easy when building new runtimes
 """
 
+from __future__ import unicode_literals
 import functools
 import gettext
 import itertools
@@ -10,9 +11,9 @@ import re
 import threading
 import warnings
 
+import six
 from abc import ABCMeta, abstractmethod
 from lxml import etree
-from StringIO import StringIO
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
@@ -34,10 +35,9 @@ import json
 log = logging.getLogger(__name__)
 
 
+@six.add_metaclass(ABCMeta)
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
-
-    __metaclass__ = ABCMeta
 
     class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
         """
@@ -85,7 +85,7 @@ class KeyValueStore(object):
 
         :update_dict: field_name, field_value pairs for all cached changes
         """
-        for key, value in update_dict.iteritems():
+        for key, value in six.iteritems(update_dict):
             self.set(key, value)
 
 
@@ -243,9 +243,9 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
+@six.add_metaclass(ABCMeta)
 class IdReader(object):
     """An abstract object that stores usages and definitions."""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_usage_id_from_aside(self, aside_id):
@@ -326,9 +326,9 @@ class IdReader(object):
         raise NotImplementedError()
 
 
+@six.add_metaclass(ABCMeta)
 class IdGenerator(object):
     """An abstract object that creates usage and definition ids"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_aside(self, definition_id, usage_id, aside_type):
@@ -438,12 +438,11 @@ class MemoryIdManager(IdReader, IdGenerator):
         return aside_id.aside_type
 
 
+@six.add_metaclass(ABCMeta)
 class Runtime(object):
     """
     Access to the runtime environment for XBlocks.
     """
-
-    __metaclass__ = ABCMeta
 
     # Abstract methods
     @abstractmethod
@@ -678,11 +677,11 @@ class Runtime(object):
             )
 
         id_generator = id_generator or self.id_generator
-        return self.parse_xml_file(StringIO(xml), id_generator)
+        return self.parse_xml_file(six.BytesIO(xml), id_generator)
 
     def parse_xml_file(self, fileobj, id_generator=None):
         """Parse an open XML file, returning a usage id."""
-        root = etree.parse(fileobj).getroot()
+        root = etree.parse(fileobj).getroot()  # pylint: disable=no-member
         usage_id = self._usage_id_from_node(root, None, id_generator)
         return usage_id
 
@@ -757,8 +756,8 @@ class Runtime(object):
         """
         Export the block to XML, writing the XML to `xmlfile`.
         """
-        root = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
-        tree = etree.ElementTree(root)
+        root = etree.Element("unknown_root", nsmap=XML_NAMESPACES)  # pylint: disable=no-member
+        tree = etree.ElementTree(root)  # pylint: disable=no-member
         block.add_xml_to_node(root)
         # write asides as children
         for aside in self.get_asides(block):
@@ -772,7 +771,7 @@ class Runtime(object):
         """
         Export `block` as a child node of `node`.
         """
-        child = etree.SubElement(node, "unknown")
+        child = etree.SubElement(node, "unknown")  # pylint: disable=no-member
         block.add_xml_to_node(child)
 
     # Rendering
@@ -1232,8 +1231,12 @@ class Mixologist(object):
                 # Use setdefault so that if someone else has already
                 # created a class before we got the lock, we don't
                 # overwrite it
+                name = base_class.__name__ + 'WithMixins'
+                if six.PY2:
+                    # Python 2.x can't handle unicode as an argument to the type() function
+                    name = name.encode('utf-8')
                 return _CLASS_CACHE.setdefault(mixin_key, type(
-                    base_class.__name__ + 'WithMixins',
+                    name,
                     (base_class, ) + mixins,
                     {'unmixed_class': base_class}
                 ))
@@ -1264,6 +1267,11 @@ class NullI18nService(object):
         self._translations = gettext.NullTranslations()
 
     def __getattr__(self, name):
+        # when requesting unicode output, the function is "ugettext" on
+        # Python 2.x, but simply "gettext" on Python 3.x. Similarly,
+        # "ungettext" on Python 2.x becomes simply "ngettext" on Python 3.x,
+        if six.PY3 and name in ("ugettext", "ungettext"):
+            name = name[1:]
         return getattr(self._translations, name)
 
     STRFTIME_FORMATS = {
@@ -1277,7 +1285,10 @@ class NullI18nService(object):
         """
         Locale-aware strftime, with format short-cuts.
         """
+        if isinstance(format, six.binary_type):
+            format = format.decode("utf-8")
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if isinstance(format, unicode):
-            format = format.encode("utf8")
-        return dtime.strftime(format).decode("utf8")
+        ret = dtime.strftime(format)
+        if isinstance(ret, six.binary_type):
+            ret = ret.decode("utf-8")
+        return ret

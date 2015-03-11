@@ -24,5 +24,14 @@ setup(
         'python-dateutil',
         'pytz',
         'webob',
+    ],
+    license='Apache 2.0',
+    classifiers=[
+        "Topic :: Education",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License 2.0",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
     ]
 )

@@ -2,7 +2,7 @@
 This module defines all of the Mixins that provide components of XBlock-family
 functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
-
+from __future__ import unicode_literals
 import functools
 import inspect
 import logging
@@ -13,6 +13,7 @@ try:
 except ImportError:
     import json
 import warnings
+import six
 
 from webob import Response
 
@@ -57,7 +58,7 @@ class HandlersMixin(object):
             if request.method != "POST":
                 return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
             try:
-                request_json = json.loads(request.body)
+                request_json = json.loads(request.body.decode('utf-8'))
             except ValueError:
                 return JsonHandlerError(400, "Invalid JSON").get_response()
             try:
@@ -154,11 +155,11 @@ class RuntimeServicesMixin(object):
 
 
 @RuntimeServicesMixin.needs('field-data')
+@six.add_metaclass(NamedAttributesMetaclass)
 class ScopedStorageMixin(RuntimeServicesMixin):
     """
     This mixin provides scope for Fields and the associated Scoped storage.
     """
-    __metaclass__ = NamedAttributesMetaclass
 
     @class_lazy
     def fields(cls):  # pylint: disable=no-self-argument
@@ -290,7 +291,7 @@ class ScopedStorageMixin(RuntimeServicesMixin):
                 # Ensure we return a string, even if unanticipated exceptions.
                 attrs.append(" %s=???" % (field.name,))
             else:
-                if isinstance(value, basestring):
+                if isinstance(value, six.string_types):
                     value = value.strip()
                     if len(value) > 40:
                         value = value[:37] + "..."
@@ -320,12 +321,11 @@ class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
         return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
+@six.add_metaclass(ChildrenModelMetaclass)
 class HierarchyMixin(ScopedStorageMixin):
     """
     This adds Fields for parents and children.
     """
-    __metaclass__ = ChildrenModelMetaclass
-
     parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
 
     def __init__(self, **kwargs):
@@ -409,7 +409,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         node.set('xblock-family', self.entry_point)
 
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():
+        for field_name, field in sorted(self.fields.items()):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
@@ -454,12 +454,12 @@ class XmlSerializationMixin(ScopedStorageMixin):
         as an xml attribute or creates a separate child node.
         """
         if field.xml_node:
-            tag = etree.QName(XML_NAMESPACES["option"], field_name)
+            tag = etree.QName(XML_NAMESPACES["option"], field_name)  # pylint: disable=no-member
             elem = node.makeelement(tag)
             elem.text = field.to_string(field.read_from(self))
-            node.insert(0, elem)
+            node.append(elem)
         else:
-            node.set(field_name, unicode(field.read_from(self)))
+            node.set(field_name, six.text_type(field.read_from(self)))
 
 
 class IndexInfoMixin(object):

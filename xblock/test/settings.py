@@ -1,4 +1,5 @@
 """Django settings for toy runtime project."""
+from __future__ import unicode_literals
 import os
 
 DEBUG = True

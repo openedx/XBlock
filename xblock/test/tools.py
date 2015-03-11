@@ -1,6 +1,7 @@
 """
 Tools for testing XBlocks
 """
+from __future__ import unicode_literals
 import warnings
 
 from contextlib import contextmanager

@@ -1,6 +1,8 @@
 """
 Module for all xblock exception classes
 """
+from __future__ import unicode_literals
+
 from webob import Response
 try:
     import simplesjson as json  # pylint: disable=F0401

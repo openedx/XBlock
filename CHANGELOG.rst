@@ -7,6 +7,8 @@ These are notable changes in XBlock.
 0.4 - In Progress
 -----------------
 
+* Dual compatiblity with both Python 2.7 and Python 3.3+
+
 * Make Scope enums (UserScope.* and BlockScope.*) into Sentinels, rather than just ints,
   so that they can have more meaningful string representations.
 

@@ -6,6 +6,7 @@ simplejson
 pytz
 python-dateutil
 markupsafe
+six
 
 # For Tests
 mock
