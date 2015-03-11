@@ -163,8 +163,8 @@ the XBlock SDK: https://github.com/edx/xblock-sdk
 License
 -------
 
-The code in this repository is licensed under version 3 of the AGPL unless
-otherwise noted.
+The code in this repository is licensed the Apache 2.0 license unless otherwise
+noted.
 
 Please see ``LICENSE.txt`` for details.
 
