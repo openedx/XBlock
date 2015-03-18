@@ -332,18 +332,58 @@ class HierarchyMixin(ScopedStorageMixin):
         # A cache of the parent block, retrieved from .parent
         self._parent_block = None
         self._parent_block_id = None
+        self._child_cache = {}
+
+        for_parent = kwargs.pop('for_parent', None)
+
+        if for_parent is not None:
+            self._parent_block = for_parent
+            self._parent_block_id = for_parent.scope_ids.usage_id
 
         super(HierarchyMixin, self).__init__(**kwargs)
 
     def get_parent(self):
         """Return the parent block of this block, or None if there isn't one."""
-        if self._parent_block_id != self.parent:
+        if not self.has_cached_parent:
             if self.parent is not None:
                 self._parent_block = self.runtime.get_block(self.parent)
             else:
                 self._parent_block = None
             self._parent_block_id = self.parent
         return self._parent_block
+
+    @property
+    def has_cached_parent(self):
+        """Return whether this block has a cached parent block."""
+        return self.parent is not None and self._parent_block_id == self.parent
+
+    def get_child(self, usage_id):
+        """Return the child identified by ``usage_id``."""
+        if usage_id in self._child_cache:
+            return self._child_cache[usage_id]
+
+        child_block = self.runtime.get_block(usage_id, for_parent=self)
+        self._child_cache[usage_id] = child_block
+        return child_block
+
+    def get_children(self, usage_id_filter=None):
+        """
+        Return instantiated XBlocks for each of this blocks ``children``.
+        """
+        if not self.has_children:
+            return []
+
+        return [
+            self.get_child(usage_id)
+            for usage_id in self.children
+            if usage_id_filter is None or usage_id_filter(usage_id)
+        ]
+
+    def clear_child_cache(self):
+        """
+        Reset the cache of children stored on this XBlock.
+        """
+        self._child_cache.clear()
 
 
 class XmlSerializationMixin(ScopedStorageMixin):

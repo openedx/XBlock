@@ -123,7 +123,7 @@ class KvsFieldData(FieldData):
         self._kvs = kvs
 
     def __repr__(self):
-        return "<{0.__class__.__name__} {0._kvs!r}>".format(self)
+        return "{0.__class__.__name__}({0._kvs!r})".format(self)
 
     def _getfield(self, block, name):
         """
@@ -635,7 +635,7 @@ class Runtime(object):
             *args, **kwargs
         )
 
-    def get_block(self, usage_id):
+    def get_block(self, usage_id, for_parent=None):
         """
         Create an XBlock instance in this runtime.
 
@@ -647,7 +647,7 @@ class Runtime(object):
         except NoSuchDefinition:
             raise NoSuchUsage(repr(usage_id))
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
-        block = self.construct_xblock(block_type, keys)
+        block = self.construct_xblock(block_type, keys, for_parent=for_parent)
         return block
 
     def get_aside(self, aside_usage_id):
