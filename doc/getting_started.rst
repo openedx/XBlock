@@ -141,14 +141,12 @@ The simplest test environment is the XBlock workbench. It can be found in the
 Testing with the edX LMS
 ........................
 
-See `testing documentation <https://github.com/edx/edx-platform/blob/master/
-docs/en_us/developers/source/xblocks.rst#testing>`_. 
+See `testing documentation <http://edx-developer-guide.readthedocs.org/en/latest/extending_platform/xblocks.html#testing>`_.
 
 Deploying your XBlock
 ---------------------
 
-See `deployment documentation <https://github.com/edx/edx-platform/blob/master/
-docs/en_us/developers/source/xblocks.rst#deploying-your-xblock>`_.  
+See `deployment documentation <http://edx-developer-guide.readthedocs.org/en/latest/extending_platform/xblocks.html#deploying-your-xblock>`_.
 
 Submitting your XBlock to edX
 -----------------------------
