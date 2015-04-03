@@ -346,6 +346,111 @@ class ExportTest(XmlTest, unittest.TestCase):
             patched_warn.assert_called_once_with("XBlock %s does not contain field %s", type(block), parameter_name)
 
 
+class TestRoundTrip(XmlTest, unittest.TestCase):
+    """ Test serialization-deserialization sequence """
+
+    def create_block(self, block_type):
+        """
+        Create a block
+        """
+        def_id = self.runtime.id_generator.create_definition(block_type)
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+        block = self.runtime.get_block(usage_id)
+        return block
+
+    @XBlock.register_temp_plugin(LeafWithDictAndList)
+    def test_string_roundtrip(self):
+        """ Test correctly serializes-deserializes List and Dicts with plain string contents """
+        block = self.create_block("leafwithdictandlist")
+
+        expected_seq = ['1', '2']
+        expected_dict = {'1': '1', 'ping': 'ack'}
+        block.sequence = expected_seq
+        block.dictionary = expected_dict
+        xml = self.export_xml_for_block(block)
+
+        parsed = self.parse_xml_to_block(xml)
+
+        self.assertEqual(parsed.sequence, expected_seq)
+        self.assertEqual(parsed.dictionary, expected_dict)
+
+    @XBlock.register_temp_plugin(LeafWithDictAndList)
+    def test_unicode_roundtrip(self):
+        """ Test correctly serializes-deserializes List and Dicts with unicode contents """
+        block = self.create_block("leafwithdictandlist")
+
+        expected_seq = [u'1', u'2']
+        expected_dict = {u'1': u'1', u'ping': u'ack'}
+        block.sequence = expected_seq
+        block.dictionary = expected_dict
+        xml = self.export_xml_for_block(block)
+
+        parsed = self.parse_xml_to_block(xml)
+
+        self.assertEqual(parsed.sequence, expected_seq)
+        self.assertEqual(parsed.dictionary, expected_dict)
+
+    @XBlock.register_temp_plugin(LeafWithDictAndList)
+    def test_integers_roundtrip(self):
+        """ Test correctly serializes-deserializes List and Dicts with integer contents """
+        block = self.create_block("leafwithdictandlist")
+
+        expected_seq = [1, 2, 3]
+        expected_dict = {1: 10, 2: 20}
+        block.sequence = expected_seq
+        block.dictionary = expected_dict
+        xml = self.export_xml_for_block(block)
+        parsed = self.parse_xml_to_block(xml)
+
+        self.assertEqual(parsed.sequence, expected_seq)
+        self.assertNotEqual(parsed.dictionary, expected_dict)
+        self.assertEqual(parsed.dictionary, {str(key): value for key, value in expected_dict.items()})
+
+    @XBlock.register_temp_plugin(LeafWithDictAndList)
+    def test_none_contents_roundtrip(self):
+        """ Test correctly serializes-deserializes List and Dicts with keys/values of None """
+        block = self.create_block("leafwithdictandlist")
+
+        expected_seq = [1, None, 3, None]
+        expected_dict = {"1": None, None: 20}
+        block.sequence = expected_seq
+        block.dictionary = expected_dict
+        xml = self.export_xml_for_block(block)
+        parsed = self.parse_xml_to_block(xml)
+
+        self.assertEqual(parsed.sequence, expected_seq)
+        self.assertNotEqual(parsed.dictionary, expected_dict)
+        self.assertEqual(parsed.dictionary, {"1": None, 'null': 20})
+
+    @XBlock.register_temp_plugin(LeafWithDictAndList)
+    def test_none_roundtrip(self):
+        """ Test correctly serializes-deserializes Null List and Dict fields """
+        block = self.create_block("leafwithdictandlist")
+
+        block.sequence = None
+        block.dictionary = None
+        xml = self.export_xml_for_block(block)
+        parsed = self.parse_xml_to_block(xml)
+
+        self.assertIsNone(parsed.sequence)
+        self.assertIsNone(parsed.dictionary)
+
+    @XBlock.register_temp_plugin(LeafWithDictAndList)
+    def test_nested_roundtrip(self):
+        """ Test correctly serializes-deserializes nested List and Dict fields """
+        block = self.create_block("leafwithdictandlist")
+
+        expected_seq = [[1, 2], ["3", "4"], {"1": "2"}]
+        expected_dict = {"outer1": {"inner1": "1", "inner2": 2}, "outer2": [1, 2, 3]}
+        block.sequence = expected_seq
+        block.dictionary = expected_dict
+        xml = self.export_xml_for_block(block)
+        parsed = self.parse_xml_to_block(xml)
+
+        self.assertEqual(parsed.sequence, expected_seq)
+        self.assertEqual(parsed.dictionary, expected_dict)
+
+
 def squish(text):
     """Turn any run of whitespace into one space."""
     return re.sub(r"\s+", " ", text)

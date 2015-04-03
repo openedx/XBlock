@@ -453,13 +453,14 @@ class XmlSerializationMixin(ScopedStorageMixin):
         Depending on settings, it either stores the value of field
         as an xml attribute or creates a separate child node.
         """
+        value = field.to_string(field.read_from(self))
         if field.xml_node:
             tag = etree.QName(XML_NAMESPACES["option"], field_name)
             elem = node.makeelement(tag)
-            elem.text = field.to_string(field.read_from(self))
+            elem.text = value
             node.insert(0, elem)
         else:
-            node.set(field_name, unicode(field.read_from(self)))
+            node.set(field_name, value)
 
 
 class IndexInfoMixin(object):
