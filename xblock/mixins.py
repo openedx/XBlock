@@ -411,7 +411,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         node.set('xblock-family', self.entry_point)
 
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():
+        for field_name, field in sorted(self.fields.iteritems()):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
@@ -460,7 +460,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
             tag = etree.QName(XML_NAMESPACES["option"], field_name)
             elem = node.makeelement(tag)
             elem.text = value
-            node.insert(0, elem)
+            node.append(elem)
         else:
             node.set(field_name, value)
 
