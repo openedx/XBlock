@@ -368,6 +368,8 @@ class XmlSerializationMixin(ScopedStorageMixin):
                 runtime to generate correct definition and usage ids for
                 children of this block.
 
+        Returns (XBlock): The newly parsed XBlock
+
         """
         block = runtime.construct_xblock_from_class(cls, keys)
 
