@@ -1,5 +1,5 @@
 test:
-	coverage run -m nose
+	tox
 
 docs:
 	cd doc && make html

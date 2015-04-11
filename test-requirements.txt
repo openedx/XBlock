@@ -1,12 +1,3 @@
-# 3rd-party needs
-lxml
-requests
-webob
-simplejson
-pytz
-python-dateutil
-markupsafe
-
 # For Tests
 mock
 nose
