@@ -8,6 +8,7 @@ python:
   - "3.5"
 cache: pip
 install:
+  - pip install -r test-requirements.txt
   - pip install tox
   - pip install coveralls
 script:
