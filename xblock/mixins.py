@@ -486,7 +486,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         node.set('xblock-family', self.entry_point)
 
         # Set node attributes based on our fields.
-        for field_name, field in list(self.fields.items()):
+        for field_name, field in sorted(self.fields.items()):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self) or field.force_export:
