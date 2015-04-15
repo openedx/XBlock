@@ -302,7 +302,7 @@ def test_runtime_render():
     update_string = u"ultimate update"
     tester = TestXBlockNoFallback(Mock(), scope_ids=Mock(spec=ScopeIds))
     with assert_raises(NoSuchViewError):
-        runtime.render(tester, 'test_nonexistant_view', [update_string])
+        runtime.render(tester, 'test_nonexistent_view', [update_string])
 
 
 class SerialDefaultKVS(DictKeyValueStore):
