@@ -248,12 +248,12 @@ class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
 # calculated at runtime.
 UNIQUE_ID = Sentinel("fields.UNIQUE_ID")
 
-# define a placeholder ('nil') value to indicate when nothing has been stored
+# Define a placeholder ('nil') value to indicate when nothing has been stored
 # in the cache ("None" may be a valid value in the cache, so we cannot use it).
 NO_CACHE_VALUE = Sentinel("fields.NO_CACHE_VALUE")
 
-# define a placeholder value that indicates that a value is explicitly dirty,
-# because it was explicitly set
+# Define a placeholder value that indicates that a value is explicitly dirty,
+# because it was explicitly set.
 EXPLICITLY_SET = Sentinel("fields.EXPLICITLY_SET")
 
 # Fields that cannot have runtime-generated defaults. These are special,
@@ -404,7 +404,7 @@ class Field(Nameable):
         # pylint: disable=protected-access
 
         # Deep copy the value being marked as dirty, so that there
-        # is a baseline to check against when saving later
+        # is a baseline to check against when saving later.
         if self not in xblock._dirty_fields:
             xblock._dirty_fields[self] = copy.deepcopy(value)
 
@@ -486,7 +486,7 @@ class Field(Nameable):
             self._set_cached_value(xblock, value)
 
         # If this is a mutable type, mark it as dirty, since mutations can occur without an
-        # explicit call to __set__ (but they do require a call to __get__)
+        # explicit call to __set__ (but they do require a call to __get__).
         if self.MUTABLE:
             self._mark_dirty(xblock, value)
 
@@ -555,17 +555,17 @@ class Field(Nameable):
         for passing to json.dumps).
 
         This is called during field writes to convert the native python
-        type to the value stored in the database
+        type to the value stored in the database.
         """
         self._warn_deprecated_outside_JSONField()
         return value
 
     def from_json(self, value):
         """
-        Return value as a native full featured python type (the inverse of to_json)
+        Return value as a native full featured python type (the inverse of to_json).
 
         Called during field reads to convert the stored value into a full featured python
-        object
+        object.
         """
         self._warn_deprecated_outside_JSONField()
         return value
@@ -591,13 +591,13 @@ class Field(Nameable):
 
     def enforce_type(self, value):
         """
-        Coerce the type of the value, if necessary
+        Coerce the type of the value, if necessary.
 
         Called on field sets to ensure that the stored type is consistent if the
-        field was initialized with enforce_type=True
+        field was initialized with enforce_type=True.
 
         This must not have side effects, since it will be executed to trigger
-        a DeprecationWarning even if enforce_type is disabled
+        a DeprecationWarning even if enforce_type is disabled.
         """
         return value
 
