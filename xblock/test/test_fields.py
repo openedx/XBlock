@@ -26,7 +26,7 @@ from xblock.fields import (
     UNIQUE_ID
 )
 
-from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in, TestRuntime
+from xblock.test.tools import assert_equals, assert_not_equals, assert_in, assert_not_in, TestRuntime
 from xblock.fields import scope_key, ScopeIds
 
 
@@ -542,6 +542,29 @@ def test_twofaced_field_access():
     assert_equals(len(field_tester._dirty_fields), 1)
     # However, the field should not ACTUALLY be marked as a field that is needing to be saved.
     assert_not_in('how_many', field_tester._get_fields_to_save())   # pylint: disable=W0212
+
+
+def test_force_dirty():
+    """
+    Check that force dirty marks field as dirty even if field was not updated
+    """
+    class FieldTester(XBlock):
+        """Test block for TwoFacedField."""
+        list_field = List(scope=Scope.settings)
+
+    runtime = TestRuntime(services={'field-data': DictFieldData({'list_field': []})})
+    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
+
+    # precondition checks
+    assert_equals(len(field_tester._dirty_fields), 0)
+
+    field_tester.fields['list_field'].force_dirty(field_tester)
+
+    # This should mark it as dirty
+    assert_equals(len(field_tester._dirty_fields), 1)
+
+    # And the field should BE marked as a field that is needing to be saved.
+    assert_in('list_field', field_tester._get_fields_to_save())   # pylint: disable=W0212
 
 
 class SentinelTest(unittest.TestCase):
