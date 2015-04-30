@@ -399,13 +399,13 @@ class Field(Nameable):
         if hasattr(xblock, '_field_data_cache') and self.name in xblock._field_data_cache:
             del xblock._field_data_cache[self.name]
 
-    def _mark_dirty(self, xblock, value):
+    def _mark_dirty(self, xblock, value, force=False):
         """Set this field to dirty on the xblock."""
         # pylint: disable=protected-access
 
         # Deep copy the value being marked as dirty, so that there
         # is a baseline to check against when saving later
-        if self not in xblock._dirty_fields:
+        if self not in xblock._dirty_fields or force:
             xblock._dirty_fields[self] = copy.deepcopy(value)
 
     def _is_dirty(self, xblock):
@@ -632,6 +632,11 @@ class Field(Nameable):
         """
         # pylint: disable=protected-access
         return self._is_dirty(xblock) or xblock._field_data.has(xblock, self.name)
+
+    def force_dirty(self, xblock):
+        """ Force set dirty status on field """
+        self._mark_dirty(xblock, EXPLICITLY_SET, force=True)
+        self._set_cached_value(xblock, getattr(xblock, self.name))
 
     def __hash__(self):
         return hash(self.name)
