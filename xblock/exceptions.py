@@ -57,7 +57,14 @@ class InvalidScopeError(Exception):
     """
     Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
     """
-    pass
+    def __init__(self, invalid_scope, valid_scopes=None):
+        if valid_scopes:
+            super(InvalidScopeError, self).__init__("Invalid scope: {}. Valid scopes are: {}".format(
+                invalid_scope,
+                valid_scopes,
+            ))
+        else:
+            super(InvalidScopeError, self).__init__("Invalid scope: {}".format(invalid_scope))
 
 
 class NoSuchViewError(Exception):
