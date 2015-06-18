@@ -26,9 +26,7 @@ from xblock.fields import (
     UNIQUE_ID
 )
 
-from xblock.test.tools import (
-    assert_equals, assert_not_equals, assert_in, assert_not_in, assert_false, assert_true, TestRuntime
-)
+from xblock.test.tools import assert_equals, assert_not_equals, assert_not_in, TestRuntime
 from xblock.fields import scope_key, ScopeIds
 
 
@@ -544,39 +542,6 @@ def test_twofaced_field_access():
     assert_equals(len(field_tester._dirty_fields), 1)
     # However, the field should not ACTUALLY be marked as a field that is needing to be saved.
     assert_not_in('how_many', field_tester._get_fields_to_save())   # pylint: disable=W0212
-
-
-def test_setting_the_same_value_marks_field_as_dirty():
-    """
-    Check that setting field to the same value does not mark mutable fields as dirty.
-    This might be an unexpected behavior though
-    """
-    class FieldTester(XBlock):
-        """Test block for set - get test."""
-        non_mutable = String(scope=Scope.settings)
-        list_field = List(scope=Scope.settings)
-        dict_field = Dict(scope=Scope.settings)
-
-    runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
-
-    # precondition checks
-    assert_equals(len(field_tester._dirty_fields), 0)
-    assert_false(field_tester.fields['list_field'].is_set_on(field_tester))
-    assert_false(field_tester.fields['dict_field'].is_set_on(field_tester))
-    assert_false(field_tester.fields['non_mutable'].is_set_on(field_tester))
-
-    field_tester.non_mutable = field_tester.non_mutable
-    field_tester.list_field = field_tester.list_field
-    field_tester.dict_field = field_tester.dict_field
-
-    assert_in(field_tester.fields['non_mutable'], field_tester._dirty_fields)
-    assert_in(field_tester.fields['list_field'], field_tester._dirty_fields)
-    assert_in(field_tester.fields['dict_field'], field_tester._dirty_fields)
-
-    assert_true(field_tester.fields['non_mutable'].is_set_on(field_tester))
-    assert_true(field_tester.fields['list_field'].is_set_on(field_tester))
-    assert_true(field_tester.fields['dict_field'].is_set_on(field_tester))
 
 
 class SentinelTest(unittest.TestCase):

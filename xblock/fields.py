@@ -405,7 +405,7 @@ class Field(Nameable):
 
         # Deep copy the value being marked as dirty, so that there
         # is a baseline to check against when saving later
-        if self not in xblock._dirty_fields or value is EXPLICITLY_SET:
+        if self not in xblock._dirty_fields:
             xblock._dirty_fields[self] = copy.deepcopy(value)
 
     def _is_dirty(self, xblock):
