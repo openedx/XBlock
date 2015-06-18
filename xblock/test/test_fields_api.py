@@ -25,7 +25,7 @@ particular combination of initial conditions that we want to test)
 """
 
 import copy
-from mock import Mock
+from mock import Mock, patch
 
 from xblock.core import XBlock
 from xblock.fields import Integer, List, String, ScopeIds, UNIQUE_ID
@@ -162,6 +162,27 @@ class UniversalProperties(object):
         self.block.save()
         assert_false(self.field_data.has(self.block, 'field'))
         assert_true(self.is_default())
+
+    def test_set_after_get_always_force_saves(self):
+        with patch.object(self.field_data, 'set_many') as patched_set_many:
+            self.set(self.get())
+
+            self.block.force_save_fields(['field'])
+
+            patched_set_many.assert_called_with(
+                self.block, {'field': self.get()}
+            )
+
+    def test_set_after_get_doesnt_save(self):
+        self.set(self.get())
+        # pylint: disable=protected-access
+        fields_to_save = self.block._get_fields_to_save()
+        assert_equals(len(fields_to_save), 0)
+
+        self.set(self.new_value)
+        # pylint: disable=protected-access
+        fields_to_save = self.block._get_fields_to_save()
+        assert_equals(len(fields_to_save), 1)
 
 
 class MutationProperties(object):
