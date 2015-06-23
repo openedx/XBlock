@@ -146,6 +146,21 @@ class UserScope(object):
         return [cls.NONE, cls.ONE, cls.ALL]
 
 
+class SharingScope(object):
+    """
+    Enumeration of sharing scopes.
+
+    To be continued.
+    """
+    ONE = Sentinel('SharingScope.ONE')
+    GROUP = Sentinel('SharingScope.GROUP')
+    ALL  = Sentinel('SharingScope.ALL')
+
+    @classmethod
+    def scopes(cls):
+        return [cls.ONE, cls.GROUP, cls.ALL]
+
+
 UNSET = Sentinel("fields.UNSET")
 
 
