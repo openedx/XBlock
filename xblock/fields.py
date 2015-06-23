@@ -146,19 +146,22 @@ class UserScope(object):
         return [cls.NONE, cls.ONE, cls.ALL]
 
 
-class SharingScope(object):
+class SharingUserScope(object):
     """
     Enumeration of sharing scopes.
 
     To be continued.
     """
-    ONE = Sentinel('SharingScope.ONE')
-    GROUP = Sentinel('SharingScope.GROUP')
-    ALL  = Sentinel('SharingScope.ALL')
+    INDIVIDUAL = Sentinel('SharingUserScope.INDIVIDUAL')
+    GROUP = Sentinel('SharingUserScope.GROUP')
+    ALL = Sentinel('SharingUserScope.ALL')
 
     @classmethod
     def scopes(cls):
-        return [cls.ONE, cls.GROUP, cls.ALL]
+        """
+        Return a list of valid/understood class scopes.
+        """
+        return [cls.INDIVIDUAL, cls.GROUP, cls.ALL]
 
 
 UNSET = Sentinel("fields.UNSET")
@@ -247,6 +250,19 @@ class Scope(ScopeBase):
     def __eq__(self, other):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
+
+class RemoteScope(Scope):
+    """
+    Defines types of remote scopes to be used.
+    """
+    group = ScopeBase(SharingUserScope.GROUP, BlockScope.USAGE, u'group')
+
+    @classmethod
+    def named_scopes(cls):
+        """Return all named Scopes."""
+        return [
+            cls.group
+            ]
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     """
