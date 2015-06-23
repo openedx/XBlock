@@ -255,12 +255,14 @@ class RemoteScope(Scope):
     """
     Defines types of remote scopes to be used.
     """
+    individual = ScopeBase(SharingUserScope.INDIVIDUAL, BlockScope.USAGE, u'individual')
     group = ScopeBase(SharingUserScope.GROUP, BlockScope.USAGE, u'group')
 
     @classmethod
     def named_scopes(cls):
         """Return all named Scopes."""
         return [
+            cls.individual,
             cls.group
             ]
 
@@ -666,6 +668,41 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
+
+
+    class Query():
+        """
+        Inner class for handling remote query operations
+        """
+        def __init__(self, field, remote_scope = RemoteScope.individual, bind = None):
+            self._field = field
+            self.remote_scope = remote_scope
+            self.bind = bind
+        
+        @property
+        def field(self):
+            """
+            Returns the outer field object
+            """
+            return self._field
+
+
+        def get(self):
+            pass
+
+        def find(self):
+            pass
+
+
+        def set(self):
+            pass
+
+
+    class Shared():
+        """
+        Inner class for handling shared field operations
+        """
+        pass
 
 
 class JSONField(Field):
