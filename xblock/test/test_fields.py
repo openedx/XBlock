@@ -519,6 +519,7 @@ def test_set_incomparable_fields():
     # (i.e. timezone aware and unaware datetimes), just reset the value.
 
     class FieldTester(XBlock):
+        """Test block for this test."""
         incomparable = Field(scope=Scope.settings)
 
     not_timezone_aware = dt.datetime(2015, 1, 1)

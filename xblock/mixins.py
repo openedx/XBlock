@@ -7,6 +7,7 @@ import functools
 import inspect
 import logging
 from lxml import etree
+import copy
 
 try:
     import simplesjson as json  # pylint: disable=F0401
@@ -246,12 +247,8 @@ class ScopedStorageMixin(RuntimeServicesMixin):
             return
 
         fields_to_save = self._get_fields_to_save()
-
-        self.force_save_fields(fields_to_save)
-
-        # clear all dirty fields in case we haven't removed all of them
-        # in force_save_fields
-        self._clear_dirty_fields()
+        if fields_to_save:
+            self.force_save_fields(fields_to_save)
 
     def force_save_fields(self, field_names):
         """
@@ -272,33 +269,36 @@ class ScopedStorageMixin(RuntimeServicesMixin):
                 # should only find one corresponding field
                 fields.remove(field)
                 # if the field was dirty, delete from dirty fields
-                if field in self._dirty_fields:
-                    del self._dirty_fields[field]
+                self._reset_dirty_field(field)
             raise XBlockSaveError(saved_fields, fields)
 
         # Remove all dirty fields, since the save was successful
         for field in fields:
-            if field in self._dirty_fields:
-                del self._dirty_fields[field]
+            self._reset_dirty_field(field)
 
     def _get_fields_to_save(self):
         """
         Get an xblock's dirty fields.
         """
-        fields_to_save = []
-        for field in self._dirty_fields.keys():
-            # If the field value isn't the same as the baseline we recorded
-            # when it was read, then save it
-            if field._is_dirty(self):  # pylint: disable=protected-access
-                fields_to_save.append(field.name)
-
-        return fields_to_save
+        # If the field value isn't the same as the baseline we recorded
+        # when it was read, then save it
+        # pylint: disable=protected-access
+        return [field.name for field in self._dirty_fields if field._is_dirty(self)]
 
     def _clear_dirty_fields(self):
         """
         Remove all dirty fields from an XBlock.
         """
         self._dirty_fields.clear()
+
+    def _reset_dirty_field(self, field):
+        """
+        Resets dirty field value with the value from the field data cache.
+        """
+        if field in self._dirty_fields:
+            self._dirty_fields[field] = copy.deepcopy(
+                self._field_data_cache[field.name]
+            )
 
     def __repr__(self):
         # `ScopedStorageMixin` obtains the `fields` attribute from the `ModelMetaclass`.
