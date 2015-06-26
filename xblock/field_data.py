@@ -199,3 +199,6 @@ class ReadOnlyFieldData(FieldData):
 
     def default(self, block, name):
         return self._source.default(block, name)
+
+    def __repr__(self):
+        return "ReadOnlyFieldData({!r})".format(self._source)

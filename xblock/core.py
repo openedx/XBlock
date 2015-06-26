@@ -136,7 +136,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
             if tag in class_._class_tags:
                 yield name, class_
 
-    def __init__(self, runtime, field_data=None, scope_ids=UNSET):
+    def __init__(self, runtime, field_data=None, scope_ids=UNSET, *args, **kwargs):
         """
         Construct a new XBlock.
 
@@ -153,13 +153,12 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
 
             scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
                 scopes.
-
         """
         if scope_ids is UNSET:
             raise TypeError('scope_ids are required')
 
         # Provide backwards compatibility for external access through _field_data
-        super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data)
+        super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
 
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""
