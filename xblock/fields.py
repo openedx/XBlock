@@ -668,40 +668,60 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
+ 
+    def Query(self, remote_scope=RemoteScope.individual, bind=None):
+        return Query(self, remote_scope, bind)
 
-
-    class Query():
+class Query(object):
+    """
+    Class for handling remote query operations
+    """
+    def __init__(self, field, remote_scope, bind):
+        self._field = field
+        self.remote_scope = remote_scope
+        self._bind = bind
+    
+    @property
+    def field(self):
         """
-        Inner class for handling remote query operations
+        Returns the outer field object
         """
-        def __init__(self, field, remote_scope = RemoteScope.individual, bind = None):
-            self._field = field
-            self.remote_scope = remote_scope
-            self.bind = bind
-        
-        @property
-        def field(self):
-            """
-            Returns the outer field object
-            """
-            return self._field
+        return self._field
 
+    def __get__(self, obj, objtype):
+        if obj in None:
+            return self
 
-        def get(self):
-            pass
+    def __set__(self, obj, val):
+        pass
 
-        def find(self):
-            pass
-
-
-        def set(self):
-            pass
-
-
-    class Shared():
+    def get(self, **args):
         """
-        Inner class for handling shared field operations
+        The get operator for Query class
         """
+        pass
+
+    def find(self):
+        """
+        The find operator for Query class
+        """
+        pass
+
+    def set(self):
+        """
+        The set operator for Query class
+        """
+        pass
+
+    def get_binding(self, **args):
+        return self._bind(**args)
+
+
+class Shared():
+    """
+    Class for handling shared field operations
+    """
+    def __init__(self):
         pass
 
 
