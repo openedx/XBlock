@@ -20,6 +20,8 @@ import yaml
 
 from xblock.internal import Nameable
 
+from xblock.query import Query, Shared
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -257,6 +259,7 @@ class RemoteScope(Scope):
     """
     individual = ScopeBase(SharingUserScope.INDIVIDUAL, BlockScope.USAGE, u'individual')
     group = ScopeBase(SharingUserScope.GROUP, BlockScope.USAGE, u'group')
+    platform = ScopeBase(SharingUserScope.ALL, BlockScope.USAGE, u'platform')
 
     @classmethod
     def named_scopes(cls):
@@ -264,6 +267,7 @@ class RemoteScope(Scope):
         return [
             cls.individual,
             cls.group
+            cls.platform
             ]
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
@@ -669,60 +673,10 @@ class Field(Nameable):
     def __hash__(self):
         return hash(self.name)
  
+    # should this be a @classmethod
     def Query(self, remote_scope=RemoteScope.individual, bind=None):
         return Query(self, remote_scope, bind)
 
-class Query(object):
-    """
-    Class for handling remote query operations
-    """
-    def __init__(self, field, remote_scope, bind):
-        self._field = field
-        self.remote_scope = remote_scope
-        self._bind = bind
-    
-    @property
-    def field(self):
-        """
-        Returns the outer field object
-        """
-        return self._field
-
-    def __get__(self, obj, objtype):
-        if obj in None:
-            return self
-
-    def __set__(self, obj, val):
-        pass
-
-    def get(self, **args):
-        """
-        The get operator for Query class
-        """
-        pass
-
-    def find(self):
-        """
-        The find operator for Query class
-        """
-        pass
-
-    def set(self):
-        """
-        The set operator for Query class
-        """
-        pass
-
-    def get_binding(self, **args):
-        return self._bind(**args)
-
-
-class Shared():
-    """
-    Class for handling shared field operations
-    """
-    def __init__(self):
-        pass
 
 
 class JSONField(Field):
