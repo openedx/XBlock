@@ -5,11 +5,22 @@ class Query(object):
     """
     Class for handling remote query operations
     """
+
     def __init__(self, field, remote_scope, bind):
         self._field = field
         self.remote_scope = remote_scope
         self._bind = bind
         self._queryable = Queryable()
+
+    def __get__(self, xblock, xblock_class):
+        print "in get"
+        if xblock is None:
+            return self
+        return self._queryable
+
+    def __set__(self, xblock, val):
+        print val
+        pass
     
     @property
     def field(self):
@@ -20,14 +31,6 @@ class Query(object):
 
     def get_bind(self):
         return self._bind
-
-    def __get__(self, obj, objtype):
-        if obj in None:
-            return self
-        return self._queryable
-
-    def __set__(self, obj, val):
-        pass
 
 class Shared(object):
     """
@@ -42,7 +45,7 @@ class Queryable(object):
     Class for Queryable objects
     """
 
-    def __init__(self, values):
+    def __init__(self, values = None):
         self._values = values
         pass
 
@@ -55,7 +58,7 @@ class Queryable(object):
             return self._values
 
 
-    def get(self, **args):
+    def get(self, selector):
         """
         The get operator for Queryable class
         """

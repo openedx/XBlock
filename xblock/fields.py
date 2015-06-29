@@ -266,7 +266,7 @@ class RemoteScope(Scope):
         """Return all named Scopes."""
         return [
             cls.individual,
-            cls.group
+            cls.group,
             cls.platform
             ]
 
@@ -672,8 +672,7 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
- 
-    # should this be a @classmethod
+        
     def Query(self, remote_scope=RemoteScope.individual, bind=None):
         return Query(self, remote_scope, bind)
 
