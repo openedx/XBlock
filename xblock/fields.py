@@ -405,7 +405,7 @@ class Field(Nameable):
 
         # Deep copy the value being marked as dirty, so that there
         # is a baseline to check against when saving later
-        if self not in xblock._dirty_fields or value is EXPLICITLY_SET:
+        if self not in xblock._dirty_fields:
             xblock._dirty_fields[self] = copy.deepcopy(value)
 
     def _is_dirty(self, xblock):
@@ -498,11 +498,22 @@ class Field(Nameable):
         Setting a value does not update the underlying data store; the
         new value is kept in the cache and the xblock is marked as
         dirty until `save` is explicitly called.
+
+        Note, if there's already a cached value and it's equal to the value
+        we're trying to cache, we won't do anything.
         """
         value = self._check_or_enforce_type(value)
-        # Mark the field as dirty and update the cache:
-        self._mark_dirty(xblock, EXPLICITLY_SET)
-        self._set_cached_value(xblock, value)
+        cached_value = self._get_cached_value(xblock)
+        try:
+            value_has_changed = cached_value != value
+        except Exception:  # pylint: disable=broad-except
+            # if we can't compare the values for whatever reason
+            # (i.e. timezone aware and unaware datetimes), just reset the value.
+            value_has_changed = True
+        if value_has_changed:
+            # Mark the field as dirty and update the cache
+            self._mark_dirty(xblock, EXPLICITLY_SET)
+            self._set_cached_value(xblock, value)
 
     def __delete__(self, xblock):
         """

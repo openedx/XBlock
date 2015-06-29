@@ -640,7 +640,8 @@ def test_get_mutable_mark_dirty():
 
     # Now test after having explicitly set the field.
     mutable_test.save()
-    assert_equals(len(mutable_test._dirty_fields), 0)
+    # _dirty_fields shouldn't be cleared here
+    assert_equals(len(mutable_test._dirty_fields), 1)
     _test_get = mutable_test.list_field
     assert_equals(len(mutable_test._dirty_fields), 1)
 
