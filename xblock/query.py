@@ -13,7 +13,6 @@ class Query(object):
         self._queryable = Queryable()
 
     def __get__(self, xblock, xblock_class):
-        print "in get"
         if xblock is None:
             return self
         return self._queryable
@@ -58,7 +57,7 @@ class Queryable(object):
             return self._values
 
 
-    def get(self, selector):
+    def get(self, *args, **kwargs):
         """
         The get operator for Queryable class
         """
