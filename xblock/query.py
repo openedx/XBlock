@@ -1,6 +1,5 @@
 
 
-
 class Query(object):
     """
     Class for handling remote query operations
@@ -57,13 +56,13 @@ class Queryable(object):
             return self._values
 
 
-    def get(self, *args, **kwargs):
+    def get(self, user_selector = None, value_selector = None):
         """
         The get operator for Queryable class
         """
         pass
 
-    def find(self):
+    def find(self, user_selector = None, value_selector = None):
         """
         The find operator for Queryable class
         """

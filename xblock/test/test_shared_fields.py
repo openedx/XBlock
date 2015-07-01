@@ -24,7 +24,7 @@ class TestRemoteScope(unittest.TestCase):
 
 		self.runtime = TestRuntime(services={'field-data': DictFieldData({})})
 		self.test_block = TestBlock(self.runtime, scope_ids=Mock(spec=ScopeIds))
-		self.test_field = TestBlock.fields['test_field']
+		self.test_field = self.test_block.fields['test_field']
 
 
 	def test_named_scopes_len(self):
