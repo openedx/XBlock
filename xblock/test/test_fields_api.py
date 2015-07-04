@@ -163,12 +163,26 @@ class UniversalProperties(object):
         assert_false(self.field_data.has(self.block, 'field'))
         assert_true(self.is_default())
 
-    def test_set_after_get_always_saves(self):
+    def test_set_after_get_always_force_saves(self):
         with patch.object(self.field_data, 'set_many') as patched_set_many:
             self.set(self.get())
-            self.block.save()
 
-            patched_set_many.assert_called_with(self.block, {'field': self.get()})
+            self.block.force_save_fields(['field'])
+
+            patched_set_many.assert_called_with(
+                self.block, {'field': self.get()}
+            )
+
+    def test_set_after_get_doesnt_save(self):
+        with patch.object(self.field_data, 'set_many') as patched_set_many:
+
+            self.set(self.get())
+            self.block.save()
+            assert_false(patched_set_many.called)
+
+            self.set(self.new_value)
+            self.block.save()
+            assert_true(patched_set_many.called)
 
 
 class MutationProperties(object):
@@ -205,6 +219,27 @@ class MutationProperties(object):
     def test_mutation_without_save_makes_non_default(self):
         self.mutate(self.get())
         assert_false(self.is_default())
+
+    def test_mutate_pointer_after_save(self):
+        pointer = self.get()
+        self.mutate(pointer)
+        self.block.save()
+        assert_equals(pointer, self.field_data.get(self.block, 'field'))
+
+        # now check what happens when we mutate a field
+        # that we haven't retrieved through __get__
+        # (which would have marked it as dirty)
+        self.mutate(pointer)
+        self.block.save()
+        assert_equals(pointer, self.field_data.get(self.block, 'field'))
+
+    def test_set_save_mutate_save(self):
+        pointer = self.new_value
+        self.set(pointer)
+        self.block.save()
+        self.mutate(pointer)
+        self.block.save()
+        assert_equals(pointer, self.field_data.get(self.block, 'field'))
 
 
 class InitialValueProperties(object):

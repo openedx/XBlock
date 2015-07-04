@@ -646,7 +646,8 @@ class TestRuntimeGetBlock(TestCase):
         self.id_reader.get_block_type.assert_called_with(self.def_id)
         self.construct_block.assert_called_with(
             self.block_type,
-            ScopeIds(self.user_id, self.block_type, self.def_id, self.usage_id)
+            ScopeIds(self.user_id, self.block_type, self.def_id, self.usage_id),
+            for_parent=None,
         )
 
     def test_missing_usage(self):

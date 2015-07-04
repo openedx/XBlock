@@ -27,7 +27,7 @@ from xblock.fields import (
 )
 
 from xblock.test.tools import (
-    assert_equals, assert_not_equals, assert_in, assert_not_in, assert_false, assert_true, TestRuntime
+    assert_equals, assert_not_equals, assert_in, assert_not_in, assert_false, TestRuntime
 )
 from xblock.fields import scope_key, ScopeIds
 
@@ -514,6 +514,23 @@ def test_values_dict():
     assert_equals({"min": 1, "max": 100}, test_field.values)
 
 
+def test_set_incomparable_fields():
+    # if we can't compare a field's value to the value it's going to be reset to
+    # (i.e. timezone aware and unaware datetimes), just reset the value.
+
+    class FieldTester(XBlock):
+        """Test block for this test."""
+        incomparable = Field(scope=Scope.settings)
+
+    not_timezone_aware = dt.datetime(2015, 1, 1)
+    timezone_aware = dt.datetime(2015, 1, 1, tzinfo=pytz.UTC)
+    runtime = TestRuntime(services={'field-data': DictFieldData({})})
+    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
+    field_tester.incomparable = not_timezone_aware
+    field_tester.incomparable = timezone_aware
+    assert_equals(field_tester.incomparable, timezone_aware)
+
+
 def test_twofaced_field_access():
     # Check that a field with different to_json and from_json representations
     # persists and saves correctly.
@@ -548,8 +565,8 @@ def test_twofaced_field_access():
 
 def test_setting_the_same_value_marks_field_as_dirty():
     """
-    Check that setting field to the same value does not mark mutable fields as dirty.
-    This might be an unexpected behavior though
+    Check that setting field to the same value marks mutable fields as dirty.
+    However, since the value hasn't changed, these fields won't be saved.
     """
     class FieldTester(XBlock):
         """Test block for set - get test."""
@@ -570,13 +587,13 @@ def test_setting_the_same_value_marks_field_as_dirty():
     field_tester.list_field = field_tester.list_field
     field_tester.dict_field = field_tester.dict_field
 
-    assert_in(field_tester.fields['non_mutable'], field_tester._dirty_fields)
+    assert_not_in(field_tester.fields['non_mutable'], field_tester._dirty_fields)
     assert_in(field_tester.fields['list_field'], field_tester._dirty_fields)
     assert_in(field_tester.fields['dict_field'], field_tester._dirty_fields)
 
-    assert_true(field_tester.fields['non_mutable'].is_set_on(field_tester))
-    assert_true(field_tester.fields['list_field'].is_set_on(field_tester))
-    assert_true(field_tester.fields['dict_field'].is_set_on(field_tester))
+    assert_false(field_tester.fields['non_mutable'].is_set_on(field_tester))
+    assert_false(field_tester.fields['list_field'].is_set_on(field_tester))
+    assert_false(field_tester.fields['dict_field'].is_set_on(field_tester))
 
 
 class SentinelTest(unittest.TestCase):
