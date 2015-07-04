@@ -1,3 +1,4 @@
+"""Summary"""
 
 
 class Query(object):
@@ -18,7 +19,6 @@ class Query(object):
 
     def __set__(self, xblock, val):
         print val
-        pass
     
     @property
     def field(self):
@@ -28,6 +28,11 @@ class Query(object):
         return self._field
 
     def get_bind(self):
+        """Summary
+        
+        Returns:
+            TYPE: Description
+        """
         return self._bind
 
 class Shared(object):
@@ -43,26 +48,36 @@ class Queryable(object):
     Class for Queryable objects
     """
 
-    def __init__(self, values = None):
+    def __init__(self, values=None):
         self._values = values
-        pass
 
     @property
     def values(self):
-
+        """Summary
+        
+        Returns:
+            TYPE: Description
+        """
         if callable(self._values):
             return self._values()
         else:
             return self._values
 
 
-    def get(self, user_selector = None, value_selector = None):
+    def get(self, user_selector=None, value_selector=None):
         """
         The get operator for Queryable class
         """
-        pass
+        if isinstance(user_selector, basestring):
+            # handle a id
+            pass
+        elif all(isinstance(item, basestring) for item in user_selector):
+            # handle a list of ids
+            pass
+        else:
+            raise TypeError
 
-    def find(self, user_selector = None, value_selector = None):
+    def find(self, user_selector=None, value_selector=None):
         """
         The find operator for Queryable class
         """
@@ -73,4 +88,3 @@ class Queryable(object):
         The set operator for Queryable class
         """
         self._values = values
-        pass
