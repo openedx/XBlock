@@ -11,6 +11,8 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 from xblock.exceptions import InvalidScopeError
+from xblock.core import XBlock
+from xblock.fields import ScopeIds
 
 
 class FieldData(object):
@@ -155,7 +157,10 @@ class SplitFieldData(FieldData):
         return self._scope_mappings[scope]
 
     def get(self, block, name):
-        return self._field_data(block, name).get(block, name)
+        if isinstance(block, XBlock):
+            return self._field_data(block, name).get(block, name)
+        elif isinstance(block, ScopeIds):
+            pass
 
     def set(self, block, name, value):
         self._field_data(block, name).set(block, name, value)
