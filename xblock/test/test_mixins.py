@@ -5,7 +5,7 @@ Tests of the XBlock-family functionality mixins
 from unittest import TestCase
 
 from xblock.fields import List, Scope, Integer
-from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin
+from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin, ViewsMixin
 
 
 class AttrAssertionMixin(TestCase):
@@ -133,3 +133,79 @@ class TestIndexInfoMixin(AttrAssertionMixin):
         with_index_info = self.IndexInfoMixinTester().index_dictionary()
         self.assertFalse(with_index_info)
         self.assertTrue(isinstance(with_index_info, dict))
+
+
+class TestViewsMixin(TestCase):
+    """
+    Tests for ViewsMixin
+    """
+    def test_supports_view_decorator(self):
+        """
+        Tests the @supports decorator for xBlock view methods
+        """
+        class SupportsDecoratorTester(ViewsMixin):
+            """
+            Test class for @supports decorator
+            """
+            @ViewsMixin.supports("a_functionality")
+            def functionality_supported_view(self):
+                """
+                A view that supports a functionality
+                """
+                pass  # pragma: no cover
+
+            @ViewsMixin.supports("functionality1")
+            @ViewsMixin.supports("functionality2")
+            def multi_featured_view(self):
+                """
+                A view that supports multiple functionalities
+                """
+                pass  # pragma: no cover
+
+            def an_unsupported_view(self):
+                """
+                A view that does not support any functionality
+                """
+                pass  # pragma: no cover
+
+        test_xblock = SupportsDecoratorTester()
+
+        for view_name, functionality, expected_result in (
+                ("functionality_supported_view", "a_functionality", True),
+                ("functionality_supported_view", "bogus_functionality", False),
+
+                ("an_unsupported_view", "a_functionality", False),
+
+                ("multi_featured_view", "functionality1", True),
+                ("multi_featured_view", "functionality2", True),
+                ("multi_featured_view", "bogus_functionality", False),
+        ):
+            self.assertEquals(
+                test_xblock.has_support(getattr(test_xblock, view_name), functionality),
+                expected_result
+            )
+
+    def test_has_support_override(self):
+        """
+        Tests overriding has_support
+        """
+        class HasSupportOverrideTester(ViewsMixin):
+            """
+            Test class for overriding has_support
+            """
+            def has_support(self, view, functionality):
+                """
+                Overrides implementation of has_support
+                """
+                return functionality == "a_functionality"
+
+        test_xblock = HasSupportOverrideTester()
+
+        for view_name, functionality, expected_result in (
+                ("functionality_supported_view", "a_functionality", True),
+                ("functionality_supported_view", "bogus_functionality", False),
+        ):
+            self.assertEquals(
+                test_xblock.has_support(getattr(test_xblock, view_name, None), functionality),
+                expected_result
+            )

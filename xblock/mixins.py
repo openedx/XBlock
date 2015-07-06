@@ -538,3 +538,50 @@ class IndexInfoMixin(object):
         default implementation is an empty dict
         """
         return {}
+
+
+class ViewsMixin(object):
+    """
+    This mixin provides decorators that can be used on xBlock view methods.
+    """
+    @classmethod
+    def supports(cls, functionality):
+        """
+        A view decorator to indicate that an xBlock view has support for the
+        given functionality.
+
+        Arguments:
+            functionality (string): An identifier for the functionality of the view.
+                For example: "multi_device".
+        """
+        def _decorator(view):
+            """
+            Internal decorator that updates the given view's list of supported
+            functionalities.
+            """
+            # pylint: disable=protected-access
+            if not hasattr(view, "_supports"):
+                view._supports = set()
+            view._supports.add(functionality)
+            return view
+        return _decorator
+
+    def has_support(self, view, functionality):
+        """
+        Returns whether the given view has support for the given functionality.
+
+        An XBlock view declares support for a functionality with the
+        @XBlock.supports decorator. The decorator stores information on the view.
+
+        Note: We implement this as an instance method to allow xBlocks to
+        override it, if necessary.
+
+        Arguments:
+            view (object): The view of the xBlock.
+            functionality (string): A functionality of the view.
+                For example: "multi_device".
+
+        Returns:
+            True or False
+        """
+        return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
