@@ -12,7 +12,7 @@ class Query(object):
     def __init__(self):
         self._queryable = Queryable()
 
-    def __get__(self, xblock, xblock_class):
+    def __get__(self, field, field_class):
         """Get the queryable instance
         
         Args:
@@ -22,12 +22,12 @@ class Query(object):
         Returns:
             TYPE: Description
         """
-        if xblock is None:
+        if field is None:
             return self
 
         return self._queryable
 
-    def __set__(self, xblock, val):
+    def __set__(self, field, val):
         print val
 
 class Shared(object):
@@ -65,6 +65,11 @@ class Queryable(object):
     def xblock(self):
         return self._xblock
 
+    @property
+    def name(self):
+        return self._name
+    
+
     def bind(self, xblock, field, remote_scope, bind):
         """Bind necesary information and object to this queryable instance
         
@@ -83,15 +88,17 @@ class Queryable(object):
         self._remote_scope = remote_scope
         self._bind = bind
 
-
     def get(self, user_name_selector=None, value_selector=None):
         """
         The get operator for Queryable class
         """
+        ## TODO: build a scope id by using user_name_selector
         field_data = self._xblock._field_data
         if isinstance(user_selector, basestring):
             # handle a id
-            value = field_data.get(self._xblock, self._name, self._remote_scope)
+            scope_id = None
+            ## TODO: build a scope id by using user_name_selector
+            value = field_data.get(scope_id, self._name, self._remote_scope)
         elif all(isinstance(item, basestring) for item in user_selector):
             # handle a list of ids
             raise NotImplementedError
@@ -104,7 +111,7 @@ class Queryable(object):
         """
         pass
 
-    def set(self, user_name_selector=None, values):
+    def set(self, user_name_selector, values):
         """
         The set operator for Queryable class
         """

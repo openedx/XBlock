@@ -37,12 +37,19 @@ class TestSharedFields(unittest.TestCase):
 
 	def test_access_queryable(self):
 	 	test_query = self.test_field.Query(self.test_block)
-
 	 	self.assertTrue(isinstance(test_query, Queryable))
-	
+
 	def test_access_queryable_xblock(self):
 	 	test_query = self.test_field.Query(self.test_block)
 	 	test_xblock = test_query.xblock
 
 	 	self.assertTrue(isinstance(test_xblock, XBlock))
+
+	def test_access_query_name(self):
+		test_query = self.test_field.Query(self.test_block)
+
+		self.assertEqual(test_query.name, self.test_field.name)
+
+
+
 
