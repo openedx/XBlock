@@ -156,11 +156,24 @@ class SplitFieldData(FieldData):
 
         return self._scope_mappings[scope]
 
-    def get(self, block, name):
+    def _shared_field_data(self, remote_field_scope):
+        """Summary
+        
+        Args:
+            block (TYPE): Description
+            name (TYPE): Description
+        
+        Returns:
+            TYPE: Description
+        """
+        return self._scope_mappings[remote_field_scope]
+
+
+    def get(self, block, name, remote_field_scope=None):
         if isinstance(block, XBlock):
             return self._field_data(block, name).get(block, name)
         elif isinstance(block, ScopeIds):
-            pass
+            return self._shared_field_data(remote_field_scope).get(block, name)
 
     def set(self, block, name, value):
         self._field_data(block, name).set(block, name, value)

@@ -342,6 +342,8 @@ class Field(Nameable):
     MUTABLE = True
     _default = None
 
+    query = Query()
+
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
@@ -684,8 +686,9 @@ class Field(Nameable):
     def __hash__(self):
         return hash(self.name)
         
-    def Query(self, remote_scope=RemoteScope.individual, bind=None):
-        return Query(self, remote_scope, bind)
+    def Query(self, xblock, remote_scope=RemoteScope.individual, bind=None):
+        self.query.bind(xblock, self, remote_scope, bind)
+        return self.query
 
 
 

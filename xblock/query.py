@@ -1,4 +1,7 @@
-"""Summary"""
+"""
+    Define Query and Shared objects. Query supports ad-hoc queries via get, find, set operators.
+    Shared uses `bind` functions to access data from pre-defined entities.  
+"""
 
 
 class Query(object):
@@ -6,34 +9,26 @@ class Query(object):
     Class for handling remote query operations
     """
 
-    def __init__(self, field, remote_scope, bind):
-        self._field = field
-        self.remote_scope = remote_scope
-        self._bind = bind
+    def __init__(self):
         self._queryable = Queryable()
 
     def __get__(self, xblock, xblock_class):
-        if xblock is None:
-            return self
-        return self._queryable
-
-    def __set__(self, xblock, val):
-        print val
-    
-    @property
-    def field(self):
-        """
-        Returns the outer field object
-        """
-        return self._field
-
-    def get_bind(self):
-        """Summary
+        """Get the queryable instance
+        
+        Args:
+            xblock (TYPE): Description
+            xblock_class (TYPE): Description
         
         Returns:
             TYPE: Description
         """
-        return self._bind
+        if xblock is None:
+            return self
+
+        return self._queryable
+
+    def __set__(self, xblock, val):
+        print val
 
 class Shared(object):
     """
@@ -48,32 +43,58 @@ class Queryable(object):
     Class for Queryable objects
     """
 
-    def __init__(self, values=None):
-        self._values = values
+    def __init__(self):
+        self._field = None
+        self._name = "_"
+        self._remote_scope = None
+        self._xblock = None
+        self._values = None
 
     @property
-    def values(self):
-        """Summary
+    def field(self):
+        """
+        Returns the outer field object
+        """
+        return self._field
+
+    @property
+    def scope(self):
+        return self._remote_scope
+
+    @property
+    def xblock(self):
+        return self._xblock
+
+    def bind(self, xblock, field, remote_scope, bind):
+        """Bind necesary information and object to this queryable instance
+        
+        Args:
+            xblock (TYPE): Description
+            field (TYPE): Description
+            remote_scope (TYPE): Description
+            bind (TYPE): Description
         
         Returns:
             TYPE: Description
         """
-        if callable(self._values):
-            return self._values()
-        else:
-            return self._values
+        self._field = field
+        self._xblock = xblock
+        self._name = field.name
+        self._remote_scope = remote_scope
+        self._bind = bind
 
 
-    def get(self, user_selector=None, value_selector=None):
+    def get(self, user_name_selector=None, value_selector=None):
         """
         The get operator for Queryable class
         """
+        field_data = self._xblock._field_data
         if isinstance(user_selector, basestring):
             # handle a id
-            pass
+            value = field_data.get(self._xblock, self._name, self._remote_scope)
         elif all(isinstance(item, basestring) for item in user_selector):
             # handle a list of ids
-            pass
+            raise NotImplementedError
         else:
             raise TypeError
 
@@ -83,7 +104,7 @@ class Queryable(object):
         """
         pass
 
-    def set(self, values):
+    def set(self, user_name_selector=None, values):
         """
         The set operator for Queryable class
         """
