@@ -154,7 +154,7 @@ class SharedUserScope(object):
 
     To be continued.
     """
-    INDIVIDUAL = Sentinel('SharedUserScope.INDIVIDUAL')
+    ONE = Sentinel('SharedUserScope.ONE')
     GROUP = Sentinel('SharedUserScope.GROUP')
     ALL = Sentinel('SharingUserScope.ALL')
 
@@ -163,7 +163,7 @@ class SharedUserScope(object):
         """
         Return a list of valid/understood class scopes.
         """
-        return [cls.INDIVIDUAL, cls.GROUP, cls.ALL]
+        return [cls.ONE, cls.GROUP, cls.ALL]
 
 
 UNSET = Sentinel("fields.UNSET")
@@ -257,17 +257,17 @@ class RemoteScope(Scope):
     """
     Defines types of remote scopes to be used.
     """
-    individual = ScopeBase(SharedUserScope.INDIVIDUAL, BlockScope.USAGE, u'individual')
-    group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'group')
-    platform = ScopeBase(SharingUserScope.ALL, BlockScope.USAGE, u'platform')
+    shared_user_state = ScopeBase(SharedUserScope.ONE, BlockScope.USAGE, u'shared_user_state')
+    shared_group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'shared_group')
+    shared_platform = ScopeBase(SharedUserScope.ALL, BlockScope.USAGE, u'shared_platform')
 
     @classmethod
     def named_scopes(cls):
         """Return all named Scopes."""
         return [
-            cls.individual,
-            cls.group,
-            cls.platform
+            cls.shared_user_state,
+            cls.shared_group,
+            cls.shared_platform
             ]
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
@@ -686,7 +686,7 @@ class Field(Nameable):
     def __hash__(self):
         return hash(self.name)
         
-    def Query(self, xblock, remote_scope=RemoteScope.individual, bind=None):
+    def Query(self, xblock, remote_scope=RemoteScope.shared_user_state, bind=None):
         self.query.bind(xblock, self, remote_scope, bind)
         return self.query
 

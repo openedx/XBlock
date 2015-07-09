@@ -3,6 +3,8 @@
     Shared uses `bind` functions to access data from pre-defined entities.  
 """
 
+from copy import deepcopy
+
 
 class Query(object):
     """
@@ -88,9 +90,10 @@ class Queryable(object):
         self._remote_scope = remote_scope
         self._bind = bind
 
-    def _replace_user_id(self, scope_ids, user_id):
-        scope_ids.user_id = user_id
-        return scope_ids
+    def _replace_xblock_user_id(self, user_id):
+        new_block = deepcopy(self._xblock)
+        new_block.scope_ids.user_id = user_id
+        return new_block
 
     def get(self, user_name_selector=None, value_selector=None):
         """
@@ -99,10 +102,9 @@ class Queryable(object):
         ## TODO: build a scope id by using user_name_selector
         field_data = self._xblock._field_data
         if isinstance(user_selector, basestring):
-            # handle a id
-            scope_ids = self._replace_user_id(self._xblock.scope_ids, user_selector)
+            new_block = self._replace_xblock_user_id(user_selector)
             ## TODO: build a scope id by using user_name_selector
-            value = field_data.get(scope_ids, self._name, self._remote_scope)
+            value = field_data.get(new_block, self._name, self._remote_scope)
         elif all(isinstance(item, basestring) for item in user_selector):
             # handle a list of ids
             raise NotImplementedError
