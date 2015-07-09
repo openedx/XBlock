@@ -11,7 +11,6 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 from xblock.exceptions import InvalidScopeError
-from xblock.core import XBlock
 
 class FieldData(object):
     """

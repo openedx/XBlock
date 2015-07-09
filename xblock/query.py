@@ -5,6 +5,9 @@
 
 from copy import deepcopy
 
+from xblock.field_data import SplitFieldData
+
+
 class Query(object):
     """
     Class for handling remote query operations
