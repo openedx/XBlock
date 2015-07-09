@@ -5,7 +5,6 @@
 
 from copy import deepcopy
 
-
 class Query(object):
     """
     Class for handling remote query operations
@@ -101,9 +100,12 @@ class Queryable(object):
         """
         ## TODO: build a scope id by using user_name_selector
         field_data = self._xblock._field_data
+
+        if isinstance(field_data, SplitFieldData) == False:
+            raise TypeError
+
         if isinstance(user_selector, basestring):
             new_block = self._replace_xblock_user_id(user_selector)
-            ## TODO: build a scope id by using user_name_selector
             value = field_data.get(new_block, self._name, self._remote_scope)
         elif all(isinstance(item, basestring) for item in user_selector):
             # handle a list of ids

@@ -12,8 +12,6 @@ from collections import defaultdict
 
 from xblock.exceptions import InvalidScopeError
 from xblock.core import XBlock
-from xblock.fields import ScopeIds
-
 
 class FieldData(object):
     """
@@ -186,7 +184,7 @@ class SplitFieldData(FieldData):
         if remote_field_scope is None:
             return self._field_data(block, name).get(block, name)
         else:
-            return self._shared_field_data(remote_field_scope).get(block, name)
+            return self._shared_field_data(remote_field_scope).get(block, name, remote=True)
 
     def set(self, block, name, value):
         self._field_data(block, name).set(block, name, value)
