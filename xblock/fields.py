@@ -20,6 +20,8 @@ import yaml
 
 from xblock.internal import Nameable
 
+from xblock.query import Query, Shared
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -146,6 +148,24 @@ class UserScope(object):
         return [cls.NONE, cls.ONE, cls.ALL]
 
 
+class SharedUserScope(object):
+    """
+    Enumeration of shared scopes.
+
+    To be continued.
+    """
+    INDIVIDUAL = Sentinel('SharedUserScope.INDIVIDUAL')
+    GROUP = Sentinel('SharedUserScope.GROUP')
+    ALL = Sentinel('SharingUserScope.ALL')
+
+    @classmethod
+    def scopes(cls):
+        """
+        Return a list of valid/understood class scopes.
+        """
+        return [cls.INDIVIDUAL, cls.GROUP, cls.ALL]
+
+
 UNSET = Sentinel("fields.UNSET")
 
 
@@ -233,6 +253,23 @@ class Scope(ScopeBase):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
 
+class RemoteScope(Scope):
+    """
+    Defines types of remote scopes to be used.
+    """
+    individual = ScopeBase(SharedUserScope.INDIVIDUAL, BlockScope.USAGE, u'individual')
+    group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'group')
+    platform = ScopeBase(SharingUserScope.ALL, BlockScope.USAGE, u'platform')
+
+    @classmethod
+    def named_scopes(cls):
+        """Return all named Scopes."""
+        return [
+            cls.individual,
+            cls.group,
+            cls.platform
+            ]
+
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     """
     A simple wrapper to collect all of the ids needed to correctly identify an XBlock
@@ -304,6 +341,8 @@ class Field(Nameable):
     """
     MUTABLE = True
     _default = None
+
+    query = Query()
 
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
@@ -646,6 +685,10 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
+        
+    def Query(self, xblock, remote_scope=RemoteScope.individual, bind=None):
+        self.query.bind(xblock, self, remote_scope, bind)
+        return self.query
 
 
 class JSONField(Field):

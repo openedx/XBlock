@@ -237,8 +237,7 @@ class KvsFieldData(FieldData):
         :param name: name of the field to default
         """
         return self._kvs.default(self._key(block, name))
-
-
+        
 # The old name for KvsFieldData, to ease transition.
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
