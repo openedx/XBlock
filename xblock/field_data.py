@@ -10,7 +10,7 @@ import copy
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-from xblock.exceptions import InvalidScopeError
+from xblock.exceptions import InvalidScopeError, NoSuchServiceError
 
 class FieldData(object):
     """
@@ -183,7 +183,11 @@ class SplitFieldData(FieldData):
         if remote_field_scope is None:
             return self._field_data(block, name).get(block, name)
         else:
-            return self._shared_field_data(remote_field_scope).get(block, name, remote=True)
+            field_data_cache = self._shared_field_data(remote_field_scope)
+            try:
+                return field_data_cache.get(block, name, remote=True)
+            except TypeError:
+                raise NoSuchServiceError()
 
     def set(self, block, name, value):
         self._field_data(block, name).set(block, name, value)
