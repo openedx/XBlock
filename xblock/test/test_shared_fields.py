@@ -11,7 +11,7 @@ from xblock.test.tools import TestRuntime
 from xblock.core import XBlock
 from xblock.fields import RemoteScope, Field, ScopeIds, List
 from xblock.query import Query, Queryable
-from xblock.field_data import DictFieldData
+from xblock.field_data import DictFieldData, SplitFieldData
 
 
 class TestSharedFields(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestSharedFields(unittest.TestCase):
 		class TestBlock(XBlock):
 			test_field = List(help = self.help_message, default = [])
 
-		self.runtime = TestRuntime(services={'field-data': DictFieldData({})})
+		self.runtime = TestRuntime(services={'field-data': SplitFieldData({})})
 		self.test_block = TestBlock(self.runtime, scope_ids=Mock(spec=ScopeIds))
 		self.test_field = self.test_block.fields['test_field']
 

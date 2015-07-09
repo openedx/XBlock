@@ -148,14 +148,14 @@ class UserScope(object):
         return [cls.NONE, cls.ONE, cls.ALL]
 
 
-class SharingUserScope(object):
+class SharedUserScope(object):
     """
-    Enumeration of sharing scopes.
+    Enumeration of shared scopes.
 
     To be continued.
     """
-    INDIVIDUAL = Sentinel('SharingUserScope.INDIVIDUAL')
-    GROUP = Sentinel('SharingUserScope.GROUP')
+    INDIVIDUAL = Sentinel('SharedUserScope.INDIVIDUAL')
+    GROUP = Sentinel('SharedUserScope.GROUP')
     ALL = Sentinel('SharingUserScope.ALL')
 
     @classmethod
@@ -257,8 +257,8 @@ class RemoteScope(Scope):
     """
     Defines types of remote scopes to be used.
     """
-    individual = ScopeBase(SharingUserScope.INDIVIDUAL, BlockScope.USAGE, u'individual')
-    group = ScopeBase(SharingUserScope.GROUP, BlockScope.USAGE, u'group')
+    individual = ScopeBase(SharedUserScope.INDIVIDUAL, BlockScope.USAGE, u'individual')
+    group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'group')
     platform = ScopeBase(SharingUserScope.ALL, BlockScope.USAGE, u'platform')
 
     @classmethod
@@ -689,7 +689,6 @@ class Field(Nameable):
     def Query(self, xblock, remote_scope=RemoteScope.individual, bind=None):
         self.query.bind(xblock, self, remote_scope, bind)
         return self.query
-
 
 
 class JSONField(Field):

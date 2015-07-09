@@ -88,6 +88,10 @@ class Queryable(object):
         self._remote_scope = remote_scope
         self._bind = bind
 
+    def _replace_user_id(self, scope_ids, user_id):
+        scope_ids.user_id = user_id
+        return scope_ids
+
     def get(self, user_name_selector=None, value_selector=None):
         """
         The get operator for Queryable class
@@ -96,9 +100,9 @@ class Queryable(object):
         field_data = self._xblock._field_data
         if isinstance(user_selector, basestring):
             # handle a id
-            scope_id = None
+            scope_ids = self._replace_user_id(self._xblock.scope_ids, user_selector)
             ## TODO: build a scope id by using user_name_selector
-            value = field_data.get(scope_id, self._name, self._remote_scope)
+            value = field_data.get(scope_ids, self._name, self._remote_scope)
         elif all(isinstance(item, basestring) for item in user_selector):
             # handle a list of ids
             raise NotImplementedError

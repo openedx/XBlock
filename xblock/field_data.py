@@ -220,11 +220,3 @@ class ReadOnlyFieldData(FieldData):
 
     def __repr__(self):
         return "ReadOnlyFieldData({!r})".format(self._source)
-
-class QueryableFieldData(SplitFieldData):
-    """
-    A FieldData that can be userd in shared Fields and Queryable objects. 
-    """
-
-    def __init__(self, scope_mappings):
-        super(QueryableFieldData, self).__init__(scope_mappings)
