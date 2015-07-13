@@ -144,51 +144,17 @@ class SplitFieldData(FieldData):
         """
         self._scope_mappings = scope_mappings
 
-    def _find_scope_in_mapping(self, scope):
-        """Summary
-        
-        Args:
-            scope (TYPE): Description
-        
-        Returns:
-            TYPE: Description
-        """
-        if scope not in self._scope_mappings:
-            raise InvalidScopeError(scope)
-
-        return self._scope_mappings[scope]
-
     def _field_data(self, block, name):
         """Return the field data for the field `name` on the :class:`~xblock.core.XBlock` `block`"""
         scope = block.fields[name].scope
 
+        if scope not in self._scope_mappings:
+            raise InvalidScopeError(scope)
+
         return self._find_scope_in_mapping(scope)
 
-    def _shared_field_data(self, remote_scope):
-        """Summary
-        
-        Args:
-            remote_scope (TYPE): Description
-        
-        Returns:
-            TYPE: Description
-        
-        Deleted Parameters:
-            block (TYPE): Description
-            name (TYPE): Description
-        """
-        return self._find_scope_in_mapping(remote_scope)
-
     def get(self, block, name):
-        remote_scope = block.fields[name].query.remote_scope
-        if remote_scope is None:
-            return self._field_data(block, name).get(block, name)
-        else:
-            field_data_cache = self._shared_field_data(remote_scope)
-            try:
-                return field_data_cache.get(block, name, remote=True)
-            except TypeError:
-                raise NoSuchServiceError()
+        return self._field_data(block, name).get(block, name)
 
     def set(self, block, name, value):
         self._field_data(block, name).set(block, name, value)

@@ -52,6 +52,11 @@ class Queryable(object):
     def field_name(self):
         return self._field_name
 
+    @property
+    def remote_scope(self):
+        return self._remote_scope
+    
+
     def bind(self, field_name, remote_scope, bind):
         """Summary
         
@@ -74,11 +79,15 @@ class Queryable(object):
         new_block.scope_ids = new_scope_ids
         return new_block
 
+    def _attach_query_to_field(self, xblock):
+        xblock.fields[self._field_name].query = self
+
     def get(self, xblock, user_name_selector=None, value_selector=None):
         """
         The get operator for Queryable class
         """
         ## TODO: build a scope id by using user_name_selector
+        self._attach_query_to_field(xblock)
         field_data = xblock._field_data
 
         if isinstance(user_name_selector, basestring):
@@ -100,6 +109,7 @@ class Queryable(object):
         """
         The set operator for Queryable class
         """
+        self._attach_query_to_field(xblock)
         field_data = xblock._field_data
         if isinstance(user_name_selector, basestring):
             new_block = self._replace_xblock_user_id(xblock, user_name_selector)

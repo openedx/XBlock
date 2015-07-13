@@ -265,9 +265,9 @@ class RemoteScope(Scope):
     def named_scopes(cls):
         """Return all named Scopes."""
         return [
-            cls.shared_user_state,
-            cls.shared_group,
-            cls.shared_platform
+            cls.user_state,
+            cls.group,
+            cls.platform
             ]
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
@@ -359,6 +359,7 @@ class Field(Nameable):
         self._values = values
         self.runtime_options = kwargs
         self.xml_node = xml_node
+        self.query = None
 
     @property
     def default(self):
