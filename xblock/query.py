@@ -5,16 +5,14 @@
 
 from copy import deepcopy
 
-from xblock.field_data import SplitFieldData
-
-
 class Query(object):
     """
     Class for handling remote query operations
     """
 
-    def __init__(self):
+    def __init__(self, field_name, remote_scope, bind):
         self._queryable = Queryable()
+        self._queryable.bind(field_name, remote_scope, bind)
 
     def __get__(self, field, field_class):
         """Get the queryable instance
@@ -26,8 +24,6 @@ class Query(object):
         Returns:
             TYPE: Description
         """
-        if field is None:
-            return self
 
         return self._queryable
 
@@ -48,69 +44,47 @@ class Queryable(object):
     """
 
     def __init__(self):
-        self._field = None
-        self._name = "_"
+        self._field_name = "unknown"
         self._remote_scope = None
-        self._xblock = None
-        self._values = None
+        self._bind = None
 
     @property
-    def field(self):
-        """
-        Returns the outer field object
-        """
-        return self._field
+    def field_name(self):
+        return self._field_name
 
-    @property
-    def remote_scope(self):
-        return self._remote_scope
-
-    @property
-    def xblock(self):
-        return self._xblock
-
-    @property
-    def name(self):
-        return self._name
-    
-
-    def bind(self, xblock, field, remote_scope, bind):
-        """Bind necesary information and object to this queryable instance
+    def bind(self, field_name, remote_scope, bind):
+        """Summary
         
         Args:
-            xblock (TYPE): Description
-            field (TYPE): Description
+            field_name (TYPE): Description
             remote_scope (TYPE): Description
             bind (TYPE): Description
         
         Returns:
             TYPE: Description
         """
-        self._field = field
-        self._xblock = xblock
-        self._name = field.name
+        self._field_name = field_name
         self._remote_scope = remote_scope
         self._bind = bind
 
-    def _replace_xblock_user_id(self, user_id):
-        new_block = deepcopy(self._xblock)
-        new_block.scope_ids.user_id = user_id
+    def _replace_xblock_user_id(self, xblock, user_id):
+        new_block = deepcopy(xblock)
+        from xblock.fields import ScopeIds
+        new_scope_ids = ScopeIds(user_id, xblock.scope_ids.block_type, xblock.scope_ids.def_id, xblock.scope_ids.usage_id)
+        new_block.scope_ids = new_scope_ids
         return new_block
 
-    def get(self, user_name_selector=None, value_selector=None):
+    def get(self, xblock, user_name_selector=None, value_selector=None):
         """
         The get operator for Queryable class
         """
         ## TODO: build a scope id by using user_name_selector
-        field_data = self._xblock._field_data
+        field_data = xblock._field_data
 
-        if isinstance(field_data, SplitFieldData) == False:
-            raise TypeError
-
-        if isinstance(user_selector, basestring):
-            new_block = self._replace_xblock_user_id(user_selector)
-            value = field_data.get(new_block, self._name)
-        elif all(isinstance(item, basestring) for item in user_selector):
+        if isinstance(user_name_selector, basestring):
+            new_block = self._replace_xblock_user_id(xblock, user_name_selector)
+            return field_data.get(new_block, self._field_name)
+        elif all(isinstance(item, basestring) for item in user_name_selector):
             # handle a list of ids
             raise NotImplementedError
         else:
@@ -122,8 +96,16 @@ class Queryable(object):
         """
         pass
 
-    def set(self, user_name_selector, values):
+    def set(self, xblock, user_name_selector, new_value):
         """
         The set operator for Queryable class
         """
-        self._values = values
+        field_data = xblock._field_data
+        if isinstance(user_name_selector, basestring):
+            new_block = self._replace_xblock_user_id(xblock, user_name_selector)
+            return field_data.set(new_block, self._field_name, new_value)
+        elif all(isinstance(item, basestring) for item in user_name_selector):
+            # handle a list of ids
+            raise NotImplementedError
+        else:
+            raise TypeError

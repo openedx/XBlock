@@ -342,8 +342,6 @@ class Field(Nameable):
     MUTABLE = True
     _default = None
 
-    query = Query()
-
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
@@ -685,10 +683,11 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
-        
-    def Query(self, xblock, remote_scope=RemoteScope.shared_user_state, bind=None):
-        self.query.bind(xblock, self, remote_scope, bind)
-        return self.query
+    
+    @classmethod
+    def Query(cls, field_name, remote_scope, bind=None):
+        cls.query = Query(field_name, remote_scope, bind)
+        return cls.query
 
 
 class JSONField(Field):
