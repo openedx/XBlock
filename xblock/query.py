@@ -62,7 +62,7 @@ class Queryable(object):
         return self._field
 
     @property
-    def scope(self):
+    def remote_scope(self):
         return self._remote_scope
 
     @property
@@ -109,7 +109,7 @@ class Queryable(object):
 
         if isinstance(user_selector, basestring):
             new_block = self._replace_xblock_user_id(user_selector)
-            value = field_data.get(new_block, self._name, self._remote_scope)
+            value = field_data.get(new_block, self._name)
         elif all(isinstance(item, basestring) for item in user_selector):
             # handle a list of ids
             raise NotImplementedError

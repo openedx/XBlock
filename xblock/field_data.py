@@ -164,11 +164,11 @@ class SplitFieldData(FieldData):
 
         return self._find_scope_in_mapping(scope)
 
-    def _shared_field_data(self, remote_field_scope):
+    def _shared_field_data(self, remote_scope):
         """Summary
         
         Args:
-            remote_field_scope (TYPE): Description
+            remote_scope (TYPE): Description
         
         Returns:
             TYPE: Description
@@ -177,13 +177,14 @@ class SplitFieldData(FieldData):
             block (TYPE): Description
             name (TYPE): Description
         """
-        return self._find_scope_in_mapping(remote_field_scope)
+        return self._find_scope_in_mapping(remote_scope)
 
-    def get(self, block, name, remote_field_scope=None):
-        if remote_field_scope is None:
+    def get(self, block, name):
+        remote_scope = block.fields[name].query.remote_scope
+        if remote_scope is None:
             return self._field_data(block, name).get(block, name)
         else:
-            field_data_cache = self._shared_field_data(remote_field_scope)
+            field_data_cache = self._shared_field_data(remote_scope)
             try:
                 return field_data_cache.get(block, name, remote=True)
             except TypeError:
