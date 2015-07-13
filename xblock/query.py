@@ -82,20 +82,29 @@ class Queryable(object):
     def _attach_query_to_field(self, xblock):
         xblock.fields[self._field_name].query = self
 
+    def _detach_query_to_field(self, xblock):
+        xblock.fields[self._field_name].query = None
+
     def get(self, xblock, user_name_selector=None, value_selector=None):
         """
         The get operator for Queryable class
         """
-        ## TODO: build a scope id by using user_name_selector
-        self._attach_query_to_field(xblock)
         field_data = xblock._field_data
 
         if isinstance(user_name_selector, basestring):
+            # attach the query to field so lower call knows this is a remote get
+            self._attach_query_to_field(xblock)
             new_block = self._replace_xblock_user_id(xblock, user_name_selector)
-            return field_data.get(new_block, self._field_name)
+            value = field_data.get(new_block, self._field_name)
+            # detach the query
+            self._detach_query_to_field(xblock)
+            del new_block
+            return value
+        
         elif all(isinstance(item, basestring) for item in user_name_selector):
             # handle a list of ids
             raise NotImplementedError
+        
         else:
             raise TypeError
 
@@ -109,13 +118,18 @@ class Queryable(object):
         """
         The set operator for Queryable class
         """
-        self._attach_query_to_field(xblock)
         field_data = xblock._field_data
+
         if isinstance(user_name_selector, basestring):
+            self._attach_query_to_field(xblock)
             new_block = self._replace_xblock_user_id(xblock, user_name_selector)
-            return field_data.set(new_block, self._field_name, new_value)
+            field_data.set(new_block, self._field_name, new_value)
+            self._detach_query_to_field(xblock)
+            del new_block
+
         elif all(isinstance(item, basestring) for item in user_name_selector):
             # handle a list of ids
             raise NotImplementedError
+        
         else:
             raise TypeError
