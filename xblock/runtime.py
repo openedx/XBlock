@@ -45,8 +45,8 @@ class KeyValueStore(object):
         Stores can use this information however they like to store and retrieve
         data.
         """
-        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1'):
-            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family)
+        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1', query=None):
+            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family, query)
 
     @abstractmethod
     def get(self, key):
@@ -156,6 +156,7 @@ class KvsFieldData(FieldData):
             block_scope_id=block_id,
             field_name=name,
             block_family=block.entry_point,
+            query=field.query
         )
         """
         field = self._getfield(block, name)
@@ -185,6 +186,7 @@ class KvsFieldData(FieldData):
             block_scope_id=block_id,
             field_name=name,
             block_family=block.entry_point,
+            query=field.query
         )
         return key
 
