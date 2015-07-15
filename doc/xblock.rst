@@ -1,6 +1,6 @@
-======
-XBlock
-======
+###########
+XBlock API
+###########
 
 .. autoclass:: xblock.core.XBlock
     :members:

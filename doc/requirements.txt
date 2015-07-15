@@ -4,3 +4,4 @@
 lazy
 sphinx
 sphinxcontrib-napoleon==0.2.6
+path.py
