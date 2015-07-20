@@ -10,21 +10,19 @@ class Query(object):
     Class for handling remote query operations
     """
 
-    def __init__(self, field_name, remote_scope, bind):
-        self._queryable = Queryable()
-        self._queryable.bind(field_name, remote_scope, bind)
+    def __init__(self, field_name, remote_scope):
+        self._queryable = Queryable(field_name, remote_scope)
 
     def __get__(self, field, field_class):
-        """Get the queryable instance
+        """Summary
         
         Args:
-            xblock (TYPE): Description
-            xblock_class (TYPE): Description
+            field (TYPE): Description
+            field_class (TYPE): Description
         
         Returns:
             TYPE: Description
         """
-
         return self._queryable
 
     def __set__(self, field, val):
@@ -34,8 +32,19 @@ class Shared(object):
     """
     Class for handling shared field operations
     """
-    def __init__(self):
-        pass
+    def __init__(self, field_name, remote_scope, bind_attr):
+        self._bind_attr = bind_attr
+        self._queryable = Queryable(field_name, remote_scope)
+    
+    def __get__(self, xblock, xblock_class):
+        if xblock is None:
+            return self
+        bind = getattr(xblock, self._bind_attr)
+        return self._queryable.get(xblock = xblock, **bind)
+
+    def __set__(self, xblock, value):
+        bind = getattr(xblock, self._bind_attr)
+        return self._queryable.set(value = value, xblock = xblock, **bind)
 
 
 class Queryable(object):
@@ -43,10 +52,9 @@ class Queryable(object):
     Class for Queryable objects
     """
 
-    def __init__(self):
-        self._field_name = "unknown"
-        self._remote_scope = None
-        self._bind = None
+    def __init__(self, field_name, remote_scope):
+        self._field_name = field_name
+        self._remote_scope = remote_scope
 
     @property
     def field_name(self):
@@ -55,26 +63,11 @@ class Queryable(object):
     @property
     def remote_scope(self):
         return self._remote_scope
-    
-
-    def bind(self, field_name, remote_scope, bind):
-        """Summary
-        
-        Args:
-            field_name (TYPE): Description
-            remote_scope (TYPE): Description
-            bind (TYPE): Description
-        
-        Returns:
-            TYPE: Description
-        """
-        self._field_name = field_name
-        self._remote_scope = remote_scope
-        self._bind = bind
 
     def _replace_xblock_user_id(self, xblock, user_id):
-        new_block = deepcopy(xblock)
         from xblock.fields import ScopeIds
+
+        new_block = deepcopy(xblock)
         new_scope_ids = ScopeIds(user_id, xblock.scope_ids.block_type, xblock.scope_ids.def_id, xblock.scope_ids.usage_id)
         new_block.scope_ids = new_scope_ids
         return new_block
@@ -85,49 +78,49 @@ class Queryable(object):
     def _detach_query_to_field(self, xblock):
         xblock.fields[self._field_name].query = None
 
-    def get(self, xblock, user_name_selector=None, value_selector=None):
+    def get(self, xblock=None, user_id=None):
         """
         The get operator for Queryable class
         """
         field_data = xblock._field_data
 
-        if isinstance(user_name_selector, basestring):
-            # attach the query to field so lower call knows this is a remote get
+        if isinstance(user_id, basestring):
+            # attach the query to field so lower call knows this is a query get (so that it can disable some assert checks)
             self._attach_query_to_field(xblock)
-            new_block = self._replace_xblock_user_id(xblock, user_name_selector)
+            new_block = self._replace_xblock_user_id(xblock, user_id)
             value = field_data.get(new_block, self._field_name)
             # detach the query
             self._detach_query_to_field(xblock)
             del new_block
             return value
         
-        elif all(isinstance(item, basestring) for item in user_name_selector):
+        elif all(isinstance(item, basestring) for item in user_id):
             # handle a list of ids
             raise NotImplementedError
         
         else:
             raise TypeError
 
-    def find(self, user_selector=None, value_selector=None):
+    def find(self, user_id=None):
         """
         The find operator for Queryable class
         """
         pass
 
-    def set(self, xblock, user_name_selector, new_value):
+    def set(self, value, xblock=None, user_id=None):
         """
         The set operator for Queryable class
         """
         field_data = xblock._field_data
 
-        if isinstance(user_name_selector, basestring):
+        if isinstance(user_id, basestring):
             self._attach_query_to_field(xblock)
-            new_block = self._replace_xblock_user_id(xblock, user_name_selector)
-            field_data.set(new_block, self._field_name, new_value)
+            new_block = self._replace_xblock_user_id(xblock, user_id)
+            field_data.set(new_block, self._field_name, value)
             self._detach_query_to_field(xblock)
             del new_block
 
-        elif all(isinstance(item, basestring) for item in user_name_selector):
+        elif all(isinstance(item, basestring) for item in user_id):
             # handle a list of ids
             raise NotImplementedError
         

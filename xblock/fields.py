@@ -156,14 +156,13 @@ class SharedUserScope(object):
     """
     ONE = Sentinel('SharedUserScope.ONE')
     GROUP = Sentinel('SharedUserScope.GROUP')
-    ALL = Sentinel('SharingUserScope.ALL')
 
     @classmethod
     def scopes(cls):
         """
         Return a list of valid/understood class scopes.
         """
-        return [cls.ONE, cls.GROUP, cls.ALL]
+        return [cls.ONE, cls.GROUP]
 
 
 UNSET = Sentinel("fields.UNSET")
@@ -259,15 +258,13 @@ class RemoteScope(Scope):
     """
     shared_user_state = ScopeBase(SharedUserScope.ONE, BlockScope.USAGE, u'shared_user_state')
     shared_group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'shared_group')
-    shared_platform = ScopeBase(SharedUserScope.ALL, BlockScope.USAGE, u'shared_platform')
 
     @classmethod
     def named_scopes(cls):
         """Return all named Scopes."""
         return [
             cls.user_state,
-            cls.group,
-            cls.platform
+            cls.group
             ]
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
@@ -360,6 +357,7 @@ class Field(Nameable):
         self.runtime_options = kwargs
         self.xml_node = xml_node
         self.query = None
+        self.shared = None
 
     @property
     def default(self):
@@ -686,9 +684,14 @@ class Field(Nameable):
         return hash(self.name)
     
     @classmethod
-    def Query(cls, field_name, remote_scope, bind=None):
-        cls.query = Query(field_name, remote_scope, bind)
+    def Query(cls, field_name, remote_scope):
+        cls.query = Query(field_name, remote_scope)
         return cls.query
+
+    @classmethod
+    def Shared(cls, field_name, remote_scope):
+        cls.shared = Shared(field_name, remote_scope)
+        return cls.shared
 
 
 class JSONField(Field):
