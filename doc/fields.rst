@@ -1,6 +1,6 @@
-======
-Fields
-======
+###########
+Fields API
+###########
 
 .. automodule:: xblock.fields
     :members:
