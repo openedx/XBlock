@@ -70,23 +70,32 @@ class Queryable(object):
     def _detach_query_to_field(self, xblock):
         xblock.fields[self._field_name].query = None
 
-    def check_sharing_premission(self, xblock):
+    def check_remote_scope_premission(self, current_block, target_block):
         ## TODO: finish this part with check if the target has the current remote_scope for sharing
-        if xblock.fields[self.field_name].remote_scope is None:
+        if target_block.fields[self.field_name].remote_scope is None:
             return False
+        current_scope_ids = current_block.scope_ids
+        target_scope_ids = target_block.scope_ids
+        ## TODO: compare the information of these two scope ids based on target_block.remote_scope permission
         return True
 
     def get(self, xblock=None, user_id=None, usage_id=None):
         """
         The get operator for Queryable class
         """
-        if self.check_sharing_premission(xblock) == False:
+        current_block = xblock
+        if usage_id is None:
+            target_block = current_block
+        else:
+            target_block = self.runtime.get_remote_block(user_id, usage_id)
+
+        if self.check_remote_scope_premission(current_block, target_block) == False:
             raise InvalidScopeError
 
         # TODO: handle usage_id and other block type
-        field_data = xblock._field_data
+        field_data = target_block._field_data
 
-        new_block = self._replace_xblock_user_id(xblock, user_id)
+        new_block = self._replace_xblock_user_id(target_block, user_id)
         # attach the query to field so field data calls know this is a query get 
         # (so that it can disable some assert checks)
         # FIXME: key error may happen here
@@ -107,6 +116,7 @@ class Queryable(object):
         """
         The set operator for Queryable class
         """
+        # TODO: handle usage_id
         field_data = xblock._field_data
 
         # FIXME: key error may happen here
