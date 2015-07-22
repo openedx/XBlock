@@ -685,13 +685,13 @@ class Field(Nameable):
         return hash(self.name)
     
     @classmethod
-    def Query(cls, field_name, remote_scope):
-        cls.query = Query(field_name, remote_scope)
+    def Query(cls, remote_scope):
+        cls.query = Query(remote_scope)
         return cls.query
 
     @classmethod
-    def Shared(cls, field_name, remote_scope):
-        cls.shared = Shared(field_name, remote_scope)
+    def Shared(cls, remote_scope):
+        cls.shared = Shared(remote_scope)
         return cls.shared
 
 
