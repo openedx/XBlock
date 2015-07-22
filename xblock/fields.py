@@ -20,6 +20,8 @@ import yaml
 
 from xblock.internal import Nameable
 
+from xblock.query import Query, Shared
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -146,6 +148,23 @@ class UserScope(object):
         return [cls.NONE, cls.ONE, cls.ALL]
 
 
+class SharedUserScope(object):
+    """
+    Enumeration of shared scopes.
+
+    To be continued.
+    """
+    ONE = Sentinel('SharedUserScope.ONE')
+    GROUP = Sentinel('SharedUserScope.GROUP')
+
+    @classmethod
+    def scopes(cls):
+        """
+        Return a list of valid/understood class scopes.
+        """
+        return [cls.ONE, cls.GROUP]
+
+
 UNSET = Sentinel("fields.UNSET")
 
 
@@ -233,6 +252,21 @@ class Scope(ScopeBase):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
 
+class RemoteScope(Scope):
+    """
+    Defines types of remote scopes to be used.
+    """
+    user_state = ScopeBase(SharedUserScope.ONE, BlockScope.USAGE, u'user_state')
+    group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'group')
+
+    @classmethod
+    def named_scopes(cls):
+        """Return all named Scopes."""
+        return [
+            cls.user_state,
+            cls.group
+            ]
+
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     """
     A simple wrapper to collect all of the ids needed to correctly identify an XBlock
@@ -308,7 +342,7 @@ class Field(Nameable):
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
-                 xml_node=False, **kwargs):
+                 xml_node=False, remote_scope=None, **kwargs):
         self.warned = False
         self.help = help
         self._enable_enforce_type = enforce_type
@@ -322,6 +356,9 @@ class Field(Nameable):
         self._values = values
         self.runtime_options = kwargs
         self.xml_node = xml_node
+        self.query = None
+        self.shared = None
+        self.remote_scope = remote_scope
 
     @property
     def default(self):
@@ -646,6 +683,16 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
+    
+    @classmethod
+    def Query(cls, field_name, remote_scope):
+        cls.query = Query(field_name, remote_scope)
+        return cls.query
+
+    @classmethod
+    def Shared(cls, field_name, remote_scope):
+        cls.shared = Shared(field_name, remote_scope)
+        return cls.shared
 
 
 class JSONField(Field):
