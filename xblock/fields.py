@@ -256,8 +256,8 @@ class RemoteScope(Scope):
     """
     Defines types of remote scopes to be used.
     """
-    shared_user_state = ScopeBase(SharedUserScope.ONE, BlockScope.USAGE, u'shared_user_state')
-    shared_group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'shared_group')
+    user_state = ScopeBase(SharedUserScope.ONE, BlockScope.USAGE, u'user_state')
+    group = ScopeBase(SharedUserScope.GROUP, BlockScope.USAGE, u'group')
 
     @classmethod
     def named_scopes(cls):

@@ -86,12 +86,16 @@ class Queryable(object):
 
         if isinstance(user_id, basestring):
             # attach the query to field so lower call knows this is a query get (so that it can disable some assert checks)
-            self._attach_query_to_field(xblock)
             new_block = self._replace_xblock_user_id(xblock, user_id)
-            value = field_data.get(new_block, self._field_name)
-            # detach the query
-            self._detach_query_to_field(xblock)
+
+            try:
+                self._attach_query_to_field(new_block)
+                value = field_data.get(new_block, self._field_name)
+                self._detach_query_to_field(new_block)
+            except KeyError:
+                value = None
             del new_block
+            
             return value
         
         elif all(isinstance(item, basestring) for item in user_id):
