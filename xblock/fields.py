@@ -342,7 +342,7 @@ class Field(Nameable):
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
-                 xml_node=False, **kwargs):
+                 xml_node=False, remote_scope=None, **kwargs):
         self.warned = False
         self.help = help
         self._enable_enforce_type = enforce_type
@@ -358,6 +358,7 @@ class Field(Nameable):
         self.xml_node = xml_node
         self.query = None
         self.shared = None
+        self.remote_scope = remote_scope
 
     @property
     def default(self):

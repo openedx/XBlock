@@ -4,6 +4,7 @@
 """
 
 from copy import deepcopy
+from xblock.exceptions import InvalidScopeError
 
 class Query(object):
     """
@@ -14,15 +15,6 @@ class Query(object):
         self._queryable = Queryable(field_name, remote_scope)
 
     def __get__(self, field, field_class):
-        """Summary
-        
-        Args:
-            field (TYPE): Description
-            field_class (TYPE): Description
-        
-        Returns:
-            TYPE: Description
-        """
         return self._queryable
 
     def __set__(self, field, val):
@@ -78,38 +70,38 @@ class Queryable(object):
     def _detach_query_to_field(self, xblock):
         xblock.fields[self._field_name].query = None
 
-    def get(self, xblock=None, user_id=None):
+    def check_sharing_premission(self, xblock):
+        ## TODO: finish this part with check if the target has the current remote_scope for sharing
+        if xblock.fields[self.field_name].remote_scope is None:
+            return False
+        return True
+
+    def get(self, xblock=None, user_id=None, usage_id=None):
         """
         The get operator for Queryable class
         """
+        if self.check_sharing_premission(xblock) == False:
+            raise InvalidScopeError
+
+        # TODO: handle usage_id and other block type
         field_data = xblock._field_data
 
-        if isinstance(user_id, basestring):
-            # attach the query to field so lower call knows this is a query get (so that it can disable some assert checks)
-            new_block = self._replace_xblock_user_id(xblock, user_id)
-
+        new_block = self._replace_xblock_user_id(xblock, user_id)
+        # attach the query to field so field data calls know this is a query get 
+        # (so that it can disable some assert checks)
+        # FIXME: key error may happen here
+        self._attach_query_to_field(new_block)
+        if field_data.has(new_block, self.field_name):
+            value = field_data.get(new_block, self.field_name)
+        else:
             try:
-                self._attach_query_to_field(new_block)
-                value = field_data.get(new_block, self._field_name)
-                self._detach_query_to_field(new_block)
+                value = field_data.default(new_block, self.field_name)
             except KeyError:
                 value = None
-            del new_block
-            
-            return value
-        
-        elif all(isinstance(item, basestring) for item in user_id):
-            # handle a list of ids
-            raise NotImplementedError
-        
-        else:
-            raise TypeError
+        self._detach_query_to_field(new_block)
+        del new_block
 
-    def find(self, user_id=None):
-        """
-        The find operator for Queryable class
-        """
-        pass
+        return value
 
     def set(self, value, xblock=None, user_id=None):
         """
@@ -117,16 +109,9 @@ class Queryable(object):
         """
         field_data = xblock._field_data
 
-        if isinstance(user_id, basestring):
-            self._attach_query_to_field(xblock)
-            new_block = self._replace_xblock_user_id(xblock, user_id)
-            field_data.set(new_block, self._field_name, value)
-            self._detach_query_to_field(xblock)
-            del new_block
-
-        elif all(isinstance(item, basestring) for item in user_id):
-            # handle a list of ids
-            raise NotImplementedError
-        
-        else:
-            raise TypeError
+        # FIXME: key error may happen here
+        self._attach_query_to_field(xblock)
+        new_block = self._replace_xblock_user_id(xblock, user_id)
+        field_data.set(new_block, self._field_name, value)
+        self._detach_query_to_field(xblock)
+        del new_block
