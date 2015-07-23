@@ -80,9 +80,9 @@ class Queryable(object):
         """
         current_block = xblock
         if usage_id is None:
-            target_block = current_block
+            target_block = xblock.runtime.get_remote_block(user_id, current_block.scope_ids.usage_id)
         else:
-            target_block = self.runtime.get_remote_block(user_id, usage_id)
+            target_block = xblock.runtime.get_remote_block(user_id, usage_id)
 
         if self.check_remote_scope_premission(field_name, current_block, target_block) == False:
             raise InvalidScopeError
