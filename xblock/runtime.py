@@ -39,14 +39,14 @@ class KeyValueStore(object):
 
     __metaclass__ = ABCMeta
 
-    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family query")):
+    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family queryable")):
         """
         Keys are structured to retain information about the scope of the data.
         Stores can use this information however they like to store and retrieve
         data.
         """
-        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1', query=None):
-            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family, query)
+        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1', queryable=None):
+            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family, queryable)
 
     @abstractmethod
     def get(self, key):
@@ -156,7 +156,7 @@ class KvsFieldData(FieldData):
             block_scope_id=block_id,
             field_name=name,
             block_family=block.entry_point,
-            query=field.query
+            queryable=field.queryable
         )
         """
         field = self._getfield(block, name)
@@ -186,7 +186,7 @@ class KvsFieldData(FieldData):
             block_scope_id=block_id,
             field_name=name,
             block_family=block.entry_point,
-            query=field.query
+            queryable=field.queryable
         )
         return key
 

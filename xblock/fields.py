@@ -356,7 +356,7 @@ class Field(Nameable):
         self._values = values
         self.runtime_options = kwargs
         self.xml_node = xml_node
-        self.query = None
+        self.queryable = None
         self.shared = None
         self.remote_scope = remote_scope
 

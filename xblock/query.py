@@ -54,16 +54,16 @@ class Queryable(object):
     def _replace_xblock_user_id(self, xblock, user_id):
         from xblock.fields import ScopeIds
 
-        new_block = deepcopy(xblock)
+        #new_block = deepcopy(xblock)
         new_scope_ids = ScopeIds(user_id, xblock.scope_ids.block_type, xblock.scope_ids.def_id, xblock.scope_ids.usage_id)
         new_block.scope_ids = new_scope_ids
         return new_block
 
     def _attach_query_to_field(self, xblock, field_name):
-        xblock.fields[field_name].query = self
+        xblock.fields[field_name].queryable = self
 
     def _detach_query_to_field(self, xblock, field_name):
-        xblock.fields[field_name].query = None
+        xblock.fields[field_name].queryable = None
 
     def check_remote_scope_premission(self, field_name, current_block, target_block):
         ## TODO: finish this part with check if the target has the current remote_scope for sharing
@@ -78,32 +78,35 @@ class Queryable(object):
         """
         The get operator for Queryable class
         """
+        print 'querying', user_id, usage_id
+
         current_block = xblock
         if usage_id is None:
             target_block = xblock.runtime.get_remote_block(user_id, current_block.scope_ids.usage_id)
         else:
             target_block = xblock.runtime.get_remote_block(user_id, usage_id)
+        print target_block.scope_ids.user_id
 
         if self.check_remote_scope_premission(field_name, current_block, target_block) == False:
             raise InvalidScopeError
 
         # TODO: handle usage_id and other block type
         field_data = target_block._field_data
+        print target_block.fields[field_name].values
+        print target_block.course_id
 
-        new_block = self._replace_xblock_user_id(target_block, user_id)
         # attach the query to field so field data calls know this is a query get 
         # (so that it can disable some assert checks)
         # FIXME: key error may happen here
-        self._attach_query_to_field(new_block, field_name)
-        if field_data.has(new_block, field_name):
-            value = field_data.get(new_block, field_name)
+        self._attach_query_to_field(target_block, field_name)
+        if field_data.has(target_block, field_name):
+            value = field_data.get(target_block, field_name)
         else:
             try:
-                value = field_data.default(new_block, field_name)
+                value = field_data.default(target_block, field_name)
             except KeyError:
                 value = None
-        self._detach_query_to_field(new_block, field_name)
-        del new_block
+        self._detach_query_to_field(target_block, field_name)
 
         return value
 

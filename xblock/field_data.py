@@ -151,7 +151,7 @@ class SplitFieldData(FieldData):
         if scope not in self._scope_mappings:
             raise InvalidScopeError(scope)
 
-        return self._find_scope_in_mapping(scope)
+        return self._scope_mappings[scope]
 
     def get(self, block, name):
         return self._field_data(block, name).get(block, name)
