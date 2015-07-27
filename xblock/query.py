@@ -100,10 +100,11 @@ class Queryable(object):
         # FIXME: key error may happen here
         self._attach_query_to_field(target_block, field_name)
         if field_data.has(target_block, field_name):
-            value = field_data.get(target_block, field_name)
+            target_field = target_block.fields[field_name]
+            value = target_field.from_json(field_data.get(target_block, field_name))
         else:
             try:
-                value = field_data.default(target_block, field_name)
+                value = target_block.fields[field_name].default
             except KeyError:
                 value = None
         self._detach_query_to_field(target_block, field_name)
@@ -114,12 +115,15 @@ class Queryable(object):
         """
         The set operator for Queryable class
         """
-        # TODO: handle usage_id
+        current_block = xblock
+        if usage_id is None:
+            target_block = xblock.runtime.get_remote_block(user_id, current_block.scope_ids.usage_id)
+        else:
+            target_block = xblock.runtime.get_remote_block(user_id, usage_id)
+
         field_data = xblock._field_data
 
         # FIXME: key error may happen here
-        self._attach_query_to_field(xblock, field_name)
-        new_block = self._replace_xblock_user_id(xblock, user_id)
-        field_data.set(new_block, field_name, value)
-        self._detach_query_to_field(xblock, field_name)
-        del new_block
+        self._attach_query_to_field(target_block, field_name)
+        field_data.set(target_block, field_name, value)
+        self._detach_query_to_field(target_block, field_name)
