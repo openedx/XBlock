@@ -11,8 +11,8 @@ class Query(object):
     Class for handling remote query operations
     """
 
-    def __init__(self, remote_scope):
-        self._queryable = Queryable(remote_scope)
+    def __init__(self, field_name, remote_scope):
+        self._queryable = Queryable(field_name, remote_scope)
 
     def __get__(self, field, field_class):
         return self._queryable
@@ -44,20 +44,17 @@ class Queryable(object):
     Class for Queryable objects
     """
 
-    def __init__(self, remote_scope):
+    def __init__(self, field_name, remote_scope):
+        self._field_name = field_name
         self._remote_scope = remote_scope
 
     @property
     def remote_scope(self):
         return self._remote_scope
-
-    def _replace_xblock_user_id(self, xblock, user_id):
-        from xblock.fields import ScopeIds
-
-        #new_block = deepcopy(xblock)
-        new_scope_ids = ScopeIds(user_id, xblock.scope_ids.block_type, xblock.scope_ids.def_id, xblock.scope_ids.usage_id)
-        new_block.scope_ids = new_scope_ids
-        return new_block
+    
+    @property
+    def field_name(self):
+        return self._field_name
 
     def _attach_query_to_field(self, xblock, field_name):
         xblock.fields[field_name].queryable = self
@@ -65,39 +62,54 @@ class Queryable(object):
     def _detach_query_to_field(self, xblock, field_name):
         xblock.fields[field_name].queryable = None
 
-    def check_remote_scope_premission(self, field_name, current_block, target_block):
-        ## TODO: finish this part with check if the target has the current remote_scope for sharing
-        if target_block.fields[field_name].remote_scope is None:
-            return False
+    def _get_target_block(self, current_block, user_id, usage_id):
+
+        if usage_id is None:
+            target_block = current_block.runtime.get_remote_block(user_id, current_block.scope_ids.usage_id)
+        else:
+            target_block = current_block.runtime.get_remote_block(user_id, usage_id)
+
+        print target_block.scope_ids
+
+        return target_block
+
+    def _check_remote_scope_premission(self, field_name, current_block, target_block):
+        from xblock.fields import RemoteScope
+
+        target_remote_scope = target_block.fields[field_name].remote_scope
         current_scope_ids = current_block.scope_ids
         target_scope_ids = target_block.scope_ids
-        ## TODO: compare the information of these two scope ids based on target_block.remote_scope permission
-        return True
 
-    def get(self, xblock, field_name, user_id=None, usage_id=None):
+        ## TODO: finish these checks
+        if target_remote_scope is None:
+            raise InvalidScopeError
+        
+        if target_remote_scope == RemoteScope.course_users:
+            if current_scope_ids.def_id != target_scope_ids.def_id:
+                raise InvalidScopeError
+        
+        elif target_remote_scope == RemoteScope.just_my_block:
+            if current_scope_ids.user_id != target_remote_scope.user_id:
+                raise InvalidScopeError
+            if current_scope_ids.block_type != target_remote_scope.block_type:
+                raise InvalidScopeError
+
+    def get(self, current_block, user_id=None, usage_id=None):
         """
         The get operator for Queryable class
         """
-        print 'querying', user_id, usage_id
+        field_name = self._field_name
 
-        current_block = xblock
-        if usage_id is None:
-            target_block = xblock.runtime.get_remote_block(user_id, current_block.scope_ids.usage_id)
-        else:
-            target_block = xblock.runtime.get_remote_block(user_id, usage_id)
-        print target_block.scope_ids.user_id
+        target_block = self._get_target_block(current_block, user_id, usage_id)
 
-        if self.check_remote_scope_premission(field_name, current_block, target_block) == False:
-            raise InvalidScopeError
+        
+        try:
+            self._check_remote_scope_premission(field_name, current_block, target_block)
+        except InvalidScopeError:
+            return None
 
-        # TODO: handle usage_id and other block type
         field_data = target_block._field_data
-        print target_block.fields[field_name].values
-        print target_block.course_id
 
-        # attach the query to field so field data calls know this is a query get 
-        # (so that it can disable some assert checks)
-        # FIXME: key error may happen here
         self._attach_query_to_field(target_block, field_name)
         if field_data.has(target_block, field_name):
             target_field = target_block.fields[field_name]
@@ -111,19 +123,21 @@ class Queryable(object):
 
         return value
 
-    def set(self, value, xblock, field_name, user_id=None, usage_id=None):
+    def set(self, value, current_block, user_id=None, usage_id=None):
         """
         The set operator for Queryable class
         """
-        current_block = xblock
-        if usage_id is None:
-            target_block = xblock.runtime.get_remote_block(user_id, current_block.scope_ids.usage_id)
-        else:
-            target_block = xblock.runtime.get_remote_block(user_id, usage_id)
+        field_name = self._field_name
 
-        field_data = xblock._field_data
+        target_block = self._get_target_block(current_block, user_id, usage_id)
 
-        # FIXME: key error may happen here
+        field_data = target_block._field_data
+
+        try:
+            self._check_remote_scope_premission(field_name, current_block, target_block)
+        except InvalidScopeError:
+            return
+
         self._attach_query_to_field(target_block, field_name)
         field_data.set(target_block, field_name, value)
         self._detach_query_to_field(target_block, field_name)
