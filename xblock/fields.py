@@ -360,7 +360,6 @@ class Field(Nameable):
         self.runtime_options = kwargs
         self.xml_node = xml_node
         self.queryable = None
-        self.shared = None
         self.remote_scope = remote_scope
 
     @property
@@ -688,14 +687,12 @@ class Field(Nameable):
         return hash(self.name)
     
     @classmethod
-    def Query(cls, field_name, remote_scope):
-        cls.query = Query(field_name, remote_scope)
-        return cls.query
+    def Query(cls, field_name):
+        return Query(field_name)
 
     @classmethod
-    def Shared(cls, remote_scope):
-        cls.shared = Shared(remote_scope)
-        return cls.shared
+    def Shared(cls, bind_property_name):
+        return Shared(bind_property_name)
 
 
 class JSONField(Field):
