@@ -27,20 +27,20 @@ class Shared(object):
     """
     Class for handling shared field operations
     """
-    def __init__(self, bind_property_name):
-        self._bind_property_name = bind_property_name
+    def __init__(self, bind_attr_name):
+        self._bind_attr_name = bind_attr_name
         self._queryable = Queryable()
     
     def __get__(self, xblock, xblock_class):
         if xblock is None:
             return self
 
-        bind = getattr(xblock, self._bind_property_name)
+        bind = getattr(xblock, self._bind_attr_name)
         self._queryable.attach_current_block(xblock)
         return self._queryable.get(**bind)
 
     def __set__(self, xblock, value):
-        bind = getattr(xblock, self._bind_property_name)
+        bind = getattr(xblock, self._bind_attr_name)
         self._queryable.attach_current_block(xblock)
         return self._queryable.set(value=value, **bind)
 
