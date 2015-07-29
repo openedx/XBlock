@@ -123,10 +123,10 @@ class Queryable(object):
         field_data = target_block._field_data
 
         self._attach_query_to_field(target_block, field_name)
-        if field_data.has(target_block, field_name):
+        try:
             target_field = target_block.fields[field_name]
             value = target_field.from_json(field_data.get(target_block, field_name))
-        else:
+        except KeyError:
             try:
                 value = target_block.fields[field_name].default
             except KeyError:
