@@ -693,8 +693,8 @@ class Field(Nameable):
         return Query(field_name)
 
     @classmethod
-    def Shared(cls, bind_attr_name):
-        return Shared(bind_attr_name)
+    def Shared(cls, field_name, bind_attr_name):
+        return Shared(field_name, bind_attr_name)
 
 
 class JSONField(Field):

@@ -27,9 +27,9 @@ class Shared(object):
     """
     Class for handling shared field operations
     """
-    def __init__(self, bind_attr_name):
+    def __init__(self, field_name, bind_attr_name):
         self._bind_attr_name = bind_attr_name
-        self._queryable = Queryable()
+        self._queryable = Queryable(field_name=field_name)
     
     def __get__(self, xblock, xblock_class):
         if xblock is None:
@@ -101,7 +101,7 @@ class Queryable(object):
             if current_scope_ids.def_id != target_scope_ids.def_id:
                 raise SharedFieldAccessDeniedError
         
-        elif target_remote_scope == RemoteScope.just_my_block:
+        elif target_remote_scope == RemoteScope.my_block_type:
             if current_scope_ids.user_id != target_remote_scope.user_id:
                 raise SharedFieldAccessDeniedError
             if current_scope_ids.block_type != target_remote_scope.block_type:
@@ -117,7 +117,7 @@ class Queryable(object):
      
         try:
             self._check_remote_scope_premission(field_name, current_block, target_block)
-        except InvalidScopeError:
+        except SharedFieldAccessDeniedError:
             return None
 
         field_data = target_block._field_data
@@ -147,7 +147,7 @@ class Queryable(object):
 
         try:
             self._check_remote_scope_premission(field_name, current_block, target_block)
-        except InvalidScopeError:
+        except SharedFieldAccessDeniedError:
             return
 
         self._attach_query_to_field(target_block, field_name)
