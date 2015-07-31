@@ -678,14 +678,14 @@ class FieldSerializationTest(unittest.TestCase):
         """
         Helper method: checks if _type's to_string given instance of _type returns expected string
         """
-        result = _type(enforce_type=True).to_string(value)
+        result = _type().to_string(value)
         self.assertEquals(result, string)
 
     def assert_from_string(self, _type, string, value):
         """
         Helper method: checks if _type's from_string given string representation of type returns expected value
         """
-        result = _type(enforce_type=True).from_string(string)
+        result = _type().from_string(string)
         self.assertEquals(result, value)
 
     @ddt.unpack
@@ -726,7 +726,10 @@ class FieldSerializationTest(unittest.TestCase):
                 2,
                 3
               ]
-            }""")))
+            }""")),
+        (DateTime, dt.datetime(2014, 4, 1, 2, 3, 4, 567890).replace(tzinfo=pytz.utc), '2014-04-01T02:03:04.567890'),
+        (DateTime, dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc), '2014-04-01T02:03:04.000000'),
+    )
     def test_both_directions(self, _type, value, string):
         """Easy cases that work in both directions."""
         self.assert_to_string(_type, value, string)
@@ -738,7 +741,7 @@ class FieldSerializationTest(unittest.TestCase):
         (Float, 1.0, r"1|1\.0*"),
         (Float, -10.0, r"-10|-10\.0*"))
     def test_to_string_regexp_matches(self, _type, value, regexp):
-        result = _type(enforce_type=True).to_string(value)
+        result = _type().to_string(value)
         self.assertRegexpMatches(result, regexp)
 
     @ddt.unpack
@@ -806,7 +809,11 @@ class FieldSerializationTest(unittest.TestCase):
                   kaw: null
             """),
             [1, 2.345, {"foo": True, "bar": [1, 2, 3]}, {"meow": False, "woof": True, "kaw": None}]
-        )
+        ),
+        # Test that legacy DateTime format including double quotes can still be imported for compatibility with
+        # old data export tar balls.
+        (DateTime, '"2014-04-01T02:03:04.567890"', dt.datetime(2014, 4, 1, 2, 3, 4, 567890).replace(tzinfo=pytz.utc)),
+        (DateTime, '"2014-04-01T02:03:04.000000"', dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)),
     )
     def test_from_string(self, _type, string, value):
         self.assert_from_string(_type, string, value)
@@ -817,7 +824,7 @@ class FieldSerializationTest(unittest.TestCase):
         This special test case is necessary since
         float('nan') compares inequal to everything.
         """
-        result = Float(enforce_type=True).from_string('NaN')
+        result = Float().from_string('NaN')
         self.assertTrue(math.isnan(result))
 
     @ddt.unpack
@@ -827,4 +834,4 @@ class FieldSerializationTest(unittest.TestCase):
     def test_from_string_errors(self, _type, string):
         """ Cases that raises various exceptions."""
         with self.assertRaises(StandardError):
-            _type(enforce_type=True).from_string(string)
+            _type().from_string(string)
