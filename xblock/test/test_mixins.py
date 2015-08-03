@@ -154,8 +154,7 @@ class TestViewsMixin(TestCase):
                 """
                 pass  # pragma: no cover
 
-            @ViewsMixin.supports("functionality1")
-            @ViewsMixin.supports("functionality2")
+            @ViewsMixin.supports("functionality1", "functionality2")
             def multi_featured_view(self):
                 """
                 A view that supports multiple functionalities
@@ -173,6 +172,7 @@ class TestViewsMixin(TestCase):
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
                 ("functionality_supported_view", "bogus_functionality", False),
+                ("functionality_supported_view", None, False),
 
                 ("an_unsupported_view", "a_functionality", False),
 

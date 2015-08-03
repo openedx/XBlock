@@ -121,18 +121,20 @@ class RuntimeServicesMixin(object):
         super(RuntimeServicesMixin, self).__init__(**kwargs)
 
     @classmethod
-    def needs(cls, service_name):
-        """A class decorator to indicate that an XBlock class needs a particular service."""
+    def needs(cls, *service_names):
+        """A class decorator to indicate that an XBlock class needs particular services."""
         def _decorator(cls_):                                # pylint: disable=missing-docstring
-            cls_._services_requested[service_name] = "need"  # pylint: disable=protected-access
+            for service_name in service_names:
+                cls_._services_requested[service_name] = "need"  # pylint: disable=protected-access
             return cls_
         return _decorator
 
     @classmethod
-    def wants(cls, service_name):
-        """A class decorator to indicate that an XBlock class wants a particular service."""
+    def wants(cls, *service_names):
+        """A class decorator to indicate that an XBlock class wants particular services."""
         def _decorator(cls_):                                # pylint: disable=missing-docstring
-            cls_._services_requested[service_name] = "want"  # pylint: disable=protected-access
+            for service_name in service_names:
+                cls_._services_requested[service_name] = "want"  # pylint: disable=protected-access
             return cls_
         return _decorator
 
@@ -545,13 +547,13 @@ class ViewsMixin(object):
     This mixin provides decorators that can be used on xBlock view methods.
     """
     @classmethod
-    def supports(cls, functionality):
+    def supports(cls, *functionalities):
         """
         A view decorator to indicate that an xBlock view has support for the
-        given functionality.
+        given functionalities.
 
         Arguments:
-            functionality (string): An identifier for the functionality of the view.
+            functionalities: String identifiers for the functionalities of the view.
                 For example: "multi_device".
         """
         def _decorator(view):
@@ -562,7 +564,8 @@ class ViewsMixin(object):
             # pylint: disable=protected-access
             if not hasattr(view, "_supports"):
                 view._supports = set()
-            view._supports.add(functionality)
+            for functionality in functionalities:
+                view._supports.add(functionality)
             return view
         return _decorator
 
