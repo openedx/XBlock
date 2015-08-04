@@ -141,4 +141,5 @@ class FieldDataDeprecationWarning(DeprecationWarning):
     pass
 
 class SharedFieldAccessDeniedError(Exception):
+    """Raised by Queryable if the shared field denied the query request"""
     pass
