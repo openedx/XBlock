@@ -150,9 +150,24 @@ class UserScope(object):
 
 class SharedUserScope(object):
     """
-    Enumeration of shared scopes.
+    Enumeration of shared user scopes.
 
-    To be continued.
+    The user scope specifies how a shared field relates to users.  A
+    :class:`.BlockScope` and a :class:`.SharedUserScope` are combined to make a
+    :class:`.RemoteScope` for a field.
+
+    ME: Identifies data agnostic to the user of the :class:`.XBlock`.  The
+        data is related to no particular user.  All users see the same data.
+        For instance, the definition of a problem.
+
+    ALL: Identifies data particular to a single user of the :class:`.XBlock`.
+        For instance, a student's answer to a problem.
+
+    GRANTED: Identifies data aggregated while the block is used by many users.
+        The data is related to all the users.  For instance, a count of how
+        many students have answered a question, or a histogram of the answers
+        submitted by all students.
+
     """
     ME = Sentinel('SharedUserScope.ME')
     ALL = Sentinel('SharedUserScope.ALL')
@@ -690,10 +705,27 @@ class Field(Nameable):
     
     @classmethod
     def Query(cls, field_name):
+        """Summary
+        
+        Args:
+            field_name (TYPE): Description
+        
+        Returns:
+            TYPE: Description
+        """
         return Query(field_name)
 
     @classmethod
     def Shared(cls, field_name, bind_attr_name):
+        """Summary
+        
+        Args:
+            field_name (TYPE): Description
+            bind_attr_name (TYPE): Description
+        
+        Returns:
+            TYPE: Description
+        """
         return Shared(field_name, bind_attr_name)
 
 
