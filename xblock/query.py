@@ -14,17 +14,17 @@ class Query(object):
         field_name (str): the name of the shared field
     """
     def __init__(self, field_name):
-        self._queryable = Queryable(field_name=field_name, remote_scope=None)
+        self._queryable = Queryable(field_name=field_name)
 
     def __get__(self, xblock, xblock_class):
         if xblock is None:
             return self
-
+        # pylint: disable=protected-access
         self._queryable._attach_current_block(xblock)
         return self._queryable
 
     def __set__(self, xblock, val):
-        pass
+        raise AttributeError("can't set attribute")
 
 class Shared(object):
     """
@@ -45,11 +45,13 @@ class Shared(object):
             return self
 
         bind = getattr(xblock, self._bind_attr_name)
+        # pylint: disable=protected-access
         self._queryable._attach_current_block(xblock)
         return self._queryable.get(**bind)
 
     def __set__(self, xblock, value):
         bind = getattr(xblock, self._bind_attr_name)
+        # pylint: disable=protected-access
         self._queryable._attach_current_block(xblock)
         return self._queryable.set(value=value, **bind)
 
@@ -195,6 +197,7 @@ class Queryable(object):
         except SharedFieldAccessDeniedError:
             return None
 
+        # pylint: disable=protected-access
         field_data = target_block._field_data
 
         self._attach_queryable_to_field(target_block, field_name)
@@ -223,6 +226,7 @@ class Queryable(object):
         current_block = self.current_block
         target_block = self._get_target_block(current_block, user_id, usage_id)
 
+        # pylint: disable=protected-access
         field_data = target_block._field_data
 
         try:

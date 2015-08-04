@@ -169,7 +169,7 @@ class SharedUserScope(object):
         submitted by all students.
 
     """
-    ME = Sentinel('SharedUserScope.ME')
+    JUST_MYSELF = Sentinel('SharedUserScope.JUST_MYSELF')
     ALL = Sentinel('SharedUserScope.ALL')
     GRANTED = Sentinel('SharedUserScope.GRANTED')
 
@@ -178,7 +178,7 @@ class SharedUserScope(object):
         """
         Return a list of valid/understood class scopes.
         """
-        return [cls.ME, cls.ALL, cls.GRANTED]
+        return [cls.JUST_MYSELF, cls.ALL, cls.GRANTED]
 
 
 UNSET = Sentinel("fields.UNSET")
@@ -274,8 +274,8 @@ class RemoteScope(Scope):
     """
     course_users = ScopeBase(SharedUserScope.ALL, BlockScope.USAGE, u'course_users')
     edx_users = ScopeBase(SharedUserScope.ALL, BlockScope.ALL, u'edx_users')
-    my_block_type = ScopeBase(SharedUserScope.ME, BlockScope.TYPE, u'my_block_type')
-    my_course = ScopeBase(SharedUserScope.ME, BlockScope.DEFINITION, u'my_course')
+    my_block_type = ScopeBase(SharedUserScope.JUST_MYSELF, BlockScope.TYPE, u'my_block_type')
+    my_course = ScopeBase(SharedUserScope.JUST_MYSELF, BlockScope.DEFINITION, u'my_course')
 
     @classmethod
     def named_scopes(cls):

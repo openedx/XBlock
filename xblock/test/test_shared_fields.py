@@ -9,9 +9,10 @@ from xblock.test.tools import TestRuntime
 
 
 from xblock.core import XBlock
-from xblock.fields import RemoteScope, Field, ScopeIds, List
+from xblock.fields import RemoteScope, Field, ScopeIds, List, Scope
 from xblock.query import Query, Queryable
 from xblock.field_data import DictFieldData, SplitFieldData
+from xblock.runtime import MemoryIdManager
 
 
 class TestSharedFields(unittest.TestCase):
@@ -20,35 +21,49 @@ class TestSharedFields(unittest.TestCase):
 		self.help_message = 'This is a help message'
 
 		class TestBlock(XBlock):
-			test_field = List(help = self.help_message, default = [])
+			test_field = List(
+				scope=Scope.user_state, 
+				help=self.help_message, 
+				default=[],
+				RemoteScope=RemoteScope.my_course
+				)
 
-		self.runtime = TestRuntime(services={'field-data': SplitFieldData({})})
-		self.test_block = TestBlock(self.runtime, scope_ids=Mock(spec=ScopeIds))
+			test_query = List.Query('test_field')
+
+		field_data = DictFieldData({})
+		sids = ScopeIds(
+			user_id="bob",
+			block_type="bobs-type",
+	    	def_id="definition-id",
+	    	usage_id="usage-id"
+	    	)
+
+
+		self.runtime = TestRuntime(services={'field-data': field_data})
+		self.test_block = TestBlock(self.runtime, scope_ids=sids)
+
 		self.test_field = self.test_block.fields['test_field']
+		self.test_query = self.test_block.test_query
+
+		self.test_field_name = self.test_field.name
 
 	def test_named_scopes_len(self):
-	 	self.assertEqual(3, len(RemoteScope.named_scopes()))
+	 	self.assertEqual(4, len(RemoteScope.named_scopes()))
 
-	def test_access_field_attributes(self):
-		test_query = self.test_field.Query(self.test_block)
+	def test_access_query_field_attribute(self):
+		self.assertEqual(self.test_field_name, self.test_query.field_name)
 
-		self.assertEqual(self.help_message, test_query.field.help)
-		self.assertEqual(self.test_field.help, test_query.field.help)
+	def test_access_query_type(self):
+	 	self.assertTrue(isinstance(self.test_query, Queryable))
 
-	def test_access_queryable(self):
-	 	test_query = self.test_field.Query(self.test_block)
-	 	self.assertTrue(isinstance(test_query, Queryable))
-
-	def test_access_queryable_xblock(self):
-	 	test_query = self.test_field.Query(self.test_block)
-	 	test_xblock = test_query.xblock
+	def test_access_query_xblock(self):
+	 	test_xblock = self.test_query.current_block
 
 	 	self.assertTrue(isinstance(test_xblock, XBlock))
 
 	def test_access_query_name(self):
-		test_query = self.test_field.Query(self.test_block)
+		self.assertEqual(self.test_query.field_name, self.test_field.name)
 
-		self.assertEqual(test_query.name, self.test_field.name)
 
 
 
