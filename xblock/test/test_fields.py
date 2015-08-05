@@ -212,7 +212,14 @@ class StringTest(FieldTest):
         self.assertJSONOrSetEquals('', '')
 
     def test_none(self):
-        self.assertJSONOrSetEquals(None, None)
+        # test for NoneType for to_string and from_string methods
+        test_field = String(enforce_type=True)
+
+        result_to_string = test_field.to_string(None)
+        self.assertEquals(result_to_string, '')
+
+        result_from_string = test_field.from_string(None)
+        self.assertEquals(result_from_string, '')
 
     def test_error(self):
         self.assertJSONOrSetTypeError(['a'])
