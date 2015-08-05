@@ -524,10 +524,8 @@ class TestMixologist(object):
         assert_equals(4, len(post_mixed.__bases__))
 
 
-@XBlock.needs("i18n")
-@XBlock.wants("secret_service")
-@XBlock.needs("no_such_service")
-@XBlock.wants("another_not_service")
+@XBlock.needs("i18n", "no_such_service")
+@XBlock.wants("secret_service", "another_not_service")
 class XBlockWithServices(XBlock):
     """
     Test XBlock class with service declarations.
