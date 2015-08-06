@@ -138,8 +138,6 @@ class Queryable(object):
         else:
             target_block = current_block.runtime.get_remote_block(user_id, usage_id)
 
-        print target_block.scope_ids
-
         return target_block
 
     def _check_remote_scope_premission(self, field_name, current_block, target_block):
