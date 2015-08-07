@@ -211,5 +211,5 @@ __ https://groups.google.com/group/edx-code
 
 .. |build-status| image:: https://travis-ci.org/edx/XBlock.svg?branch=master
    :target: https://travis-ci.org/edx/XBlock
-.. |coverage-status| image:: https://coveralls.io/repos/edx/XBlock/badge.png
+.. |coverage-status| image:: https://coveralls.io/repos/edx/XBlock/badge.svg
    :target: https://coveralls.io/r/edx/XBlock
