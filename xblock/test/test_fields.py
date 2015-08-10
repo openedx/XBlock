@@ -37,9 +37,9 @@ class FieldTest(unittest.TestCase):
 
     FIELD_TO_TEST = Mock()
 
-    def set_and_get_field(self, arg, enforce_type):
+    def get_block(self, enforce_type):
         """
-        Set the field to arg in a Block, get it and return it
+        Create a block with a field 'field_x' that is of type FIELD_TO_TEST.
         """
         class TestBlock(XBlock):
             """
@@ -48,7 +48,13 @@ class FieldTest(unittest.TestCase):
             field_x = self.FIELD_TO_TEST(enforce_type=enforce_type)
 
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
-        block = TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+        return TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+
+    def set_and_get_field(self, arg, enforce_type):
+        """
+        Set the field to arg in a Block, get it and return the set value.
+        """
+        block = self.get_block(enforce_type)
         block.field_x = arg
         return block.field_x
 
@@ -223,6 +229,7 @@ class StringTest(FieldTest):
         self.assertJSONOrSetTypeError({})
 
 
+@ddt.ddt
 class DateTest(FieldTest):
     """
     Tests of the Date field.
@@ -257,6 +264,25 @@ class DateTest(FieldTest):
             '2014-04-01T02:03:04.000000',
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)
         )
+
+    @ddt.unpack
+    @ddt.data(
+        (
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
+            dt.datetime(2014, 4, 1, 2, 3, 5)
+        ),
+        (
+            dt.datetime(2014, 4, 1, 2, 3, 4),
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
+        )
+    )
+    def test_naive(self, original, replacement):
+        """
+        Make sure field comparison doesn't crash when comparing naive and non-naive datetimes.
+        """
+        block = self.get_block(True)
+        block.field_x = original
+        block.field_x = replacement
 
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)

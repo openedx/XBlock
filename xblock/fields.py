@@ -439,7 +439,11 @@ class Field(Nameable):
                 value, traceback.format_exc().splitlines()[-1])
             warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
         else:
-            if value != new_value:
+            try:
+                equal = value == new_value
+            except TypeError:
+                equal = False
+            if not equal:
                 message = u"The value {} would be enforced to {}".format(
                     value, new_value)
                 warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
