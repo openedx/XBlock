@@ -37,9 +37,9 @@ class FieldTest(unittest.TestCase):
 
     FIELD_TO_TEST = Mock()
 
-    def set_and_get_field(self, arg, enforce_type):
+    def get_block(self, enforce_type):
         """
-        Set the field to arg in a Block, get it and return it
+        Create a block with a field 'field_x' that is of type FIELD_TO_TEST.
         """
         class TestBlock(XBlock):
             """
@@ -48,7 +48,13 @@ class FieldTest(unittest.TestCase):
             field_x = self.FIELD_TO_TEST(enforce_type=enforce_type)
 
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
-        block = TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+        return TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+
+    def set_and_get_field(self, arg, enforce_type):
+        """
+        Set the field to arg in a Block, get it and return the set value.
+        """
+        block = self.get_block(enforce_type)
         block.field_x = arg
         return block.field_x
 
@@ -82,6 +88,13 @@ class FieldTest(unittest.TestCase):
         Assert that serialization of `arg` to JSON equals `expected`.
         """
         self.assertEqual(expected, self.FIELD_TO_TEST().to_json(arg))
+
+    def assertFromJSONOrLitEquals(self, expected, arg):
+        """
+        Assert that deserialization of `arg` from stringified JSON or
+        Python Literal equals `expected`.
+        """
+        self.assertEqual(expected, self.FIELD_TO_TEST().from_json(arg))
 
     def assertJSONOrSetValueError(self, arg):
         """
@@ -230,6 +243,7 @@ class StringTest(FieldTest):
         self.assertJSONOrSetTypeError({})
 
 
+@ddt.ddt
 class DateTest(FieldTest):
     """
     Tests of the Date field.
@@ -264,6 +278,25 @@ class DateTest(FieldTest):
             '2014-04-01T02:03:04.000000',
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)
         )
+
+    @ddt.unpack
+    @ddt.data(
+        (
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
+            dt.datetime(2014, 4, 1, 2, 3, 5)
+        ),
+        (
+            dt.datetime(2014, 4, 1, 2, 3, 4),
+            dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
+        )
+    )
+    def test_naive(self, original, replacement):
+        """
+        Make sure field comparison doesn't crash when comparing naive and non-naive datetimes.
+        """
+        block = self.get_block(True)
+        block.field_x = original
+        block.field_x = replacement
 
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)
@@ -312,6 +345,10 @@ class ListTest(FieldTest):
         self.assertJSONOrSetEquals([], [])
         self.assertJSONOrSetEquals(['foo', 'bar'], ['foo', 'bar'])
         self.assertJSONOrSetEquals([1, 3.4], [1, 3.4])
+
+    def test_json_lit_coersion(self):
+        self.assertFromJSONOrLitEquals([1, 2, None, "hello"], '[1, 2, null, "hello"]')
+        self.assertFromJSONOrLitEquals([None, 3, 4, True], "[None, 3, 4, True]")
 
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)
@@ -404,6 +441,10 @@ class DictTest(FieldTest):
     def test_json_equals(self):
         self.assertJSONOrSetEquals({}, {})
         self.assertJSONOrSetEquals({'a': 'b', 'c': 3}, {'a': 'b', 'c': 3})
+
+    def test_json_lit_coersion(self):
+        self.assertFromJSONOrLitEquals({'d': "e", "f": 4}, '{"d": "e", "f": 4}')
+        self.assertFromJSONOrLitEquals({'g': "h", "i": None}, "{'g': 'h', 'i': None}")
 
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)
@@ -659,14 +700,14 @@ class FieldSerializationTest(unittest.TestCase):
         """
         Helper method: checks if _type's to_string given instance of _type returns expected string
         """
-        result = _type(enforce_type=True).to_string(value)
+        result = _type().to_string(value)
         self.assertEquals(result, string)
 
     def assert_from_string(self, _type, string, value):
         """
         Helper method: checks if _type's from_string given string representation of type returns expected value
         """
-        result = _type(enforce_type=True).from_string(string)
+        result = _type().from_string(string)
         self.assertEquals(result, value)
 
     @ddt.unpack
@@ -707,7 +748,10 @@ class FieldSerializationTest(unittest.TestCase):
                 2,
                 3
               ]
-            }""")))
+            }""")),
+        (DateTime, dt.datetime(2014, 4, 1, 2, 3, 4, 567890).replace(tzinfo=pytz.utc), '2014-04-01T02:03:04.567890'),
+        (DateTime, dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc), '2014-04-01T02:03:04.000000'),
+    )
     def test_both_directions(self, _type, value, string):
         """Easy cases that work in both directions."""
         self.assert_to_string(_type, value, string)
@@ -719,7 +763,7 @@ class FieldSerializationTest(unittest.TestCase):
         (Float, 1.0, r"1|1\.0*"),
         (Float, -10.0, r"-10|-10\.0*"))
     def test_to_string_regexp_matches(self, _type, value, regexp):
-        result = _type(enforce_type=True).to_string(value)
+        result = _type().to_string(value)
         self.assertRegexpMatches(result, regexp)
 
     @ddt.unpack
@@ -787,7 +831,11 @@ class FieldSerializationTest(unittest.TestCase):
                   kaw: null
             """),
             [1, 2.345, {"foo": True, "bar": [1, 2, 3]}, {"meow": False, "woof": True, "kaw": None}]
-        )
+        ),
+        # Test that legacy DateTime format including double quotes can still be imported for compatibility with
+        # old data export tar balls.
+        (DateTime, '"2014-04-01T02:03:04.567890"', dt.datetime(2014, 4, 1, 2, 3, 4, 567890).replace(tzinfo=pytz.utc)),
+        (DateTime, '"2014-04-01T02:03:04.000000"', dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)),
     )
     def test_from_string(self, _type, string, value):
         self.assert_from_string(_type, string, value)
@@ -798,7 +846,7 @@ class FieldSerializationTest(unittest.TestCase):
         This special test case is necessary since
         float('nan') compares inequal to everything.
         """
-        result = Float(enforce_type=True).from_string('NaN')
+        result = Float().from_string('NaN')
         self.assertTrue(math.isnan(result))
 
     @ddt.unpack
@@ -808,4 +856,4 @@ class FieldSerializationTest(unittest.TestCase):
     def test_from_string_errors(self, _type, string):
         """ Cases that raises various exceptions."""
         with self.assertRaises(StandardError):
-            _type(enforce_type=True).from_string(string)
+            _type().from_string(string)

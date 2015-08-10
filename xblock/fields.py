@@ -5,6 +5,7 @@ The hosting runtime application decides what actual storage mechanism to use
 for each scope.
 
 """
+import ast
 
 from collections import namedtuple
 import copy
@@ -439,7 +440,11 @@ class Field(Nameable):
                 value, traceback.format_exc().splitlines()[-1])
             warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
         else:
-            if value != new_value:
+            try:
+                equal = value == new_value
+            except TypeError:
+                equal = False
+            if not equal:
                 message = u"The value {} would be enforced to {}".format(
                     value, new_value)
                 warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
@@ -598,7 +603,7 @@ class Field(Nameable):
         """
         self._warn_deprecated_outside_JSONField()
         value = yaml.safe_load(serialized)
-        return self._check_or_enforce_type(value)
+        return self.enforce_type(value)
 
     def enforce_type(self, value):
         """
@@ -610,7 +615,7 @@ class Field(Nameable):
         This must not have side effects, since it will be executed to trigger
         a DeprecationWarning even if enforce_type is disabled
         """
-        return value
+        return self.from_json(value)
 
     def read_from(self, xblock):
         """
@@ -652,7 +657,27 @@ class JSONField(Field):
     """
     Field type which has a convenient JSON representation.
     """
-    pass  # for now; we'll bubble functions down when we finish deprecation in Field
+    @classmethod
+    def coerce_value(cls, value, goal_types):
+        """
+        When loading from XML, a more complex data structure may be serialized
+        into a string. Attempt to load the value both from a JSON parser and
+        from an AST literal, since some export functions just run str() on the
+        values.
+
+        If the result is not the right type, throw an error.
+        """
+        try:
+            value = json.loads(value)
+        except ValueError:
+            try:
+                value = ast.literal_eval(value)
+            except (SyntaxError, ValueError):
+                raise TypeError("Could not deserialize string {0}. Please ensure it is valid JSON.".format(repr(value)))
+        if not isinstance(value, goal_types):
+            raise TypeError("Value stored on {0} must be of types: {1}. Found {2}.".format(
+                cls.__name__, repr(goal_types), type(value)))
+        return value
 
 
 class Integer(JSONField):
@@ -674,8 +699,6 @@ class Integer(JSONField):
             return None
         return int(value)
 
-    enforce_type = from_json
-
 
 class Float(JSONField):
     """
@@ -692,8 +715,6 @@ class Float(JSONField):
         if value is None or value == '':
             return None
         return float(value)
-
-    enforce_type = from_json
 
 
 class Boolean(JSONField):
@@ -731,8 +752,6 @@ class Boolean(JSONField):
         else:
             return bool(value)
 
-    enforce_type = from_json
-
 
 class Dict(JSONField):
     """
@@ -746,10 +765,11 @@ class Dict(JSONField):
     def from_json(self, value):
         if value is None or isinstance(value, dict):
             return value
+        elif isinstance(value, basestring):
+            value = self.coerce_value(value, (dict, type(None)))
         else:
             raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
-
-    enforce_type = from_json
+        return value
 
 
 class List(JSONField):
@@ -764,10 +784,11 @@ class List(JSONField):
     def from_json(self, value):
         if value is None or isinstance(value, list):
             return value
+        elif isinstance(value, basestring):
+            value = self.coerce_value(value, (list, type(None)))
         else:
             raise TypeError('Value stored in a List must be None or a list, found %s' % type(value))
-
-    enforce_type = from_json
+        return value
 
 
 class Set(JSONField):
@@ -829,8 +850,6 @@ class String(JSONField):
         """String gets serialized and deserialized without quote marks."""
         return self.to_json(value)
 
-    enforce_type = from_json
-
 
 class DateTime(JSONField):
     """
@@ -846,31 +865,27 @@ class DateTime(JSONField):
         """
         Parse the date from an ISO-formatted date string, or None.
         """
-        if isinstance(value, basestring):
-
-            # Parser interprets empty string as now by default
-            if value == "":
-                return None
-
-            try:
-                parsed_date = dateutil.parser.parse(value)
-            except (TypeError, ValueError):
-                raise ValueError("Could not parse {} as a date".format(value))
-
-            if parsed_date.tzinfo is not None:  # pylint: disable=maybe-no-member
-                parsed_date.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
-            else:
-                parsed_date = parsed_date.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
-
-            return parsed_date
-
         if value is None:
             return None
 
-        if isinstance(value, datetime.datetime):
-            return value
+        if isinstance(value, basestring):
+            # Parser interprets empty string as now by default
+            if value == "":
+                return None
+            try:
+                value = dateutil.parser.parse(value)
+            except (TypeError, ValueError):
+                raise ValueError("Could not parse {} as a date".format(value))
 
-        raise TypeError("Value should be loaded from a string, not {}".format(type(value)))
+        if not isinstance(value, datetime.datetime):
+            raise TypeError(
+                "Value should be loaded from a string, a datetime object or None, not {}".format(type(value))
+            )
+
+        if value.tzinfo is not None:  # pylint: disable=maybe-no-member
+            return value.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
+        else:
+            return value.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
 
     def to_json(self, value):
         """
@@ -882,11 +897,9 @@ class DateTime(JSONField):
             return None
         raise TypeError("Value stored must be a datetime object, not {}".format(type(value)))
 
-    def enforce_type(self, value):
-        if isinstance(value, datetime.datetime) or value is None:
-            return value
-
-        return self.from_json(value)
+    def to_string(self, value):
+        """DateTime fields get serialized without quote marks."""
+        return self.to_json(value)
 
 
 class Any(JSONField):
