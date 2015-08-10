@@ -275,7 +275,7 @@ class RemoteScope(Scope):
     course_users = ScopeBase(SharedUserScope.ALL, BlockScope.USAGE, u'course_users')
     edx_users = ScopeBase(SharedUserScope.ALL, BlockScope.ALL, u'edx_users')
     my_block_type = ScopeBase(SharedUserScope.JUST_MYSELF, BlockScope.TYPE, u'my_block_type')
-    my_course = ScopeBase(SharedUserScope.JUST_MYSELF, BlockScope.DEFINITION, u'my_course')
+    my_course = ScopeBase(SharedUserScope.JUST_MYSELF, BlockScope.USAGE, u'my_course')
 
     @classmethod
     def named_scopes(cls):

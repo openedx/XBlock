@@ -117,7 +117,6 @@ class Queryable(object):
         Returns:
             None
         """
-        #
         xblock.fields[field_name].queryable = None
 
     def _get_target_block(self, current_block, user_id, usage_id):
@@ -134,11 +133,9 @@ class Queryable(object):
             XBlock: the target XBlock that is being queried
         """
         if usage_id is None:
-            target_block = current_block.runtime.get_remote_block(user_id, current_block.scope_ids.usage_id)
-        else:
-            target_block = current_block.runtime.get_remote_block(user_id, usage_id)
+            usage_id = current_block.scope_ids.usage_id
 
-        return target_block
+        return current_block.runtime.get_remote_block(user_id, usage_id)
 
     def _check_remote_scope_premission(self, field_name, current_block, target_block):
         """
@@ -156,26 +153,31 @@ class Queryable(object):
         Returns:
             None
         """
-        from xblock.fields import RemoteScope
+        from xblock.fields import BlockScope, SharedUserScope
 
         try:
             target_remote_scope = target_block.fields[field_name].remote_scope
         except KeyError:
             raise SharedFieldAccessDeniedError
-        current_scope_ids = current_block.scope_ids
-        target_scope_ids = target_block.scope_ids
 
         if target_remote_scope is None:
             raise SharedFieldAccessDeniedError
-        
-        if target_remote_scope == RemoteScope.course_users:
+
+        current_scope_ids = current_block.scope_ids
+        target_scope_ids = target_block.scope_ids
+
+        if target_remote_scope.user == SharedUserScope.JUST_MYSELF:
+            if current_scope_ids.user_id != target_scope_ids.user_id:
+                raise SharedFieldAccessDeniedError
+
+        if target_remote_scope.block == BlockScope.USAGE:
+            if current_scope_ids.usage_id != target_scope_ids.usage_id:
+                raise SharedFieldAccessDeniedError
+        elif target_remote_scope.block == BlockScope.DEFINITION:
             if current_scope_ids.def_id != target_scope_ids.def_id:
                 raise SharedFieldAccessDeniedError
-        
-        elif target_remote_scope == RemoteScope.my_block_type:
-            if current_scope_ids.user_id != target_remote_scope.user_id:
-                raise SharedFieldAccessDeniedError
-            if current_scope_ids.block_type != target_remote_scope.block_type:
+        elif target_remote_scope.block == BlockScope.TYPE:
+            if current_scope_ids.block_type != target_scope_ids.block_type:
                 raise SharedFieldAccessDeniedError
 
     def get(self, user_id=None, usage_id=None):

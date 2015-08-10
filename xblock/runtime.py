@@ -39,7 +39,7 @@ class KeyValueStore(object):
 
     __metaclass__ = ABCMeta
 
-    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family queryable")):
+    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family, queryable")):
         """
         Keys are structured to retain information about the scope of the data.
         Stores can use this information however they like to store and retrieve
