@@ -808,18 +808,10 @@ class String(JSONField):
     MUTABLE = False
 
     def from_json(self, value):
-        if value is None:
-            return ''
-        elif isinstance(value, basestring):
+        if value is None or isinstance(value, basestring):
             return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
-
-    def to_json(self, value):
-        if value is None:
-            return ''
-        self._warn_deprecated_outside_JSONField()
-        return value
 
     def from_string(self, value):
         """String gets serialized and deserialized without quote marks."""
