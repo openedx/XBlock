@@ -280,9 +280,10 @@ class DateTest(FieldTest):
         """
         Make sure field comparison doesn't crash when comparing naive and non-naive datetimes.
         """
-        block = self.get_block(True)
-        block.field_x = original
-        block.field_x = replacement
+        for enforce_type in (False, True):
+            block = self.get_block(enforce_type)
+            block.field_x = original
+            block.field_x = replacement
 
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)
