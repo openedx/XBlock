@@ -14,11 +14,13 @@ class Query(object):
         field_name (str): the name of the shared field
     """
     def __init__(self, field_name):
-        self._queryable = Queryable(field_name=field_name)
+        self._file_name = field_name
 
     def __get__(self, xblock, xblock_class):
         if xblock is None:
             return self
+
+        self._queryable = Queryable(field_name=self._file_name)
         # pylint: disable=protected-access
         self._queryable._attach_current_block(xblock)
         return self._queryable
@@ -37,19 +39,21 @@ class Shared(object):
             This property is used to get query information.  
     """
     def __init__(self, field_name, bind_attr_name):
+        self._file_name = field_name
         self._bind_attr_name = bind_attr_name
-        self._queryable = Queryable(field_name=field_name)
     
     def __get__(self, xblock, xblock_class):
         if xblock is None:
             return self
-
+        
+        self._queryable = Queryable(field_name=self._file_name)
         bind = getattr(xblock, self._bind_attr_name)
         # pylint: disable=protected-access
         self._queryable._attach_current_block(xblock)
         return self._queryable.get(**bind)
 
     def __set__(self, xblock, value):
+        self._queryable = Queryable(field_name=self._file_name)
         bind = getattr(xblock, self._bind_attr_name)
         # pylint: disable=protected-access
         self._queryable._attach_current_block(xblock)
