@@ -650,11 +650,11 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
-    
+
     @classmethod
     def Query(cls, field_name):
         """
-        Return a instance of Query which allow ad-hoc queries to access shared fields. 
+        Return a instance of Query which allow ad-hoc queries to access shared fields.
         """
         return Query(field_name)
 
@@ -662,7 +662,7 @@ class Field(Nameable):
     def Shared(cls, field_name, bind_attr_name):
         """
         Return a instance of Shared which uses a bined function to access shared fields.
-        
+
         Args:
             field_name (str): The name of shared field
             bind_attr_name (str): The name of binding property function in this XBlock

@@ -140,6 +140,7 @@ class FieldDataDeprecationWarning(DeprecationWarning):
     """Warning for use of deprecated _field_data accessor"""
     pass
 
+
 class SharedFieldAccessDeniedError(Exception):
     """Raised by Queryable if the shared field denied the query request"""
     pass
