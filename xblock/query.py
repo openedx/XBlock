@@ -141,7 +141,7 @@ class Queryable(object):
         """
         This method checks the defined remote scope in shared field
         with current xblock to determine if current xblock has the 
-        permission to access the shared field  in target xblock.
+        permission to access the shared field in target xblock.
 
         Rise SharedFieldAccessDeniedError if permission denied. 
         

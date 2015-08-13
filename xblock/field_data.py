@@ -12,6 +12,7 @@ from collections import defaultdict
 
 from xblock.exceptions import InvalidScopeError
 
+
 class FieldData(object):
     """
     An interface allowing access to an XBlock's field values indexed by field names.
