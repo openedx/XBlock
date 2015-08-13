@@ -653,26 +653,19 @@ class Field(Nameable):
     
     @classmethod
     def Query(cls, field_name):
-        """Summary
-        
-        Args:
-            field_name (TYPE): Description
-        
-        Returns:
-            TYPE: Description
+        """
+        Return a instance of Query which allow ad-hoc queries to access shared fields. 
         """
         return Query(field_name)
 
     @classmethod
     def Shared(cls, field_name, bind_attr_name):
-        """Summary
+        """
+        Return a instance of Shared which uses a bined function to access shared fields.
         
         Args:
-            field_name (TYPE): Description
-            bind_attr_name (TYPE): Description
-        
-        Returns:
-            TYPE: Description
+            field_name (str): The name of shared field
+            bind_attr_name (str): The name of binding property function in this XBlock
         """
         return Shared(field_name, bind_attr_name)
 
