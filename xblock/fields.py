@@ -147,40 +147,6 @@ class UserScope(object):
         """
         return [cls.NONE, cls.ONE, cls.ALL]
 
-
-class SharedUserScope(object):
-    """
-    Enumeration of shared user scopes.
-
-    The user scope specifies how a shared field relates to users.  A
-    :class:`.BlockScope` and a :class:`.SharedUserScope` are combined to make a
-    :class:`.RemoteScope` for a field.
-
-    ME: Identifies data agnostic to the user of the :class:`.XBlock`.  The
-        data is related to no particular user.  All users see the same data.
-        For instance, the definition of a problem.
-
-    ALL: Identifies data particular to a single user of the :class:`.XBlock`.
-        For instance, a student's answer to a problem.
-
-    GRANTED: Identifies data aggregated while the block is used by many users.
-        The data is related to all the users.  For instance, a count of how
-        many students have answered a question, or a histogram of the answers
-        submitted by all students.
-
-    """
-    JUST_MYSELF = Sentinel('SharedUserScope.JUST_MYSELF')
-    ALL = Sentinel('SharedUserScope.ALL')
-    GRANTED = Sentinel('SharedUserScope.GRANTED')
-
-    @classmethod
-    def scopes(cls):
-        """
-        Return a list of valid/understood class scopes.
-        """
-        return [cls.JUST_MYSELF, cls.ALL, cls.GRANTED]
-
-
 UNSET = Sentinel("fields.UNSET")
 
 
@@ -267,26 +233,6 @@ class Scope(ScopeBase):
     def __eq__(self, other):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
-
-class RemoteScope(Scope):
-    """
-    Defines types of remote scopes to be used.
-    """
-    course_users = ScopeBase(SharedUserScope.ALL, BlockScope.USAGE, u'course_users')
-    edx_users = ScopeBase(SharedUserScope.ALL, BlockScope.ALL, u'edx_users')
-    my_block_type = ScopeBase(SharedUserScope.JUST_MYSELF, BlockScope.TYPE, u'my_block_type')
-    my_course = ScopeBase(SharedUserScope.JUST_MYSELF, BlockScope.USAGE, u'my_course')
-
-    @classmethod
-    def named_scopes(cls):
-        """Return all named Scopes."""
-        return [
-            cls.course_users,
-            cls.edx_users,
-            cls.my_block_type,
-            cls.my_course
-            ]
-
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     """
     A simple wrapper to collect all of the ids needed to correctly identify an XBlock
@@ -362,7 +308,7 @@ class Field(Nameable):
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
-                 xml_node=False, remote_scope=None, **kwargs):
+                 xml_node=False, shared=False, **kwargs):
         self.warned = False
         self.help = help
         self._enable_enforce_type = enforce_type
@@ -377,7 +323,7 @@ class Field(Nameable):
         self.runtime_options = kwargs
         self.xml_node = xml_node
         self.queryable = None
-        self.remote_scope = remote_scope
+        self.shared = shared
 
     @property
     def default(self):

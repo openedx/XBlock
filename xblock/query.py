@@ -153,32 +153,16 @@ class Queryable(object):
         Returns:
             None
         """
-        from xblock.fields import BlockScope, SharedUserScope
-
-        try:
-            target_remote_scope = target_block.fields[field_name].remote_scope
-        except KeyError:
-            raise SharedFieldAccessDeniedError
-
-        if target_remote_scope is None:
-            raise SharedFieldAccessDeniedError
+        shared = target_block.fields[field_name].shared
 
         current_scope_ids = current_block.scope_ids
         target_scope_ids = target_block.scope_ids
 
-        if target_remote_scope.user == SharedUserScope.JUST_MYSELF:
-            if current_scope_ids.user_id != target_scope_ids.user_id:
+        if shared:
+            if current_scope_ids.def_id.course_key != target_scope_ids.def_id.course_key:
                 raise SharedFieldAccessDeniedError
-
-        if target_remote_scope.block == BlockScope.USAGE:
-            if current_scope_ids.usage_id != target_scope_ids.usage_id:
-                raise SharedFieldAccessDeniedError
-        elif target_remote_scope.block == BlockScope.DEFINITION:
-            if current_scope_ids.def_id != target_scope_ids.def_id:
-                raise SharedFieldAccessDeniedError
-        elif target_remote_scope.block == BlockScope.TYPE:
-            if current_scope_ids.block_type != target_scope_ids.block_type:
-                raise SharedFieldAccessDeniedError
+        else:
+            raise SharedFieldAccessDeniedError
 
     def get(self, user_id=None, usage_id=None):
         """
