@@ -159,6 +159,9 @@ class Queryable(object):
         target_scope_ids = target_block.scope_ids
 
         if shared:
+        # We are not allowing cross-course sharing due to:
+        # 1) Security concerns
+        # 2) Demonstrates fine-grained access control
             if current_scope_ids.def_id.course_key != target_scope_ids.def_id.course_key:
                 raise SharedFieldAccessDeniedError
         else:
