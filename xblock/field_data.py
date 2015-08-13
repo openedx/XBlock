@@ -10,7 +10,7 @@ import copy
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-from xblock.exceptions import InvalidScopeError, NoSuchServiceError
+from xblock.exceptions import InvalidScopeError
 
 class FieldData(object):
     """
