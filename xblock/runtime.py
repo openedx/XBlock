@@ -658,7 +658,7 @@ class Runtime(object):
 
         The `usage_id` and `user_id` is used to find the XBlock class and data.
         """
-        ## TODO: this is a copy of of get_block, should we modularize some code to avoid duplicated code? 
+        ## Basically, this is a copy of of get_block, should we modularize some code to avoid duplicated code? 
         def_id = self.id_reader.get_definition_id(usage_id)
         try:
             block_type = self.id_reader.get_block_type(def_id)
