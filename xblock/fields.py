@@ -652,6 +652,7 @@ class Field(Nameable):
         return hash(self.name)
 
     @classmethod
+    # pylint: disable=invalid-name
     def Query(cls, field_name):
         """
         Return a instance of Query which allow ad-hoc queries to access shared fields.
@@ -659,6 +660,7 @@ class Field(Nameable):
         return Query(field_name)
 
     @classmethod
+    # pylint: disable=invalid-name
     def Shared(cls, field_name, bind_attr_name):
         """
         Return a instance of Shared which uses a bined function to access shared fields.

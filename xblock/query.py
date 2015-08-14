@@ -16,6 +16,7 @@ class Query(object):
     """
     def __init__(self, field_name):
         self._file_name = field_name
+        self._queryable = None
 
     def __get__(self, xblock, xblock_class):
         if xblock is None:
@@ -43,6 +44,7 @@ class Shared(object):
     def __init__(self, field_name, bind_attr_name):
         self._file_name = field_name
         self._bind_attr_name = bind_attr_name
+        self._queryable = None
 
     def __get__(self, xblock, xblock_class):
         if xblock is None:
