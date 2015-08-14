@@ -46,7 +46,15 @@ class KeyValueStore(object):
         data.
         """
         def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1', queryable=None):
-            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family, queryable)
+            return super(KeyValueStore.Key, cls).__new__(
+                cls, 
+                scope, 
+                user_id, 
+                block_scope_id, 
+                field_name, 
+                block_family, 
+                queryable
+            )
 
     @abstractmethod
     def get(self, key):
