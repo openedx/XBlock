@@ -20,6 +20,16 @@ class UserService(Service):
         """
         raise NotImplementedError()
 
+    def get_all_users(self, **kwargs):
+        """
+        This is default, example implementation.  Anything real needs to override
+
+        This is expected to return a list instance of XBlockUser instances.
+
+        **kwargs is intended to be used for filtering options, such as by course.
+        """
+        raise NotImplementedError()
+
 
 class XBlockUser(object):
     """
