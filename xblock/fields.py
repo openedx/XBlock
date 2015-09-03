@@ -20,6 +20,8 @@ import yaml
 
 from xblock.internal import Nameable
 
+from xblock.query import Query, Shared
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -308,7 +310,7 @@ class Field(Nameable):
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
-                 xml_node=False, **kwargs):
+                 xml_node=False, shared=False, **kwargs):
         self.warned = False
         self.help = help
         self._enable_enforce_type = enforce_type
@@ -322,6 +324,8 @@ class Field(Nameable):
         self._values = values
         self.runtime_options = kwargs
         self.xml_node = xml_node
+        self.queryable = None
+        self.shared = shared
 
     @property
     def default(self):
@@ -650,6 +654,26 @@ class Field(Nameable):
 
     def __hash__(self):
         return hash(self.name)
+
+    @classmethod
+    # pylint: disable=invalid-name
+    def Query(cls, field_name):
+        """
+        Return a instance of Query which allow ad-hoc queries to access shared fields.
+        """
+        return Query(field_name)
+
+    @classmethod
+    # pylint: disable=invalid-name
+    def Shared(cls, field_name, bind_attr_name):
+        """
+        Return a instance of Shared which uses a bined function to access shared fields.
+
+        Args:
+            field_name (str): The name of shared field
+            bind_attr_name (str): The name of binding property function in this XBlock
+        """
+        return Shared(field_name, bind_attr_name)
 
 
 class JSONField(Field):

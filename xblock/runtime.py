@@ -39,14 +39,22 @@ class KeyValueStore(object):
 
     __metaclass__ = ABCMeta
 
-    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
+    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family, queryable")):
         """
         Keys are structured to retain information about the scope of the data.
         Stores can use this information however they like to store and retrieve
         data.
         """
-        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1'):
-            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family)
+        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1', queryable=None):
+            return super(KeyValueStore.Key, cls).__new__(
+                cls,
+                scope,
+                user_id,
+                block_scope_id,
+                field_name,
+                block_family,
+                queryable
+            )
 
     @abstractmethod
     def get(self, key):
@@ -156,6 +164,7 @@ class KvsFieldData(FieldData):
             block_scope_id=block_id,
             field_name=name,
             block_family=block.entry_point,
+            queryable=field.queryable
         )
         """
         field = self._getfield(block, name)
@@ -185,6 +194,7 @@ class KvsFieldData(FieldData):
             block_scope_id=block_id,
             field_name=name,
             block_family=block.entry_point,
+            queryable=field.queryable
         )
         return key
 
@@ -648,6 +658,23 @@ class Runtime(object):
             raise NoSuchUsage(repr(usage_id))
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
         block = self.construct_xblock(block_type, keys, for_parent=for_parent)
+        return block
+
+    def get_remote_block(self, user_id, usage_id):
+        """
+        Create an remote XBlock instance in this runtime.
+
+        The `usage_id` and `user_id` is used to find the XBlock class and data.
+        """
+        # Basically, this is a copy of of get_block
+        # should we modularize some code to avoid duplicated code?
+        def_id = self.id_reader.get_definition_id(usage_id)
+        try:
+            block_type = self.id_reader.get_block_type(def_id)
+        except NoSuchDefinition:
+            raise NoSuchUsage(repr(usage_id))
+        keys = ScopeIds(user_id, block_type, def_id, usage_id)
+        block = self.construct_xblock(block_type, keys)
         return block
 
     def get_aside(self, aside_usage_id):
