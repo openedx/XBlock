@@ -439,7 +439,11 @@ class Field(Nameable):
                 value, traceback.format_exc().splitlines()[-1])
             warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
         else:
-            if value != new_value:
+            try:
+                equal = value == new_value
+            except TypeError:
+                equal = False
+            if not equal:
                 message = u"The value {} would be enforced to {}".format(
                     value, new_value)
                 warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
@@ -598,7 +602,7 @@ class Field(Nameable):
         """
         self._warn_deprecated_outside_JSONField()
         value = yaml.safe_load(serialized)
-        return self._check_or_enforce_type(value)
+        return self.enforce_type(value)
 
     def enforce_type(self, value):
         """
@@ -838,31 +842,27 @@ class DateTime(JSONField):
         """
         Parse the date from an ISO-formatted date string, or None.
         """
-        if isinstance(value, basestring):
-
-            # Parser interprets empty string as now by default
-            if value == "":
-                return None
-
-            try:
-                parsed_date = dateutil.parser.parse(value)
-            except (TypeError, ValueError):
-                raise ValueError("Could not parse {} as a date".format(value))
-
-            if parsed_date.tzinfo is not None:  # pylint: disable=maybe-no-member
-                parsed_date.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
-            else:
-                parsed_date = parsed_date.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
-
-            return parsed_date
-
         if value is None:
             return None
 
-        if isinstance(value, datetime.datetime):
-            return value
+        if isinstance(value, basestring):
+            # Parser interprets empty string as now by default
+            if value == "":
+                return None
+            try:
+                value = dateutil.parser.parse(value)
+            except (TypeError, ValueError):
+                raise ValueError("Could not parse {} as a date".format(value))
 
-        raise TypeError("Value should be loaded from a string, not {}".format(type(value)))
+        if not isinstance(value, datetime.datetime):
+            raise TypeError(
+                "Value should be loaded from a string, a datetime object or None, not {}".format(type(value))
+            )
+
+        if value.tzinfo is not None:  # pylint: disable=maybe-no-member
+            return value.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
+        else:
+            return value.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
 
     def to_json(self, value):
         """
@@ -874,11 +874,11 @@ class DateTime(JSONField):
             return None
         raise TypeError("Value stored must be a datetime object, not {}".format(type(value)))
 
-    def enforce_type(self, value):
-        if isinstance(value, datetime.datetime) or value is None:
-            return value
+    def to_string(self, value):
+        """DateTime fields get serialized without quote marks."""
+        return self.to_json(value)
 
-        return self.from_json(value)
+    enforce_type = from_json
 
 
 class Any(JSONField):
