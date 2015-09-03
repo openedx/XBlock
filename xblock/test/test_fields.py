@@ -689,6 +689,8 @@ class FieldSerializationTest(unittest.TestCase):
         result = _type().from_string(string)
         self.assertEquals(result, value)
 
+    # Serialisation test data that is tested both ways, i.e. whether serialisation of the value
+    # yields the string and deserialisation of the string yields the value.
     @ddt.unpack
     @ddt.data(
         (Integer, 0, '0'),
@@ -745,6 +747,10 @@ class FieldSerializationTest(unittest.TestCase):
         result = _type().to_string(value)
         self.assertRegexpMatches(result, regexp)
 
+    # Test data for non-canonical serialisations of values that we should be able to correctly
+    # deserialise.  These values are not serialised to the representation given here for various
+    # reasons; some of them are non-standard number representations, others are YAML data that
+    # isn't valid JSON, yet others use non-standard capitalisation.
     @ddt.unpack
     @ddt.data(
         (Integer, "0xff", 0xff),
