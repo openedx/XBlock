@@ -1,3 +1,5 @@
+.. _Exceptions API:
+
 ##############
 Exceptions API
 ##############

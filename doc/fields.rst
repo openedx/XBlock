@@ -1,3 +1,5 @@
+.. _Fields API:
+
 ###########
 Fields API
 ###########
