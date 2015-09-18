@@ -1,3 +1,5 @@
+.. _XBlock API:
+
 ###########
 XBlock API
 ###########

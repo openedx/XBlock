@@ -1,3 +1,5 @@
+.. _Fragment API:
+
 ############
 Fragment API
 ############

@@ -1,3 +1,5 @@
+.. _Runtime API:
+
 ###########
 Runtime API
 ###########
