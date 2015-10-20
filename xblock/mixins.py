@@ -272,7 +272,8 @@ class ScopedStorageMixin(RuntimeServicesMixin):
                 fields.remove(field)
                 # if the field was dirty, delete from dirty fields
                 self._reset_dirty_field(field)
-            raise XBlockSaveError(saved_fields, fields)
+            msg = 'Error saving fields {}'.format(save_error.saved_field_names)
+            raise XBlockSaveError(saved_fields, fields, msg)
 
         # Remove all dirty fields, since the save was successful
         for field in fields:
