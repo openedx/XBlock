@@ -21,7 +21,7 @@ class XBlockSaveError(Exception):
     """
     Raised to indicate an error in saving an XBlock
     """
-    def __init__(self, saved_fields, dirty_fields):
+    def __init__(self, saved_fields, dirty_fields, message=None):
         """
         Create a new XBlockSaveError
 
@@ -30,7 +30,7 @@ class XBlockSaveError(Exception):
         `dirty_fields` - a set of fields that were left dirty after the save
         """
         # Exception is an old-style class, so can't use super
-        Exception.__init__(self)
+        Exception.__init__(self, message)
 
         self.saved_fields = saved_fields
         self.dirty_fields = dirty_fields
