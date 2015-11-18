@@ -1,11 +1,15 @@
 """
 Tests of the XBlock-family functionality mixins
 """
-
+from lxml import etree
+import mock
 from unittest import TestCase
 
-from xblock.fields import List, Scope, Integer
+from xblock.core import XBlock
+from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID
+from xblock.field_data import DictFieldData
 from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin, ViewsMixin
+from xblock.runtime import Runtime
 
 
 class AttrAssertionMixin(TestCase):
@@ -209,3 +213,70 @@ class TestViewsMixin(TestCase):
                 test_xblock.has_support(getattr(test_xblock, view_name, None), functionality),
                 expected_result
             )
+
+
+class TestXmlSerializationMixin(TestCase):
+    """ Tests for XmlSerialization Mixin """
+
+    etree_node_tag = 'test_xblock'
+
+    class TestXBlock(XBlock):
+        """ XBlock for XML export test """
+        field = String()
+        simple_default = String(default="default")
+        simple_default_with_force_export = String(default="default", force_export=True)
+        unique_id_default = String(default=UNIQUE_ID)
+        unique_id_default_with_force_export = String(default=UNIQUE_ID, force_export=True)
+
+    def _make_block(self):
+        """ Creates a test block """
+        runtime_mock = mock.Mock(spec=Runtime)
+        scope_ids = ScopeIds("user_id", self.etree_node_tag, "def_id",  "usage_id")
+        return self.TestXBlock(runtime_mock, field_data=DictFieldData({}), scope_ids=scope_ids)
+
+    def _assert_node_attributes(self, node, attributes):
+        node_attributes = node.keys()
+        node_attributes.remove('xblock-family')
+
+        self.assertEqual(node.get('xblock-family'), self.TestXBlock.entry_point)
+
+        self.assertEqual(set(node_attributes), set(attributes.keys()))
+
+        for key, value in attributes.iteritems():
+            if value != UNIQUE_ID:
+                self.assertEqual(node.get(key), value)
+            else:
+                self.assertIsNotNone(node.get(key))
+
+    def test_add_xml_to_node(self):
+        block = self._make_block()
+        node = etree.Element(self.etree_node_tag)
+
+        # precondition check
+        for field_name in block.fields.keys():
+            self.assertFalse(block.fields[field_name].is_set_on(block))
+
+        block.add_xml_to_node(node)
+
+        self._assert_node_attributes(
+            node, {'simple_default_with_force_export': 'default', 'unique_id_default_with_force_export': UNIQUE_ID}
+        )
+
+        block.field = 'Value1'
+        block.simple_default = 'Value2'
+        block.simple_default_with_force_export = 'Value3'
+        block.unique_id_default = 'Value4'
+        block.unique_id_default_with_force_export = 'Value5'
+
+        block.add_xml_to_node(node)
+
+        self._assert_node_attributes(
+            node,
+            {
+                'field': 'Value1',
+                'simple_default': 'Value2',
+                'simple_default_with_force_export': 'Value3',
+                'unique_id_default': 'Value4',
+                'unique_id_default_with_force_export': 'Value5',
+            }
+        )
