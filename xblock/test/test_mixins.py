@@ -220,6 +220,7 @@ class TestXmlSerializationMixin(TestCase):
 
     etree_node_tag = 'test_xblock'
 
+    # pylint:disable=invalid-name
     class TestXBlock(XBlock):
         """ XBlock for XML export test """
         field = String()
@@ -231,10 +232,11 @@ class TestXmlSerializationMixin(TestCase):
     def _make_block(self):
         """ Creates a test block """
         runtime_mock = mock.Mock(spec=Runtime)
-        scope_ids = ScopeIds("user_id", self.etree_node_tag, "def_id",  "usage_id")
+        scope_ids = ScopeIds("user_id", self.etree_node_tag, "def_id", "usage_id")
         return self.TestXBlock(runtime_mock, field_data=DictFieldData({}), scope_ids=scope_ids)
 
     def _assert_node_attributes(self, node, attributes):
+        """ Asserts node attributes """
         node_attributes = node.keys()
         node_attributes.remove('xblock-family')
 
@@ -249,6 +251,7 @@ class TestXmlSerializationMixin(TestCase):
                 self.assertIsNotNone(node.get(key))
 
     def test_add_xml_to_node(self):
+        """ Tests add_xml_to_node with various field defaults and runtime parameters """
         block = self._make_block()
         node = etree.Element(self.etree_node_tag)
 
