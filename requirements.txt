@@ -28,3 +28,6 @@ cookiecutter
 
 # Our own XBlocks
 -e .
+
+# pyfilesystem
+fs
