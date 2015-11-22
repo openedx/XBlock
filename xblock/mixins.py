@@ -26,8 +26,8 @@ from xblock.internal import class_lazy, NamedAttributesMetaclass
 # OrderedDict is used so that namespace attributes are put in predictable order
 # This allows for simple string equality assertions in tests and have no other effects
 XML_NAMESPACES = OrderedDict([
-    ("option", "http://code.edx.org/xblock/option"),
     ("block", "http://code.edx.org/xblock/block"),
+    ("option", "http://code.edx.org/xblock/option"),
 ])
 
 

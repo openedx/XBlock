@@ -19,7 +19,7 @@ from xblock.test.toy_runtime import ToyRuntime
 
 def get_namespace_attrs():
     """ Returns string suitable to be used as an xmlns parameters in XBlock XML representation """
-    return " ".join('xmlns:{}="{}"'.format(k, v) for k, v in XML_NAMESPACES.items())
+    return " ".join('xmlns:{}="{}"'.format(k, v) for k, v in sorted(XML_NAMESPACES.items()))
 
 
 class Leaf(XBlock):
