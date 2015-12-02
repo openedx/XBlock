@@ -298,6 +298,9 @@ class Field(Nameable):
         xml_node: if set, the field will be serialized as a
             separate node instead of an xml attribute (default: False).
 
+        force_export: if set, the field value will be exported to XML even if normal
+            export conditions are not met (i.e. the field has no explicit value set)
+
         kwargs: optional runtime-specific options/metadata. Will be stored as
             runtime_options.
 
@@ -308,7 +311,7 @@ class Field(Nameable):
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
-                 xml_node=False, **kwargs):
+                 xml_node=False, force_export=False, **kwargs):
         self.warned = False
         self.help = help
         self._enable_enforce_type = enforce_type
@@ -322,6 +325,7 @@ class Field(Nameable):
         self._values = values
         self.runtime_options = kwargs
         self.xml_node = xml_node
+        self.force_export = force_export
 
     @property
     def default(self):

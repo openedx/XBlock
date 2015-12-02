@@ -480,7 +480,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         for field_name, field in self.fields.iteritems():
             if field_name in ('children', 'parent', 'content'):
                 continue
-            if field.is_set_on(self) or field.runtime_options.get('force_export', False):
+            if field.is_set_on(self) or field.force_export:
                 self._add_field(node, field_name, field)
 
         # Add children for each of our children.
