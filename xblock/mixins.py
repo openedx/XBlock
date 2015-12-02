@@ -8,6 +8,7 @@ import inspect
 import logging
 from lxml import etree
 import copy
+from collections import OrderedDict
 
 try:
     import simplesjson as json  # pylint: disable=F0401
@@ -22,10 +23,12 @@ from xblock.fields import Field, Reference, Scope, ReferenceList
 from xblock.internal import class_lazy, NamedAttributesMetaclass
 
 
-XML_NAMESPACES = {
-    "option": "http://code.edx.org/xblock/option",
-    "block": "http://code.edx.org/xblock/block",
-}
+# OrderedDict is used so that namespace attributes are put in predictable order
+# This allows for simple string equality assertions in tests and have no other effects
+XML_NAMESPACES = OrderedDict([
+    ("option", "http://code.edx.org/xblock/option"),
+    ("block", "http://code.edx.org/xblock/block"),
+])
 
 
 class HandlersMixin(object):
@@ -477,7 +480,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         for field_name, field in self.fields.iteritems():
             if field_name in ('children', 'parent', 'content'):
                 continue
-            if field.is_set_on(self):
+            if field.is_set_on(self) or field.force_export:
                 self._add_field(node, field_name, field)
 
         # Add children for each of our children.
