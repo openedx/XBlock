@@ -3,12 +3,14 @@ from setuptools import setup
 
 setup(
     name='XBlock',
-    version="0.4.3",
+    version='0.4.4',
     description='XBlock Core Library',
     packages=[
         'xblock',
         'xblock.django',
         'xblock.reference',
+        'xblock.test',
+        'xblock.test.django',
     ],
     install_requires=[
         'lxml',
