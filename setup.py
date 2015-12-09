@@ -27,7 +27,7 @@ setup(
         'fs',
     ],
     extras_require={
-        'django-fs-support': ['django-pyfs']
+        'django': ['django-pyfs']
     },
     license='Apache 2.0',
     classifiers=(

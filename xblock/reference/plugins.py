@@ -10,7 +10,7 @@ Much of this still needs to be organized.
 try:
     from djpyfs import djpyfs  # pylint: disable=import-error
 except ImportError:
-    pass
+    djpyfs = None
 
 from xblock.fields import Field, NO_CACHE_VALUE
 from xblock.fields import scope_key
@@ -126,8 +126,13 @@ class Filesystem(Field):
         raise NotImplementedError
 
     def __set__(self, xblock, value):
-        """
-        We don't support this until we figure out what this means
+        """We interact with a file system by open/close/read/write, not
+        set and get.
+
+        We don't support this until we figure out what this means. In
+        abstract, it might be nice to have something here to keep in
+        our KVS with some kind of metadata about the file system
+        (perhaps prefix and location or similar?)
         """
         raise NotImplementedError
 
@@ -157,9 +162,9 @@ class FSService(Service):
         """
 
         # TODO: Get xblock from context, once the plumbing is piped through
-        try:
+        if djpyfs:
             return djpyfs.get_filesystem(scope_key(instance, xblock))
-        except NameError:
+        else:
             # The reference implementation relies on djpyfs
             # https://github.com/edx/django-pyfs
             # For Django runtimes, you may use this reference
