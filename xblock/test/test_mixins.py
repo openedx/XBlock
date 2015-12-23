@@ -229,11 +229,12 @@ class TestXmlSerializationMixin(TestCase):
 
         field = String()
         simple_default = String(default="default")
-        simple_default_with_force_export = String(default="default", force_export=True)
+        force_export = String(default="default", force_export=True)
         unique_id_default = String(default=UNIQUE_ID)
-        unique_id_default_with_force_export = String(default=UNIQUE_ID, force_export=True)
+        unique_id_force_export = String(default=UNIQUE_ID, force_export=True)
 
     class TestXBlockWithDateTime(XBlock):
+        """ XBlock for DateTime fields export """
         etree_node_tag = 'test_xblock_with_datetime'
 
         datetime = DateTime(default=None)
@@ -242,18 +243,18 @@ class TestXmlSerializationMixin(TestCase):
         """ Creates a test block """
         block_type = block_type if block_type else self.TestXBlock
         runtime_mock = mock.Mock(spec=Runtime)
-        scope_ids = ScopeIds("user_id", block_type.etree_node_tag, "def_id",  "usage_id")
+        scope_ids = ScopeIds("user_id", block_type.etree_node_tag, "def_id", "usage_id")
         return block_type(runtime_mock, field_data=DictFieldData({}), scope_ids=scope_ids)
 
-    def _assert_node_attributes(self, node, attributes):
-        """ Asserts node attributes """
+    def _assert_node_attributes(self, node, expected_attributes):
+        """ Checks XML node attributes to match expected_attributes"""
         node_attributes = node.keys()
         node_attributes.remove('xblock-family')
 
         self.assertEqual(node.get('xblock-family'), self.TestXBlock.entry_point)
-        self.assertEqual(set(node_attributes), set(attributes.keys()))
+        self.assertEqual(set(node_attributes), set(expected_attributes.keys()))
 
-        for key, value in attributes.iteritems():
+        for key, value in expected_attributes.iteritems():
             if value != UNIQUE_ID:
                 self.assertEqual(node.get(key), value)
             else:
@@ -272,14 +273,14 @@ class TestXmlSerializationMixin(TestCase):
         block.add_xml_to_node(node)
 
         self._assert_node_attributes(
-            node, {'simple_default_with_force_export': 'default', 'unique_id_default_with_force_export': UNIQUE_ID}
+            node, {'force_export': 'default', 'unique_id_force_export': UNIQUE_ID}
         )
 
         block.field = 'Value1'
         block.simple_default = 'Value2'
-        block.simple_default_with_force_export = 'Value3'
+        block.force_export = 'Value3'
         block.unique_id_default = 'Value4'
-        block.unique_id_default_with_force_export = 'Value5'
+        block.unique_id_force_export = 'Value5'
 
         block.add_xml_to_node(node)
 
@@ -288,9 +289,9 @@ class TestXmlSerializationMixin(TestCase):
             {
                 'field': 'Value1',
                 'simple_default': 'Value2',
-                'simple_default_with_force_export': 'Value3',
+                'force_export': 'Value3',
                 'unique_id_default': 'Value4',
-                'unique_id_default_with_force_export': 'Value5',
+                'unique_id_force_export': 'Value5',
             }
         )
 
@@ -300,6 +301,9 @@ class TestXmlSerializationMixin(TestCase):
     )
     @ddt.unpack
     def test_datetime_serialization(self, value, expected_attributes):
+        """
+        Tests exporting DateTime fields to XML
+        """
         block_type = self.TestXBlockWithDateTime
         block = self._make_block(block_type)
         node = etree.Element(block_type.etree_node_tag)
