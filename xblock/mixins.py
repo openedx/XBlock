@@ -522,6 +522,10 @@ class XmlSerializationMixin(ScopedStorageMixin):
         as an xml attribute or creates a separate child node.
         """
         value = field.to_string(field.read_from(self))
+
+        if value is None:
+            value = ""
+
         if field.xml_node:
             tag = etree.QName(XML_NAMESPACES["option"], field_name)
             elem = node.makeelement(tag)
