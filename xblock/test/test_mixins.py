@@ -228,9 +228,9 @@ class TestXmlSerializationMixin(TestCase):
         etree_node_tag = 'test_xblock'
 
         field = String()
-        simple_default = String(default="default")
-        force_export = String(default="default", force_export=True)
-        unique_id_default = String(default=UNIQUE_ID)
+        simple = String(default="default")
+        simple_force_export = String(default="default", force_export=True)
+        unique_id = String(default=UNIQUE_ID)
         unique_id_force_export = String(default=UNIQUE_ID, force_export=True)
 
     class TestXBlockWithDateTime(XBlock):
@@ -273,13 +273,13 @@ class TestXmlSerializationMixin(TestCase):
         block.add_xml_to_node(node)
 
         self._assert_node_attributes(
-            node, {'force_export': 'default', 'unique_id_force_export': UNIQUE_ID}
+            node, {'simple_force_export': 'default', 'unique_id_force_export': UNIQUE_ID}
         )
 
         block.field = 'Value1'
-        block.simple_default = 'Value2'
-        block.force_export = 'Value3'
-        block.unique_id_default = 'Value4'
+        block.simple = 'Value2'
+        block.simple_force_export = 'Value3'
+        block.unique_id = 'Value4'
         block.unique_id_force_export = 'Value5'
 
         block.add_xml_to_node(node)
@@ -288,9 +288,9 @@ class TestXmlSerializationMixin(TestCase):
             node,
             {
                 'field': 'Value1',
-                'simple_default': 'Value2',
-                'force_export': 'Value3',
-                'unique_id_default': 'Value4',
+                'simple': 'Value2',
+                'simple_force_export': 'Value3',
+                'unique_id': 'Value4',
                 'unique_id_force_export': 'Value5',
             }
         )
