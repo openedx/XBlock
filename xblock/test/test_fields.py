@@ -205,6 +205,7 @@ class BooleanTest(FieldTest):
         self.assertJSONOrSetEquals(False, [])
 
 
+@ddt.ddt
 class StringTest(FieldTest):
     """
     Tests the String Field.
@@ -218,7 +219,29 @@ class StringTest(FieldTest):
         self.assertJSONOrSetEquals('', '')
 
     def test_none(self):
-        self.assertJSONOrSetEquals(None, None)
+        # This test shows that None is converted to None when flowing through
+        # to/from_string for a String field. However, a String field isn't allowed
+        # to be None - so this tests a scenario that shouldn't happen in the code.
+        test_field = String(enforce_type=True)
+        self.assertEquals(test_field.to_string(None), None)
+        self.assertEquals(test_field.from_string(None), None)
+
+    @ddt.data(True, False)
+    def test_set_to_none(self, enforce_type):
+        # A String field set to None is actually set to the empty string.
+        self.assertEquals(self.set_and_get_field(None, enforce_type), '')
+
+    @ddt.data(True, False)
+    def test_no_none_defaults(self, enforce_type):
+        # A String field with an explicit default of None uses the empty string as its default.
+        test_field = String(enforce_type=enforce_type, default=None)
+        self.assertEquals(test_field.default, '')
+
+    @ddt.data(True, False)
+    def test_no_default_specified(self, enforce_type):
+        # A String field with no default uses an empty string as its default.
+        test_field = String(enforce_type=enforce_type)
+        self.assertEquals(test_field.default, '')
 
     def test_error(self):
         self.assertJSONOrSetTypeError(['a'])

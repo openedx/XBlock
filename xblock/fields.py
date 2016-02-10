@@ -810,10 +810,33 @@ class String(JSONField):
     """
     A field class for representing a string.
 
-    The value, as loaded or enforced, can either be None or a basestring instance.
-
+    The value, as loaded or enforced, can *only* be a basestring instance.
     """
     MUTABLE = False
+    _default = ''
+
+    def __init__(self, *args, **kwargs):
+        """
+        String class constructor.
+        Overrides any defaults of None to be an empty string ('').
+        """
+        super(String, self).__init__(*args, **kwargs)
+
+        if self._default is None:
+            warnings.warn(
+                "String field does not support default of None - changed field {name} to ''.".format(name=self.name),
+                DeprecationWarning,
+                stacklevel=3
+            )
+            self._default = ''
+
+    def __set__(self, xblock, value):
+        """
+        Override any setting of a String field to None.
+        """
+        if value is None:
+            value = ''
+        super(String, self).__set__(xblock, value)
 
     def from_json(self, value):
         if value is None or isinstance(value, basestring):
