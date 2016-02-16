@@ -300,15 +300,15 @@ class ExportTest(XmlTest, unittest.TestCase):
         xml = textwrap.dedent("""\
             <?xml version='1.0' encoding='UTF8'?>
             <leafwithoption %s xblock-family="xblock.v1">
-              <option:data3>{
-              "child": 1,
-              "with custom option": true
-            }</option:data3>
               <option:data4>[
               1.23,
               true,
               "some string"
             ]</option:data4>
+              <option:data3>{
+              "child": 1,
+              "with custom option": true
+            }</option:data3>
             </leafwithoption>
             """) % get_namespace_attrs()
         block = self.parse_xml_to_block(xml)

@@ -11,7 +11,7 @@ from unittest import TestCase
 from xblock.core import XBlock
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
 from xblock.field_data import DictFieldData
-from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin, ViewsMixin
+from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin, ViewsMixin, XML_NAMESPACES
 from xblock.runtime import Runtime
 
 
@@ -227,17 +227,28 @@ class TestXmlSerializationMixin(TestCase):
         """ XBlock for XML export test """
         etree_node_tag = 'test_xblock'
 
-        field = String()
-        simple = String(default="default")
-        simple_force_export = String(default="default", force_export=True)
-        unique_id = String(default=UNIQUE_ID)
-        unique_id_force_export = String(default=UNIQUE_ID, force_export=True)
+        str_field = String()
+        str_str_default = String(default="default")
+        str_str_default_force_export = String(default="default", force_export=True)
+        str_uid_default = String(default=UNIQUE_ID)
+        str_uid_default_force_export = String(default=UNIQUE_ID, force_export=True)
+        str_none_default = String(default=None)
+        str_none_default_force_export = String(default=None, force_export=True)
 
     class TestXBlockWithDateTime(XBlock):
         """ XBlock for DateTime fields export """
         etree_node_tag = 'test_xblock_with_datetime'
 
         datetime = DateTime(default=None)
+
+    def setUp(self):
+        """
+        Construct test XBlocks.
+        """
+        self.test_xblock = self._make_block(self.TestXBlock)
+        self.test_xblock_tag = self.TestXBlock.etree_node_tag
+        self.test_xblock_datetime = self._make_block(self.TestXBlockWithDateTime)
+        self.test_xblock_datetime_tag = self.TestXBlockWithDateTime.etree_node_tag
 
     def _make_block(self, block_type=None):
         """ Creates a test block """
@@ -260,38 +271,154 @@ class TestXmlSerializationMixin(TestCase):
             else:
                 self.assertIsNotNone(node.get(key))
 
-    def test_add_xml_to_node(self):
-        """ Tests add_xml_to_node with various field defaults and runtime parameters """
-        block_type = self.TestXBlock
-        block = self._make_block(block_type)
-        node = etree.Element(block_type.etree_node_tag)
+    def _assert_node_elements(self, node, expected_elements):
+        """
+        Checks XML node elements to match expected elements.
+        """
+        node_elements = list(node)
+        self.assertEqual(set([elem.tag for elem in node_elements]), set(expected_elements.keys()))
+        # All elements on the node are expected to have a "none"="true" attribute.
+        for elem in node:
+            self.assertEqual(elem.get('none'), 'true')
 
-        # precondition check
-        for field_name in block.fields.keys():
-            self.assertFalse(block.fields[field_name].is_set_on(block))
+    def test_no_fields_set_add_xml_to_node(self):
+        """
+        Tests that no fields are set on a TestXBlock when initially made
+        and no fields are present in the XML (besides force-exported defaults).
+        """
+        node = etree.Element(self.test_xblock_tag)
 
-        block.add_xml_to_node(node)
+        # Precondition check: no fields are set.
+        for field_name in self.test_xblock.fields.keys():
+            self.assertFalse(self.test_xblock.fields[field_name].is_set_on(self.test_xblock))
 
-        self._assert_node_attributes(
-            node, {'simple_force_export': 'default', 'unique_id_force_export': UNIQUE_ID}
-        )
-
-        block.field = 'Value1'
-        block.simple = 'Value2'
-        block.simple_force_export = 'Value3'
-        block.unique_id = 'Value4'
-        block.unique_id_force_export = 'Value5'
-
-        block.add_xml_to_node(node)
+        self.test_xblock.add_xml_to_node(node)
 
         self._assert_node_attributes(
             node,
             {
-                'field': 'Value1',
-                'simple': 'Value2',
-                'simple_force_export': 'Value3',
-                'unique_id': 'Value4',
-                'unique_id_force_export': 'Value5',
+                'str_str_default_force_export': 'default',
+                'str_uid_default_force_export': UNIQUE_ID
+            }
+        )
+        self._assert_node_elements(
+            node,
+            {
+                # The tag is prefixed with {namespace}.
+                '{{{}}}{}'.format(
+                    XML_NAMESPACES["option"],
+                    'str_none_default_force_export'
+                ): None
+            }
+        )
+
+    def test_set_fields_add_xml_to_node(self):
+        """
+        Tests that set fields appear in XML after add_xml_to_node.
+        """
+        node = etree.Element(self.test_xblock_tag)
+
+        self.test_xblock.str_field = 'str_field_val'
+        self.test_xblock.str_str_default = 'str_str_default_val'
+        self.test_xblock.str_str_default_force_export = 'str_str_default_force_export_val'
+        self.test_xblock.str_uid_default = 'str_uid_default_val'
+        self.test_xblock.str_uid_default_force_export = 'str_uid_default_force_export_val'
+        self.test_xblock.str_none_default = 'str_none_default_val'
+        self.test_xblock.str_none_default_force_export = 'str_none_default_force_export_val'
+
+        self.test_xblock.add_xml_to_node(node)
+
+        self._assert_node_attributes(
+            node,
+            {
+                'str_field': 'str_field_val',
+                'str_str_default': 'str_str_default_val',
+                'str_str_default_force_export': 'str_str_default_force_export_val',
+                'str_uid_default': 'str_uid_default_val',
+                'str_uid_default_force_export': 'str_uid_default_force_export_val',
+                'str_none_default': 'str_none_default_val',
+                'str_none_default_force_export': 'str_none_default_force_export_val',
+            }
+        )
+        self._assert_node_elements(node, {})
+
+    def test_set_field_to_none_add_xml_to_node(self):
+        """
+        Tests add_xml_to_node with String field value set to None.
+        """
+        node = etree.Element(self.test_xblock_tag)
+
+        # Now set all fields to None.
+        self.test_xblock.str_field = None
+        self.test_xblock.str_str_default = None
+        self.test_xblock.str_str_default_force_export = None
+        self.test_xblock.str_uid_default = None
+        self.test_xblock.str_uid_default_force_export = None
+        self.test_xblock.str_none_default = None
+        self.test_xblock.str_none_default_force_export = None
+
+        self.test_xblock.add_xml_to_node(node)
+
+        self._assert_node_attributes(node, {})
+        self._assert_node_elements(
+            node,
+            {
+                # The tags are prefixed with {namespace}.
+                '{{{}}}{}'.format(XML_NAMESPACES["option"], tag): None
+                for tag in [
+                    'str_field',
+                    'str_str_default',
+                    'str_str_default_force_export',
+                    'str_uid_default',
+                    'str_uid_default_force_export',
+                    'str_none_default',
+                    'str_none_default_force_export'
+                ]
+            }
+        )
+
+    def test_set_unset_then_add_xml_to_node(self):
+        """
+        Tests add_xml_to_node with non-UNIQUE_ID String field value unset after being set.
+        """
+        node = etree.Element(self.test_xblock_tag)
+
+        # Now set some fields to values.
+        self.test_xblock.str_field = None
+        self.test_xblock.str_str_default = 'water is wet'
+        self.test_xblock.str_str_default_force_export = ''
+        self.test_xblock.str_uid_default = 'smart'
+        self.test_xblock.str_uid_default_force_export = '47'
+        self.test_xblock.str_none_default = ''
+        self.test_xblock.str_none_default_force_export = None
+
+        # Now unset those same fields.
+        del self.test_xblock.str_field
+        del self.test_xblock.str_str_default
+        del self.test_xblock.str_str_default_force_export
+        del self.test_xblock.str_uid_default
+        del self.test_xblock.str_uid_default_force_export
+        del self.test_xblock.str_none_default
+        del self.test_xblock.str_none_default_force_export
+
+        self.test_xblock.add_xml_to_node(node)
+
+        # The fields should no longer be present in the XML representation.
+        self._assert_node_attributes(
+            node,
+            {
+                'str_str_default_force_export': 'default',
+                'str_uid_default_force_export': UNIQUE_ID
+            }
+        )
+        self._assert_node_elements(
+            node,
+            {
+                # The tag is prefixed with {namespace}.
+                '{{{}}}{}'.format(
+                    XML_NAMESPACES["option"],
+                    'str_none_default_force_export'
+                ): None
             }
         )
 
@@ -304,12 +431,10 @@ class TestXmlSerializationMixin(TestCase):
         """
         Tests exporting DateTime fields to XML
         """
-        block_type = self.TestXBlockWithDateTime
-        block = self._make_block(block_type)
-        node = etree.Element(block_type.etree_node_tag)
+        node = etree.Element(self.test_xblock_datetime_tag)
 
-        block.datetime = value
+        self.test_xblock_datetime.datetime = value
 
-        block.add_xml_to_node(node)
+        self.test_xblock_datetime.add_xml_to_node(node)
 
         self._assert_node_attributes(node, expected_attributes)
