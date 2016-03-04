@@ -406,16 +406,23 @@ def test_object_identity():
         """Toy class for ModelMetaclass and field access testing"""
         field_a = List(scope=Scope.settings)
 
+    def mock_default(block, name):  # pylint: disable=unused-argument
+        """
+        Raising KeyError emulates no attribute found, which causes
+        proper default value to be used after field is deleted.
+        """
+        raise KeyError
+
     # Make sure that field_data always returns a different object
     # each time it's actually queried, so that the caching is
     # doing the work to maintain object identity.
     field_data = MagicMock(spec=FieldData)
     field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
+    field_data.default = mock_default
     field_tester = FieldTester(
         runtime=TestRuntime(services={'field-data': field_data}),
         scope_ids=MagicMock(spec=ScopeIds)
     )
-
     value = field_tester.field_a
     assert_equals(value, field_tester.field_a)
 

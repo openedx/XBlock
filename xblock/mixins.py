@@ -449,13 +449,13 @@ class XmlSerializationMixin(ScopedStorageMixin):
             namespace = qname.namespace
 
             if namespace == XML_NAMESPACES["option"]:
-                cls._set_field_if_present(block, tag, child.text)
+                cls._set_field_if_present(block, tag, child.text, child.attrib)
             else:
                 block.runtime.add_node_as_child(block, child, id_generator)
 
         # Attributes become fields.
         for name, value in node.items():
-            cls._set_field_if_present(block, name, value)
+            cls._set_field_if_present(block, name, value, {})
 
         # Text content becomes "content", if such a field exists.
         if "content" in block.fields and block.fields["content"].scope == Scope.content:
@@ -507,32 +507,43 @@ class XmlSerializationMixin(ScopedStorageMixin):
             return None
 
     @classmethod
-    def _set_field_if_present(cls, block, name, value):
+    def _set_field_if_present(cls, block, name, value, attrs):
         """Sets the field block.name, if block have such a field."""
         if name in block.fields:
             value = (block.fields[name]).from_string(value)
-            setattr(block, name, value)
+            if "none" in attrs and attrs["none"] == "true":
+                setattr(block, name, None)
+            else:
+                setattr(block, name, value)
         else:
             logging.warn("XBlock %s does not contain field %s", type(block), name)
 
     def _add_field(self, node, field_name, field):
-        """Add xml representation of field to node.
+        """
+        Add xml representation of field to node.
 
         Depending on settings, it either stores the value of field
         as an xml attribute or creates a separate child node.
         """
         value = field.to_string(field.read_from(self))
+        text_value = "" if value is None else value
 
-        if value is None:
-            value = ""
+        # Is the field type supposed to serialize the fact that the value is None to XML?
+        save_none_as_xml_attr = field.none_to_xml and value is None
+        field_attrs = {"none": "true"} if save_none_as_xml_attr else {}
 
-        if field.xml_node:
+        if save_none_as_xml_attr or field.xml_node:
+            # Field will be output to XML as an separate element.
             tag = etree.QName(XML_NAMESPACES["option"], field_name)
-            elem = node.makeelement(tag)
-            elem.text = value
-            node.insert(0, elem)
+            elem = etree.SubElement(node, tag, field_attrs)
+            if field.xml_node:
+                # Only set the value if forced via xml_node;
+                # in all other cases, the value is None.
+                # Avoids an unnecessary XML end tag.
+                elem.text = text_value
         else:
-            node.set(field_name, value)
+            # Field will be output to XML as an attribute on the node.
+            node.set(field_name, text_value)
 
 
 class IndexInfoMixin(object):

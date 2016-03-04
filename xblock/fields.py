@@ -307,6 +307,8 @@ class Field(Nameable):
     """
     MUTABLE = True
     _default = None
+    # Indicates if a field's None value should be sent to the XML representation.
+    none_to_xml = False
 
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
@@ -464,6 +466,19 @@ class Field(Nameable):
         key = scope_key(self, xblock)
         return hashlib.sha1(key).hexdigest()
 
+    def _get_default_value_to_cache(self, xblock):
+        """
+        Perform special logic to provide a field's default value for caching.
+        """
+        try:
+            # pylint: disable=protected-access
+            return self.from_json(xblock._field_data.default(xblock, self.name))
+        except KeyError:
+            if self._default is UNIQUE_ID:
+                return self._check_or_enforce_type(self._calculate_unique_id(xblock))
+            else:
+                return self.default
+
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
@@ -482,13 +497,7 @@ class Field(Nameable):
                 value = self.from_json(field_data.get(xblock, self.name))
             elif self.name not in NO_GENERATED_DEFAULTS:
                 # Cache default value
-                try:
-                    value = self.from_json(field_data.default(xblock, self.name))
-                except KeyError:
-                    if self._default is UNIQUE_ID:
-                        value = self._check_or_enforce_type(self._calculate_unique_id(xblock))
-                    else:
-                        value = self.default
+                value = self._get_default_value_to_cache(xblock)
             else:
                 value = self.default
             self._set_cached_value(xblock, value)
@@ -549,7 +558,7 @@ class Field(Nameable):
         # Since we know that the field_data no longer contains the value, we can
         # avoid the possible database lookup that a future get() call would
         # entail by setting the cached value now to its default value.
-        self._set_cached_value(xblock, copy.deepcopy(self.default))
+        self._set_cached_value(xblock, self._get_default_value_to_cache(xblock))
 
     def __repr__(self):
         return "<{0.__class__.__name__} {0.name}>".format(self)
@@ -828,6 +837,11 @@ class String(JSONField):
     def to_string(self, value):
         """String gets serialized and deserialized without quote marks."""
         return self.to_json(value)
+
+    @property
+    def none_to_xml(self):
+        """Returns True to use a XML node for the field and represent None as an attribute."""
+        return True
 
     enforce_type = from_json
 
