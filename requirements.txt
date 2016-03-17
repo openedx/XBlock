@@ -2,7 +2,7 @@
 pyyaml
 lxml
 requests
-webob
+webob == 1.5.1
 simplejson
 pytz
 python-dateutil

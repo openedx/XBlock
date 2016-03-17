@@ -79,6 +79,7 @@ class TestDjangoWebobResponse(TestCase):
 
     def test_content_type(self):
         # Default charset
+
         self.assertEquals(
             self._as_django(content_type='application/json')['Content-Type'],
             'application/json; charset=UTF-8'

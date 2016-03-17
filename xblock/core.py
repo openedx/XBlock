@@ -172,6 +172,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         should call super to collect validation results from its superclasses, and then
         add any additional results as necessary.
         """
+        # TESTING for TRAVIS
         return Validation(self.scope_ids.usage_id)
 
 
