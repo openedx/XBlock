@@ -8,7 +8,7 @@ from lxml import etree
 import mock
 from unittest import TestCase
 
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlockAside
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
 from xblock.field_data import DictFieldData
 from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin, ViewsMixin, XML_NAMESPACES
@@ -235,6 +235,14 @@ class TestXmlSerializationMixin(TestCase):
         str_none_default = String(default=None)
         str_none_default_force_export = String(default=None, force_export=True)
 
+    # pylint:disable=invalid-name
+    class TestXBlockAside(XBlockAside):
+        """ XBlockAside for XML export test """
+        etree_node_tag = 'test_xblock_aside'
+
+        str_field = String()
+        str_str_default = String(default="default")
+
     class TestXBlockWithDateTime(XBlock):
         """ XBlock for DateTime fields export """
         etree_node_tag = 'test_xblock_with_datetime'
@@ -249,20 +257,22 @@ class TestXmlSerializationMixin(TestCase):
         self.test_xblock_tag = self.TestXBlock.etree_node_tag
         self.test_xblock_datetime = self._make_block(self.TestXBlockWithDateTime)
         self.test_xblock_datetime_tag = self.TestXBlockWithDateTime.etree_node_tag
+        self.test_xblock_aside = self._make_block(self.TestXBlockAside)
+        self.test_xblock_aside_tag = self.TestXBlockAside.etree_node_tag
 
     def _make_block(self, block_type=None):
         """ Creates a test block """
         block_type = block_type if block_type else self.TestXBlock
         runtime_mock = mock.Mock(spec=Runtime)
         scope_ids = ScopeIds("user_id", block_type.etree_node_tag, "def_id", "usage_id")
-        return block_type(runtime_mock, field_data=DictFieldData({}), scope_ids=scope_ids)
+        return block_type(runtime=runtime_mock, field_data=DictFieldData({}), scope_ids=scope_ids)
 
-    def _assert_node_attributes(self, node, expected_attributes):
+    def _assert_node_attributes(self, node, expected_attributes, entry_point=None):
         """ Checks XML node attributes to match expected_attributes"""
         node_attributes = node.keys()
         node_attributes.remove('xblock-family')
 
-        self.assertEqual(node.get('xblock-family'), self.TestXBlock.entry_point)
+        self.assertEqual(node.get('xblock-family'), entry_point if entry_point else self.TestXBlock.entry_point)
         self.assertEqual(set(node_attributes), set(expected_attributes.keys()))
 
         for key, value in expected_attributes.iteritems():
@@ -421,6 +431,26 @@ class TestXmlSerializationMixin(TestCase):
                 ): None
             }
         )
+
+    def test_xblock_aside_add_xml_to_node(self):
+        """
+        Tests that add_xml_to_node works proper for xblock aside.
+        """
+        node = etree.Element(self.test_xblock_aside_tag)
+
+        self.test_xblock_aside.str_field = 'str_field_val_aside'
+        self.test_xblock_aside.str_str_default = 'str_str_default_val'
+        self.test_xblock_aside.add_xml_to_node(node)
+
+        self._assert_node_attributes(
+            node,
+            {
+                'str_field': 'str_field_val_aside',
+                'str_str_default': 'str_str_default_val',
+            },
+            self.TestXBlockAside.entry_point
+        )
+        self._assert_node_elements(node, {})
 
     @ddt.data(
         (None, {'datetime': ''}),
