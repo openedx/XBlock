@@ -77,15 +77,15 @@ class TestDjangoWebobResponse(TestCase):
         self.assertIn('X-Foo', self._as_django(headerlist=[('X-Foo', 'bar')]))
         self.assertEquals(self._as_django(headerlist=[('X-Foo', 'bar')])['X-Foo'], 'bar')
 
-    def test_content_type(self):
-        # Default charset
+    def test_content_types(self):
+        # JSON content type (no charset should be returned)
         self.assertEquals(
             self._as_django(content_type='application/json')['Content-Type'],
-            'application/json; charset=UTF-8'
+            'application/json'
         )
 
-        # Other charset
+        # HTML content type (UTF-8 charset should be returned)
         self.assertEquals(
-            self._as_django(content_type='application/json', charset='ascii')['Content-Type'],
-            'application/json; charset=ascii'
+            self._as_django(content_type='text/html')['Content-Type'],
+            'text/html; charset=UTF-8'
         )
