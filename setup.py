@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='XBlock',
-    version='0.4.5',
+    version='0.4.7',
     description='XBlock Core Library',
     packages=[
         'xblock',
