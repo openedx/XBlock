@@ -581,6 +581,24 @@ def test_service():
     runtime.render(tester, 'student_view')
 
 
+def test_ugettext_calls():
+    """
+    Test ugettext calls in xblock.
+    """
+    runtime = TestRuntime()
+    block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
+    assert_equals(block.ugettext('test'), u'test')
+    assert_true(isinstance(block.ugettext('test'), unicode))
+
+    # NoSuchServiceError exception should raise if i18n is none/empty.
+    runtime = TestRuntime(services={
+        'i18n': None
+    })
+    block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
+    with assert_raises(NoSuchServiceError):
+        block.ugettext('test')
+
+
 @XBlock.needs("no_such_service_sub")
 @XBlock.wants("another_not_service_sub")
 class SubXBlockWithServices(XBlockWithServices):
