@@ -183,6 +183,14 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         runtime_ugettext = runtime_service.ugettext
         return runtime_ugettext(text)
 
+    def add_xml_to_node(self, node):
+        """
+        For exporting, set data on etree.Element `node`.
+        """
+        super(XBlock, self).add_xml_to_node(node)
+        # Add children for each of our children.
+        self.add_children_to_node(node)
+
 
 class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, SharedBlockBase):
     """

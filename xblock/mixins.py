@@ -413,6 +413,15 @@ class HierarchyMixin(ScopedStorageMixin):
         """
         self._child_cache.clear()
 
+    def add_children_to_node(self, node):
+        """
+        Add children to etree.Element `node`.
+        """
+        if self.has_children:
+            for child_id in self.children:
+                child = self.runtime.get_block(child_id)
+                self.runtime.add_block_as_child_node(child, node)
+
 
 class XmlSerializationMixin(ScopedStorageMixin):
     """
@@ -482,12 +491,6 @@ class XmlSerializationMixin(ScopedStorageMixin):
                 continue
             if field.is_set_on(self) or field.force_export:
                 self._add_field(node, field_name, field)
-
-        # Add children for each of our children.
-        if self.has_children:
-            for child_id in self.children:
-                child = self.runtime.get_block(child_id)
-                self.runtime.add_block_as_child_node(child, node)
 
         # A content field becomes text content.
         text = self.xml_text_content()
