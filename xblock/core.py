@@ -50,6 +50,9 @@ class SharedBlockBase(Plugin):
     """
     Behaviors and attrs which all XBlock like things should share
     """
+
+    resources_dir = 'public'
+
     @classmethod
     def open_local_resource(cls, uri):
         """Open a local resource.
@@ -62,20 +65,27 @@ class SharedBlockBase(Plugin):
 
         For security reasons, the default implementation will return only a
         very restricted set of file types, which must be located in a folder
-        called "public". XBlock authors who want to override this behavior will
-        need to take care to ensure that the method only serves legitimate
-        public resources. At the least, the URI should be matched against a
-        whitelist regex to ensure that you do not serve an unauthorized
-        resource.
-
+        that defaults to "public".  The location used for public resources can
+        be changed on a per-XBlock basis. XBlock authors who want to override
+        this behavior will need to take care to ensure that the method only
+        serves legitimate public resources. At the least, the URI should be
+        matched against a whitelist regex to ensure that you do not serve an
+        unauthorized resource.
         """
-        # Verify the URI is in whitelisted form before opening for serving.
-        # URI must begin with public/, and no file path component can start
-        # with a dot, which prevents ".." and ".hidden" files.
-        if not uri.startswith("public/"):
-            raise DisallowedFileError("Only files from public/ are allowed: %r" % uri)
+
+        # If no resources_dir is set, then this XBlock cannot serve local resources.
+        if cls.resources_dir is None:
+            raise DisallowedFileError("This XBlock is not configured to serve local resources")
+
+        # Make sure the path starts with whatever resources_dir is set to.
+        if not uri.startswith(cls.resources_dir + '/'):
+            raise DisallowedFileError("Only files from %r/ are allowed: %r" % (cls.resources_dir, uri))
+
+        # Disalow paths that have a '/.' component, as `/./` is a no-op and `/../`
+        # can be used to recurse back past the entry point of this XBlock.
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
+
         return pkg_resources.resource_stream(cls.__module__, uri)
 
 
