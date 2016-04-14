@@ -917,6 +917,13 @@ class OpenLocalResourceTest(unittest.TestCase):
         """Just something to load resources from."""
         pass
 
+    class UnloadableXBlock(XBlock):
+        """Just something to load resources from."""
+
+        resources_dir = None
+
+        pass
+
     def stub_resource_stream(self, module, name):
         """Act like pkg_resources.resource_stream, for testing."""
         assert module == "xblock.test.test_core"
@@ -950,6 +957,29 @@ class OpenLocalResourceTest(unittest.TestCase):
             msg = ".*: %s" % re.escape(repr(uri))
             with assert_raises_regexp(DisallowedFileError, msg):
                 loadable.open_local_resource(uri)
+
+    @ddt.data(
+        "public/hey.js",
+        "public/sub/hey.js",
+        "public/js/vendor/jNotify.jQuery.min.js",
+        "public/something.foo",         # Unknown file extension is fine
+        "public/a/long/PATH/no-problem=here$123.ext",
+        "public/ℓιвяαяу.js",
+        "public/foo.js",
+        "public/.git/secret.js",
+        "static/secret.js",
+        "../public/no-no.bad",
+        "image.png",
+        ".git/secret.js",
+        "static/ℓιвяαяу.js",
+    )
+    def test_open_local_resource_with_no_resources_dir(self, uri):
+        unloadable = self.UnloadableXBlock(None, scope_ids=None)
+
+        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+            msg = "not configured to serve local resources"
+            with assert_raises_regexp(DisallowedFileError, msg):
+                unloadable.open_local_resource(uri)
 
 
 class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
