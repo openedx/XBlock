@@ -54,6 +54,10 @@ class SharedBlockBase(Plugin):
     resources_dir = 'public'
 
     @classmethod
+    def get_resources_dir(cls):
+        return cls.resources_dir
+
+    @classmethod
     def open_local_resource(cls, uri):
         """Open a local resource.
 
