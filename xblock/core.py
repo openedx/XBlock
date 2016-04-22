@@ -87,17 +87,16 @@ class SharedBlockBase(Plugin):
         if cls.resources_dir is None:
             raise DisallowedFileError("This XBlock is not configured to serve local resources")
 
-        # Make sure the path starts with whatever resources_dir is set to.
-        full_base_dir = os.path.join(cls.resources_dir, cls.public_dir)
-        if not uri.startswith(full_base_dir + '/'):
-            raise DisallowedFileError("Only files from %r/ are allowed: %r" % (full_base_dir, uri))
+        # Make sure the path starts with whatever public_dir is set to.
+        if not uri.startswith(cls.public_dir + '/'):
+            raise DisallowedFileError("Only files from %r/ are allowed: %r" % (cls.public_dir, uri))
 
         # Disalow paths that have a '/.' component, as `/./` is a no-op and `/../`
         # can be used to recurse back past the entry point of this XBlock.
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
 
-        return pkg_resources.resource_stream(cls.__module__, uri)
+        return pkg_resources.resource_stream(cls.__module__, os.path.join(cls.resources_dir, uri))
 
 
 # -- Base Block
