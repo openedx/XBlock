@@ -57,10 +57,16 @@ class SharedBlockBase(Plugin):
 
     @classmethod
     def get_resources_dir(cls):
+        """
+        Gets the resource directory for this XBlock.
+        """
         return cls.resources_dir
 
     @classmethod
     def get_public_dir(cls):
+        """
+        Gets the public directory for this XBlock.
+        """
         return cls.public_dir
 
     @classmethod
