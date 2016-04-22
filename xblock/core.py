@@ -8,6 +8,7 @@ and used by all runtimes.
 import inspect
 import pkg_resources
 import warnings
+import os
 from collections import defaultdict
 
 from xblock.exceptions import DisallowedFileError
