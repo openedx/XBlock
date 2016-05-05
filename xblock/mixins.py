@@ -11,7 +11,7 @@ import copy
 from collections import OrderedDict
 
 try:
-    import simplesjson as json  # pylint: disable=F0401
+    import simplejson as json   # pylint: disable=F0401
 except ImportError:
     import json
 import warnings

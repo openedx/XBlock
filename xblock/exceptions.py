@@ -3,7 +3,7 @@ Module for all xblock exception classes
 """
 from webob import Response
 try:
-    import simplesjson as json  # pylint: disable=F0401
+    import simplejson as json   # pylint: disable=F0401
 except ImportError:
     import json
 
