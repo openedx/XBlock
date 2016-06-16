@@ -1,7 +1,6 @@
 # 3rd-party needs
 pyyaml
 lxml
-requests
 webob>=1.6.0
 simplejson
 pytz
