@@ -17,6 +17,7 @@ setup(
         'markupsafe',
         'python-dateutil',
         'pytz',
+        'pyyaml',
         'webob',
         'fs',
     ],

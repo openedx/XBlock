@@ -63,7 +63,6 @@ class FieldData(object):
         """
         raise NotImplementedError
 
-    @abstractmethod
     def has(self, block, name):
         """
         Return whether or not the field named `name` has a non-default value for the XBlock `block`.
