@@ -119,7 +119,7 @@ class Plugin(object):
 
         return PLUGIN_CACHE[key]
 
-    @classmethod
+    @class_lazy
     def load_classes(cls, fail_silently=True):
         """Load all the classes for a plugin.
 
