@@ -17,6 +17,7 @@ import traceback
 import warnings
 import json
 import yaml
+import unicodedata
 
 from xblock.internal import Nameable
 
@@ -479,6 +480,13 @@ class Field(Nameable):
             else:
                 return self.default
 
+    def _sanitize(self, value):
+        """
+        Allow the individual fields to sanitize the value being set -or- "get".
+        For example, a String field wants to remove control characters.
+        """
+        return value
+
     def __get__(self, xblock, xblock_class):
         """
         Gets the value of this xblock. Prioritizes the cached value over
@@ -507,7 +515,7 @@ class Field(Nameable):
         if self.MUTABLE:
             self._mark_dirty(xblock, value)
 
-        return value
+        return self._sanitize(value)
 
     def __set__(self, xblock, value):
         """
@@ -520,6 +528,7 @@ class Field(Nameable):
         we're trying to cache, we won't do anything.
         """
         value = self._check_or_enforce_type(value)
+        value = self._sanitize(value)
         cached_value = self._get_cached_value(xblock)
         try:
             value_has_changed = cached_value != value
@@ -824,9 +833,25 @@ class String(JSONField):
     """
     MUTABLE = False
 
+    def _sanitize(self, value):
+        """
+        Remove the control characters that are not allowed in XML:
+        https://www.w3.org/TR/xml/#charsets
+        Leave all other characters.
+        """
+        if isinstance(value, unicode):
+            new_value = u''.join(ch for ch in value if unicodedata.category(ch)[0] != u'C' or ch in (u'\n', u'\r', u'\t'))
+        elif isinstance(value, str):
+            new_value = ''.join(ch for ch in value if ord(ch) >= 32 or ch in ('\n', '\r', '\t'))
+        else:
+            return value
+        # The new string will be equivalent to the original string if no control characters are present.
+        # If equivalent, return the original string - some tests check for object equality instead of string equality.
+        return value if value == new_value else new_value
+
     def from_json(self, value):
         if value is None or isinstance(value, basestring):
-            return value
+            return self._sanitize(value)
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
