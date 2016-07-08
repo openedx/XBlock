@@ -69,7 +69,7 @@ class FieldTest(unittest.TestCase):
             if issubclass(warning.category, DeprecationWarning)
         ))
 
-    def assertJSONOrSetEquals(self, expected, arg):
+    def assertJSONOrSetGetEquals(self, expected, arg):
         """
         Asserts the result of field.from_json and of setting field.
         """
@@ -77,6 +77,12 @@ class FieldTest(unittest.TestCase):
         self.assertEqual(expected, self.FIELD_TO_TEST().from_json(arg))
         # set+get with enforce_type arg -> expected
         self.assertEqual(expected, self.set_and_get_field(arg, True))
+
+    def assertJSONOrSetEquals(self, expected, arg):
+        """
+        Asserts the result of field.from_json and of setting field.
+        """
+        self.assertJSONOrSetGetEquals(expected, arg)
         # set+get without enforce_type arg -> arg
         # provoking a warning unless arg == expected
         count = 0 if arg == expected else 1
@@ -227,6 +233,15 @@ class StringTest(FieldTest):
         self.assertJSONOrSetTypeError([1])
         self.assertJSONOrSetTypeError([])
         self.assertJSONOrSetTypeError({})
+
+    def test_control_characters_filtered(self):
+        self.assertJSONOrSetGetEquals(u'', u'\v')
+        self.assertJSONOrSetGetEquals('', '\v')
+        with self.assertRaises(AssertionError):
+            self.assertJSONOrSetGetEquals('\v', u'')
+        with self.assertRaises(AssertionError):
+            self.assertJSONOrSetGetEquals(u'\v', '')
+        self.assertJSONOrSetGetEquals(u'\n\r\t', u'\n\v\r\b\t')
 
 
 @ddt.ddt
