@@ -909,6 +909,18 @@ def test_json_handler_return_response():
     assert_equals(response.content_type, "text/plain")
 
 
+def test_json_handler_return_unicode():
+    test_request = Mock(method="POST", body='["foo", "bar"]')
+
+    @XBlock.json_handler
+    def test_func(self, request, suffix):  # pylint: disable=unused-argument
+        return Response(request=request)
+
+    response = test_func(Mock(), test_request, "dummy_suffix")
+    for request_part in response.request:
+        assert_equals(type(request_part), unicode)
+
+
 @ddt.ddt
 class OpenLocalResourceTest(unittest.TestCase):
     """Tests of `open_local_resource`."""

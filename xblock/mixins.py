@@ -10,10 +10,7 @@ from lxml import etree
 import copy
 from collections import OrderedDict
 
-try:
-    import simplejson as json   # pylint: disable=F0401
-except ImportError:
-    import json
+import json
 import warnings
 
 from webob import Response
