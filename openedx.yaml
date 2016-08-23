@@ -4,6 +4,6 @@
 nick: xblk
 oeps: {}
 openedx-release: {parent-repo: edx/edx-platform}
-owner: MUST FILL IN OWNER
+owner: edx/platform-team
 tags: [xblock]
 track-pulls: true
