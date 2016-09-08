@@ -1,6 +1,7 @@
 """
 Tests for the UserService
 """
+from past.builtins import basestring
 import collections
 from xblock.reference.user_service import XBlockUser, UserService
 from xblock.test.tools import assert_equals, assert_raises, assert_is_instance, assert_false

@@ -5,6 +5,10 @@ The hosting runtime application decides what actual storage mechanism to use
 for each scope.
 
 """
+from builtins import str
+from builtins import zip
+from past.builtins import basestring
+from builtins import object
 
 from collections import namedtuple
 import copy
@@ -839,7 +843,7 @@ class String(JSONField):
         https://www.w3.org/TR/xml/#charsets
         Leave all other characters.
         """
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             new_value = u''.join(ch for ch in value if unicodedata.category(ch)[0] != u'C' or ch in (u'\n', u'\r', u'\t'))
         elif isinstance(value, str):
             new_value = ''.join(ch for ch in value if ord(ch) >= 32 or ch in ('\n', '\r', '\t'))
@@ -1013,23 +1017,23 @@ def scope_key(instance, xblock):
     if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
         pass
     elif instance.scope.user == UserScope.ONE:
-        scope_key_dict['user'] = unicode(xblock.scope_ids.user_id)
+        scope_key_dict['user'] = str(xblock.scope_ids.user_id)
     else:
         raise NotImplementedError()
 
     if instance.scope.block == BlockScope.TYPE:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.block_type)
+        scope_key_dict['block'] = str(xblock.scope_ids.block_type)
     elif instance.scope.block == BlockScope.USAGE:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.usage_id)
+        scope_key_dict['block'] = str(xblock.scope_ids.usage_id)
     elif instance.scope.block == BlockScope.DEFINITION:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.def_id)
+        scope_key_dict['block'] = str(xblock.scope_ids.def_id)
     elif instance.scope.block == BlockScope.ALL:
         pass
     else:
         raise NotImplementedError()
 
     replacements = list(itertools.product("._-", "._-"))
-    substitution_list = dict(zip("./\\,_ +:-", ("".join(x) for x in replacements)))
+    substitution_list = dict(list(zip("./\\,_ +:-", ("".join(x) for x in replacements))))
     # Above runs in 4.7us, and generates a list of common substitutions:
     # {' ': '_-', '+': '-.', '-': '--', ',': '_.', '/': '._', '.': '..', ':': '-_', '\\': '.-', '_': '__'}
 

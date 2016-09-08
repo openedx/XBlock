@@ -13,6 +13,7 @@ setup(
         'xblock.test.django',
     ],
     install_requires=[
+        'future',
         'lxml',
         'markupsafe',
         'python-dateutil',

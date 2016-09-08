@@ -3,6 +3,7 @@
 This code is in the Runtime layer.
 
 """
+from builtins import object
 
 import functools
 import itertools

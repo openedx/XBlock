@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """Test XML parsing in XBlocks."""
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 
 import re
-import StringIO
+import io
 import textwrap
 import unittest
 import ddt
@@ -19,7 +23,7 @@ from xblock.test.toy_runtime import ToyRuntime
 
 def get_namespace_attrs():
     """ Returns string suitable to be used as an xmlns parameters in XBlock XML representation """
-    return " ".join('xmlns:{}="{}"'.format(k, v) for k, v in XML_NAMESPACES.items())
+    return " ".join('xmlns:{}="{}"'.format(k, v) for k, v in list(XML_NAMESPACES.items()))
 
 
 class Leaf(XBlock):
@@ -104,7 +108,7 @@ class XmlTestMixin(object):
 
     def export_xml_for_block(self, block):
         """A helper to return the XML string for a block."""
-        output = StringIO.StringIO()
+        output = io.StringIO()
         self.runtime.export_to_xml(block, output)
         return output.getvalue()
 
@@ -404,7 +408,7 @@ class TestRoundTrip(XmlTest, unittest.TestCase):
 
         self.assertEqual(parsed.sequence, expected_seq)
         self.assertNotEqual(parsed.dictionary, expected_dict)
-        self.assertEqual(parsed.dictionary, {str(key): value for key, value in expected_dict.items()})
+        self.assertEqual(parsed.dictionary, {str(key): value for key, value in list(expected_dict.items())})
 
     @XBlock.register_temp_plugin(LeafWithDictAndList)
     def test_none_contents_roundtrip(self):

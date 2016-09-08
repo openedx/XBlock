@@ -3,18 +3,18 @@
 "The only code you have to test is the code you want to work."
 
 """
+from builtins import object
 
 from abc import ABCMeta, abstractmethod
 
 import unittest
 
 from xblock.test.tools import unabc
+from future.utils import with_metaclass
 
 
-class Abstract(object):
+class Abstract(with_metaclass(ABCMeta, object)):
     """Our test subject: an abstract class with two abstract methods."""
-
-    __metaclass__ = ABCMeta
 
     def concrete(self, arg):
         """This is available as-is on all subclasses."""

@@ -1,6 +1,7 @@
 """
 Test XBlock Aside
 """
+from builtins import zip
 from unittest import TestCase
 from xblock.core import XBlockAside, XBlock
 from xblock.fields import ScopeIds, Scope, String
@@ -130,7 +131,7 @@ class ParsingTest(AsideRuntimeSetup, XmlTestMixin):
         """
         self.assertEqual(first.scope_ids.block_type, second.scope_ids.block_type)
         self.assertEqual(first.fields, second.fields)
-        for field in first.fields.itervalues():
+        for field in list(first.fields.values()):
             self.assertEqual(field.read_from(first), field.read_from(second), field)
 
     def _test_roundrip_of(self, block):
@@ -139,7 +140,7 @@ class ParsingTest(AsideRuntimeSetup, XmlTestMixin):
         """
         restored = self.parse_xml_to_block(self.export_xml_for_block(block))
         self._assert_xthing_equal(block, restored)
-        for first, second in itertools.izip(self.runtime.get_asides(block), self.runtime.get_asides(restored)):
+        for first, second in zip(self.runtime.get_asides(block), self.runtime.get_asides(restored)):
             self._assert_xthing_equal(first, second)
 
     @XBlockAside.register_temp_plugin(TestAside, 'test_aside')

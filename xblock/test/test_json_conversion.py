@@ -2,6 +2,7 @@
 Tests asserting that ModelTypes convert to and from json when working
 with ModelDatas
 """
+from builtins import object
 # Allow inspection of private class members
 # pylint: disable=W0212
 from mock import Mock

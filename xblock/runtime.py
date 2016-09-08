@@ -1,6 +1,11 @@
 """
 Machinery to make the common case easy when building new runtimes
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import range
+from builtins import object
 
 import functools
 import gettext
@@ -12,7 +17,7 @@ import warnings
 
 from abc import ABCMeta, abstractmethod
 from lxml import etree
-from StringIO import StringIO
+from io import StringIO
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
@@ -30,14 +35,13 @@ from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 
 import logging
 import json
+from future.utils import with_metaclass
 
 log = logging.getLogger(__name__)
 
 
-class KeyValueStore(object):
+class KeyValueStore(with_metaclass(ABCMeta, object)):
     """The abstract interface for Key Value Stores."""
-
-    __metaclass__ = ABCMeta
 
     class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
         """
@@ -85,7 +89,7 @@ class KeyValueStore(object):
 
         :update_dict: field_name, field_value pairs for all cached changes
         """
-        for key, value in update_dict.iteritems():
+        for key, value in list(update_dict.items()):
             self.set(key, value)
 
 
@@ -223,7 +227,7 @@ class KvsFieldData(FieldData):
         updated_dict = {}
 
         # Generate a new dict with the correct mappings.
-        for (key, value) in update_dict.items():
+        for (key, value) in list(update_dict.items()):
             updated_dict[self._key(block, key)] = value
 
         self._kvs.set_many(updated_dict)
@@ -243,9 +247,8 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
-class IdReader(object):
+class IdReader(with_metaclass(ABCMeta, object)):
     """An abstract object that stores usages and definitions."""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_usage_id_from_aside(self, aside_id):
@@ -326,9 +329,8 @@ class IdReader(object):
         raise NotImplementedError()
 
 
-class IdGenerator(object):
+class IdGenerator(with_metaclass(ABCMeta, object)):
     """An abstract object that creates usage and definition ids"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_aside(self, definition_id, usage_id, aside_type):
@@ -438,12 +440,10 @@ class MemoryIdManager(IdReader, IdGenerator):
         return aside_id.aside_type
 
 
-class Runtime(object):
+class Runtime(with_metaclass(ABCMeta, object)):
     """
     Access to the runtime environment for XBlocks.
     """
-
-    __metaclass__ = ABCMeta
 
     # Abstract methods
     @abstractmethod
@@ -904,7 +904,7 @@ class Runtime(object):
 
         html = u"<div class='{}'{properties}>{body}{js}</div>".format(
             markupsafe.escape(' '.join(css_classes)),
-            properties="".join(" data-%s='%s'" % item for item in data.items()),
+            properties="".join(" data-%s='%s'" % item for item in list(data.items())),
             body=frag.body_html(),
             js=json_init)
 
@@ -1086,7 +1086,7 @@ class Runtime(object):
             """Bad path exception thrown when path cannot be found."""
             pass
         results = self.query(block)
-        ROOT, SEP, WORD, FINAL = range(4)               # pylint: disable=C0103
+        ROOT, SEP, WORD, FINAL = list(range(4))               # pylint: disable=C0103
         state = ROOT
         lexer = RegexLexer(
             ("dotdot", r"\.\."),
@@ -1278,6 +1278,6 @@ class NullI18nService(object):
         Locale-aware strftime, with format short-cuts.
         """
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if isinstance(format, unicode):
+        if isinstance(format, str):
             format = format.encode("utf8")
         return dtime.strftime(format).decode("utf8")

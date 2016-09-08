@@ -1,6 +1,7 @@
 """
 This file supports the XBlock service that returns data about users.
 """
+from builtins import object
 
 from xblock.reference.plugins import Service
 

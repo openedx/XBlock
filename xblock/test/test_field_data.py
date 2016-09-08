@@ -1,6 +1,7 @@
 """
 Tests of the utility FieldData's defined by xblock
 """
+from builtins import object
 
 from mock import Mock
 

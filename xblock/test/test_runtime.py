@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests the features of xblock/runtime"""
 from __future__ import print_function
+from builtins import object
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
@@ -145,7 +146,7 @@ def test_db_model_keys():
 
     assert_false(field_data.has(tester, 'not a field'))
 
-    for field in tester.fields.values():
+    for field in list(tester.fields.values()):
         new_value = 'new ' + field.name
         assert_false(field_data.has(tester, field.name))
         if isinstance(field, List):
@@ -156,7 +157,7 @@ def test_db_model_keys():
     tester.save()
 
     # Make sure everything saved correctly
-    for field in tester.fields.values():
+    for field in list(tester.fields.values()):
         assert_true(field_data.has(tester, field.name))
 
     def get_key_value(scope, user_id, block_scope_id, field_name):
@@ -409,7 +410,7 @@ class Dynamic(object):
     Object for testing that sets attrs based on __init__ kwargs
     """
     def __init__(self, **kwargs):
-        for name, value in kwargs.items():
+        for name, value in list(kwargs.items()):
             setattr(self, name, value)
 
 
@@ -537,8 +538,8 @@ class XBlockWithServices(XBlock):
         def assert_equals_unicode(str1, str2):
             """`str1` equals `str2`, and both are Unicode strings."""
             assert_equals(str1, str2)
-            assert isinstance(str1, unicode)
-            assert isinstance(str2, unicode)
+            assert isinstance(str1, str)
+            assert isinstance(str2, str)
 
         i18n = self.runtime.service(self, "i18n")
         assert_equals_unicode(u"Welcome!", i18n.ugettext("Welcome!"))
@@ -589,7 +590,7 @@ def test_ugettext_calls():
     runtime = TestRuntime()
     block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
     assert_equals(block.ugettext('test'), u'test')
-    assert_true(isinstance(block.ugettext('test'), unicode))
+    assert_true(isinstance(block.ugettext('test'), str))
 
     # NoSuchServiceError exception should raise if i18n is none/empty.
     runtime = TestRuntime(services={

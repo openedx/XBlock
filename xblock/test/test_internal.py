@@ -1,8 +1,10 @@
 """Tests of the xblock.internal module."""
+from builtins import object
 
 from unittest import TestCase
 
 from xblock.internal import class_lazy, NamedAttributesMetaclass, Nameable
+from future.utils import with_metaclass
 
 
 class TestLazyClassProperty(TestCase):
@@ -41,9 +43,8 @@ class TestGetSetDescriptor(Nameable):
         pass
 
 
-class NamingTester(object):
+class NamingTester(with_metaclass(NamedAttributesMetaclass, object)):
     """Class with several descriptors that should get names."""
-    __metaclass__ = NamedAttributesMetaclass
 
     test_descriptor = TestDescriptor()
     test_getset_descriptor = TestGetSetDescriptor()

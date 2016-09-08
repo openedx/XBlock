@@ -7,6 +7,7 @@ The README file in this directory contains much more information.
 Much of this still needs to be organized.
 """
 from __future__ import print_function
+from builtins import object
 
 try:
     from django.core.exceptions import ImproperlyConfigured

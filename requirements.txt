@@ -1,4 +1,5 @@
 # 3rd-party needs
+future
 pyyaml
 lxml
 webob>=1.6.0

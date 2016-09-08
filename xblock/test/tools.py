@@ -1,6 +1,8 @@
 """
 Tools for testing XBlocks
 """
+from builtins import zip
+from builtins import object
 import warnings
 
 from contextlib import contextmanager

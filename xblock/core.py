@@ -287,7 +287,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         If all of the aside's data is empty or a default value, then the aside shouldn't
         be serialized as XML at all.
         """
-        return any([field.is_set_on(self) for field in self.fields.itervalues()])
+        return any(field.is_set_on(self) for field in self.fields.values())
 
 
 # Maintain backwards compatibility

@@ -588,7 +588,7 @@ def test_xblock_save_one():
     def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
-        raise KeyValueMultiSaveError([update_dict.keys()[0]])
+        raise KeyValueMultiSaveError([list(update_dict.keys())[0]])
 
     field_tester = setup_save_failure(fake_set_many)
 
@@ -918,7 +918,7 @@ def test_json_handler_return_unicode():
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     for request_part in response.request:
-        assert_equals(type(request_part), unicode)
+        assert_equals(type(request_part), str)
 
 
 @ddt.ddt

@@ -23,6 +23,9 @@ covered, we define sets of test properties (which actually implement the
 tests of the various operations), and test setup (which set up the
 particular combination of initial conditions that we want to test)
 """
+from builtins import next
+from builtins import range
+from builtins import object
 
 import copy
 from mock import Mock, patch
@@ -466,7 +469,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
 
     @property
     def default_iterator(self):
-        return iter(xrange(1000))
+        return iter(list(range(1000)))
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
@@ -483,7 +486,7 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
 
     @property
     def default_iterator(self):
-        return ([None] * i for i in xrange(1000))
+        return ([None] * i for i in range(1000))
 
 
 class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):
