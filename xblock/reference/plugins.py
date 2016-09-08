@@ -6,6 +6,7 @@ The README file in this directory contains much more information.
 
 Much of this still needs to be organized.
 """
+from __future__ import print_function
 
 try:
     from django.core.exceptions import ImproperlyConfigured
@@ -25,7 +26,7 @@ try:
 except ImportError:
     djpyfs = None  # pylint: disable=invalid-name
 except ImproperlyConfigured:
-    print "Warning! Django is not correctly configured."
+    print("Warning! Django is not correctly configured.")
     djpyfs = None  # pylint: disable=invalid-name
 
 from xblock.fields import Field, NO_CACHE_VALUE

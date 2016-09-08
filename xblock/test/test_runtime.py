@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests the features of xblock/runtime"""
+from __future__ import print_function
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
@@ -121,16 +122,16 @@ def check_field(collection, field):
     Sets the field to a new value and asserts that the update properly occurs.
     Deletes the new value, and asserts that the default value is properly restored.
     """
-    print "Getting %s from %r" % (field.name, collection)
+    print("Getting %s from %r" % (field.name, collection))
     assert_equals(field.default, getattr(collection, field.name))
     new_value = 'new ' + field.name
-    print "Setting %s to %s on %r" % (field.name, new_value, collection)
+    print("Setting %s to %s on %r" % (field.name, new_value, collection))
     setattr(collection, field.name, new_value)
-    print "Checking %s on %r" % (field.name, collection)
+    print("Checking %s on %r" % (field.name, collection))
     assert_equals(new_value, getattr(collection, field.name))
-    print "Deleting %s from %r" % (field.name, collection)
+    print("Deleting %s from %r" % (field.name, collection))
     delattr(collection, field.name)
-    print "Back to defaults for %s in %r" % (field.name, collection)
+    print("Back to defaults for %s in %r" % (field.name, collection))
     assert_equals(field.default, getattr(collection, field.name))
 
 
@@ -225,7 +226,7 @@ def test_querypath_parsing():
     mrun = MockRuntimeForQuerying()
     block = Mock()
     mrun.querypath(block, "..//@hello")
-    print mrun.mock_query.mock_calls
+    print(mrun.mock_query.mock_calls)
     expected = Mock()
     expected.parent().descendants().attr("hello")
     assert mrun.mock_query.mock_calls == expected.mock_calls

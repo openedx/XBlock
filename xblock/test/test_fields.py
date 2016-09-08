@@ -863,5 +863,5 @@ class FieldSerializationTest(unittest.TestCase):
         ['{"foo":"bar"}', '[1, 2, 3]', 'baz', '1.abc', 'defg']))
     def test_from_string_errors(self, _type, string):
         """ Cases that raises various exceptions."""
-        with self.assertRaises(StandardError):
+        with self.assertRaises(Exception):
             _type().from_string(string)
