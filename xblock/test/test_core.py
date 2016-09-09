@@ -4,19 +4,17 @@ Tests the fundamentals of XBlocks including - but not limited to -
 metaclassing, field access, caching, serialization, and bulk saves.
 """
 from __future__ import unicode_literals
-from builtins import next
-
-from builtins import str
+from builtins import next, str  # pylint: disable=redefined-builtin
 
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
-from mock import patch, MagicMock, Mock
 from datetime import datetime
 import json
 import re
 import unittest
 
 import ddt
+from mock import patch, MagicMock, Mock
 from webob import Response
 
 from xblock.core import XBlock

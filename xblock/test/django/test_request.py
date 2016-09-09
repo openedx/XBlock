@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 
 # Set up Django settings
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xblock.test.settings")
+from unittest import TestCase
 
 # Django isn't always available, so skip tests if it isn't.
 from nose.plugins.skip import SkipTest
@@ -17,10 +17,12 @@ try:
 except ImportError:
     HAS_DJANGO = False
 
-from unittest import TestCase
 from webob import Response
 
 from xblock.django.request import django_to_webob_request, webob_to_django_response
+
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xblock.test.settings")
 
 
 class TestDjangoWebobRequest(TestCase):

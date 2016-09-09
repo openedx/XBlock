@@ -2,7 +2,7 @@
 This file supports the XBlock service that returns data about users.
 """
 from __future__ import unicode_literals
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 
 from xblock.reference.plugins import Service
 

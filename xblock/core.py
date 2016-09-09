@@ -6,7 +6,7 @@ and used by all runtimes.
 
 """
 from __future__ import unicode_literals
-from builtins import bytes
+from builtins import bytes  # pylint: disable=redefined-builtin
 import future.utils
 
 import inspect

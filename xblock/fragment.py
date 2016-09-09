@@ -4,7 +4,7 @@ This code is in the Runtime layer.
 
 """
 from __future__ import unicode_literals
-from builtins import object, str
+from builtins import object, str  # pylint: disable=redefined-builtin
 
 from collections import namedtuple
 

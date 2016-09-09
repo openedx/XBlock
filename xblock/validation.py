@@ -2,8 +2,7 @@
 Validation information for an xblock instance.
 """
 from __future__ import unicode_literals
-from builtins import str
-from builtins import object
+from builtins import str, object  # pylint: disable=redefined-builtin
 
 
 class ValidationMessage(object):

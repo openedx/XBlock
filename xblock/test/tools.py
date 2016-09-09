@@ -2,8 +2,7 @@
 Tools for testing XBlocks
 """
 from __future__ import unicode_literals
-from builtins import zip
-from builtins import object
+from builtins import object, zip  # pylint: disable=redefined-builtin
 import warnings
 
 from contextlib import contextmanager

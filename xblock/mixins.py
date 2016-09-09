@@ -3,8 +3,8 @@ This module defines all of the Mixins that provide components of XBlock-family
 functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
 from __future__ import unicode_literals
-from past.builtins import basestring
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
+from past.builtins import basestring  # pylint: disable=redefined-builtin
 import future.utils
 
 import functools

@@ -8,7 +8,7 @@ Much of this still needs to be organized.
 """
 from __future__ import print_function
 from __future__ import unicode_literals
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 
 try:
     from django.core.exceptions import ImproperlyConfigured

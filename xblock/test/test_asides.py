@@ -2,10 +2,10 @@
 Test XBlock Aside
 """
 from __future__ import unicode_literals
-from builtins import zip
-import future.utils
-
+from builtins import zip  # pylint: disable=redefined-builtin
 from unittest import TestCase
+
+import future.utils
 from xblock.core import XBlockAside, XBlock
 from xblock.fields import ScopeIds, Scope, String
 from xblock.fragment import Fragment
@@ -13,7 +13,6 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.test_runtime import TestXBlock
 from xblock.test.tools import TestRuntime
 from xblock.test.test_parsing import Leaf, XmlTestMixin
-from timeit import itertools
 
 
 class TestAside(XBlockAside):

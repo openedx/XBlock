@@ -6,10 +6,7 @@ for each scope.
 
 """
 from __future__ import unicode_literals
-from builtins import str
-from builtins import zip
-from past.builtins import basestring
-from builtins import object
+from builtins import str, zip, object  # pylint: disable=redefined-builtin
 import future.utils
 
 from collections import namedtuple

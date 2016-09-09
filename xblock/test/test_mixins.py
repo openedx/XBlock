@@ -2,7 +2,7 @@
 Tests of the XBlock-family functionality mixins
 """
 from __future__ import unicode_literals
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 import future.utils
 
 import ddt as ddt

@@ -24,9 +24,7 @@ tests of the various operations), and test setup (which set up the
 particular combination of initial conditions that we want to test)
 """
 from __future__ import unicode_literals
-from builtins import next
-from builtins import range
-from builtins import object
+from builtins import next, range, object  # pylint: disable=redefined-builtin
 
 import copy
 from mock import Mock, patch

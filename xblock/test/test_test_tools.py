@@ -4,17 +4,16 @@
 
 """
 from __future__ import unicode_literals
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 
 from abc import ABCMeta, abstractmethod
-
-import unittest
+from unittest import TestCase
 
 from xblock.test.tools import unabc
-from future.utils import with_metaclass
+import future.utils
 
 
-class Abstract(with_metaclass(ABCMeta, object)):
+class Abstract(future.utils.with_metaclass(ABCMeta, object)):
     """Our test subject: an abstract class with two abstract methods."""
 
     def concrete(self, arg):
@@ -44,7 +43,7 @@ class ForceConcreteMessage(Abstract):
     pass
 
 
-class TestUnAbc(unittest.TestCase):
+class TestUnAbc(TestCase):
     """Test the @unabc decorator."""
 
     def test_cant_abstract(self):

@@ -2,7 +2,7 @@
 Tests of the utility FieldData's defined by xblock
 """
 from __future__ import unicode_literals
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 
 from mock import Mock
 

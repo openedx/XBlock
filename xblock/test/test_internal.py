@@ -1,6 +1,6 @@
 """Tests of the xblock.internal module."""
 from __future__ import unicode_literals
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 
 from unittest import TestCase
 

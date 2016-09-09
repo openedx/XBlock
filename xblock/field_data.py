@@ -5,7 +5,7 @@ provide varied persistence backends while keeping the API used by the `XBlock`
 simple.
 """
 from __future__ import unicode_literals
-from builtins import object
+from builtins import object  # pylint: disable=redefined-builtin
 import future.utils
 
 import copy
