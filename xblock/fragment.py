@@ -3,7 +3,7 @@
 This code is in the Runtime layer.
 
 """
-from builtins import object
+from builtins import object, str
 
 from collections import namedtuple
 

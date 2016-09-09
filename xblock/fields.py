@@ -9,6 +9,7 @@ from builtins import str
 from builtins import zip
 from past.builtins import basestring
 from builtins import object
+import future.utils
 
 from collections import namedtuple
 import copy
@@ -157,6 +158,7 @@ UNSET = Sentinel("fields.UNSET")
 ScopeBase = namedtuple('ScopeBase', 'user block name')
 
 
+@future.utils.python_2_unicode_compatible
 class Scope(ScopeBase):
     """
     Defines six types of scopes to be used: `content`, `settings`,
@@ -231,11 +233,14 @@ class Scope(ScopeBase):
     children = Sentinel('Scope.children')
     parent = Sentinel('Scope.parent')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def __eq__(self, other):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
+
+    def __hash__(self):
+        return hash((u'xblock.fields.Scope', self.user, self.block))
 
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
@@ -469,7 +474,7 @@ class Field(Nameable):
         for the field in its given scope.
         """
         key = scope_key(self, xblock)
-        return hashlib.sha1(key).hexdigest()
+        return hashlib.sha1(key.encode('utf-8')).hexdigest()
 
     def _get_default_value_to_cache(self, xblock):
         """
@@ -756,7 +761,10 @@ class Boolean(JSONField):
                                       **kwargs)
 
     def from_json(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, bytes):
+            value = value.decode('ascii', errors='replace')
+
+        if isinstance(value, str):
             return value.lower() == 'true'
         else:
             return bool(value)
@@ -778,6 +786,18 @@ class Dict(JSONField):
             return value
         else:
             raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
+
+    def to_string(self, value):
+        """
+        In python3, json.dumps() cannot sort keys of different types,
+        so preconvert None to 'null'.
+        """
+        self.enforce_type(value)
+        if isinstance(value, dict) and None in value:
+            value = value.copy()
+            value['null'] = value[None]
+            del value[None]
+        return super(Dict, self).to_string(value)
 
     enforce_type = from_json
 
@@ -843,10 +863,11 @@ class String(JSONField):
         https://www.w3.org/TR/xml/#charsets
         Leave all other characters.
         """
+        if isinstance(value, bytes):
+            value = value.decode('utf-8')
+
         if isinstance(value, str):
-            new_value = u''.join(ch for ch in value if unicodedata.category(ch)[0] != u'C' or ch in (u'\n', u'\r', u'\t'))
-        elif isinstance(value, str):
-            new_value = ''.join(ch for ch in value if ord(ch) >= 32 or ch in ('\n', '\r', '\t'))
+            new_value = u''.join(ch for ch in value if unicodedata.category(ch)[0] != u'C' or ch in u'\n\r\t')
         else:
             return value
         # The new string will be equivalent to the original string if no control characters are present.
@@ -854,7 +875,7 @@ class String(JSONField):
         return value if value == new_value else new_value
 
     def from_json(self, value):
-        if value is None or isinstance(value, basestring):
+        if value is None or isinstance(value, (bytes, str)):
             return self._sanitize(value)
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
@@ -865,6 +886,8 @@ class String(JSONField):
 
     def to_string(self, value):
         """String gets serialized and deserialized without quote marks."""
+        if isinstance(value, bytes):
+            value = value.decode('utf-8')
         return self.to_json(value)
 
     @property
@@ -892,7 +915,10 @@ class DateTime(JSONField):
         if value is None:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, bytes):
+            value = value.decode('utf-8')
+
+        if isinstance(value, str):
             # Parser interprets empty string as now by default
             if value == "":
                 return None
@@ -1032,8 +1058,8 @@ def scope_key(instance, xblock):
     else:
         raise NotImplementedError()
 
-    replacements = list(itertools.product("._-", "._-"))
-    substitution_list = dict(list(zip("./\\,_ +:-", ("".join(x) for x in replacements))))
+    replacements = itertools.product("._-", "._-")
+    substitution_list = dict(zip("./\\,_ +:-", ("".join(x) for x in replacements)))
     # Above runs in 4.7us, and generates a list of common substitutions:
     # {' ': '_-', '+': '-.', '-': '--', ',': '_.', '/': '._', '.': '..', ':': '-_', '\\': '.-', '_': '__'}
 
@@ -1042,7 +1068,7 @@ def scope_key(instance, xblock):
     def encode(char):
         """
         Replace all non-alphanumeric characters with -n- where n
-        is their UTF8 code.
+        is their Unicode codepoint.
         TODO: Test for UTF8 which is not ASCII
         """
         if char.isalnum():

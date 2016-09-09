@@ -440,7 +440,7 @@ class MutableTestCases(UniversalTestCases, MutationProperties):
     """Set up tests of a mutable field"""
     field_class = List
     field_default = []
-    new_value = ['a', 'b']
+    new_value = [u'a', u'b']
 
     def mutate(self, value):
         """Modify the supplied value"""
@@ -451,7 +451,7 @@ class UniqueIdTestCases(ImmutableTestCases):
     """Set up tests for field with UNIQUE_ID default"""
     field_class = String
     field_default = UNIQUE_ID
-    new_value = 'user-assigned ID'
+    new_value = u'user-assigned ID'
 # pylint: enable=no-member
 
 
@@ -469,7 +469,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
 
     @property
     def default_iterator(self):
-        return iter(list(range(1000)))
+        return iter(range(1000))
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):

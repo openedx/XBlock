@@ -1,6 +1,7 @@
 """Helpers for WebOb requests and responses."""
 from builtins import zip
 from builtins import object
+import future.utils
 
 import webob
 from collections import MutableMapping
@@ -78,9 +79,15 @@ def querydict_to_multidict(query_dict, wrap=None):
 
     """
     wrap = wrap or (lambda val: val)
+
+    if future.utils.PY2:
+        item_lists = query_dict.iterlists()
+    else:
+        item_lists = query_dict.lists()
+
     return MultiDict(chain.from_iterable(
-        list(zip(repeat(key), (wrap(v) for v in vals)))
-        for key, vals in query_dict.iterlists()
+        zip(repeat(key), (wrap(v) for v in vals))
+        for key, vals in item_lists
     ))
 
 

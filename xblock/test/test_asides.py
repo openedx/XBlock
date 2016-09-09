@@ -2,6 +2,8 @@
 Test XBlock Aside
 """
 from builtins import zip
+import future.utils
+
 from unittest import TestCase
 from xblock.core import XBlockAside, XBlock
 from xblock.fields import ScopeIds, Scope, String
@@ -131,7 +133,7 @@ class ParsingTest(AsideRuntimeSetup, XmlTestMixin):
         """
         self.assertEqual(first.scope_ids.block_type, second.scope_ids.block_type)
         self.assertEqual(first.fields, second.fields)
-        for field in list(first.fields.values()):
+        for field in future.utils.itervalues(first.fields):
             self.assertEqual(field.read_from(first), field.read_from(second), field)
 
     def _test_roundrip_of(self, block):

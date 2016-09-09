@@ -2,6 +2,8 @@
 Tests of the XBlock-family functionality mixins
 """
 from builtins import object
+import future.utils
+
 import ddt as ddt
 from datetime import datetime
 import pytz
@@ -270,13 +272,13 @@ class TestXmlSerializationMixin(TestCase):
 
     def _assert_node_attributes(self, node, expected_attributes, entry_point=None):
         """ Checks XML node attributes to match expected_attributes"""
-        node_attributes = list(node.keys())
+        node_attributes = node.keys()
         node_attributes.remove('xblock-family')
 
         self.assertEqual(node.get('xblock-family'), entry_point if entry_point else self.TestXBlock.entry_point)
         self.assertEqual(set(node_attributes), set(expected_attributes.keys()))
 
-        for key, value in list(expected_attributes.items()):
+        for key, value in future.utils.iteritems(expected_attributes):
             if value != UNIQUE_ID:
                 self.assertEqual(node.get(key), value)
             else:
@@ -300,7 +302,7 @@ class TestXmlSerializationMixin(TestCase):
         node = etree.Element(self.test_xblock_tag)
 
         # Precondition check: no fields are set.
-        for field_name in list(self.test_xblock.fields.keys()):
+        for field_name in future.utils.iterkeys(self.test_xblock.fields):
             self.assertFalse(self.test_xblock.fields[field_name].is_set_on(self.test_xblock))
 
         self.test_xblock.add_xml_to_node(node)

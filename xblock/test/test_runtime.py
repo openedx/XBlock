@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Tests the features of xblock/runtime"""
 from __future__ import print_function
-from builtins import object
+from builtins import object, str
+import future.utils
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
@@ -146,7 +147,7 @@ def test_db_model_keys():
 
     assert_false(field_data.has(tester, 'not a field'))
 
-    for field in list(tester.fields.values()):
+    for field in future.utils.itervalues(tester.fields):
         new_value = 'new ' + field.name
         assert_false(field_data.has(tester, field.name))
         if isinstance(field, List):
@@ -157,7 +158,7 @@ def test_db_model_keys():
     tester.save()
 
     # Make sure everything saved correctly
-    for field in list(tester.fields.values()):
+    for field in future.utils.itervalues(tester.fields):
         assert_true(field_data.has(tester, field.name))
 
     def get_key_value(scope, user_id, block_scope_id, field_name):
@@ -410,7 +411,7 @@ class Dynamic(object):
     Object for testing that sets attrs based on __init__ kwargs
     """
     def __init__(self, **kwargs):
-        for name, value in list(kwargs.items()):
+        for name, value in future.utils.iteritems(kwargs):
             setattr(self, name, value)
 
 

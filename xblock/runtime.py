@@ -1,11 +1,10 @@
 """
 Machinery to make the common case easy when building new runtimes
 """
-from future import standard_library
-standard_library.install_aliases()
 from builtins import next
 from builtins import range
 from builtins import object
+import future.utils
 
 import functools
 import gettext
@@ -17,7 +16,7 @@ import warnings
 
 from abc import ABCMeta, abstractmethod
 from lxml import etree
-from io import StringIO
+from io import StringIO, BytesIO
 
 from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
@@ -35,12 +34,11 @@ from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 
 import logging
 import json
-from future.utils import with_metaclass
 
 log = logging.getLogger(__name__)
 
 
-class KeyValueStore(with_metaclass(ABCMeta, object)):
+class KeyValueStore(future.utils.with_metaclass(ABCMeta, object)):
     """The abstract interface for Key Value Stores."""
 
     class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
@@ -89,7 +87,7 @@ class KeyValueStore(with_metaclass(ABCMeta, object)):
 
         :update_dict: field_name, field_value pairs for all cached changes
         """
-        for key, value in list(update_dict.items()):
+        for key, value in future.utils.iteritems(update_dict):
             self.set(key, value)
 
 
@@ -227,7 +225,7 @@ class KvsFieldData(FieldData):
         updated_dict = {}
 
         # Generate a new dict with the correct mappings.
-        for (key, value) in list(update_dict.items()):
+        for (key, value) in future.utils.iteritems(update_dict):
             updated_dict[self._key(block, key)] = value
 
         self._kvs.set_many(updated_dict)
@@ -247,7 +245,7 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
-class IdReader(with_metaclass(ABCMeta, object)):
+class IdReader(future.utils.with_metaclass(ABCMeta, object)):
     """An abstract object that stores usages and definitions."""
 
     @abstractmethod
@@ -329,7 +327,7 @@ class IdReader(with_metaclass(ABCMeta, object)):
         raise NotImplementedError()
 
 
-class IdGenerator(with_metaclass(ABCMeta, object)):
+class IdGenerator(future.utils.with_metaclass(ABCMeta, object)):
     """An abstract object that creates usage and definition ids"""
 
     @abstractmethod
@@ -440,7 +438,7 @@ class MemoryIdManager(IdReader, IdGenerator):
         return aside_id.aside_type
 
 
-class Runtime(with_metaclass(ABCMeta, object)):
+class Runtime(future.utils.with_metaclass(ABCMeta, object)):
     """
     Access to the runtime environment for XBlocks.
     """
@@ -678,7 +676,11 @@ class Runtime(with_metaclass(ABCMeta, object)):
             )
 
         id_generator = id_generator or self.id_generator
-        return self.parse_xml_file(StringIO(xml), id_generator)
+        if isinstance(xml, bytes):
+            io_type = BytesIO
+        else:
+            io_type = StringIO
+        return self.parse_xml_file(io_type(xml), id_generator)
 
     def parse_xml_file(self, fileobj, id_generator=None):
         """Parse an open XML file, returning a usage id."""
@@ -766,7 +768,7 @@ class Runtime(with_metaclass(ABCMeta, object)):
                 aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
                 aside.add_xml_to_node(aside_node)
                 block.append(aside_node)
-        tree.write(xmlfile, xml_declaration=True, pretty_print=True, encoding="utf8")
+        tree.write(xmlfile, xml_declaration=True, pretty_print=True, encoding='utf-8')
 
     def add_block_as_child_node(self, block, node):
         """
@@ -904,7 +906,7 @@ class Runtime(with_metaclass(ABCMeta, object)):
 
         html = u"<div class='{}'{properties}>{body}{js}</div>".format(
             markupsafe.escape(' '.join(css_classes)),
-            properties="".join(" data-%s='%s'" % item for item in list(data.items())),
+            properties="".join(" data-%s='%s'" % item for item in future.utils.iteritems(data)),
             body=frag.body_html(),
             js=json_init)
 
@@ -1086,7 +1088,7 @@ class Runtime(with_metaclass(ABCMeta, object)):
             """Bad path exception thrown when path cannot be found."""
             pass
         results = self.query(block)
-        ROOT, SEP, WORD, FINAL = list(range(4))               # pylint: disable=C0103
+        ROOT, SEP, WORD, FINAL = range(4)  # pylint: disable=C0103
         state = ROOT
         lexer = RegexLexer(
             ("dotdot", r"\.\."),
@@ -1267,10 +1269,10 @@ class NullI18nService(object):
         return getattr(self._translations, name)
 
     STRFTIME_FORMATS = {
-        "SHORT_DATE_FORMAT": "%b %d, %Y",
-        "LONG_DATE_FORMAT": "%A, %B %d, %Y",
-        "TIME_FORMAT": "%I:%M:%S %p",
-        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
+        u"SHORT_DATE_FORMAT": u"%b %d, %Y",
+        u"LONG_DATE_FORMAT": u"%A, %B %d, %Y",
+        u"TIME_FORMAT": u"%I:%M:%S %p",
+        u"DATE_TIME_FORMAT": u"%b %d, %Y at %H:%M",
     }
 
     def strftime(self, dtime, format):      # pylint: disable=redefined-builtin
@@ -1278,6 +1280,31 @@ class NullI18nService(object):
         Locale-aware strftime, with format short-cuts.
         """
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if isinstance(format, str):
-            format = format.encode("utf8")
-        return dtime.strftime(format).decode("utf8")
+        if future.utils.PY2 and isinstance(format, str):
+            format = format.encode("utf-8")
+        timestring = dtime.strftime(format)
+        if future.utils.PY2:
+            timestring = timestring.decode('utf-8')
+        return timestring
+
+    @property
+    def ugettext(self):
+        """
+        Dispatch to the appropriate gettext method
+        """
+        # pylint: disable=no-member
+        if future.utils.PY3:
+            return self._translations.gettext
+        else:
+            return self._translations.ugettext
+
+    @property
+    def ungettext(self):
+        """
+        Dispatch to the appropriate ngettext method
+        """
+        # pylint: disable=no-member
+        if future.utils.PY3:
+            return self._translations.ngettext
+        else:
+            return self._translations.ungettext

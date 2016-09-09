@@ -79,7 +79,7 @@ def _num_plugins_cached():
     """
     Returns the number of plugins that have been cached.
     """
-    return len(list(plugin.PLUGIN_CACHE.keys()))
+    return len(plugin.PLUGIN_CACHE)
 
 
 @XBlock.register_temp_plugin(AmbiguousBlock1, "thumbs")

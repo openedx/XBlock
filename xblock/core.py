@@ -5,6 +5,9 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
+from builtins import bytes
+import future.utils
+
 import inspect
 import pkg_resources
 import warnings
@@ -89,6 +92,9 @@ class SharedBlockBase(Plugin):
         matched against a whitelist regex to ensure that you do not serve an
         unauthorized resource.
         """
+
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
 
         # If no resources_dir is set, then this XBlock cannot serve local resources.
         if cls.resources_dir is None:
@@ -287,7 +293,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         If all of the aside's data is empty or a default value, then the aside shouldn't
         be serialized as XML at all.
         """
-        return any(field.is_set_on(self) for field in self.fields.values())
+        return any(field.is_set_on(self) for field in future.utils.itervalues(self.fields))
 
 
 # Maintain backwards compatibility

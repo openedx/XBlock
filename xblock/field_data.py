@@ -5,6 +5,7 @@ provide varied persistence backends while keeping the API used by the `XBlock`
 simple.
 """
 from builtins import object
+import future.utils
 
 import copy
 
@@ -12,10 +13,9 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 from xblock.exceptions import InvalidScopeError
-from future.utils import with_metaclass
 
 
-class FieldData(with_metaclass(ABCMeta, object)):
+class FieldData(future.utils.with_metaclass(ABCMeta, object)):
     """
     An interface allowing access to an XBlock's field values indexed by field names.
     """
@@ -87,7 +87,7 @@ class FieldData(with_metaclass(ABCMeta, object)):
         :param update_dict: A map of field names to their new values
         :type update_dict: dict
         """
-        for key, value in list(update_dict.items()):
+        for key, value in future.utils.iteritems(update_dict):
             self.set(block, key, value)
 
     def default(self, block, name):  # pylint: disable=unused-argument
@@ -161,9 +161,9 @@ class SplitFieldData(FieldData):
 
     def set_many(self, block, update_dict):
         update_dicts = defaultdict(dict)
-        for key, value in list(update_dict.items()):
+        for key, value in future.utils.iteritems(update_dict):
             update_dicts[self._field_data(block, key)][key] = value
-        for field_data, update_dict in list(update_dicts.items()):
+        for field_data, update_dict in future.utils.iteritems(update_dicts):
             field_data.set_many(block, update_dict)
 
     def delete(self, block, name):
