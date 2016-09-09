@@ -9,6 +9,7 @@ pep8
 caniusepython3
 diff-cover >= 0.2.1
 ddt==0.8.0
+tox
 
 # For docs
 -r doc/requirements.txt
