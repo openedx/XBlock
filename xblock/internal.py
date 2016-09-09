@@ -1,6 +1,7 @@
 """
 Internal machinery used to make building XBlock family base classes easier.
 """
+from __future__ import unicode_literals
 from builtins import object
 import future.utils
 

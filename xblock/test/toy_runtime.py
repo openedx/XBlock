@@ -1,4 +1,5 @@
 """A very basic toy runtime for XBlock tests."""
+from __future__ import unicode_literals
 import logging
 
 try:

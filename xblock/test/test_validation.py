@@ -1,6 +1,7 @@
 """
 Test xblock/validation.py
 """
+from __future__ import unicode_literals
 
 import unittest
 from xblock.test.tools import assert_raises

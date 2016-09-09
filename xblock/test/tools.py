@@ -1,6 +1,7 @@
 """
 Tools for testing XBlocks
 """
+from __future__ import unicode_literals
 from builtins import zip
 from builtins import object
 import warnings

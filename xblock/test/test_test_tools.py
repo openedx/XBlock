@@ -3,6 +3,7 @@
 "The only code you have to test is the code you want to work."
 
 """
+from __future__ import unicode_literals
 from builtins import object
 
 from abc import ABCMeta, abstractmethod

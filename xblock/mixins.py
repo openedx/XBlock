@@ -2,6 +2,7 @@
 This module defines all of the Mixins that provide components of XBlock-family
 functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
+from __future__ import unicode_literals
 from past.builtins import basestring
 from builtins import object
 import future.utils

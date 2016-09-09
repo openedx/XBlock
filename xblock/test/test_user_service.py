@@ -1,6 +1,7 @@
 """
 Tests for the UserService
 """
+from __future__ import unicode_literals
 from past.builtins import basestring
 import collections
 from xblock.reference.user_service import XBlockUser, UserService

@@ -3,6 +3,7 @@
 Tests the fundamentals of XBlocks including - but not limited to -
 metaclassing, field access, caching, serialization, and bulk saves.
 """
+from __future__ import unicode_literals
 
 from builtins import str
 

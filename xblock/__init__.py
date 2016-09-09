@@ -1,6 +1,7 @@
 """
 XBlock Courseware Components
 """
+from __future__ import unicode_literals
 
 # For backwards compatability, provide the XBlockMixin in xblock.fields
 # without causing a circular import

@@ -1,4 +1,5 @@
 """Tests of the xblock.internal module."""
+from __future__ import unicode_literals
 from builtins import object
 
 from unittest import TestCase

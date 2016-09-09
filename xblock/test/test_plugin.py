@@ -1,6 +1,7 @@
 """
 Test xblock/core/plugin.py
 """
+from __future__ import unicode_literals
 
 from mock import patch, Mock
 

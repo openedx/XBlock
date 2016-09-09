@@ -5,6 +5,7 @@ The hosting runtime application decides what actual storage mechanism to use
 for each scope.
 
 """
+from __future__ import unicode_literals
 from builtins import str
 from builtins import zip
 from past.builtins import basestring

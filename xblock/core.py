@@ -5,6 +5,7 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
+from __future__ import unicode_literals
 from builtins import bytes
 import future.utils
 

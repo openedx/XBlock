@@ -1,6 +1,7 @@
 """
 Test XBlock Aside
 """
+from __future__ import unicode_literals
 from builtins import zip
 import future.utils
 

@@ -1,4 +1,5 @@
 """Helpers for WebOb requests and responses."""
+from __future__ import unicode_literals
 from builtins import zip
 from builtins import object
 import future.utils

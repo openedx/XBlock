@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Test XML parsing in XBlocks."""
+from __future__ import unicode_literals
 from builtins import str
 from builtins import object
 import future.utils
