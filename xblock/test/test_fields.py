@@ -64,7 +64,7 @@ class FieldTest(unittest.TestCase):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", DeprecationWarning)
             yield
-        self.assertEquals(count, sum(
+        self.assertEqual(count, sum(
             1 for warning in caught
             if issubclass(warning.category, DeprecationWarning)
         ))
@@ -671,16 +671,16 @@ class SentinelTest(unittest.TestCase):
     """
     def test_equality(self):
         base = Sentinel('base')
-        self.assertEquals(base, base)
-        self.assertEquals(base, Sentinel('base'))
+        self.assertEqual(base, base)
+        self.assertEqual(base, Sentinel('base'))
         self.assertNotEquals(base, Sentinel('foo'))
         self.assertNotEquals(base, 'base')
 
     def test_hashing(self):
         base = Sentinel('base')
         a_dict = {base: True}
-        self.assertEquals(a_dict[Sentinel('base')], True)
-        self.assertEquals(a_dict[base], True)
+        self.assertEqual(a_dict[Sentinel('base')], True)
+        self.assertEqual(a_dict[base], True)
         self.assertNotIn(Sentinel('foo'), a_dict)
         self.assertNotIn('base', a_dict)
 
@@ -695,14 +695,14 @@ class FieldSerializationTest(unittest.TestCase):
         Helper method: checks if _type's to_string given instance of _type returns expected string
         """
         result = _type().to_string(value)
-        self.assertEquals(result, string)
+        self.assertEqual(result, string)
 
     def assert_from_string(self, _type, string, value):
         """
         Helper method: checks if _type's from_string given string representation of type returns expected value
         """
         result = _type().from_string(string)
-        self.assertEquals(result, value)
+        self.assertEqual(result, value)
 
     # Serialisation test data that is tested both ways, i.e. whether serialisation of the value
     # yields the string and deserialisation of the string yields the value.

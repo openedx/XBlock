@@ -692,7 +692,7 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime = TestRuntime(Mock(spec=IdReader), field_data)
         with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEquals(runtime.field_data, field_data)
+            self.assertEqual(runtime.field_data, field_data)
 
     def test_set_field_data(self):
         field_data = Mock(spec=FieldData)
@@ -700,4 +700,4 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime.field_data = field_data
         with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEquals(runtime.field_data, field_data)
+            self.assertEqual(runtime.field_data, field_data)

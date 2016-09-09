@@ -188,7 +188,7 @@ class TestViewsMixin(TestCase):
                 ("multi_featured_view", "functionality2", True),
                 ("multi_featured_view", "bogus_functionality", False),
         ):
-            self.assertEquals(
+            self.assertEqual(
                 test_xblock.has_support(getattr(test_xblock, view_name), functionality),
                 expected_result
             )
@@ -213,7 +213,7 @@ class TestViewsMixin(TestCase):
                 ("functionality_supported_view", "a_functionality", True),
                 ("functionality_supported_view", "bogus_functionality", False),
         ):
-            self.assertEquals(
+            self.assertEqual(
                 test_xblock.has_support(getattr(test_xblock, view_name, None), functionality),
                 expected_result
             )

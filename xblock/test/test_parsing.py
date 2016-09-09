@@ -269,8 +269,8 @@ class ExportTest(XmlTest, unittest.TestCase):
                 sequence='["one", "two", "three"]' />
             """))
 
-        self.assertEquals(block.dictionary, {"foo": "bar"})
-        self.assertEquals(block.sequence, ["one", "two", "three"])
+        self.assertEqual(block.dictionary, {"foo": "bar"})
+        self.assertEqual(block.sequence, ["one", "two", "three"])
 
     @XBlock.register_temp_plugin(LeafWithOption)
     def test_export_then_import_with_options(self):

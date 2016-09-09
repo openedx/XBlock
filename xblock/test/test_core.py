@@ -918,7 +918,7 @@ def test_json_handler_return_unicode():
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     for request_part in response.request:
-        assert_equals(type(request_part), str)
+        assert_is_instance(request_part, str)
 
 
 @ddt.ddt
