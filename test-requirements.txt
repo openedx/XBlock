@@ -1,14 +1,14 @@
 # For Tests
+astroid
+caniusepython3
+coverage
+ddt==0.8.0
+diff-cover >= 0.2.1
 mock
 nose
-coverage
-astroid
+pep8
 pylint
 rednose
-pep8
-caniusepython3
-diff-cover >= 0.2.1
-ddt==0.8.0
 tox
 
 # For docs
