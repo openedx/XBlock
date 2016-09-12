@@ -3,21 +3,23 @@ Machinery to make the common case easy when building new runtimes
 """
 from __future__ import unicode_literals
 from builtins import next, range, object  # pylint: disable=redefined-builtin
-import future.utils
 
+from abc import ABCMeta, abstractmethod
+from collections import namedtuple
 import functools
 import gettext
 import itertools
-import markupsafe
+from io import StringIO, BytesIO
+import json
+import logging
 import re
 import threading
 import warnings
 
-from abc import ABCMeta, abstractmethod
+import future.utils
 from lxml import etree
-from io import StringIO, BytesIO
+import markupsafe
 
-from collections import namedtuple
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
 from xblock.fragment import Fragment
@@ -31,8 +33,6 @@ from xblock.exceptions import (
 )
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 
-import logging
-import json
 
 log = logging.getLogger(__name__)
 

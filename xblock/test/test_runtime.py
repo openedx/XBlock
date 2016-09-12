@@ -3,15 +3,15 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 from builtins import object, str  # pylint: disable=redefined-builtin
-import future.utils
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
 from collections import namedtuple
 from datetime import datetime
-from mock import Mock, patch
 from unittest import TestCase
 
+import future.utils
+from mock import Mock, patch
 from xblock.core import XBlock, XBlockMixin
 from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, Integer
 from xblock.exceptions import (

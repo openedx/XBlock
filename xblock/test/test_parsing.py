@@ -2,15 +2,16 @@
 """Test XML parsing in XBlocks."""
 from __future__ import unicode_literals
 from builtins import str, object  # pylint: disable=redefined-builtin
-import future.utils
 
 import re
 import io
 import textwrap
 import unittest
+
+import future.utils
 import ddt
-import mock
 from lxml import etree
+import mock
 
 from xblock.core import XBlock, XML_NAMESPACES
 from xblock.fields import Scope, String, Integer, Dict, List

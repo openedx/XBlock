@@ -6,13 +6,12 @@ simple.
 """
 from __future__ import unicode_literals
 from builtins import object  # pylint: disable=redefined-builtin
-import future.utils
-
-import copy
 
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+import copy
 
+import future.utils
 from xblock.exceptions import InvalidScopeError
 
 

@@ -2,8 +2,9 @@
 Tests for the UserService
 """
 from __future__ import unicode_literals
-from past.builtins import basestring  # pylint: disable=redefined-builtin
 import collections
+
+from past.builtins import basestring  # pylint: disable=redefined-builtin
 from xblock.reference.user_service import XBlockUser, UserService
 from xblock.test.tools import assert_equals, assert_raises, assert_is_instance, assert_false
 

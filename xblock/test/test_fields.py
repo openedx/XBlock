@@ -6,16 +6,15 @@ from __future__ import unicode_literals
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
 
-from mock import Mock
-import unittest
-
-import datetime as dt
-import pytz
-import warnings
-import math
-import textwrap
-import itertools
 from contextlib import contextmanager
+import datetime as dt
+import itertools
+import math
+from mock import Mock
+import pytz
+import textwrap
+import unittest
+import warnings
 
 import ddt
 

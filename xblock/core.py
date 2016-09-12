@@ -7,14 +7,14 @@ and used by all runtimes.
 """
 from __future__ import unicode_literals
 from builtins import bytes  # pylint: disable=redefined-builtin
-import future.utils
 
 import inspect
-import pkg_resources
 import warnings
 import os
 from collections import defaultdict
 
+import future.utils
+import pkg_resources
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
 from xblock.internal import class_lazy
@@ -30,6 +30,9 @@ from xblock.mixins import (
 )
 from xblock.plugin import Plugin
 from xblock.validation import Validation
+
+# This is imported just to re-expose exceptions that were moved into that file
+import xblock.exceptions
 
 # exposing XML_NAMESPACES as a member of core, in order to avoid importing mixins where
 # XML_NAMESPACES are needed (e.g. runtime.py).
@@ -295,10 +298,6 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         be serialized as XML at all.
         """
         return any(field.is_set_on(self) for field in future.utils.itervalues(self.fields))
-
-
-# Maintain backwards compatibility
-import xblock.exceptions
 
 
 class KeyValueMultiSaveError(xblock.exceptions.KeyValueMultiSaveError):

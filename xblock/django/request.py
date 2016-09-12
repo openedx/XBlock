@@ -1,12 +1,13 @@
 """Helpers for WebOb requests and responses."""
 from __future__ import unicode_literals
 from builtins import zip, object  # pylint: disable=redefined-builtin
-import future.utils
 
-import webob
 from collections import MutableMapping
-from lazy import lazy
 from itertools import chain, repeat
+
+import future.utils
+from lazy import lazy
+import webob
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 

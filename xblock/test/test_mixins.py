@@ -3,15 +3,15 @@ Tests of the XBlock-family functionality mixins
 """
 from __future__ import unicode_literals
 from builtins import object  # pylint: disable=redefined-builtin
-import future.utils
 
-import ddt as ddt
 from datetime import datetime
-import pytz
-from lxml import etree
-import mock
 from unittest import TestCase
 
+import ddt as ddt
+import future.utils
+from lxml import etree
+import mock
+import pytz
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
 from xblock.field_data import DictFieldData

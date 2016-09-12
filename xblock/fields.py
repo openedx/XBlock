@@ -7,20 +7,21 @@ for each scope.
 """
 from __future__ import unicode_literals
 from builtins import str, zip, object  # pylint: disable=redefined-builtin
-import future.utils
 
 from collections import namedtuple
 import copy
 import datetime
-import dateutil.parser
 import hashlib
 import itertools
-import pytz
 import traceback
 import warnings
 import json
-import yaml
 import unicodedata
+import yaml
+
+import dateutil.parser
+import future.utils
+import pytz
 
 from xblock.internal import Nameable
 
@@ -349,7 +350,7 @@ class Field(Nameable):
     def name(self):
         """Returns the name of this field."""
         # This is set by ModelMetaclass
-        return self.__name__ or 'unknown'
+        return self.__name__ or 'unknown'  # pylint: disable=no-member
 
     @property
     def values(self):

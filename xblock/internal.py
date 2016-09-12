@@ -3,10 +3,11 @@ Internal machinery used to make building XBlock family base classes easier.
 """
 from __future__ import unicode_literals
 from builtins import object  # pylint: disable=redefined-builtin
-import future.utils
 
 import functools
 import inspect
+
+import future.utils
 
 
 class LazyClassProperty(object):

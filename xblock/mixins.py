@@ -4,19 +4,19 @@ functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
 from __future__ import unicode_literals
 from builtins import object  # pylint: disable=redefined-builtin
-from past.builtins import basestring  # pylint: disable=redefined-builtin
-import future.utils
 
-import functools
-import inspect
-import logging
-from lxml import etree
 import copy
 from collections import OrderedDict
-
+import functools
+import inspect
 import json
+import logging
 import warnings
 
+import future.utils
+from past.builtins import basestring  # pylint: disable=redefined-builtin
+
+from lxml import etree
 from webob import Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
@@ -157,7 +157,7 @@ class RuntimeServicesMixin(object):
         Returns:
             One of "need", "want", or None.
         """
-        return cls._combined_services.get(service_name)
+        return cls._combined_services.get(service_name)  # pylint: disable=no-member
 
 
 @RuntimeServicesMixin.needs('field-data')
