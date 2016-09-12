@@ -674,8 +674,8 @@ class SentinelTest(unittest.TestCase):
         base = Sentinel('base')
         self.assertEqual(base, base)
         self.assertEqual(base, Sentinel('base'))
-        self.assertNotEquals(base, Sentinel('foo'))
-        self.assertNotEquals(base, 'base')
+        self.assertNotEqual(base, Sentinel('foo'))
+        self.assertNotEqual(base, 'base')
 
     def test_hashing(self):
         base = Sentinel('base')
