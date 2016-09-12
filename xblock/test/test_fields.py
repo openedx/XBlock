@@ -10,13 +10,13 @@ from contextlib import contextmanager
 import datetime as dt
 import itertools
 import math
-from mock import Mock
-import pytz
 import textwrap
 import unittest
 import warnings
 
 import ddt
+from mock import Mock
+import pytz
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
