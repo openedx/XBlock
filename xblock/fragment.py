@@ -3,6 +3,8 @@
 This code is in the Runtime layer.
 
 """
+from __future__ import unicode_literals
+from builtins import object, str  # pylint: disable=redefined-builtin
 
 from collections import namedtuple
 
@@ -86,7 +88,7 @@ class Fragment(object):
         that it is the only content on the page.
 
         """
-        assert isinstance(content, unicode)
+        assert isinstance(content, str)
         self.content += content
 
     def _default_placement(self, mimetype):

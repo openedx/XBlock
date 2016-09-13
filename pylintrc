@@ -12,14 +12,14 @@ profile=no
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS, migrations
+ignore=CVS, migrations, .tox
 
 # Pickle collected data for later comparisons.
 persistent=yes
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins=
+load-plugins=caniusepython3.pylint_checker
 
 
 [MESSAGES CONTROL]
@@ -46,6 +46,7 @@ disable=
     star-args,
     abstract-class-not-used,
     abstract-class-little-used,
+    abstract-class-instantiated,
     no-init,
     too-many-lines,
     no-self-use,
@@ -56,7 +57,8 @@ disable=
     too-many-return-statements,
     too-many-branches,
     too-many-arguments,
-    too-many-locals
+    too-many-locals,
+    duplicate-code,
 
 
 [REPORTS]
@@ -146,6 +148,8 @@ no-docstring-rgx=__.*__|test_.+|setUp|tearDown
 # Minimum line length for functions/classes that require docstrings, shorter
 # ones are exempt.
 docstring-min-length=-1
+
+extension-pkg-whitelist=lxml
 
 
 [FORMAT]

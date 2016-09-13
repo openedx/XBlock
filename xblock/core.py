@@ -5,12 +5,16 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
+from __future__ import unicode_literals
+from builtins import bytes  # pylint: disable=redefined-builtin
+
 import inspect
-import pkg_resources
 import warnings
 import os
 from collections import defaultdict
 
+import future.utils
+import pkg_resources
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
 from xblock.internal import class_lazy
@@ -26,6 +30,9 @@ from xblock.mixins import (
 )
 from xblock.plugin import Plugin
 from xblock.validation import Validation
+
+# This is imported just to re-expose exceptions that were moved into that file
+import xblock.exceptions
 
 # exposing XML_NAMESPACES as a member of core, in order to avoid importing mixins where
 # XML_NAMESPACES are needed (e.g. runtime.py).
@@ -89,6 +96,9 @@ class SharedBlockBase(Plugin):
         matched against a whitelist regex to ensure that you do not serve an
         unauthorized resource.
         """
+
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
 
         # If no resources_dir is set, then this XBlock cannot serve local resources.
         if cls.resources_dir is None:
@@ -287,11 +297,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         If all of the aside's data is empty or a default value, then the aside shouldn't
         be serialized as XML at all.
         """
-        return any([field.is_set_on(self) for field in self.fields.itervalues()])
-
-
-# Maintain backwards compatibility
-import xblock.exceptions
+        return any(field.is_set_on(self) for field in future.utils.itervalues(self.fields))
 
 
 class KeyValueMultiSaveError(xblock.exceptions.KeyValueMultiSaveError):

@@ -3,16 +3,18 @@
 Tests the fundamentals of XBlocks including - but not limited to -
 metaclassing, field access, caching, serialization, and bulk saves.
 """
+from __future__ import unicode_literals
+from builtins import next, str  # pylint: disable=redefined-builtin
 
 # Allow accessing protected members for testing purposes
 # pylint: disable=W0212
-from mock import patch, MagicMock, Mock
 from datetime import datetime
 import json
 import re
 import unittest
 
 import ddt
+from mock import patch, MagicMock, Mock
 from webob import Response
 
 from xblock.core import XBlock
@@ -29,9 +31,14 @@ from xblock.mixins import ScopedStorageMixin
 from xblock.runtime import Runtime
 
 from xblock.test.tools import (
-    assert_equals, assert_raises, assert_raises_regexp,
-    assert_not_equals, assert_false,
-    WarningTestMixin, TestRuntime,
+    assert_equals,
+    assert_false,
+    assert_is_instance,
+    assert_not_equals,
+    assert_raises,
+    assert_raises_regexp,
+    WarningTestMixin,
+    TestRuntime,
 )
 
 
@@ -588,7 +595,7 @@ def test_xblock_save_one():
     def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
-        raise KeyValueMultiSaveError([update_dict.keys()[0]])
+        raise KeyValueMultiSaveError([next(iter(update_dict))])
 
     field_tester = setup_save_failure(fake_set_many)
 
@@ -821,10 +828,10 @@ def test_cached_parent():
 
 def test_json_handler_basic():
     test_self = Mock()
-    test_data = {"foo": "bar", "baz": "quux"}
+    test_data = {u"foo": u"bar", u"baz": u"quux"}
     test_data_json = json.dumps(test_data)
-    test_suffix = "suff"
-    test_request = Mock(method="POST", body=test_data_json)
+    test_suffix = u"suff"
+    test_request = Mock(method=u"POST", body=test_data_json)
 
     @XBlock.json_handler
     def test_func(self, request, suffix):
@@ -835,7 +842,7 @@ def test_json_handler_basic():
 
     response = test_func(test_self, test_request, test_suffix)
     assert_equals(response.status_code, 200)
-    assert_equals(response.body, test_data_json)
+    assert_equals(response.body.decode('utf-8'), test_data_json)
     assert_equals(response.content_type, "application/json")
 
 
@@ -849,7 +856,7 @@ def test_json_handler_invalid_json():
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 400)
-    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    assert_equals(json.loads(response.body.decode('utf-8')), {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
 
 
@@ -863,7 +870,7 @@ def test_json_handler_get():
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 405)
-    assert_equals(json.loads(response.body), {"error": "Method must be POST"})
+    assert_equals(json.loads(response.body.decode('utf-8')), {"error": "Method must be POST"})
     assert_equals(list(response.allow), ["POST"])
 
 
@@ -877,23 +884,23 @@ def test_json_handler_empty_request():
     response = test_func(Mock(), test_request, "dummy_suffix")
     # pylint: disable=no-member
     assert_equals(response.status_code, 400)
-    assert_equals(json.loads(response.body), {"error": "Invalid JSON"})
+    assert_equals(json.loads(response.body.decode('utf-8')), {"error": "Invalid JSON"})
     assert_equals(response.content_type, "application/json")
 
 
 def test_json_handler_error():
     test_status_code = 418
-    test_message = "I'm a teapot"
-    test_request = Mock(method="POST", body="{}")
+    test_message = u"I'm a teapot"
+    test_request = Mock(method=u"POST", body="{}")
 
     @XBlock.json_handler
     def test_func(self, request, suffix):   # pylint: disable=unused-argument
         raise JsonHandlerError(test_status_code, test_message)
 
-    response = test_func(Mock(), test_request, "dummy_suffix")  # pylint: disable=assignment-from-no-return
+    response = test_func(Mock(), test_request, u"dummy_suffix")  # pylint: disable=assignment-from-no-return
     assert_equals(response.status_code, test_status_code)
-    assert_equals(json.loads(response.body), {"error": test_message})
-    assert_equals(response.content_type, "application/json")
+    assert_equals(json.loads(response.body.decode('utf-8')), {u"error": test_message})
+    assert_equals(response.content_type, u"application/json")
 
 
 def test_json_handler_return_response():
@@ -901,12 +908,12 @@ def test_json_handler_return_response():
 
     @XBlock.json_handler
     def test_func(self, request, suffix):  # pylint: disable=unused-argument
-        return Response(body="not JSON", status=418, content_type="text/plain")
+        return Response(body=u"not JSON", status=418, content_type=u"text/plain")
 
-    response = test_func(Mock(), test_request, "dummy_suffix")
-    assert_equals(response.body, "not JSON")
+    response = test_func(Mock(), test_request, u"dummy_suffix")
+    assert_equals(response.ubody, u"not JSON")
     assert_equals(response.status_code, 418)
-    assert_equals(response.content_type, "text/plain")
+    assert_equals(response.content_type, u"text/plain")
 
 
 def test_json_handler_return_unicode():
@@ -918,7 +925,7 @@ def test_json_handler_return_unicode():
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     for request_part in response.request:
-        assert_equals(type(request_part), unicode)
+        assert_is_instance(request_part, str)
 
 
 @ddt.ddt
@@ -939,48 +946,78 @@ class OpenLocalResourceTest(unittest.TestCase):
         return "!" + name + "!"
 
     @ddt.data(
-        "public/hey.js",
-        "public/sub/hey.js",
-        "public/js/vendor/jNotify.jQuery.min.js",
-        "public/something.foo",         # Unknown file extension is fine
-        "public/a/long/PATH/no-problem=here$123.ext",
-        "public/ℓιвяαяу.js",
+        u"public/hey.js",
+        u"public/sub/hey.js",
+        u"public/js/vendor/jNotify.jQuery.min.js",
+        u"public/something.foo",         # Unknown file extension is fine
+        u"public/a/long/PATH/no-problem=here$123.ext",
+        u"public/ℓιвяαяу.js",
     )
     def test_open_good_local_resource(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)
         with patch('pkg_resources.resource_stream', self.stub_resource_stream):
             assert loadable.open_local_resource(uri) == "!" + uri + "!"
+            assert loadable.open_local_resource(uri.encode('utf-8')) == "!" + uri + "!"
 
     @ddt.data(
-        "public/../secret.js",
-        "public/.git/secret.js",
-        "static/secret.js",
-        "../public/no-no.bad",
-        "image.png",
-        ".git/secret.js",
-        "static/ℓιвяαяу.js",
+        u"public/hey.js".encode('utf-8'),
+        u"public/sub/hey.js".encode('utf-8'),
+        u"public/js/vendor/jNotify.jQuery.min.js".encode('utf-8'),
+        u"public/something.foo".encode('utf-8'),         # Unknown file extension is fine
+        u"public/a/long/PATH/no-problem=here$123.ext".encode('utf-8'),
+        u"public/ℓιвяαяу.js".encode('utf-8'),
+    )
+    def test_open_good_local_resource_binary(self, uri):
+        loadable = self.LoadableXBlock(None, scope_ids=None)
+        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+            assert loadable.open_local_resource(uri) == "!" + uri.decode('utf-8') + "!"
+
+    @ddt.data(
+        u"public/../secret.js",
+        u"public/.git/secret.js",
+        u"static/secret.js",
+        u"../public/no-no.bad",
+        u"image.png",
+        u".git/secret.js",
+        u"static/ℓιвяαяу.js",
     )
     def test_open_bad_local_resource(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)
         with patch('pkg_resources.resource_stream', self.stub_resource_stream):
-            msg = ".*: %s" % re.escape(repr(uri))
+            msg_pattern = ".*: %s" % re.escape(repr(uri))
+            with assert_raises_regexp(DisallowedFileError, msg_pattern):
+                loadable.open_local_resource(uri)
+
+    @ddt.data(
+        u"public/../secret.js".encode('utf-8'),
+        u"public/.git/secret.js".encode('utf-8'),
+        u"static/secret.js".encode('utf-8'),
+        u"../public/no-no.bad".encode('utf-8'),
+        u"image.png".encode('utf-8'),
+        u".git/secret.js".encode('utf-8'),
+        u"static/ℓιвяαяу.js".encode('utf-8'),
+    )
+    def test_open_bad_local_resource_binary(self, uri):
+        loadable = self.LoadableXBlock(None, scope_ids=None)
+        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+            msg = u".*: %s" % re.escape(repr(uri.decode('utf-8')))
             with assert_raises_regexp(DisallowedFileError, msg):
                 loadable.open_local_resource(uri)
 
     @ddt.data(
-        "public/hey.js",
-        "public/sub/hey.js",
-        "public/js/vendor/jNotify.jQuery.min.js",
-        "public/something.foo",         # Unknown file extension is fine
-        "public/a/long/PATH/no-problem=here$123.ext",
-        "public/ℓιвяαяу.js",
-        "public/foo.js",
-        "public/.git/secret.js",
-        "static/secret.js",
-        "../public/no-no.bad",
-        "image.png",
-        ".git/secret.js",
-        "static/ℓιвяαяу.js",
+        u"public/hey.js",
+        u"public/sub/hey.js",
+        u"public/js/vendor/jNotify.jQuery.min.js",
+        u"public/something.foo",         # Unknown file extension is fine
+        u"public/a/long/PATH/no-problem=here$123.ext",
+        u"public/ℓιвяαяу.js",
+        u"public/foo.js",
+        u"public/.git/secret.js",
+        u"static/secret.js",
+        u"../public/no-no.bad",
+        u"image.png",
+        u".git/secret.js",
+        u"static/ℓιвяαяу.js",
     )
     def test_open_local_resource_with_no_resources_dir(self, uri):
         unloadable = self.UnloadableXBlock(None, scope_ids=None)

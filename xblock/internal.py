@@ -1,8 +1,13 @@
 """
 Internal machinery used to make building XBlock family base classes easier.
 """
+from __future__ import unicode_literals
+from builtins import object  # pylint: disable=redefined-builtin
+
 import functools
 import inspect
+
+import future.utils
 
 
 class LazyClassProperty(object):
@@ -38,7 +43,7 @@ class NamedAttributesMetaclass(type):
     def __new__(mcs, name, bases, attrs):
         # Iterate over the attrs before they're bound to the class
         # so that we don't accidentally trigger any __get__ methods
-        for attr_name, attr in attrs.iteritems():
+        for attr_name, attr in future.utils.iteritems(attrs):
             if Nameable.needs_name(attr):
                 attr.__name__ = attr_name
 
@@ -60,12 +65,10 @@ class Nameable(object):
     """
     __slots__ = ('__name__')
 
-    __name__ = None
-
     @staticmethod
     def needs_name(obj):
         """
         Return True if `obj` is a :class:`.Nameable` object that
         hasn't yet been assigned a name.
         """
-        return isinstance(obj, Nameable) and obj.__name__ is None
+        return isinstance(obj, Nameable) and getattr(obj, '__name__', None) is None

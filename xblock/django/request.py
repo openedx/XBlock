@@ -1,9 +1,13 @@
 """Helpers for WebOb requests and responses."""
+from __future__ import unicode_literals
+from builtins import zip, object  # pylint: disable=redefined-builtin
 
-import webob
 from collections import MutableMapping
+from itertools import chain, repeat
+
+import future.utils
 from lazy import lazy
-from itertools import chain, repeat, izip
+import webob
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
@@ -76,9 +80,15 @@ def querydict_to_multidict(query_dict, wrap=None):
 
     """
     wrap = wrap or (lambda val: val)
+
+    if future.utils.PY2:
+        item_lists = query_dict.iterlists()
+    else:
+        item_lists = query_dict.lists()
+
     return MultiDict(chain.from_iterable(
-        izip(repeat(key), (wrap(v) for v in vals))
-        for key, vals in query_dict.iterlists()
+        zip(repeat(key), (wrap(v) for v in vals))
+        for key, vals in item_lists
     ))
 
 

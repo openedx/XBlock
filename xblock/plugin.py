@@ -3,6 +3,8 @@
 This code is in the Runtime layer.
 
 """
+from __future__ import unicode_literals
+from builtins import object  # pylint: disable=redefined-builtin
 
 import functools
 import itertools

@@ -1,0 +1,24 @@
+# For Tests
+astroid
+caniusepython3
+coverage
+ddt==0.8.0
+diff-cover >= 0.2.1
+mock
+nose
+pep8
+pylint
+rednose
+tox
+
+# For docs
+-r doc/requirements.txt
+
+# For generating new XBlocks
+cookiecutter
+
+# Our own XBlocks
+-e .
+
+# pyfilesystem
+fs

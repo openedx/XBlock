@@ -1,4 +1,5 @@
 """Script execution for script fragments in content."""
+from __future__ import unicode_literals
 
 import textwrap
 
@@ -13,6 +14,6 @@ def run_script(pycode):
 
     # execute it.
     globs = {}
-    exec pycode in globs, globs  # pylint: disable=W0122
+    exec(pycode, globs, globs)  # pylint: disable=W0122
 
     return globs

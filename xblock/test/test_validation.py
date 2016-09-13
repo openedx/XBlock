@@ -1,6 +1,7 @@
 """
 Test xblock/validation.py
 """
+from __future__ import unicode_literals
 
 import unittest
 from xblock.test.tools import assert_raises
@@ -21,7 +22,7 @@ class ValidationMessageTest(unittest.TestCase):
             ValidationMessage("unknown type", u"Unknown type info")
 
         with assert_raises(TypeError):
-            ValidationMessage(ValidationMessage.WARNING, "Non-unicode message")
+            ValidationMessage(ValidationMessage.WARNING, b"Non-unicode message")
 
     def test_to_json(self):
         """

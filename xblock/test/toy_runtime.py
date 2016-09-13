@@ -1,4 +1,5 @@
 """A very basic toy runtime for XBlock tests."""
+from __future__ import unicode_literals
 import logging
 
 try:
@@ -6,6 +7,7 @@ try:
 except ImportError:
     import json
 
+import future.utils
 from xblock.fields import Scope
 from xblock.runtime import (
     KvsFieldData, KeyValueStore, Runtime, MemoryIdManager
@@ -83,7 +85,7 @@ class ToyRuntimeKeyValueStore(KeyValueStore):
         `update_dict`: A dictionary of keys: values.
         This method sets the value of each key to the specified new value.
         """
-        for key, value in update_dict.items():
+        for key, value in future.utils.iteritems(update_dict):
             # We just call `set` directly here, because this is an in-memory representation
             # thus we don't concern ourselves with bulk writes.
             self.set(key, value)

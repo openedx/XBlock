@@ -23,6 +23,8 @@ covered, we define sets of test properties (which actually implement the
 tests of the various operations), and test setup (which set up the
 particular combination of initial conditions that we want to test)
 """
+from __future__ import unicode_literals
+from builtins import next, range, object  # pylint: disable=redefined-builtin
 
 import copy
 from mock import Mock, patch
@@ -437,7 +439,7 @@ class MutableTestCases(UniversalTestCases, MutationProperties):
     """Set up tests of a mutable field"""
     field_class = List
     field_default = []
-    new_value = ['a', 'b']
+    new_value = [u'a', u'b']
 
     def mutate(self, value):
         """Modify the supplied value"""
@@ -448,7 +450,7 @@ class UniqueIdTestCases(ImmutableTestCases):
     """Set up tests for field with UNIQUE_ID default"""
     field_class = String
     field_default = UNIQUE_ID
-    new_value = 'user-assigned ID'
+    new_value = u'user-assigned ID'
 # pylint: enable=no-member
 
 
@@ -466,7 +468,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
 
     @property
     def default_iterator(self):
-        return iter(xrange(1000))
+        return iter(range(1000))
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
@@ -483,7 +485,7 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
 
     @property
     def default_iterator(self):
-        return ([None] * i for i in xrange(1000))
+        return ([None] * i for i in range(1000))
 
 
 class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):

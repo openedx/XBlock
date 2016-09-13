@@ -1,6 +1,7 @@
 """
 Test xblock/core/plugin.py
 """
+from __future__ import unicode_literals
 
 from mock import patch, Mock
 
@@ -79,7 +80,7 @@ def _num_plugins_cached():
     """
     Returns the number of plugins that have been cached.
     """
-    return len(plugin.PLUGIN_CACHE.keys())
+    return len(plugin.PLUGIN_CACHE)
 
 
 @XBlock.register_temp_plugin(AmbiguousBlock1, "thumbs")

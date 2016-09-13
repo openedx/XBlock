@@ -5,12 +5,16 @@ branches:
       - master
 python:
   - "2.7"
+  - "3.5"
 cache: pip
 install:
-  - pip install -r requirements.txt
-  - pip install -r django_requirements.txt
+  - pip install -r test-requirements.txt
+  - pip install tox
   - pip install coveralls
 script:
   - make test doc quality
 after_success:
   - coveralls
+env:
+  - TOXENV=djangoNA
+  - TOXENV=django18

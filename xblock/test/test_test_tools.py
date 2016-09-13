@@ -3,18 +3,18 @@
 "The only code you have to test is the code you want to work."
 
 """
+from __future__ import unicode_literals
+from builtins import object  # pylint: disable=redefined-builtin
 
 from abc import ABCMeta, abstractmethod
-
-import unittest
+from unittest import TestCase
 
 from xblock.test.tools import unabc
+import future.utils
 
 
-class Abstract(object):
+class Abstract(future.utils.with_metaclass(ABCMeta, object)):
     """Our test subject: an abstract class with two abstract methods."""
-
-    __metaclass__ = ABCMeta
 
     def concrete(self, arg):
         """This is available as-is on all subclasses."""
@@ -43,7 +43,7 @@ class ForceConcreteMessage(Abstract):
     pass
 
 
-class TestUnAbc(unittest.TestCase):
+class TestUnAbc(TestCase):
     """Test the @unabc decorator."""
 
     def test_cant_abstract(self):

@@ -4,21 +4,21 @@ data to particular scoped fields by name. This allows individual runtimes to
 provide varied persistence backends while keeping the API used by the `XBlock`
 simple.
 """
-
-import copy
+from __future__ import unicode_literals
+from builtins import object  # pylint: disable=redefined-builtin
 
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
+import copy
 
+import future.utils
 from xblock.exceptions import InvalidScopeError
 
 
-class FieldData(object):
+class FieldData(future.utils.with_metaclass(ABCMeta, object)):
     """
     An interface allowing access to an XBlock's field values indexed by field names.
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get(self, block, name):
@@ -87,7 +87,7 @@ class FieldData(object):
         :param update_dict: A map of field names to their new values
         :type update_dict: dict
         """
-        for key, value in update_dict.items():
+        for key, value in future.utils.iteritems(update_dict):
             self.set(block, key, value)
 
     def default(self, block, name):  # pylint: disable=unused-argument
@@ -161,9 +161,9 @@ class SplitFieldData(FieldData):
 
     def set_many(self, block, update_dict):
         update_dicts = defaultdict(dict)
-        for key, value in update_dict.items():
+        for key, value in future.utils.iteritems(update_dict):
             update_dicts[self._field_data(block, key)][key] = value
-        for field_data, update_dict in update_dicts.items():
+        for field_data, update_dict in future.utils.iteritems(update_dicts):
             field_data.set_many(block, update_dict)
 
     def delete(self, block, name):

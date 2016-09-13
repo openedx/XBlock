@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 """Tests the features of xblock/runtime"""
+from __future__ import print_function
+from __future__ import unicode_literals
+from builtins import object, str  # pylint: disable=redefined-builtin
 # Allow tests to access private members of classes
 # pylint: disable=W0212
 
 from collections import namedtuple
 from datetime import datetime
-from mock import Mock, patch
 from unittest import TestCase
 
+import future.utils
+from mock import Mock, patch
 from xblock.core import XBlock, XBlockMixin
 from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, Integer
 from xblock.exceptions import (
@@ -121,16 +125,16 @@ def check_field(collection, field):
     Sets the field to a new value and asserts that the update properly occurs.
     Deletes the new value, and asserts that the default value is properly restored.
     """
-    print "Getting %s from %r" % (field.name, collection)
+    print("Getting %s from %r" % (field.name, collection))
     assert_equals(field.default, getattr(collection, field.name))
     new_value = 'new ' + field.name
-    print "Setting %s to %s on %r" % (field.name, new_value, collection)
+    print("Setting %s to %s on %r" % (field.name, new_value, collection))
     setattr(collection, field.name, new_value)
-    print "Checking %s on %r" % (field.name, collection)
+    print("Checking %s on %r" % (field.name, collection))
     assert_equals(new_value, getattr(collection, field.name))
-    print "Deleting %s from %r" % (field.name, collection)
+    print("Deleting %s from %r" % (field.name, collection))
     delattr(collection, field.name)
-    print "Back to defaults for %s in %r" % (field.name, collection)
+    print("Back to defaults for %s in %r" % (field.name, collection))
     assert_equals(field.default, getattr(collection, field.name))
 
 
@@ -144,7 +148,7 @@ def test_db_model_keys():
 
     assert_false(field_data.has(tester, 'not a field'))
 
-    for field in tester.fields.values():
+    for field in future.utils.itervalues(tester.fields):
         new_value = 'new ' + field.name
         assert_false(field_data.has(tester, field.name))
         if isinstance(field, List):
@@ -155,7 +159,7 @@ def test_db_model_keys():
     tester.save()
 
     # Make sure everything saved correctly
-    for field in tester.fields.values():
+    for field in future.utils.itervalues(tester.fields):
         assert_true(field_data.has(tester, field.name))
 
     def get_key_value(scope, user_id, block_scope_id, field_name):
@@ -225,7 +229,7 @@ def test_querypath_parsing():
     mrun = MockRuntimeForQuerying()
     block = Mock()
     mrun.querypath(block, "..//@hello")
-    print mrun.mock_query.mock_calls
+    print(mrun.mock_query.mock_calls)
     expected = Mock()
     expected.parent().descendants().attr("hello")
     assert mrun.mock_query.mock_calls == expected.mock_calls
@@ -408,7 +412,7 @@ class Dynamic(object):
     Object for testing that sets attrs based on __init__ kwargs
     """
     def __init__(self, **kwargs):
-        for name, value in kwargs.items():
+        for name, value in future.utils.iteritems(kwargs):
             setattr(self, name, value)
 
 
@@ -536,8 +540,8 @@ class XBlockWithServices(XBlock):
         def assert_equals_unicode(str1, str2):
             """`str1` equals `str2`, and both are Unicode strings."""
             assert_equals(str1, str2)
-            assert isinstance(str1, unicode)
-            assert isinstance(str2, unicode)
+            assert isinstance(str1, str)
+            assert isinstance(str2, str)
 
         i18n = self.runtime.service(self, "i18n")
         assert_equals_unicode(u"Welcome!", i18n.ugettext("Welcome!"))
@@ -588,7 +592,7 @@ def test_ugettext_calls():
     runtime = TestRuntime()
     block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
     assert_equals(block.ugettext('test'), u'test')
-    assert_true(isinstance(block.ugettext('test'), unicode))
+    assert_true(isinstance(block.ugettext('test'), str))
 
     # NoSuchServiceError exception should raise if i18n is none/empty.
     runtime = TestRuntime(services={
@@ -690,7 +694,7 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime = TestRuntime(Mock(spec=IdReader), field_data)
         with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEquals(runtime.field_data, field_data)
+            self.assertEqual(runtime.field_data, field_data)
 
     def test_set_field_data(self):
         field_data = Mock(spec=FieldData)
@@ -698,4 +702,4 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime.field_data = field_data
         with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEquals(runtime.field_data, field_data)
+            self.assertEqual(runtime.field_data, field_data)
