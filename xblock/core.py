@@ -105,6 +105,20 @@ class SharedBlockBase(Plugin):
 
         return pkg_resources.resource_stream(cls.__module__, os.path.join(cls.resources_dir, uri))
 
+    @property
+    def supports_save(self):
+        """
+        True if this block supports being saved.
+        """
+        return False
+
+    @property
+    def supports_asides(self):
+        """
+        True if this block can be shown with asides.
+        """
+        return False
+
 
 # -- Base Block
 class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin,
@@ -188,9 +202,12 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         # Provide backwards compatibility for external access through _field_data
         super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
 
-    def render(self, view, context=None):
-        """Render `view` with this block's runtime and the supplied `context`"""
-        return self.runtime.render(self, view, context)
+    @property
+    def supports_asides(self):
+        """
+        True if this block can be shown with asides.
+        """
+        return True
 
     def validate(self):
         """
@@ -221,7 +238,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
 
 class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, SharedBlockBase):
     """
-    This mixin allows Xblock-like class to declare that it provides aside functionality.
+    This class allows XBlock-like classes to declare that they provides aside functionality.
     """
 
     entry_point = "xblock_asides.v1"
@@ -288,6 +305,44 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         be serialized as XML at all.
         """
         return any([field.is_set_on(self) for field in self.fields.itervalues()])
+
+
+# -- UI-only Block
+class UIBlock(RuntimeServicesMixin, HandlersMixin, ViewsMixin, SharedBlockBase):
+    """Base class for UI Blocks.
+
+    This class differs from XBlocks in that they are intended only to
+    provide pluggable user interfaces. They explicitly have no state
+    and cannot be persisted.
+
+    Derive from this class to create a new kind of UIBlock.  There are no
+    required methods, but you will probably need at least one view.
+
+    Don't provide the ``__init__`` method when deriving from this class.
+
+    """
+    entry_point = 'ui_block.v1'
+
+    def __init__(self, block_type, runtime, *args, **kwargs):
+        """
+        Construct a new UIBlock.
+
+        This class should only be instantiated by runtimes.
+
+        Arguments:
+
+            runtime (:class:`.Runtime`): Use it to access the environment.
+                It is available in XBlock code as ``self.runtime``.
+
+            field_data (:class:`.FieldData`): Interface used by the XBlock
+                fields to access their data from wherever it is persisted.
+                Deprecated.
+
+            scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
+                scopes.
+        """
+        super(UIBlock, self).__init__(runtime=runtime, *args, **kwargs)
+        self.block_type = block_type
 
 
 # Maintain backwards compatibility

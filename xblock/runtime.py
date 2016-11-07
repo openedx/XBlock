@@ -26,7 +26,7 @@ from xblock.exceptions import (
     NoSuchDefinition,
     FieldDataDeprecationWarning,
 )
-from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
+from xblock.core import UIBlock, XBlock, XBlockAside, XML_NAMESPACES
 
 import logging
 import json
@@ -612,7 +612,7 @@ class Runtime(object):
         return XBlockAside.load_class(aside_type, select=self.select)
 
     def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
-        r"""
+        """
         Construct a new xblock of the type identified by block_type,
         passing \*args and \*\*kwargs into `__init__`.
         """
@@ -649,6 +649,19 @@ class Runtime(object):
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
         block = self.construct_xblock(block_type, keys, for_parent=for_parent)
         return block
+
+    def load_ui_block_type(self, block_type):
+        """
+        Returns a subclass of :class:`.UIBlock` that corresponds to the specified `block_type`.
+        """
+        return UIBlock.load_class(block_type, select=self.select)
+
+    def construct_ui_block(self, block_type, *args, **kwargs):
+        """
+        Construct a new UI block of the type identified by block_type,
+        passing \*args and \*\*kwargs into `__init__`.
+        """
+        return self.load_ui_block_type(block_type)(block_type, self, *args, **kwargs)
 
     def get_aside(self, aside_usage_id):
         """
@@ -806,7 +819,8 @@ class Runtime(object):
             frag = view_fn(context)
 
             # Explicitly save because render action may have changed state
-            block.save()
+            if block.supports_save:
+                block.save()
             updated_frag = self.wrap_xblock(block, view_name, frag, context)
             return self.render_asides(block, view_name, updated_frag, context)
         finally:
@@ -973,13 +987,14 @@ class Runtime(object):
         has the given block's rendering.
         """
         aside_frag_fns = []
-        for aside in self.get_asides(block):
-            aside_view_fn = aside.aside_view_declaration(view_name)
-            if aside_view_fn is not None:
-                aside_frag_fns.append((aside, aside_view_fn))
-        if aside_frag_fns:
-            # layout (overideable by other runtimes)
-            return self.layout_asides(block, context, frag, view_name, aside_frag_fns)
+        if block.supports_asides:
+            for aside in self.get_asides(block):
+                aside_view_fn = aside.aside_view_declaration(view_name)
+                if aside_view_fn is not None:
+                    aside_frag_fns.append((aside, aside_view_fn))
+            if aside_frag_fns:
+                # layout (overideable by other runtimes)
+                return self.layout_asides(block, context, frag, view_name, aside_frag_fns)
         return frag
 
     def layout_asides(self, block, context, frag, view_name, aside_frag_fns):

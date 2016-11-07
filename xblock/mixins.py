@@ -222,6 +222,13 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         super(ScopedStorageMixin, self).__init__(**kwargs)
 
     @property
+    def block_type(self):
+        """
+        Returns the block type for this block.
+        """
+        return self.scope_ids.block_type
+
+    @property
     def _field_data(self):
         """
         Return the FieldData for this XBlock (either as passed in the constructor
@@ -241,6 +248,13 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         """
         warnings.warn("Setting _field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
         self._deprecated_per_instance_field_data = field_data
+
+    @property
+    def supports_save(self):
+        """
+        Returns true if this block supports being saved.
+        """
+        return True
 
     def save(self):
         """Save all dirty fields attached to this XBlock."""
@@ -607,3 +621,7 @@ class ViewsMixin(object):
             True or False
         """
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
+
+    def render(self, view, context=None):
+        """Render `view` with this block's runtime and the supplied `context`"""
+        return self.runtime.render(self, view, context)
