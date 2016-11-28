@@ -249,13 +249,6 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         warnings.warn("Setting _field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
         self._deprecated_per_instance_field_data = field_data
 
-    @property
-    def supports_save(self):
-        """
-        Returns true if this block supports being saved.
-        """
-        return True
-
     def save(self):
         """Save all dirty fields attached to this XBlock."""
         if not self._dirty_fields:

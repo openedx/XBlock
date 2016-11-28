@@ -522,8 +522,8 @@ class Runtime(object):
 
     # Construction
     def __init__(
-            self, id_reader, field_data=None, mixins=(), services=None,
-            default_class=None, select=None, id_generator=None
+            self, id_reader, field_data=None, mixins=(), services=None, ui_block_runtime=None,
+            default_class=None, select=None, id_generator=None,
     ):
         """
         Arguments:
@@ -577,8 +577,9 @@ class Runtime(object):
         if id_generator is None:
             warnings.warn("IdGenerator will be required in the future in order to support XBlockAsides", FutureWarning)
 
-    # Block operations
+        self.ui_block_runtime = ui_block_runtime or UIBlockRuntime(services=self._services)
 
+    # Block operations
     @property
     def field_data(self):
         """
@@ -649,19 +650,6 @@ class Runtime(object):
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
         block = self.construct_xblock(block_type, keys, for_parent=for_parent)
         return block
-
-    def load_ui_block_type(self, block_type):
-        """
-        Returns a subclass of :class:`.UIBlock` that corresponds to the specified `block_type`.
-        """
-        return UIBlock.load_class(block_type, select=self.select)
-
-    def construct_ui_block(self, block_type, *args, **kwargs):
-        """
-        Construct a new UI block of the type identified by block_type,
-        passing \*args and \*\*kwargs into `__init__`.
-        """
-        return self.load_ui_block_type(block_type)(block_type, self, *args, **kwargs)
 
     def get_aside(self, aside_usage_id):
         """
@@ -808,19 +796,11 @@ class Runtime(object):
         old_view_name = self._view_name
         self._view_name = view_name
         try:
-
-            view_fn = getattr(block, view_name, None)
-            if view_fn is None:
-                view_fn = getattr(block, "fallback_view", None)
-                if view_fn is None:
-                    raise NoSuchViewError(block, view_name)
-                view_fn = functools.partial(view_fn, view_name)
-
-            frag = view_fn(context)
+            # Request that the UI runtime render the block
+            frag = self.ui_block_runtime.render(block, view_name=view_name, context=context)
 
             # Explicitly save because render action may have changed state
-            if block.supports_save:
-                block.save()
+            block.save()
             updated_frag = self.wrap_xblock(block, view_name, frag, context)
             return self.render_asides(block, view_name, updated_frag, context)
         finally:
@@ -987,14 +967,13 @@ class Runtime(object):
         has the given block's rendering.
         """
         aside_frag_fns = []
-        if block.supports_asides:
-            for aside in self.get_asides(block):
-                aside_view_fn = aside.aside_view_declaration(view_name)
-                if aside_view_fn is not None:
-                    aside_frag_fns.append((aside, aside_view_fn))
-            if aside_frag_fns:
-                # layout (overideable by other runtimes)
-                return self.layout_asides(block, context, frag, view_name, aside_frag_fns)
+        for aside in self.get_asides(block):
+            aside_view_fn = aside.aside_view_declaration(view_name)
+            if aside_view_fn is not None:
+                aside_frag_fns.append((aside, aside_view_fn))
+        if aside_frag_fns:
+            # layout (overideable by other runtimes)
+            return self.layout_asides(block, context, frag, view_name, aside_frag_fns)
         return frag
 
     def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
@@ -1166,6 +1145,68 @@ class Runtime(object):
             if family_id == family.entry_point:
                 return family
         raise ValueError(u'No such family: {}'.format(family_id))
+
+
+class UIBlockRuntime(object):
+    """
+    Access to the runtime environment for all types of blocks.
+    """
+
+    # Construction
+    def __init__(self, services=None, default_class=None, select=None):
+        """
+        Arguments:
+            services (dictionary): Services to make available through the
+                :meth:`service` method.  There's no point passing anything here
+                if you are overriding :meth:`service` in your sub-class.
+
+            default_class (class): The default class to use if a class can't be found for a
+                particular `block_type` when loading an :class:`.XBlock`.
+
+            select: A function to select from one or more :class:`.XBlock` subtypes found
+                when calling :meth:`.XBlock.load_class` to resolve a `block_type`.
+                This is the same `select` as used by :meth:`.Plugin.load_class`.
+        """
+        self._services = services or {}
+
+        # Provide some default implementations
+        self._services.setdefault("i18n", NullI18nService())
+
+        self.default_class = default_class
+        self.select = select
+
+    def load_ui_block_type(self, block_type):
+        """
+        Returns a subclass of :class:`.UIBlock` that corresponds to the specified `block_type`.
+        """
+        return UIBlock.load_class(block_type, default=self.default_class, select=self.select)
+
+    def construct_ui_block(self, block_type, *args, **kwargs):
+        """
+        Construct a new UI block of the type identified by block_type,
+        passing \*args and \*\*kwargs into `__init__`.
+        """
+        return self.load_ui_block_type(block_type)(block_type, self, *args, **kwargs)
+
+    def render(self, block, view_name, context=None):
+        """
+        Render a block by invoking its view method.
+
+        Finds the view named `view_name` on `block`.  The default view will be
+        used if a specific view hasn't been registered.  If there is no default
+        view, an exception will be raised.
+
+        The view is invoked, passing it `context`.  The value returned by the
+        view is returned, with possible modifications by the runtime to
+        integrate it into a larger whole.
+        """
+        view_fn = getattr(block, view_name, None)
+        if view_fn is None:
+            view_fn = getattr(block, "fallback_view", None)
+            if view_fn is None:
+                raise NoSuchViewError(block, view_name)
+            view_fn = functools.partial(view_fn, view_name)
+        return view_fn(context)
 
 
 class ObjectAggregator(object):

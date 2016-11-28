@@ -105,20 +105,6 @@ class SharedBlockBase(Plugin):
 
         return pkg_resources.resource_stream(cls.__module__, os.path.join(cls.resources_dir, uri))
 
-    @property
-    def supports_save(self):
-        """
-        True if this block supports being saved.
-        """
-        return False
-
-    @property
-    def supports_asides(self):
-        """
-        True if this block can be shown with asides.
-        """
-        return False
-
 
 # -- Base Block
 class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin,
@@ -201,13 +187,6 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
 
         # Provide backwards compatibility for external access through _field_data
         super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
-
-    @property
-    def supports_asides(self):
-        """
-        True if this block can be shown with asides.
-        """
-        return True
 
     def validate(self):
         """
@@ -308,15 +287,17 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
 
 
 # -- UI-only Block
-class UIBlock(RuntimeServicesMixin, HandlersMixin, ViewsMixin, SharedBlockBase):
+class UIBlock(RuntimeServicesMixin, ViewsMixin, SharedBlockBase):
     """Base class for UI Blocks.
-
-    This class differs from XBlocks in that they are intended only to
-    provide pluggable user interfaces. They explicitly have no state
-    and cannot be persisted.
 
     Derive from this class to create a new kind of UIBlock.  There are no
     required methods, but you will probably need at least one view.
+
+    This class differs from XBlocks in that they are intended only to
+    provide pluggable user interfaces. They explicitly have no state
+    and cannot be persisted. They receive any data that they need as
+    context parameters to their view methods, and they can in turn
+    use runtime services to requests more data that they need.
 
     Don't provide the ``__init__`` method when deriving from this class.
 
@@ -333,13 +314,6 @@ class UIBlock(RuntimeServicesMixin, HandlersMixin, ViewsMixin, SharedBlockBase):
 
             runtime (:class:`.Runtime`): Use it to access the environment.
                 It is available in XBlock code as ``self.runtime``.
-
-            field_data (:class:`.FieldData`): Interface used by the XBlock
-                fields to access their data from wherever it is persisted.
-                Deprecated.
-
-            scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
-                scopes.
         """
         super(UIBlock, self).__init__(runtime=runtime, *args, **kwargs)
         self.block_type = block_type
