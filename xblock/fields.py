@@ -9,24 +9,26 @@ for each scope.
 from collections import namedtuple
 import copy
 import datetime
-import dateutil.parser
 import hashlib
 import itertools
-import pytz
-import traceback
-import warnings
 import json
-import yaml
+import traceback
 import unicodedata
+import warnings
+
+import dateutil.parser
+from lxml import etree
+import pytz
+import six
+import yaml
 
 from xblock.internal import Nameable
-
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
     'BlockScope', 'UserScope', 'Scope', 'ScopeIds',
     'Field',
-    'Boolean', 'Dict', 'Float', 'Integer', 'List', 'Set', 'String',
+    'Boolean', 'Dict', 'Float', 'Integer', 'List', 'Set', 'String', 'XMLString',
     'XBlockMixin',
 ]
 
@@ -832,6 +834,19 @@ class String(JSONField):
 
     """
     MUTABLE = False
+    VALID_CONTROLS = {u'\n', u'\r', u'\t'}
+
+    def _valid_unichar(self, character):
+        """
+        Strip invalid control characters from a unicode text object.
+        """
+        return unicodedata.category(character)[0] != u'C' or character in self.VALID_CONTROLS
+
+    def _valid_bytechar(self, character):
+        """
+        Strip invalid control characters from a bytestring object.
+        """
+        return ord(character) >= 32 or character.decode('ascii', errors='replace') in self.VALID_CONTROLS
 
     def _sanitize(self, value):
         """
@@ -839,10 +854,10 @@ class String(JSONField):
         https://www.w3.org/TR/xml/#charsets
         Leave all other characters.
         """
-        if isinstance(value, unicode):
-            new_value = u''.join(ch for ch in value if unicodedata.category(ch)[0] != u'C' or ch in (u'\n', u'\r', u'\t'))
-        elif isinstance(value, str):
-            new_value = ''.join(ch for ch in value if ord(ch) >= 32 or ch in ('\n', '\r', '\t'))
+        if isinstance(value, six.text_type):
+            new_value = u''.join(ch for ch in value if self._valid_unichar(ch))
+        elif isinstance(value, six.binary_type):
+            new_value = b''.join(ch for ch in value if self._valid_bytechar(ch))
         else:
             return value
         # The new string will be equivalent to the original string if no control characters are present.
@@ -869,6 +884,32 @@ class String(JSONField):
         return True
 
     enforce_type = from_json
+
+
+class XMLString(String):
+    """
+    A field class for representing an XML string.
+
+    The value, as loaded or enforced, can either be None or a basestring instance.
+    If it is a basestring instance, it must be valid XML.  If it is not valid XML,
+    an lxml.etree.XMLSyntaxError will be raised.
+    """
+
+    def to_json(self, value):
+        """
+        Serialize the data, ensuring that it is valid XML (or None).
+
+        Raises an lxml.etree.XMLSyntaxError if it is a basestring but not valid
+        XML.
+        """
+        if self._enable_enforce_type:
+            value = self.enforce_type(value)
+        return super(XMLString, self).to_json(value)
+
+    def enforce_type(self, value):
+        if value is not None:
+            etree.XML(value)
+        return value
 
 
 class DateTime(JSONField):

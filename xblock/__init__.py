@@ -2,8 +2,7 @@
 XBlock Courseware Components
 """
 
-# For backwards compatability, provide the XBlockMixin in xblock.fields
-# without causing a circular import
+import os
 import warnings
 import xblock.core
 import xblock.fields
@@ -20,6 +19,10 @@ class XBlockMixin(xblock.core.XBlockMixin):
         super(XBlockMixin, self).__init__(*args, **kwargs)
 
 
+# For backwards compatability, provide the XBlockMixin in xblock.fields
+# without causing a circular import
 xblock.fields.XBlockMixin = XBlockMixin
 
-__version__ = "0.4.7"
+VERSION_FILE = os.path.join(os.path.dirname(__file__), 'VERSION.txt')
+
+__version__ = open(VERSION_FILE).read().strip()
