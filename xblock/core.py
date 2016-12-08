@@ -188,10 +188,6 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         # Provide backwards compatibility for external access through _field_data
         super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
 
-    def render(self, view, context=None):
-        """Render `view` with this block's runtime and the supplied `context`"""
-        return self.runtime.render(self, view, context)
-
     def validate(self):
         """
         Ask this xblock to validate itself. Subclasses are expected to override this
@@ -221,7 +217,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
 
 class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, SharedBlockBase):
     """
-    This mixin allows Xblock-like class to declare that it provides aside functionality.
+    This class allows XBlock-like classes to declare that they provides aside functionality.
     """
 
     entry_point = "xblock_asides.v1"
@@ -288,6 +284,39 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         be serialized as XML at all.
         """
         return any([field.is_set_on(self) for field in self.fields.itervalues()])
+
+
+# -- UI-only Block
+class UIBlock(RuntimeServicesMixin, ViewsMixin, SharedBlockBase):
+    """Base class for UI Blocks.
+
+    Derive from this class to create a new kind of UIBlock.  There are no
+    required methods, but you will probably need at least one view.
+
+    This class differs from XBlocks in that they are intended only to
+    provide pluggable user interfaces. They explicitly have no state
+    and cannot be persisted. They receive any data that they need as
+    context parameters to their view methods, and they can in turn
+    use runtime services to requests more data that they need.
+
+    Don't provide the ``__init__`` method when deriving from this class.
+
+    """
+    entry_point = 'ui_block.v1'
+
+    def __init__(self, block_type, runtime, *args, **kwargs):
+        """
+        Construct a new UIBlock.
+
+        This class should only be instantiated by runtimes.
+
+        Arguments:
+
+            runtime (:class:`.Runtime`): Use it to access the environment.
+                It is available in XBlock code as ``self.runtime``.
+        """
+        super(UIBlock, self).__init__(runtime=runtime, *args, **kwargs)
+        self.block_type = block_type
 
 
 # Maintain backwards compatibility

@@ -222,6 +222,13 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         super(ScopedStorageMixin, self).__init__(**kwargs)
 
     @property
+    def block_type(self):
+        """
+        Returns the block type for this block.
+        """
+        return self.scope_ids.block_type
+
+    @property
     def _field_data(self):
         """
         Return the FieldData for this XBlock (either as passed in the constructor
@@ -607,3 +614,7 @@ class ViewsMixin(object):
             True or False
         """
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
+
+    def render(self, view, context=None):
+        """Render `view` with this block's runtime and the supplied `context`"""
+        return self.runtime.render(self, view, context)

@@ -4,6 +4,10 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+0.5 - In Progress
+-----------------
+* Introduce UIBlock as a pluggable way to render user interfaces.
+
 0.4 - In Progress
 -----------------
 
