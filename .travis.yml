@@ -9,8 +9,8 @@ cache: pip
 install:
   - pip install -r requirements.txt
   - pip install -r django_requirements.txt
-  - pip install coveralls
+  - pip install codecov
 script:
   - make test doc quality
 after_success:
-  - coveralls
+  - codecov
