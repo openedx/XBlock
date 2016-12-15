@@ -2,34 +2,31 @@
 Tests for classes extending Field.
 """
 
-# Allow accessing protected members for testing purposes
-# pylint: disable=W0212
+# pylint: disable=abstract-class-instantiated, protected-access
 
-from mock import Mock
-import unittest
-
+from contextlib import contextmanager
 import datetime as dt
-import pytz
-import warnings
+import itertools
 import math
 import textwrap
-import itertools
-from contextlib import contextmanager
+import unittest
+import warnings
 
 import ddt
+from lxml import etree
+from mock import Mock
+import pytz
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
 from xblock.fields import (
-    Any, Boolean, Dict, Field, Float,
-    Integer, List, Set, String, DateTime, Reference, ReferenceList, Sentinel,
-    UNIQUE_ID
+    Any, Boolean, Dict, Field, Float, Integer, List, Set, String, XMLString, DateTime, Reference, ReferenceList,
+    ScopeIds, Sentinel, UNIQUE_ID, scope_key,
 )
 
 from xblock.test.tools import (
     assert_equals, assert_not_equals, assert_in, assert_not_in, assert_false, TestRuntime
 )
-from xblock.fields import scope_key, ScopeIds
 
 
 class FieldTest(unittest.TestCase):
@@ -242,6 +239,44 @@ class StringTest(FieldTest):
         with self.assertRaises(AssertionError):
             self.assertJSONOrSetGetEquals(u'\v', '')
         self.assertJSONOrSetGetEquals(u'\n\r\t', u'\n\v\r\b\t')
+
+
+@ddt.ddt
+class XMLStringTest(FieldTest):
+    """
+    Tests the XMLString Field.
+    """
+    FIELD_TO_TEST = XMLString
+
+    @ddt.data(
+        u'<abc>Hello</abc>',
+        u'<abc attr="yes">Hello</abc>',
+        u'<xml/>',
+        '<bytes/>',
+        '<unicode>\xc8\x88</unicode>',
+        None
+    )
+    def test_json_equals(self, input_text):
+        xml_string = self.FIELD_TO_TEST(enforce_type=True)
+        self.assertEqual(xml_string.to_json(input_text), input_text)
+
+    @ddt.data(
+        'text',
+        '<xml',
+        '<xml attr=3/>',
+        '<xml attr="3/>',
+        '<open>',
+        '<open>with text',
+        '<xml/>trailing text',
+        '<open>text</close>',
+        '<invalid_utf8 char="\x9e"/>',
+    )
+    def test_bad_xml(self, input_text):
+        # pylint: disable=no-member
+        xml_string = self.FIELD_TO_TEST(enforce_type=True)
+        self.assertRaises(etree.XMLSyntaxError, xml_string.to_json, input_text)
+        unchecked_xml_string = self.FIELD_TO_TEST(enforce_type=False)
+        self.assertEqual(unchecked_xml_string.to_json(input_text), input_text)
 
 
 @ddt.ddt

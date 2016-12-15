@@ -3,6 +3,7 @@ pyyaml
 lxml
 webob>=1.6.0
 simplejson
+six
 pytz
 python-dateutil
 markupsafe
