@@ -886,6 +886,7 @@ class Runtime(object):
         if frag.js_init_fn:
             data['init'] = frag.js_init_fn
             data['runtime-version'] = frag.js_init_version
+            data['use-require'] = frag.use_require_js
 
         json_init = ""
         # TODO/Note: We eventually want to remove: hasattr(frag, 'json_init_args')
