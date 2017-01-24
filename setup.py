@@ -30,6 +30,7 @@ setup(
         'pyyaml',
         'six',
         'webob',
+        'web-fragments',
     ],
     extras_require={
         'django': ['django-pyfs']
