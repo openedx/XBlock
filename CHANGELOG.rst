@@ -7,6 +7,8 @@ These are notable changes in XBlock.
 0.4 - In Progress
 -----------------
 
+* Separate Fragment class out into new web-fragments package
+
 * Make Scope enums (UserScope.* and BlockScope.*) into Sentinels, rather than just ints,
   so that they can have more meaningful string representations.
 

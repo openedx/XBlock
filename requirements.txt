@@ -26,6 +26,9 @@ ddt==0.8.0
 # For generating new XBlocks
 cookiecutter
 
+# For web fragments
+web-fragments
+
 # Our own XBlocks
 -e .
 

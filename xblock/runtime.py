@@ -15,9 +15,9 @@ from lxml import etree
 from StringIO import StringIO
 
 from collections import namedtuple
+from web_fragments.fragment import Fragment
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
-from xblock.fragment import Fragment
 from xblock.exceptions import (
     NoSuchViewError,
     NoSuchHandlerError,
@@ -909,7 +909,7 @@ class Runtime(object):
             js=json_init)
 
         wrapped.add_content(html)
-        wrapped.add_frag_resources(frag)
+        wrapped.add_fragment_resources(frag)
         return wrapped
 
     # Asides
@@ -996,13 +996,13 @@ class Runtime(object):
             aside_frag_fns list((aside, aside_fn)): The asides and closures for rendering to call
         """
         result = Fragment(frag.content)
-        result.add_frag_resources(frag)
+        result.add_fragment_resources(frag)
 
         for aside, aside_fn in aside_frag_fns:
             aside_frag = self.wrap_aside(block, aside, view_name, aside_fn(block, context), context)
             aside.save()
             result.add_content(aside_frag.content)
-            result.add_frag_resources(aside_frag)
+            result.add_fragment_resources(aside_frag)
 
         return result
 

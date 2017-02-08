@@ -8,6 +8,7 @@ from datetime import datetime
 from mock import Mock, patch
 from unittest import TestCase
 
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockMixin
 from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, Integer
 from xblock.exceptions import (
@@ -26,7 +27,6 @@ from xblock.runtime import (
     Mixologist,
     ObjectAggregator,
 )
-from xblock.fragment import Fragment
 from xblock.field_data import DictFieldData, FieldData
 
 from xblock.test.tools import (
