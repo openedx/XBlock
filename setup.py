@@ -36,7 +36,16 @@ setup(
         'django': ['django-pyfs']
     },
     license='Apache 2.0',
-    classifiers=(
-        "License :: OSI Approved :: Apache Software License 2.0",
-    )
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Framework :: Django',
+        'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
+        'Framework :: Django :: 1.10',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+    ]
 )
