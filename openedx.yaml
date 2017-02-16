@@ -3,7 +3,6 @@
 
 nick: xblk
 oeps: {}
-openedx-release: {parent-repo: edx/edx-platform}
 owner: edx/platform-team
 tags: [xblock]
 track-pulls: true
