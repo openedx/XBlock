@@ -1,22 +1,28 @@
 """
 Test XBlock Aside
 """
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from unittest import TestCase
+
+import six
+
 from web_fragments.fragment import Fragment
+
 from xblock.core import XBlockAside, XBlock
 from xblock.fields import ScopeIds, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.test_runtime import TestXBlock
 from xblock.test.tools import TestRuntime
 from xblock.test.test_parsing import Leaf, XmlTestMixin
-from timeit import itertools
 
 
 class TestAside(XBlockAside):
     """
     Test xblock aside class
     """
-    FRAG_CONTENT = u"<p>Aside rendered</p>"
+    FRAG_CONTENT = "<p>Aside rendered</p>"
 
     content = String(default="default_value", scope=Scope.content)
     data2 = String(default="default_value", scope=Scope.user_state)
@@ -31,7 +37,7 @@ class TestInheritedAside(TestAside):
     """
     XBlock Aside that inherits an aside view function from its parent.
     """
-    FRAG_CONTENT = u"<p>Inherited aside rendered</p>"
+    FRAG_CONTENT = "<p>Inherited aside rendered</p>"
 
 
 class AsideRuntimeSetup(TestCase):
@@ -61,10 +67,10 @@ class TestAsides(AsideRuntimeSetup):
         Test that rendering the xblock renders its aside
         """
 
-        frag = self.runtime.render(self.tester, 'student_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'student_view', ["ignore"])
         self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
 
-        frag = self.runtime.render(self.tester, 'author_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
 
     @XBlockAside.register_temp_plugin(TestAside)
@@ -74,11 +80,11 @@ class TestAsides(AsideRuntimeSetup):
         Test that rendering the xblock renders its aside (when the aside view is
         inherited).
         """
-        frag = self.runtime.render(self.tester, 'student_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'student_view', ["ignore"])
         self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
         self.assertIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
 
-        frag = self.runtime.render(self.tester, 'author_view', [u"ignore"])
+        frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
         self.assertNotIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
 
@@ -130,7 +136,7 @@ class ParsingTest(AsideRuntimeSetup, XmlTestMixin):
         """
         self.assertEqual(first.scope_ids.block_type, second.scope_ids.block_type)
         self.assertEqual(first.fields, second.fields)
-        for field in first.fields.itervalues():
+        for field in six.itervalues(first.fields):
             self.assertEqual(field.read_from(first), field.read_from(second), field)
 
     def _test_roundrip_of(self, block):
@@ -139,7 +145,7 @@ class ParsingTest(AsideRuntimeSetup, XmlTestMixin):
         """
         restored = self.parse_xml_to_block(self.export_xml_for_block(block))
         self._assert_xthing_equal(block, restored)
-        for first, second in itertools.izip(self.runtime.get_asides(block), self.runtime.get_asides(restored)):
+        for first, second in six.moves.zip(self.runtime.get_asides(block), self.runtime.get_asides(restored)):
             self._assert_xthing_equal(first, second)
 
     @XBlockAside.register_temp_plugin(TestAside, 'test_aside')

@@ -24,8 +24,12 @@ tests of the various operations), and test setup (which set up the
 particular combination of initial conditions that we want to test)
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import copy
+
 from mock import Mock, patch
+import six
 
 from xblock.core import XBlock
 from xblock.fields import Integer, List, String, ScopeIds, UNIQUE_ID
@@ -409,7 +413,7 @@ class DictFieldDataWithSequentialDefault(DictFieldData):
         self._sequence = sequence
 
     def default(self, block, name):
-        return next(self._sequence)
+        return next(iter(self._sequence))
 
 
 class StaticDefaultTestCases(UniversalTestCases, DefaultValueProperties):
@@ -466,7 +470,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
 
     @property
     def default_iterator(self):
-        return iter(xrange(1000))
+        return six.moves.range(1000)
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
@@ -483,7 +487,7 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
 
     @property
     def default_iterator(self):
-        return ([None] * i for i in xrange(1000))
+        return ([None] * i for i in six.moves.range(1000))
 
 
 class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):
@@ -558,11 +562,15 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
                 test_name += "And" + noop_prefix.__name__
                 test_classes = (noop_prefix, ) + test_classes
 
-            vars()[test_name] = type(test_name, test_classes, {'__test__': True})
+            vars()[test_name] = type(
+                str(test_name),  # First argument must be native string type
+                test_classes,
+                {'__test__': True},
+            )
 
 # If we don't delete the loop variables, then they leak into the global namespace
 # and cause the last class looped through to be tested twice. Surprise!
-# pylint: disable=W0631
+# pylint: disable=undefined-loop-variable
 del operation_backend
 del noop_prefix
 del base_test_case

@@ -12,13 +12,14 @@ markupsafe
 mock
 nose
 coverage
-# pinning astroid b/c it's throwing errors on 2.7.8 altho doc says it shouldn't
-astroid == 1.2.1
-pylint == 1.3.1
+astroid
+pylint
 rednose
 pep8
+caniusepython3
 diff-cover >= 0.2.1
 ddt==0.8.0
+tox
 
 # For docs
 -r doc/requirements.txt
@@ -28,6 +29,7 @@ cookiecutter
 
 # For web fragments
 web-fragments
+#git+https://github.com/edx/web-fragments.git@0.1.1#egg=web_fragments==0.1.1
 
 # Our own XBlocks
 -e .

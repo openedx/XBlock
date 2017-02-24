@@ -2,8 +2,15 @@
 XBlock Courseware Components
 """
 
+# For backwards compatability, provide the XBlockMixin in xblock.fields
+# without causing a circular import
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import codecs
 import os
 import warnings
+
 import xblock.core
 import xblock.fields
 
@@ -25,4 +32,4 @@ xblock.fields.XBlockMixin = XBlockMixin
 
 VERSION_FILE = os.path.join(os.path.dirname(__file__), 'VERSION.txt')
 
-__version__ = open(VERSION_FILE).read().strip()
+__version__ = codecs.open(VERSION_FILE, encoding='ascii').read().strip()

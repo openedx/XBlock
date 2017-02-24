@@ -2,8 +2,12 @@
 Tests asserting that ModelTypes convert to and from json when working
 with ModelDatas
 """
+
 # Allow inspection of private class members
-# pylint: disable=W0212
+# pylint: disable=protected-access
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from mock import Mock
 
 from xblock.core import XBlock

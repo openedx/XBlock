@@ -4,6 +4,8 @@ Tests for classes extending Field.
 
 # pylint: disable=abstract-class-instantiated, protected-access
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from contextlib import contextmanager
 import datetime as dt
 import itertools
@@ -16,6 +18,7 @@ import ddt
 from lxml import etree
 from mock import Mock
 import pytz
+import six
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
@@ -61,7 +64,7 @@ class FieldTest(unittest.TestCase):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", DeprecationWarning)
             yield
-        self.assertEquals(count, sum(
+        self.assertEqual(count, sum(
             1 for warning in caught
             if issubclass(warning.category, DeprecationWarning)
         ))
@@ -232,13 +235,13 @@ class StringTest(FieldTest):
         self.assertJSONOrSetTypeError({})
 
     def test_control_characters_filtered(self):
-        self.assertJSONOrSetGetEquals(u'', u'\v')
         self.assertJSONOrSetGetEquals('', '\v')
+        self.assertJSONOrSetGetEquals('', b'\v')
         with self.assertRaises(AssertionError):
-            self.assertJSONOrSetGetEquals('\v', u'')
+            self.assertJSONOrSetGetEquals('\v', b'')
         with self.assertRaises(AssertionError):
-            self.assertJSONOrSetGetEquals(u'\v', '')
-        self.assertJSONOrSetGetEquals(u'\n\r\t', u'\n\v\r\b\t')
+            self.assertJSONOrSetGetEquals('\v', '')
+        self.assertJSONOrSetGetEquals('\n\r\t', '\n\v\r\b\t')
 
 
 @ddt.ddt
@@ -249,11 +252,11 @@ class XMLStringTest(FieldTest):
     FIELD_TO_TEST = XMLString
 
     @ddt.data(
-        u'<abc>Hello</abc>',
-        u'<abc attr="yes">Hello</abc>',
-        u'<xml/>',
-        '<bytes/>',
-        '<unicode>\xc8\x88</unicode>',
+        '<abc>Hello</abc>',
+        '<abc attr="yes">Hello</abc>',
+        '<xml/>',
+        b'<bytes/>',
+        b'<unicode>\xc8\x88</unicode>',
         None
     )
     def test_json_equals(self, input_text):
@@ -262,14 +265,15 @@ class XMLStringTest(FieldTest):
 
     @ddt.data(
         'text',
-        '<xml',
-        '<xml attr=3/>',
-        '<xml attr="3/>',
-        '<open>',
+        '<unfinished_tag',
+        '<xml unquoted_attr=3/>',
+        '<xml unclosed_attr="3/>',
         '<open>with text',
         '<xml/>trailing text',
         '<open>text</close>',
-        '<invalid_utf8 char="\x9e"/>',
+        '<open>',
+        b'<open>',
+        b'<invalid_utf8_bytes char="\xe1"/>',
     )
     def test_bad_xml(self, input_text):
         # pylint: disable=no-member
@@ -706,16 +710,16 @@ class SentinelTest(unittest.TestCase):
     """
     def test_equality(self):
         base = Sentinel('base')
-        self.assertEquals(base, base)
-        self.assertEquals(base, Sentinel('base'))
-        self.assertNotEquals(base, Sentinel('foo'))
-        self.assertNotEquals(base, 'base')
+        self.assertEqual(base, base)
+        self.assertEqual(base, Sentinel('base'))
+        self.assertNotEqual(base, Sentinel('foo'))
+        self.assertNotEqual(base, 'base')
 
     def test_hashing(self):
         base = Sentinel('base')
         a_dict = {base: True}
-        self.assertEquals(a_dict[Sentinel('base')], True)
-        self.assertEquals(a_dict[base], True)
+        self.assertEqual(a_dict[Sentinel('base')], True)
+        self.assertEqual(a_dict[base], True)
         self.assertNotIn(Sentinel('foo'), a_dict)
         self.assertNotIn('base', a_dict)
 
@@ -730,14 +734,14 @@ class FieldSerializationTest(unittest.TestCase):
         Helper method: checks if _type's to_string given instance of _type returns expected string
         """
         result = _type().to_string(value)
-        self.assertEquals(result, string)
+        self.assertEqual(result, string)
 
     def assert_from_string(self, _type, string, value):
         """
         Helper method: checks if _type's from_string given string representation of type returns expected value
         """
         result = _type().from_string(string)
-        self.assertEquals(result, value)
+        self.assertEqual(result, value)
 
     # Serialisation test data that is tested both ways, i.e. whether serialisation of the value
     # yields the string and deserialisation of the string yields the value.
@@ -802,7 +806,7 @@ class FieldSerializationTest(unittest.TestCase):
         (Float, -10.0, r"-10|-10\.0*"))
     def test_to_string_regexp_matches(self, _type, value, regexp):
         result = _type().to_string(value)
-        self.assertRegexpMatches(result, regexp)
+        six.assertRegex(self, result, regexp)
 
     # Test data for non-canonical serialisations of values that we should be able to correctly
     # deserialise.  These values are not serialised to the representation given here for various
@@ -898,5 +902,5 @@ class FieldSerializationTest(unittest.TestCase):
         ['{"foo":"bar"}', '[1, 2, 3]', 'baz', '1.abc', 'defg']))
     def test_from_string_errors(self, _type, string):
         """ Cases that raises various exceptions."""
-        with self.assertRaises(StandardError):
+        with self.assertRaises(Exception):
             _type().from_string(string)

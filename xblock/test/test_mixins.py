@@ -1,12 +1,17 @@
 """
 Tests of the XBlock-family functionality mixins
 """
-import ddt as ddt
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime
-import pytz
+from unittest import TestCase
+
+import ddt as ddt
 from lxml import etree
 import mock
-from unittest import TestCase
+import pytz
+import six
 
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
@@ -187,7 +192,7 @@ class TestViewsMixin(TestCase):
                 ("multi_featured_view", "functionality2", True),
                 ("multi_featured_view", "bogus_functionality", False),
         ):
-            self.assertEquals(
+            self.assertEqual(
                 test_xblock.has_support(getattr(test_xblock, view_name), functionality),
                 expected_result
             )
@@ -212,7 +217,7 @@ class TestViewsMixin(TestCase):
                 ("functionality_supported_view", "a_functionality", True),
                 ("functionality_supported_view", "bogus_functionality", False),
         ):
-            self.assertEquals(
+            self.assertEqual(
                 test_xblock.has_support(getattr(test_xblock, view_name, None), functionality),
                 expected_result
             )
@@ -269,13 +274,13 @@ class TestXmlSerializationMixin(TestCase):
 
     def _assert_node_attributes(self, node, expected_attributes, entry_point=None):
         """ Checks XML node attributes to match expected_attributes"""
-        node_attributes = node.keys()
+        node_attributes = list(node.keys())
         node_attributes.remove('xblock-family')
 
         self.assertEqual(node.get('xblock-family'), entry_point if entry_point else self.TestXBlock.entry_point)
         self.assertEqual(set(node_attributes), set(expected_attributes.keys()))
 
-        for key, value in expected_attributes.iteritems():
+        for key, value in six.iteritems(expected_attributes):
             if value != UNIQUE_ID:
                 self.assertEqual(node.get(key), value)
             else:
@@ -299,7 +304,7 @@ class TestXmlSerializationMixin(TestCase):
         node = etree.Element(self.test_xblock_tag)
 
         # Precondition check: no fields are set.
-        for field_name in self.test_xblock.fields.keys():
+        for field_name in six.iterkeys(self.test_xblock.fields):
             self.assertFalse(self.test_xblock.fields[field_name].is_set_on(self.test_xblock))
 
         self.test_xblock.add_xml_to_node(node)

@@ -13,7 +13,7 @@
 
 import sys
 import os
-from path import path
+from path import Path as path
 import sys
 import mock
 

@@ -1,8 +1,13 @@
 """
 Internal machinery used to make building XBlock family base classes easier.
 """
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import functools
 import inspect
+
+import six
 
 
 class LazyClassProperty(object):
@@ -38,7 +43,7 @@ class NamedAttributesMetaclass(type):
     def __new__(mcs, name, bases, attrs):
         # Iterate over the attrs before they're bound to the class
         # so that we don't accidentally trigger any __get__ methods
-        for attr_name, attr in attrs.iteritems():
+        for attr_name, attr in six.iteritems(attrs):
             if Nameable.needs_name(attr):
                 attr.__name__ = attr_name
 
@@ -58,8 +63,8 @@ class Nameable(object):
     :class:`.NamedAttributesMetaclass`, will be assigned a `__name__`
     attribute based on what class attribute they are bound to.
     """
-    __slots__ = ('__name__')
-
+    if six.PY2:
+        __slots__ = ('__name__',)
     __name__ = None
 
     @staticmethod
