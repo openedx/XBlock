@@ -5,11 +5,12 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
-import inspect
-import pkg_resources
-import warnings
-import os
 from collections import defaultdict
+import inspect
+import os
+import warnings
+
+import pkg_resources
 
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
