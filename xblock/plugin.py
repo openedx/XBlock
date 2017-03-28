@@ -130,7 +130,7 @@ class Plugin(object):
         plugin cannot import. The goal is to be able to use part of
         libraries from an XBlock (and thus have it installed), even if
         the overall XBlock cannot be used (e.g. depends on Django in a
-        non-Django application). There is diagreement about whether
+        non-Django application). There is disagreement about whether
         this is a good idea, or whether we should see failures early
         (e.g. on startup or first page load), and in what
         contexts. Hence, the flag.
