@@ -17,6 +17,9 @@ class SingleUserService(UserService):
     def get_current_user(self):
         return self.user
 
+    def get_all_users(self):
+        return [self.user]
+
 
 def test_dummy_user_service_current_user():
     """
@@ -32,6 +35,17 @@ def test_dummy_user_service_current_user():
     assert_false(isinstance(current_user.emails, basestring))
     # assert that opt_attrs is a Mapping
     assert_is_instance(current_user.opt_attrs, collections.Mapping)
+
+
+def test_dummy_user_service_all_users():
+    """
+    Tests that get_all_users() works on a dummy user service.
+    """
+    user = XBlockUser(full_name="tester")
+    user_service = SingleUserService(user)
+    all_users = user_service.get_all_users()
+    assert_is_instance(all_users, list)
+    assert_equals(user, all_users[0])
 
 
 def test_dummy_user_service_exception():
