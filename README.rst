@@ -2,8 +2,8 @@ Part of `edX code`__.
 
 __ http://code.edx.org/
 
-XBlock Courseware Components |build-status| |coverage-status|
-=============================================================
+XBlock Courseware Components |build-status| |coverage-status| |pypi-version|
+============================================================================
 
 XBlock is a component architecture by edX.org for building courseware.
 
@@ -215,3 +215,5 @@ __ https://groups.google.com/group/edx-code
    :target: https://travis-ci.org/edx/XBlock
 .. |coverage-status| image:: https://coveralls.io/repos/edx/XBlock/badge.svg
    :target: https://coveralls.io/r/edx/XBlock
+.. |pypi-version| image:: https://img.shields.io/pypi/v/XBlock.svg
+   :target: https://pypi.python.org/pypi/XBlock
