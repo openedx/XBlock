@@ -930,7 +930,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         pass
 
     class UnloadableXBlock(XBlock):
-        """Just something to load resources from."""
+        """Just something to (not) load resources from."""
         resources_dir = None
 
     def stub_resource_stream(self, module, name):

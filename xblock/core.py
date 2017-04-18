@@ -104,6 +104,16 @@ class SharedBlockBase(Plugin):
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
 
+        return cls.stream_local_resource(uri)
+
+    @classmethod
+    def stream_local_resource(cls, uri):
+        """
+        Stream a local resources.
+
+        This is a helper method to get a file-like handle to a local resource
+        while adjusting URIs based on the resource configuration of this XBlock.
+        """
         return pkg_resources.resource_stream(cls.__module__, os.path.join(cls.resources_dir, uri))
 
 
