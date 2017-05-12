@@ -19,7 +19,7 @@ persistent=yes
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins=
+load-plugins=caniusepython3.pylint_checker
 
 
 [MESSAGES CONTROL]
@@ -46,8 +46,11 @@ disable=
     star-args,
     abstract-class-not-used,
     abstract-class-little-used,
+    abstract-class-instantiated,
     no-init,
     too-many-lines,
+    no-else-return,
+    arguments-differ,
     no-self-use,
     too-many-ancestors,
     too-many-instance-attributes,
@@ -56,7 +59,9 @@ disable=
     too-many-return-statements,
     too-many-branches,
     too-many-arguments,
-    too-many-locals
+    too-many-locals,
+    duplicate-code,
+    len-as-condition,
 
 
 [REPORTS]
@@ -92,9 +97,6 @@ comment=no
 
 
 [BASIC]
-
-# Required attributes for module, separated by a comma
-required-attributes=
 
 # List of builtins function names that should not be used, separated by a comma
 bad-functions=map,filter,apply,input
@@ -147,6 +149,7 @@ no-docstring-rgx=__.*__|test_.+|setUp|tearDown
 # ones are exempt.
 docstring-min-length=-1
 
+extension-pkg-whitelist=lxml
 
 [FORMAT]
 
@@ -227,10 +230,6 @@ additional-builtins=
 
 
 [CLASSES]
-
-# List of interface methods to ignore, separated by a comma. This is used for
-# instance to not check methods defines in Zope's Interface base class.
-ignore-iface-methods=isImplementedBy,deferred,extends,names,namesAndDescriptions,queryDescriptionFor,getBases,getDescriptionFor,getDoc,getName,getTaggedValue,getTaggedValueTags,isEqualOrExtendedBy,setTaggedValue,isImplementedByInstancesOf,adaptWith,is_implemented_by
 
 # List of method names used to declare (i.e. assign) instance attributes.
 defining-attr-methods=__init__,__new__,setUp

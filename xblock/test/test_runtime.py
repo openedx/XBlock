@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 """Tests the features of xblock/runtime"""
-# Allow tests to access private members of classes
-# pylint: disable=W0212
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+# pylint: disable=protected-access
 
 from collections import namedtuple
 from datetime import datetime
-from mock import Mock, patch
 from unittest import TestCase
 
+from mock import Mock, patch
+import six
+
 from web_fragments.fragment import Fragment
+
 from xblock.core import XBlock, XBlockMixin
-from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, Integer
 from xblock.exceptions import (
     NoSuchDefinition,
     NoSuchHandlerError,
@@ -19,6 +23,7 @@ from xblock.exceptions import (
     NoSuchViewError,
     FieldDataDeprecationWarning,
 )
+from xblock.fields import BlockScope, Scope, String, ScopeIds, List, UserScope, Integer
 from xblock.runtime import (
     DictKeyValueStore,
     IdReader,
@@ -106,32 +111,11 @@ class TestXBlock(TestXBlockNoFallback):
         if view_name == 'test_fallback_view':
             return Fragment(self.preferences)
         else:
-            return Fragment(u"{} default".format(view_name))
+            return Fragment("{} default".format(view_name))
 
 
 # Allow this tuple to be named as if it were a class
 TestUsage = namedtuple('TestUsage', 'id, def_id')  # pylint: disable=C0103
-
-
-def check_field(collection, field):
-    """
-    Test method.
-
-    Asserts that the given `field` is present in `collection`.
-    Sets the field to a new value and asserts that the update properly occurs.
-    Deletes the new value, and asserts that the default value is properly restored.
-    """
-    print "Getting %s from %r" % (field.name, collection)
-    assert_equals(field.default, getattr(collection, field.name))
-    new_value = 'new ' + field.name
-    print "Setting %s to %s on %r" % (field.name, new_value, collection)
-    setattr(collection, field.name, new_value)
-    print "Checking %s on %r" % (field.name, collection)
-    assert_equals(new_value, getattr(collection, field.name))
-    print "Deleting %s from %r" % (field.name, collection)
-    delattr(collection, field.name)
-    print "Back to defaults for %s in %r" % (field.name, collection)
-    assert_equals(field.default, getattr(collection, field.name))
 
 
 def test_db_model_keys():
@@ -144,7 +128,7 @@ def test_db_model_keys():
 
     assert_false(field_data.has(tester, 'not a field'))
 
-    for field in tester.fields.values():
+    for field in six.itervalues(tester.fields):
         new_value = 'new ' + field.name
         assert_false(field_data.has(tester, field.name))
         if isinstance(field, List):
@@ -155,7 +139,7 @@ def test_db_model_keys():
     tester.save()
 
     # Make sure everything saved correctly
-    for field in tester.fields.values():
+    for field in six.itervalues(tester.fields):
         assert_true(field_data.has(tester, field.name))
 
     def get_key_value(scope, user_id, block_scope_id, field_name):
@@ -225,7 +209,7 @@ def test_querypath_parsing():
     mrun = MockRuntimeForQuerying()
     block = Mock()
     mrun.querypath(block, "..//@hello")
-    print mrun.mock_query.mock_calls
+    print(mrun.mock_query.mock_calls)
     expected = Mock()
     expected.parent().descendants().attr("hello")
     assert mrun.mock_query.mock_calls == expected.mock_calls
@@ -236,38 +220,38 @@ def test_runtime_handle():
 
     key_store = DictKeyValueStore()
     field_data = KvsFieldData(key_store)
-    runtime = TestRuntime(services={'field-data': field_data})
-    tester = TestXBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+    test_runtime = TestRuntime(services={'field-data': field_data})
+    basic_tester = TestXBlock(test_runtime, scope_ids=Mock(spec=ScopeIds))
     runtime = MockRuntimeForQuerying()
     # string we want to update using the handler
     update_string = "user state update"
-    assert_equals(runtime.handle(tester, 'existing_handler', update_string),
+    assert_equals(runtime.handle(basic_tester, 'existing_handler', update_string),
                   'I am the existing test handler')
-    assert_equals(tester.user_state, update_string)
+    assert_equals(basic_tester.user_state, update_string)
 
     # when the handler needs to use the fallback as given name can't be found
     new_update_string = "new update"
-    assert_equals(runtime.handle(tester, 'test_fallback_handler', new_update_string),
+    assert_equals(runtime.handle(basic_tester, 'test_fallback_handler', new_update_string),
                   'I have been handled')
-    assert_equals(tester.user_state, new_update_string)
+    assert_equals(basic_tester.user_state, new_update_string)
 
     # request to use a handler which doesn't have XBlock.handler decoration
     # should use the fallback
     new_update_string = "new update"
-    assert_equals(runtime.handle(tester, 'handler_without_correct_decoration', new_update_string),
+    assert_equals(runtime.handle(basic_tester, 'handler_without_correct_decoration', new_update_string),
                   'gone to fallback')
-    assert_equals(tester.user_state, new_update_string)
+    assert_equals(basic_tester.user_state, new_update_string)
 
     # handler can't be found & no fallback handler supplied, should throw an exception
-    tester = TestXBlockNoFallback(runtime, scope_ids=Mock(spec=ScopeIds))
+    no_fallback_tester = TestXBlockNoFallback(runtime, scope_ids=Mock(spec=ScopeIds))
     ultimate_string = "ultimate update"
     with assert_raises(NoSuchHandlerError):
-        runtime.handle(tester, 'test_nonexistant_fallback_handler', ultimate_string)
+        runtime.handle(no_fallback_tester, 'test_nonexistant_fallback_handler', ultimate_string)
 
     # request to use a handler which doesn't have XBlock.handler decoration
     # and no fallback should raise NoSuchHandlerError
     with assert_raises(NoSuchHandlerError):
-        runtime.handle(tester, 'handler_without_correct_decoration', 'handled')
+        runtime.handle(no_fallback_tester, 'handler_without_correct_decoration', 'handled')
 
 
 def test_runtime_render():
@@ -279,7 +263,7 @@ def test_runtime_render():
     usage_id = runtime.id_generator.create_usage(def_id)
     tester = TestXBlock(runtime, scope_ids=ScopeIds('user', block_type, def_id, usage_id))
     # string we want to update using the handler
-    update_string = u"user state update"
+    update_string = "user state update"
 
     # test against the student view
     frag = runtime.render(tester, 'student_view', [update_string])
@@ -287,22 +271,22 @@ def test_runtime_render():
     assert_equals(tester.preferences, update_string)
 
     # test against the fallback view
-    update_string = u"new update"
+    update_string = "new update"
     frag = runtime.render(tester, 'test_fallback_view', [update_string])
     assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
     # test block-first
-    update_string = u"penultimate update"
+    update_string = "penultimate update"
     frag = tester.render('student_view', [update_string])
     assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
     # test against the no-fallback XBlock
-    update_string = u"ultimate update"
-    tester = TestXBlockNoFallback(Mock(), scope_ids=Mock(spec=ScopeIds))
+    update_string = "ultimate update"
+    no_fallback_tester = TestXBlockNoFallback(Mock(), scope_ids=Mock(spec=ScopeIds))
     with assert_raises(NoSuchViewError):
-        runtime.render(tester, 'test_nonexistent_view', [update_string])
+        runtime.render(no_fallback_tester, 'test_nonexistent_view', [update_string])
 
 
 class SerialDefaultKVS(DictKeyValueStore):
@@ -408,7 +392,7 @@ class Dynamic(object):
     Object for testing that sets attrs based on __init__ kwargs
     """
     def __init__(self, **kwargs):
-        for name, value in kwargs.items():
+        for name, value in six.iteritems(kwargs):
             setattr(self, name, value)
 
 
@@ -495,7 +479,7 @@ class TestMixologist(object):
         assert_is(FieldTester, self.mixologist.mix(FieldTester).unmixed_class)
 
     def test_mixin_fields(self):
-        assert_is(FirstMixin.fields['field'], FirstMixin.field)
+        assert_is(FirstMixin.fields['field'], FirstMixin.field)  # pylint: disable=unsubscriptable-object
 
     def test_mixed_fields(self):
         mixed = self.mixologist.mix(FieldTester)
@@ -536,22 +520,22 @@ class XBlockWithServices(XBlock):
         def assert_equals_unicode(str1, str2):
             """`str1` equals `str2`, and both are Unicode strings."""
             assert_equals(str1, str2)
-            assert isinstance(str1, unicode)
-            assert isinstance(str2, unicode)
+            assert isinstance(str1, six.text_type)
+            assert isinstance(str2, six.text_type)
 
         i18n = self.runtime.service(self, "i18n")
-        assert_equals_unicode(u"Welcome!", i18n.ugettext("Welcome!"))
+        assert_equals_unicode("Welcome!", i18n.ugettext("Welcome!"))
 
-        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 0))
-        assert_equals_unicode(u"Singular", i18n.ungettext("Singular", "Plural", 1))
-        assert_equals_unicode(u"Plural", i18n.ungettext("Singular", "Plural", 2))
+        assert_equals_unicode("Plural", i18n.ungettext("Singular", "Plural", 0))
+        assert_equals_unicode("Singular", i18n.ungettext("Singular", "Plural", 1))
+        assert_equals_unicode("Plural", i18n.ungettext("Singular", "Plural", 2))
 
         when = datetime(2013, 2, 14, 22, 30, 17)
-        assert_equals_unicode(u"2013-02-14", i18n.strftime(when, "%Y-%m-%d"))
-        assert_equals_unicode(u"Feb 14, 2013", i18n.strftime(when, "SHORT_DATE"))
-        assert_equals_unicode(u"Thursday, February 14, 2013", i18n.strftime(when, "LONG_DATE"))
-        assert_equals_unicode(u"Feb 14, 2013 at 22:30", i18n.strftime(when, "DATE_TIME"))
-        assert_equals_unicode(u"10:30:17 PM", i18n.strftime(when, "TIME"))
+        assert_equals_unicode("2013-02-14", i18n.strftime(when, "%Y-%m-%d"))
+        assert_equals_unicode("Feb 14, 2013", i18n.strftime(when, "SHORT_DATE"))
+        assert_equals_unicode("Thursday, February 14, 2013", i18n.strftime(when, "LONG_DATE"))
+        assert_equals_unicode("Feb 14, 2013 at 22:30", i18n.strftime(when, "DATE_TIME"))
+        assert_equals_unicode("10:30:17 PM", i18n.strftime(when, "TIME"))
 
         # secret_service is available.
         assert_equals(self.runtime.service(self, "secret_service"), 17)
@@ -587,8 +571,8 @@ def test_ugettext_calls():
     """
     runtime = TestRuntime()
     block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
-    assert_equals(block.ugettext('test'), u'test')
-    assert_true(isinstance(block.ugettext('test'), unicode))
+    assert_equals(block.ugettext('test'), 'test')
+    assert_true(isinstance(block.ugettext('test'), six.text_type))
 
     # NoSuchServiceError exception should raise if i18n is none/empty.
     runtime = TestRuntime(services={
@@ -690,7 +674,7 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime = TestRuntime(Mock(spec=IdReader), field_data)
         with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEquals(runtime.field_data, field_data)
+            self.assertEqual(runtime.field_data, field_data)
 
     def test_set_field_data(self):
         field_data = Mock(spec=FieldData)
@@ -698,4 +682,4 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
         with self.assertWarns(FieldDataDeprecationWarning):
             runtime.field_data = field_data
         with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEquals(runtime.field_data, field_data)
+            self.assertEqual(runtime.field_data, field_data)

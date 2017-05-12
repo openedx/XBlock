@@ -4,4 +4,5 @@
 lazy
 sphinx
 sphinxcontrib-napoleon==0.2.6
+sphinx_rtd_theme==0.1.9
 path.py

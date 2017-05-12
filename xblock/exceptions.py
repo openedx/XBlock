@@ -1,6 +1,9 @@
 """
 Module for all xblock exception classes
 """
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from webob import Response
 try:
     import simplejson as json   # pylint: disable=F0401
@@ -14,7 +17,8 @@ class XBlockNotFoundError(Exception):
     """
     def __init__(self, usage_id):
         # Exception is an old-style class, so can't use super
-        Exception.__init__(self, "Unable to load an xblock for usage_id {!r}".format(usage_id))
+        Exception.__init__(self)
+        self.message = "Unable to load an xblock for usage_id {!r}".format(usage_id)
 
 
 class XBlockSaveError(Exception):
@@ -30,8 +34,9 @@ class XBlockSaveError(Exception):
         `dirty_fields` - a set of fields that were left dirty after the save
         """
         # Exception is an old-style class, so can't use super
-        Exception.__init__(self, message)
+        Exception.__init__(self)
 
+        self.message = message
         self.saved_fields = saved_fields
         self.dirty_fields = dirty_fields
 
@@ -58,13 +63,14 @@ class InvalidScopeError(Exception):
     Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
     """
     def __init__(self, invalid_scope, valid_scopes=None):
+        super(InvalidScopeError, self).__init__()
         if valid_scopes:
-            super(InvalidScopeError, self).__init__("Invalid scope: {}. Valid scopes are: {}".format(
+            self.message = "Invalid scope: {}. Valid scopes are: {}".format(
                 invalid_scope,
                 valid_scopes,
-            ))
+            )
         else:
-            super(InvalidScopeError, self).__init__("Invalid scope: {}".format(invalid_scope))
+            self.message = "Invalid scope: {}".format(invalid_scope)
 
 
 class NoSuchViewError(Exception):
@@ -79,7 +85,8 @@ class NoSuchViewError(Exception):
         :param view_name: The name of the view that couldn't be found
         """
         # Can't use super because Exception is an old-style class
-        Exception.__init__(self, "Unable to find view {!r} on block {!r}".format(view_name, block))
+        Exception.__init__(self)
+        self.message = "Unable to find view {!r} on block {!r}".format(view_name, block)
 
 
 class NoSuchHandlerError(Exception):
@@ -124,9 +131,10 @@ class JsonHandlerError(Exception):
         the Response.
         """
         return Response(
-            json.dumps({"error": self.message}),
+            json.dumps({"error": self.message}),  # pylint: disable=exception-message-attribute
             status_code=self.status_code,
             content_type="application/json",
+            charset="utf-8",
             **kwargs
         )
 

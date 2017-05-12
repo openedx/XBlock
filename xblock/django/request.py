@@ -1,9 +1,13 @@
 """Helpers for WebOb requests and responses."""
 
-import webob
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import MutableMapping
+from itertools import chain, repeat
 from lazy import lazy
-from itertools import chain, repeat, izip
+
+import six
+import webob
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
@@ -20,7 +24,7 @@ def webob_to_django_response(webob_response):
     return django_response
 
 
-class HeaderDict(MutableMapping):
+class HeaderDict(MutableMapping, six.Iterator):
     """
     Provide a dictionary view of the HTTP headers in a
     Django request.META dictionary that translates the
@@ -77,8 +81,8 @@ def querydict_to_multidict(query_dict, wrap=None):
     """
     wrap = wrap or (lambda val: val)
     return MultiDict(chain.from_iterable(
-        izip(repeat(key), (wrap(v) for v in vals))
-        for key, vals in query_dict.iterlists()
+        six.moves.zip(repeat(key), (wrap(v) for v in vals))
+        for key, vals in six.iterlists(query_dict)
     ))
 
 

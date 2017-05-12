@@ -4,8 +4,20 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
-0.4 - In Progress
------------------
+1.0 - Python 3
+--------------
+
+* Introduce Python 3 compatibility to the xblock code base.
+  This does not enable Python 2 codebases (like edx-platform) to load xblocks
+  written in Python 3, but it lays the groundwork for future migrations.
+
+0.5 - ???
+---------
+
+No notes provided.
+
+0.4
+---
 
 * Separate Fragment class out into new web-fragments package
 

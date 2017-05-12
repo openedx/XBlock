@@ -2,6 +2,8 @@
 Test xblock/validation.py
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 from xblock.test.tools import assert_raises
 
@@ -18,20 +20,20 @@ class ValidationMessageTest(unittest.TestCase):
         Test that `TypeError`s are thrown for bad input parameters.
         """
         with assert_raises(TypeError):
-            ValidationMessage("unknown type", u"Unknown type info")
+            ValidationMessage("unknown type", "Unknown type info")
 
         with assert_raises(TypeError):
-            ValidationMessage(ValidationMessage.WARNING, "Non-unicode message")
+            ValidationMessage(ValidationMessage.WARNING, b"Non-unicode message")
 
     def test_to_json(self):
         """
         Test the `to_json` method.
         """
-        expected = {"type": ValidationMessage.ERROR, "text": u"Error message"}
-        self.assertEqual(expected, ValidationMessage(ValidationMessage.ERROR, u"Error message").to_json())
+        expected = {"type": ValidationMessage.ERROR, "text": "Error message"}
+        self.assertEqual(expected, ValidationMessage(ValidationMessage.ERROR, "Error message").to_json())
 
-        expected = {"type": ValidationMessage.WARNING, "text": u"Warning message"}
-        self.assertEqual(expected, ValidationMessage(ValidationMessage.WARNING, u"Warning message").to_json())
+        expected = {"type": ValidationMessage.WARNING, "text": "Warning message"}
+        self.assertEqual(expected, ValidationMessage(ValidationMessage.WARNING, "Warning message").to_json())
 
 
 class ValidationTest(unittest.TestCase):
@@ -48,7 +50,7 @@ class ValidationTest(unittest.TestCase):
         self.assertTrue(validation.empty)
         self.assertTrue(validation)
 
-        validation.add(ValidationMessage(ValidationMessage.ERROR, u"Error message"))
+        validation.add(ValidationMessage(ValidationMessage.ERROR, "Error message"))
         self.assertFalse(validation.empty)
         self.assertFalse(validation)
 
@@ -57,19 +59,19 @@ class ValidationTest(unittest.TestCase):
         Test the behavior of adding the messages from another `Validation` object to this instance.
         """
         validation_1 = Validation("id")
-        validation_1.add(ValidationMessage(ValidationMessage.ERROR, u"Error message"))
+        validation_1.add(ValidationMessage(ValidationMessage.ERROR, "Error message"))
 
         validation_2 = Validation("id")
-        validation_2.add(ValidationMessage(ValidationMessage.WARNING, u"Warning message"))
+        validation_2.add(ValidationMessage(ValidationMessage.WARNING, "Warning message"))
 
         validation_1.add_messages(validation_2)
         self.assertEqual(2, len(validation_1.messages))
 
         self.assertEqual(ValidationMessage.ERROR, validation_1.messages[0].type)
-        self.assertEqual(u"Error message", validation_1.messages[0].text)
+        self.assertEqual("Error message", validation_1.messages[0].text)
 
         self.assertEqual(ValidationMessage.WARNING, validation_1.messages[1].type)
-        self.assertEqual(u"Warning message", validation_1.messages[1].text)
+        self.assertEqual("Warning message", validation_1.messages[1].text)
 
     def test_add_messages_error(self):
         """
@@ -92,14 +94,14 @@ class ValidationTest(unittest.TestCase):
         }
         self.assertEqual(expected, validation.to_json())
 
-        validation.add(ValidationMessage(ValidationMessage.ERROR, u"Error message"))
-        validation.add(ValidationMessage(ValidationMessage.WARNING, u"Warning message"))
+        validation.add(ValidationMessage(ValidationMessage.ERROR, "Error message"))
+        validation.add(ValidationMessage(ValidationMessage.WARNING, "Warning message"))
 
         expected = {
             "xblock_id": "id",
             "messages": [
-                {"type": ValidationMessage.ERROR, "text": u"Error message"},
-                {"type": ValidationMessage.WARNING, "text": u"Warning message"}
+                {"type": ValidationMessage.ERROR, "text": "Error message"},
+                {"type": ValidationMessage.WARNING, "text": "Warning message"}
             ],
             "empty": False
         }
