@@ -1,0 +1,12 @@
+coverage:
+  status:
+    project:
+      default:
+        enabled: yes
+        target: auto
+    patch:
+      default:
+        enabled: yes
+        target: 90%
+
+comment: false
