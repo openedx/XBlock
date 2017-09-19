@@ -24,6 +24,7 @@ from nose.plugins.skip import SkipTest
 
 from webob import Response
 
+from xblock import django  # pylint: disable=unused-import
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 # pylint: enable=wrong-import-position
 

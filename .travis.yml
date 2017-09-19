@@ -4,15 +4,20 @@ branches:
     only:
       - master
 python:
-  - "3.5"
+  - 2.7
+  - 3.5
 cache: pip
 install:
   - pip install tox
   - pip install codecov
 env:
-  - TOX_ENV=py27
-  - TOX_ENV=py35
-  - TOX_ENV=docs
+  - TOX_ENV=django18
+  - TOX_ENV=django110
+  - TOX_ENV=django111
+matrix:
+  include:
+    - python: 3.5
+      env: TOX_ENV=docs
 script:
   - tox -e $TOX_ENV
 after_success:
