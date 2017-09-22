@@ -53,8 +53,6 @@ This code runs and is tested on Python 2.7 and 3.5.
 
         $ pip install -r requirements.txt
 
-.. _a fork of XBlock that provides Python 3 support: https://github.com/singingwolfboy/XBlock/tree/py3
-
 
 Testing
 --------
