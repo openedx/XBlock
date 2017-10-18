@@ -20,6 +20,8 @@ caniusepython3
 diff-cover >= 0.2.1
 ddt==0.8.0
 tox
+hypothesis>=3.33.0,<4.0
+
 
 # For docs
 -r doc/requirements.txt
