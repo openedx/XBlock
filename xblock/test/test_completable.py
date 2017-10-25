@@ -11,7 +11,6 @@ from hypothesis import given, example
 import hypothesis.strategies as strategies
 
 from xblock.core import XBlock
-from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.runtime import Runtime
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
@@ -45,7 +44,7 @@ class CompletableXBlockMixinTest(TestCase):
         block_type = block_type if block_type else self.TestBuddyXBlock
         runtime = runtime if runtime else mock.Mock(spec=Runtime)
         scope_ids = ScopeIds("user_id", "test_buddy", "def_id", "usage_id")
-        return block_type(runtime=runtime, field_data=DictFieldData({}), scope_ids=scope_ids)
+        return block_type(runtime=runtime, scope_ids=scope_ids)
 
     def test_has_custom_completion_property(self):
         """
