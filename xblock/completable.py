@@ -20,9 +20,8 @@ class CompletableXBlockMixin(object):
     has_custom_completion = True
     completion_method = XBlockCompletionMode.COMPLETABLE
 
-    # Completion_percent is somewhat misleading name - as it is actually a ratio. But this is how edx-platform calls it,
-    # so use the same name here for consistency
-    # https://github.com/edx/XBlock/pull/368#discussion_r146560619
+    # To read more on the debate about using the terms percent vs ratio, see:
+    # https://openedx.atlassian.net/wiki/spaces/OpenDev/pages/245465398/Naming+with+Percent+or+Ratio
     def emit_completion(self, completion_percent):
         """
         Emits completion event through Completion API.
@@ -46,7 +45,7 @@ class CompletableXBlockMixin(object):
             )
 
         if completion_percent is None or not 0.0 <= completion_percent <= 1.0:
-            raise ValueError("Completion ratio must be in [0.0; 1.0] interval, {} given".format(completion_percent))
+            raise ValueError("Completion percent must be in [0.0; 1.0] interval, {} given".format(completion_percent))
 
         self.runtime.publish(
             self,
