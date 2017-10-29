@@ -1046,6 +1046,7 @@ class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
     # Example: XBlock(runtime, field_data=Whatever(), scopeIds=ScopeIds())
     # Note that test_mixins have that pattern in abundance - the only reason it didn't fail earlier is that
     # test_mixins are alphabetically preceding
+    # Related: https://github.com/edx/XBlock/pull/368#discussion_r146740102
     def test_field_data_paramater(self):
         field_data = Mock(spec=FieldData)
         with self.assertWarns(FieldDataDeprecationWarning):
