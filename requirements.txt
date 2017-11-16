@@ -31,7 +31,6 @@ cookiecutter
 
 # For web fragments
 web-fragments
-#git+https://github.com/edx/web-fragments.git@0.1.1#egg=web_fragments==0.1.1
 
 # Our own XBlocks
 -e .

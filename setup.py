@@ -38,6 +38,8 @@ setup(
     extras_require={
         'django': ['django-pyfs >= 1.0.5']
     },
+    author='edX',
+    author_email='oscm@edx.org',
     license='Apache 2.0',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
