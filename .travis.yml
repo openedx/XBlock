@@ -1,8 +1,5 @@
 language: python
 sudo: false
-branches:
-  only:
-    - master
 python:
   - 2.7
   - 3.5
@@ -31,3 +28,4 @@ deploy:
   on:
     tags: true
     python: 3.5
+    condition: '$TOX_ENV = django111'
