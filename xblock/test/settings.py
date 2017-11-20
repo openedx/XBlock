@@ -5,10 +5,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
-# The variable doesn't seem to actually get interpolated in
-TEMPLATE_STRING_IF_INVALID = "<MISSING VARIABLE '%s'>"
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -89,13 +85,6 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '5ftdd9(@p)tg&amp;bqv$(^d!63psz9+g+_i5om_e%!32%po2_+%l7'
-
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    # 'django.template.loaders.eggs.Loader',
-)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',

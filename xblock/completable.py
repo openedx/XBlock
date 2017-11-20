@@ -3,6 +3,7 @@ This module defines CompletableXBlockMixin and completion mode enumeration.
 """
 from __future__ import absolute_import, unicode_literals
 
+
 class XBlockCompletionMode(object):
     """
     Enumeration for completion modes.
