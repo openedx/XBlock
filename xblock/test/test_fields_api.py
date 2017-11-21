@@ -548,6 +548,7 @@ class SaveNoopPrefix(object):
         self.block.save()
 # pylint: enable=no-member
 
+
 for operation_backend in (BlockFirstOperations, FieldFirstOperations):
     for noop_prefix in (None, GetNoopPrefix, GetSaveNoopPrefix, SaveNoopPrefix):
         for base_test_case in (

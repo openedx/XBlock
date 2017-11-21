@@ -1,5 +1,5 @@
 quality:
-	pep8
+	pycodestyle
 	script/max_pylint_violations
 	pylint --py3k xblock
 
