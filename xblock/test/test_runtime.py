@@ -102,12 +102,12 @@ class TestXBlock(TestXBlockNoFallback):
 
     def student_view(self, context):
         """ an existing view to be used """
-        self.preferences = context[0]
+        self.preferences = context.get('content')
         return Fragment(self.preferences)
 
     def fallback_view(self, view_name, context):
         """ test fallback view """
-        self.preferences = context[0]
+        self.preferences = context.get('content')
         if view_name == 'test_fallback_view':
             return Fragment(self.preferences)
         else:
@@ -266,19 +266,19 @@ def test_runtime_render():
     update_string = "user state update"
 
     # test against the student view
-    frag = runtime.render(tester, 'student_view', [update_string])
+    frag = runtime.render(tester, 'student_view', dict(content=update_string))
     assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
     # test against the fallback view
     update_string = "new update"
-    frag = runtime.render(tester, 'test_fallback_view', [update_string])
+    frag = runtime.render(tester, 'test_fallback_view', dict(content=update_string))
     assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
     # test block-first
     update_string = "penultimate update"
-    frag = tester.render('student_view', [update_string])
+    frag = tester.render('student_view', dict(content=update_string))
     assert_in(update_string, frag.body_html())
     assert_equals(tester.preferences, update_string)
 
@@ -286,7 +286,7 @@ def test_runtime_render():
     update_string = "ultimate update"
     no_fallback_tester = TestXBlockNoFallback(Mock(), scope_ids=Mock(spec=ScopeIds))
     with assert_raises(NoSuchViewError):
-        runtime.render(no_fallback_tester, 'test_nonexistent_view', [update_string])
+        runtime.render(no_fallback_tester, 'test_nonexistent_view', dict(content=update_string))
 
 
 class SerialDefaultKVS(DictKeyValueStore):
