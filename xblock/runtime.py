@@ -787,6 +787,9 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         used if a specific view hasn't be registered.  If there is no default
         view, an exception will be raised.
 
+        All of the services enabled on the block are passed to the `context`,
+        keyed as e.g. `_i18n_service`.
+
         The view is invoked, passing it `context`.  The value returned by the
         view is returned, with possible modifications by the runtime to
         integrate it into a larger whole.
@@ -796,8 +799,17 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         # as a default
         old_view_name = self._view_name
         self._view_name = view_name
-        try:
 
+        # Add all the xblock's enabled services to the view context
+        if context is None:
+            context = {}
+        for service_name in self._services:
+            try:
+                context['_{}_service'.format(service_name)] = self.service(block, service_name)
+            except NoSuchServiceError:
+                pass
+
+        try:
             view_fn = getattr(block, view_name, None)
             if view_fn is None:
                 view_fn = getattr(block, "fallback_view", None)
