@@ -67,10 +67,10 @@ class TestAsides(AsideRuntimeSetup):
         Test that rendering the xblock renders its aside
         """
 
-        frag = self.runtime.render(self.tester, 'student_view', ["ignore"])
+        frag = self.runtime.render(self.tester, 'student_view', dict(content="ignore"))
         self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
 
-        frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
+        frag = self.runtime.render(self.tester, 'author_view', dict(content="ignore"))
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
 
     @XBlockAside.register_temp_plugin(TestAside)
@@ -80,11 +80,11 @@ class TestAsides(AsideRuntimeSetup):
         Test that rendering the xblock renders its aside (when the aside view is
         inherited).
         """
-        frag = self.runtime.render(self.tester, 'student_view', ["ignore"])
+        frag = self.runtime.render(self.tester, 'student_view', dict(content="ignore"))
         self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
         self.assertIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
 
-        frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
+        frag = self.runtime.render(self.tester, 'author_view', dict(content="ignore"))
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
         self.assertNotIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
 

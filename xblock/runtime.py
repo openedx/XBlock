@@ -609,7 +609,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         """
         return XBlockAside.load_class(aside_type, select=self.select)
 
-    def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
+    def construct_xblock(self, block_type, scope_ids, field_data=None, **kwargs):
         r"""
         Construct a new xblock of the type identified by block_type,
         passing \*args and \*\*kwargs into `__init__`.
@@ -618,10 +618,10 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             cls=self.load_block_type(block_type),
             scope_ids=scope_ids,
             field_data=field_data,
-            *args, **kwargs
+            **kwargs
         )
 
-    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
+    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application.
@@ -630,7 +630,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             runtime=self,
             field_data=field_data,
             scope_ids=scope_ids,
-            *args, **kwargs
+            **kwargs
         )
 
     def get_block(self, usage_id, for_parent=None):
@@ -787,6 +787,9 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         used if a specific view hasn't be registered.  If there is no default
         view, an exception will be raised.
 
+        All of the services enabled on the block are passed to the `context`,
+        keyed as e.g. `_i18n_service`.
+
         The view is invoked, passing it `context`.  The value returned by the
         view is returned, with possible modifications by the runtime to
         integrate it into a larger whole.
@@ -796,8 +799,17 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         # as a default
         old_view_name = self._view_name
         self._view_name = view_name
-        try:
 
+        # Add all the xblock's enabled services to the view context
+        if context is None:
+            context = {}
+        for service_name in self._services:
+            try:
+                context['_{}_service'.format(service_name)] = self.service(block, service_name)
+            except NoSuchServiceError:
+                pass
+
+        try:
             view_fn = getattr(block, view_name, None)
             if view_fn is None:
                 view_fn = getattr(block, "fallback_view", None)
