@@ -45,6 +45,8 @@ def default_select(identifier, all_entry_points):
     elif len(all_entry_points) > 1:
         raise AmbiguousPluginError(all_entry_points)
 
+    return None
+
 
 class Plugin(object):
     """Base class for a system that uses entry_points to load plugins.

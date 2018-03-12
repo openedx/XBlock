@@ -99,6 +99,7 @@ class TestXBlock(TestXBlockNoFallback):
             return "I have been handled"
         if handler_name == 'handler_without_correct_decoration':
             return "gone to fallback"
+        return None
 
     def student_view(self, context):
         """ an existing view to be used """

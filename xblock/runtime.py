@@ -609,7 +609,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         """
         return XBlockAside.load_class(aside_type, select=self.select)
 
-    def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
+    def construct_xblock(self, block_type, scope_ids, field_data=None, **kwargs):
         r"""
         Construct a new xblock of the type identified by block_type,
         passing \*args and \*\*kwargs into `__init__`.
@@ -618,10 +618,10 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             cls=self.load_block_type(block_type),
             scope_ids=scope_ids,
             field_data=field_data,
-            *args, **kwargs
+            **kwargs
         )
 
-    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
+    def construct_xblock_from_class(self, cls, scope_ids, field_data=None, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins
         defined for this application.
@@ -630,7 +630,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             runtime=self,
             field_data=field_data,
             scope_ids=scope_ids,
-            *args, **kwargs
+            **kwargs
         )
 
     def get_block(self, usage_id, for_parent=None):
