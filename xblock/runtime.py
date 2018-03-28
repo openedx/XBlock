@@ -927,15 +927,21 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
 
     def get_asides(self, block):
         """
-        Return all of the asides which might be decorating this `block`.
+        Return instances for all of the asides that will decorate this `block`.
 
         Arguments:
             block (:class:`.XBlock`): The block to render retrieve asides for.
+
+        Returns:
+            List of XBlockAside instances
         """
-        return [
+        aside_instances = [
             self.get_aside_of_type(block, aside_type)
-            for aside_type
-            in self.applicable_aside_types(block)
+            for aside_type in self.applicable_aside_types(block)
+        ]
+        return [
+            aside_instance for aside_instance in aside_instances
+            if aside_instance.should_apply_to_block(block)
         ]
 
     # pylint: disable=unused-argument

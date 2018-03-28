@@ -1,5 +1,5 @@
 #!/bin/bash
-DEFAULT_MAX=7
+DEFAULT_MAX=21
 
 pylint xblock | tee /tmp/pylint-xblock.log
 ERR=`grep -E "^[C|R|W|E]:" /tmp/pylint-xblock.log | wc -l`
