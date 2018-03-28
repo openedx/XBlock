@@ -32,6 +32,16 @@ class TestAside(XBlockAside):
         """Add to the student view"""
         return Fragment(self.FRAG_CONTENT)
 
+    @XBlockAside.aside_for('studio_view')
+    def studio_view_aside(self, block, context):  # pylint: disable=unused-argument
+        """Add to the studio view"""
+        return Fragment(self.FRAG_CONTENT)
+
+    @classmethod
+    def should_apply_to_block(cls, block):
+        """Overrides base implementation for testing purposes"""
+        return block.content != 'should not apply'
+
 
 class TestInheritedAside(TestAside):
     """
@@ -66,12 +76,14 @@ class TestAsides(AsideRuntimeSetup):
         """
         Test that rendering the xblock renders its aside
         """
-
         frag = self.runtime.render(self.tester, 'student_view', ["ignore"])
         self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
 
         frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
+
+        frag = self.runtime.render(self.tester, 'studio_view', ["ignore"])
+        self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
 
     @XBlockAside.register_temp_plugin(TestAside)
     @XBlockAside.register_temp_plugin(TestInheritedAside)
@@ -87,6 +99,29 @@ class TestAsides(AsideRuntimeSetup):
         frag = self.runtime.render(self.tester, 'author_view', ["ignore"])
         self.assertNotIn(TestAside.FRAG_CONTENT, frag.body_html())
         self.assertNotIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
+
+        frag = self.runtime.render(self.tester, 'studio_view', ["ignore"])
+        self.assertIn(TestAside.FRAG_CONTENT, frag.body_html())
+        self.assertIn(TestInheritedAside.FRAG_CONTENT, frag.body_html())
+
+    @XBlockAside.register_temp_plugin(TestAside)
+    def test_aside_should_apply_to_block(self):
+        """
+        Test that should_apply_to_block returns True by default, and that it prevents
+        the aside from being applied to the given block when it returns False.
+        """
+        self.assertTrue(TestAside.should_apply_to_block(self.tester))
+        test_aside_instances = [
+            inst for inst in self.runtime.get_asides(self.tester) if isinstance(inst, TestAside)
+        ]
+        self.assertEqual(len(test_aside_instances), 1)
+
+        self.tester.content = 'should not apply'
+        self.assertFalse(TestAside.should_apply_to_block(self.tester))
+        test_aside_instances = [
+            inst for inst in self.runtime.get_asides(self.tester) if isinstance(inst, TestAside)
+        ]
+        self.assertEqual(len(test_aside_instances), 0)
 
 
 class ParsingTest(AsideRuntimeSetup, XmlTestMixin):

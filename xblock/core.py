@@ -256,6 +256,14 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
             return func
         return _decorator
 
+    @classmethod
+    def should_apply_to_block(cls, block):  # pylint: disable=unused-argument
+        """
+        Return True if the aside should be applied to a given block. This can be overridden
+        if some aside should only wrap blocks with certain properties.
+        """
+        return True
+
     @class_lazy
     def _combined_asides(cls):  # pylint: disable=no-self-argument
         """
