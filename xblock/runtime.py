@@ -506,11 +506,13 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         changes.
 
         In this case the `event_type` would be `grade`, and the `event_data`
-        would be a dictionary of the following form:
+        would be a dictionary of the following form::
+
             {
                 'value': <number>,
                 'max_value': <number>,
             }
+
         The grade event represents a grade of value/max_value for the current
         user.
 
@@ -537,7 +539,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             mixins (tuple): Classes that should be mixed in with every :class:`.XBlock`
                 created by this `Runtime`.
 
-            services (dictionary): Services to make available through the
+            services (dict): Services to make available through the
                 :meth:`service` method.  There's no point passing anything here
                 if you are overriding :meth:`service` in your sub-class.
 
@@ -1063,9 +1065,9 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         finding and delivering services.
 
         Arguments:
-            block (an XBlock): this block's class will be examined for service
+            block (XBlock): this block's class will be examined for service
                 decorators.
-            service_name (string): the name of the service requested.
+            service_name (str): the name of the service requested.
 
         Returns:
             An object implementing the requested service, or None.

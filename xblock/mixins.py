@@ -151,7 +151,7 @@ class RuntimeServicesMixin(object):
         This function finds those declarations for a block.
 
         Arguments:
-            service_name (string): the name of the service requested.
+            service_name (str): the name of the service requested.
 
         Returns:
             One of "need", "want", or None.
@@ -338,8 +338,7 @@ class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
 
     """
     def __new__(mcs, name, bases, attrs):
-        if (attrs.get('has_children', False) or
-                any(getattr(base, 'has_children', False) for base in bases)):
+        if (attrs.get('has_children', False) or any(getattr(base, 'has_children', False) for base in bases)):
             attrs['children'] = ReferenceList(
                 help='The ids of the children of this XBlock',
                 scope=Scope.children)
@@ -434,7 +433,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         Use `node` to construct a new block.
 
         Arguments:
-            node (etree.Element): The xml node to parse into an xblock.
+            node (:class:`~xml.etree.ElementTree.Element`): The xml node to parse into an xblock.
 
             runtime (:class:`.Runtime`): The runtime to use while parsing.
 
@@ -603,7 +602,7 @@ class ViewsMixin(object):
 
         Arguments:
             view (object): The view of the xBlock.
-            functionality (string): A functionality of the view.
+            functionality (str): A functionality of the view.
                 For example: "multi_device".
 
         Returns:

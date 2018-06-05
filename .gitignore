@@ -4,6 +4,7 @@
 local_settings.py
 *.egg-info
 .coverage
+.hypothesis
 .tox
 .treerc
 htmlcov

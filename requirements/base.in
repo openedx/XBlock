@@ -1,0 +1,13 @@
+# Core requirements for using this package
+
+fs
+futures ; python_version == "2.7"   # via s3transfer
+lxml
+markupsafe
+python-dateutil
+pytz
+pyyaml
+simplejson
+six
+web-fragments
+webob>=1.6.0
