@@ -51,7 +51,7 @@ This code runs and is tested on Python 2.7 and 3.5.
 3.  Install the requirements and register the XBlock entry points with (you may
     need to sudo this if you don't use virtualenv):
 
-        $ pip install -r requirements.txt
+        $ make requirements
 
 
 Testing
@@ -209,5 +209,5 @@ __ https://groups.google.com/group/edx-code
 
 .. |build-status| image:: https://travis-ci.org/edx/XBlock.svg?branch=master
    :target: https://travis-ci.org/edx/XBlock
-.. |coverage-status| image:: https://coveralls.io/repos/edx/XBlock/badge.svg
-   :target: https://coveralls.io/r/edx/XBlock
+.. |coverage-status| image:: http://codecov.io/github/edx/XBlock/coverage.svg?branch=master
+   :target: https://codecov.io/github/edx/XBlock?branch=master

@@ -36,7 +36,7 @@ setup(
         'web-fragments',
     ],
     extras_require={
-        'django': ['django-pyfs >= 1.0.5']
+        'django': ['django-pyfs >= 1.0.5', 'lazy']
     },
     author='edX',
     author_email='oscm@edx.org',

@@ -119,7 +119,7 @@ class TestAsides(AsideRuntimeSetup):
         self.tester.content = 'should not apply'
         self.assertFalse(TestAside.should_apply_to_block(self.tester))
         test_aside_instances = [
-            inst for inst in self.runtime.get_asides(self.tester) if isinstance(inst, TestAside)
+            instance for instance in self.runtime.get_asides(self.tester) if isinstance(instance, TestAside)
         ]
         self.assertEqual(len(test_aside_instances), 0)
 

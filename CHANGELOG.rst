@@ -5,7 +5,7 @@ Change history for XBlock
 These are notable changes in XBlock.
 
 1.2.0 - Aside filtering
---------------
+-----------------------
 
 * Add capability for XBlockAsides to apply only to XBlocks that match certain conditions
 

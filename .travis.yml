@@ -5,8 +5,7 @@ python:
   - 3.5
 cache: pip
 install:
-  - pip install tox
-  - pip install codecov
+  - pip install -r requirements/travis.txt
 env:
   - TOX_ENV=django18
   - TOX_ENV=django110
