@@ -7,10 +7,7 @@ responses.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # Set up Django settings
-import os
 from unittest import TestCase
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xblock.test.settings")
 
 # pylint: disable=wrong-import-position
 try:
@@ -19,9 +16,7 @@ try:
 except ImportError:
     HAS_DJANGO = False
 
-# Django isn't always available, so skip tests if it isn't.
-from nose.plugins.skip import SkipTest
-
+import pytest
 from webob import Response
 
 from xblock import django  # pylint: disable=unused-import
@@ -29,14 +24,12 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 # pylint: enable=wrong-import-position
 
 
+@pytest.mark.skipif(not HAS_DJANGO, reason='Django not available')
 class TestDjangoWebobRequest(TestCase):
     """
     Tests of the django_to_webob_request function
     """
     def setUp(self):
-        if not HAS_DJANGO:
-            raise SkipTest("Django not available")
-
         self.req_factory = RequestFactory()
 
     def test_post_already_read(self):
@@ -51,15 +44,11 @@ class TestDjangoWebobRequest(TestCase):
         self.assertEqual(webob_req.POST.getall('foo'), ['bar'])
 
 
+@pytest.mark.skipif(not HAS_DJANGO, reason='Django not available')
 class TestDjangoWebobResponse(TestCase):
     """
     Tests of the webob_to_django_response function
     """
-
-    def setUp(self):
-        if not HAS_DJANGO:
-            raise SkipTest("Django not available")
-
     def _as_django(self, *args, **kwargs):
         """
         Return a :class:`django.http.HttpResponse` created from a `webob.Response`

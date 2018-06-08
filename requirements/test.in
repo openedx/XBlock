@@ -12,5 +12,7 @@ mock
 nose
 pycodestyle
 pylint
-rednose
+pytest
+pytest-cov
+pytest-django
 tox

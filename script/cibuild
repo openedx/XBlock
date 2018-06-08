@@ -13,7 +13,7 @@ export PIP_DOWNLOAD_CACHE=${PIP_DOWNLOAD_CACHE-.pip_cache}
 make requirements
 
 # Run the tests
-coverage run -m nose
+pytest
 
 # Compute coverage
 coverage html

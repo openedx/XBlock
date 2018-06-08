@@ -126,6 +126,8 @@ class TestRuntime(Runtime):
     """
     An empty runtime to be used in tests
     """
+    __test__ = False
+
     # unabc doesn't squash pylint errors
     # pylint: disable=abstract-method
     def __init__(self, *args, **kwargs):

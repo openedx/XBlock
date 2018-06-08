@@ -14,8 +14,8 @@ import re
 import unittest
 
 import ddt
-from mock import patch, MagicMock, Mock
 import six
+from mock import patch, MagicMock, Mock
 from webob import Response
 
 from xblock.core import XBlock
@@ -1039,14 +1039,6 @@ class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
         """An empty XBlock for testing"""
         pass
 
-    # FIXME: This test is fragile - fails in python27 if a warning it is expecting is emitted before it is executed
-    # warnings module in py27 seems to be intelligent enough to deduplicate warnings raised at the same place. So if
-    # this test is executed _after_ any test that already raised FieldDataDeprecationWarning in XBlock constructor
-    # (currently raised in `ScopedStorageMixin`) it will not catch the warning and fail.
-    # Example: XBlock(runtime, field_data=Whatever(), scopeIds=ScopeIds())
-    # Note that test_mixins have that pattern in abundance - the only reason it didn't fail earlier is that
-    # test_mixins are alphabetically preceding
-    # Related: https://github.com/edx/XBlock/pull/368#discussion_r146740102
     def test_field_data_paramater(self):
         field_data = Mock(spec=FieldData)
         with self.assertWarns(FieldDataDeprecationWarning):

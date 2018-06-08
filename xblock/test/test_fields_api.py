@@ -396,7 +396,11 @@ class UniversalTestCases(UniversalProperties):
         self.field_default  # The static default value for the field
         self.get_field_data()  # A function that returns a new :class:`~xblock.field_data.FieldData` instance
     """
-    def setUp(self):
+    # pylint: disable=attribute-defined-outside-init
+    def setup_method(self):
+        """
+        Setup for each test method in the class.
+        """
         class TestBlock(XBlock):
             """Testing block for all field API tests"""
             field = self.field_class(default=copy.deepcopy(self.field_default))
@@ -404,6 +408,7 @@ class UniversalTestCases(UniversalProperties):
         self.field_data = self.get_field_data()
         self.runtime = TestRuntime(services={'field-data': self.field_data})
         self.block = TestBlock(self.runtime, scope_ids=Mock(spec=ScopeIds))
+    # pylint: enable=attribute-defined-outside-init
 
 
 class DictFieldDataWithSequentialDefault(DictFieldData):
@@ -514,8 +519,8 @@ class GetNoopPrefix(object):
     Requires from subclasses:
         self.block  # An initialized xblock with a field named `field`
     """
-    def setUp(self):
-        super(GetNoopPrefix, self).setUp()
+    def setup_method(self):
+        super(GetNoopPrefix, self).setup_method()
         self.get()
 
 
@@ -528,8 +533,8 @@ class GetSaveNoopPrefix(object):
     Requires from subclasses:
         self.block  # An initialized xblock with a field named `field`
     """
-    def setUp(self):
-        super(GetSaveNoopPrefix, self).setUp()
+    def setup_method(self):
+        super(GetSaveNoopPrefix, self).setup_method()
         self.get()
         self.block.save()
 
@@ -543,8 +548,8 @@ class SaveNoopPrefix(object):
     Requires from subclasses:
         self.block  # An initialized xblock with a field named `field`
     """
-    def setUp(self):
-        super(SaveNoopPrefix, self).setUp()
+    def setup_method(self):
+        super(SaveNoopPrefix, self).setup_method()
         self.block.save()
 # pylint: enable=no-member
 

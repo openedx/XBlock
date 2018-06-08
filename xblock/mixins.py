@@ -268,7 +268,8 @@ class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeSer
             # Throws KeyValueMultiSaveError if things go wrong
             self._field_data.set_many(self, fields_to_save_json)
         except KeyValueMultiSaveError as save_error:
-            saved_fields = [field for field in fields if field.name in save_error.saved_field_names]
+            saved_fields = [field for field in fields
+                            if field.name in save_error.saved_field_names]  # pylint: disable=exception-escape
             for field in saved_fields:
                 # should only find one corresponding field
                 fields.remove(field)

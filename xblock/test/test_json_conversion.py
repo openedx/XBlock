@@ -19,6 +19,8 @@ from xblock.test.tools import assert_equals, assert_is_instance, TestRuntime
 
 class TestJSONConversionField(Field):
     """Field for testing json conversion"""
+    __test__ = False
+
     def from_json(self, value):
         assert_equals('set', value['$type'])
         return set(value['$vals'])
@@ -32,12 +34,15 @@ class TestJSONConversionField(Field):
 
 class TestBlock(XBlock):
     """XBlock for testing json conversion"""
+    __test__ = False
     field_a = TestJSONConversionField(scope=Scope.content)
     field_b = TestJSONConversionField(scope=Scope.content)
 
 
 class TestModel(DictFieldData):
     """ModelData for testing json conversion"""
+    __test__ = False
+
     def default(self, block, name):
         return {'$type': 'set', '$vals': [0, 1]}
 
@@ -48,12 +53,15 @@ class TestJsonConversion(object):
     the json that comes out of the ModelData to python objects
     """
 
-    def setUp(self):
+    def setup_method(self):
+        """
+        Setup for each test method in this class.
+        """
         field_data = TestModel({
             'field_a': {'$type': 'set', '$vals': [1, 2, 3]}
         })
         runtime = TestRuntime(services={'field-data': field_data})
-        self.block = TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+        self.block = TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))  # pylint: disable=attribute-defined-outside-init
 
     def test_get(self):
         # Test field with a value

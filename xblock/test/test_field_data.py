@@ -21,6 +21,7 @@ class TestingBlock(XBlock):
     do the right thing with a split fielddata.
 
     """
+    __test__ = False
     content = String(scope=Scope.content)
     settings = String(scope=Scope.settings)
     user_state = String(scope=Scope.user_state)
@@ -30,7 +31,11 @@ class TestSplitFieldData(object):
     """
     Tests of :ref:`SplitFieldData`.
     """
-    def setUp(self):
+    # pylint: disable=attribute-defined-outside-init
+    def setup_method(self):
+        """
+        Setup for each test case in this class.
+        """
         self.content = Mock()
         self.settings = Mock()
         self.split = SplitFieldData({
@@ -42,6 +47,7 @@ class TestSplitFieldData(object):
             runtime=self.runtime,
             scope_ids=Mock(),
         )
+    # pylint: enable=attribute-defined-outside-init
 
     def test_get(self):
         self.split.get(self.block, 'content')
@@ -82,7 +88,11 @@ class TestReadOnlyFieldData(object):
     """
     Tests of :ref:`ReadOnlyFieldData`.
     """
-    def setUp(self):
+    # pylint: disable=attribute-defined-outside-init
+    def setup_method(self):
+        """
+        Setup for each test case in this class.
+        """
         self.source = Mock()
         self.read_only = ReadOnlyFieldData(self.source)
         self.runtime = TestRuntime(services={'field-data': self.read_only})
@@ -90,6 +100,7 @@ class TestReadOnlyFieldData(object):
             runtime=self.runtime,
             scope_ids=Mock(),
         )
+    # pylint: enable=attribute-defined-outside-init
 
     def test_get(self):
         assert_equals(self.source.get.return_value, self.read_only.get(self.block, 'content'))
