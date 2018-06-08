@@ -59,17 +59,13 @@ Testing
 
 To run the test suite:
 
-    $ nosetests
+    $ pytest
 
 This will run:
 
-    * Unit tests of the XBlock core and runtime.
+    * Unit tests of the XBlock core and runtime, with coverage data collected.
 
-To run the test suite under coverage:
-
-    $ coverage run -m nose
-
-to execute the tests. Then to view the coverage report:
+To view the coverage report:
 
     $ coverage report
 
