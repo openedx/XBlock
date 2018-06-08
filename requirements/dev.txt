@@ -11,8 +11,8 @@ atomicwrites==1.1.5
 attrs==18.1.0
 backports.functools-lru-cache==1.5
 backports.os==0.1.1
-boto3==1.7.35
-botocore==1.10.35
+boto3==1.7.44
+botocore==1.10.44
 caniusepython3==7.0.0
 certifi==2018.4.16
 chardet==3.0.4
@@ -33,8 +33,8 @@ fs==2.0.23
 funcsigs==1.0.2
 future==0.16.0
 futures==3.2.0 ; python_version == "2.7"
-hypothesis==3.57.0
-idna==2.6
+hypothesis==3.60.1
+idna==2.7
 inflect==0.3.1
 isort==4.3.4
 jinja2-pluralize==0.3.0
@@ -49,6 +49,7 @@ mock==2.0.0
 more-itertools==4.2.0
 nose==1.3.7
 packaging==17.1
+path.py==11.0.1
 pbr==4.0.4
 pip-tools==2.0.2
 pluggy==0.6.0
@@ -58,12 +59,12 @@ pygments==2.2.0
 pylint==1.9.2
 pyparsing==2.2.0
 pytest-cov==2.5.1
-pytest-django==3.2.1
-pytest==3.6.1
+pytest-django==3.3.2
+pytest==3.6.2
 python-dateutil==2.7.3
 pytz==2018.4
 pyyaml==3.12
-requests==2.18.4
+requests==2.19.1
 s3transfer==0.1.13
 simplejson==3.15.0
 singledispatch==3.4.0.3
@@ -71,7 +72,7 @@ six==1.11.0
 tox-battery==0.5.1
 tox==3.0.0
 typing==3.6.4
-urllib3==1.22
+urllib3==1.23
 virtualenv==16.0.0
 web-fragments==0.2.2
 webob==1.8.2

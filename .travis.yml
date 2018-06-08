@@ -2,19 +2,17 @@ language: python
 sudo: false
 python:
   - 2.7
-  - 3.5
+  - 3.6
 cache: pip
 install:
   - pip install -r requirements/travis.txt
 env:
-  - TOX_ENV=django18
-  - TOX_ENV=django110
   - TOX_ENV=django111
 matrix:
   include:
-    - python: 3.5
+    - python: 3.6
       env: TOX_ENV=docs
-    - python: 3.5
+    - python: 3.6
       env: TOX_ENV=quality
 script:
   - tox -e $TOX_ENV
@@ -28,5 +26,5 @@ deploy:
   distributions: sdist bdist_wheel
   on:
     tags: true
-    python: 3.5
+    python: 3.6
     condition: '$TOX_ENV = django111'

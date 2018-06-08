@@ -434,6 +434,12 @@ class Field(Nameable):
         baseline = xblock._dirty_fields[self]
         return baseline is EXPLICITLY_SET or xblock._field_data_cache[self.name] != baseline
 
+    def _is_lazy(self, value):
+        """
+        Detect if a value is being evaluated lazily by Django.
+        """
+        return 'django.utils.functional.' in str(type(value))
+
     def _check_or_enforce_type(self, value):
         """
         Depending on whether enforce_type is enabled call self.enforce_type and
@@ -884,6 +890,10 @@ class String(JSONField):
     def from_json(self, value):
         if value is None or isinstance(value, (six.binary_type, six.text_type)):
             return self._sanitize(value)
+        elif self._is_lazy(value):
+            # Allow lazily translated strings to be used as String default values.
+            # The translated values are *not* sanitized.
+            return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 

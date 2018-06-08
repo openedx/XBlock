@@ -6,8 +6,8 @@
 #
 appdirs==1.4.3
 backports.os==0.1.1
-boto3==1.7.35             # via fs-s3fs
-botocore==1.10.35         # via boto3, s3transfer
+boto3==1.7.44             # via fs-s3fs
+botocore==1.10.44         # via boto3, s3transfer
 django-pyfs==2.0
 django==1.11.13
 docutils==0.14            # via botocore

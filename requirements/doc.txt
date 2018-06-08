@@ -4,12 +4,12 @@
 #
 #    make upgrade
 #
-alabaster==0.7.10         # via sphinx
+alabaster==0.7.11         # via sphinx
 appdirs==1.4.3
 babel==2.6.0              # via sphinx
 backports.os==0.1.1
-boto3==1.7.35
-botocore==1.10.35
+boto3==1.7.44
+botocore==1.10.44
 certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.0
@@ -22,7 +22,7 @@ fs==2.0.23
 funcsigs==1.0.2           # via mock
 future==0.16.0
 futures==3.2.0 ; python_version == "2.7"
-idna==2.6                 # via requests
+idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
 jinja2==2.10              # via sphinx
 jmespath==0.9.3
@@ -37,7 +37,7 @@ pyparsing==2.2.0          # via packaging
 python-dateutil==2.7.3
 pytz==2018.4
 pyyaml==3.12
-requests==2.18.4          # via sphinx
+requests==2.19.1          # via sphinx
 s3transfer==0.1.13
 simplejson==3.15.0
 six==1.11.0
@@ -45,6 +45,6 @@ snowballstemmer==1.2.1    # via sphinx
 sphinx==1.7.5
 sphinxcontrib-websupport==1.1.0  # via sphinx
 typing==3.6.4
-urllib3==1.22             # via requests
+urllib3==1.23             # via requests
 web-fragments==0.2.2
 webob==1.8.2
