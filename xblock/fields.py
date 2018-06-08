@@ -434,6 +434,12 @@ class Field(Nameable):
         baseline = xblock._dirty_fields[self]
         return baseline is EXPLICITLY_SET or xblock._field_data_cache[self.name] != baseline
 
+    def _is_lazy(self, value):
+        """
+        Detect if a value is being evaluated lazily by Django.
+        """
+        return 'django.utils.functional.__proxy__' in str(type(value))
+
     def _check_or_enforce_type(self, value):
         """
         Depending on whether enforce_type is enabled call self.enforce_type and
@@ -454,14 +460,16 @@ class Field(Nameable):
                 value, traceback.format_exc().splitlines()[-1])
             warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
         else:
-            try:
-                equal = value == new_value
-            except TypeError:
-                equal = False
-            if not equal:
-                message = "The value {!r} would be enforced to {!r}".format(
-                    value, new_value)
-                warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
+            # Refuse to evaluate lazy evaluations during this type enforcement.
+            if not self._is_lazy(value) and not self._is_lazy(new_value):
+                try:
+                    equal = value == new_value
+                except TypeError:
+                    equal = False
+                if not equal:
+                    message = "The value {!r} would be enforced to {!r}".format(
+                        value, new_value)
+                    warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
 
         return value
 
@@ -884,6 +892,10 @@ class String(JSONField):
     def from_json(self, value):
         if value is None or isinstance(value, (six.binary_type, six.text_type)):
             return self._sanitize(value)
+        elif self._is_lazy(value):
+            # Allow lazily translated strings to be used as String default values.
+            # The translated values are *not* sanitized.
+            return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
