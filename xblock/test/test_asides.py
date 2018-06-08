@@ -22,6 +22,7 @@ class TestAside(XBlockAside):
     """
     Test xblock aside class
     """
+    __test__ = False
     FRAG_CONTENT = "<p>Aside rendered</p>"
 
     content = String(default="default_value", scope=Scope.content)
