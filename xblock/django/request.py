@@ -33,6 +33,7 @@ class HeaderDict(MutableMapping, six.Iterator):
     UNPREFIXED_HEADERS = ('CONTENT_TYPE', 'CONTENT_LENGTH')
 
     def __init__(self, meta):
+        super(HeaderDict, self).__init__()
         self._meta = meta
 
     def _meta_name(self, name):

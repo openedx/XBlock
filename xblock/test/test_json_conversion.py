@@ -14,7 +14,7 @@ from xblock.core import XBlock
 from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import DictFieldData
 
-from xblock.test.tools import assert_equals, assert_is_instance, TestRuntime
+from xblock.test.tools import TestRuntime
 
 
 class TestJSONConversionField(Field):
@@ -22,7 +22,7 @@ class TestJSONConversionField(Field):
     __test__ = False
 
     def from_json(self, value):
-        assert_equals('set', value['$type'])
+        assert value['$type'] == 'set'
         return set(value['$vals'])
 
     def to_json(self, value):
@@ -65,16 +65,14 @@ class TestJsonConversion(object):
 
     def test_get(self):
         # Test field with a value
-        assert_is_instance(self.block.field_a, set)
+        assert isinstance(self.block.field_a, set)
 
         # Test ModelData default
-        assert_is_instance(self.block.field_b, set)
+        assert isinstance(self.block.field_b, set)
 
     def test_set(self):
         self.block.field_b = set([5, 6, 5])
         self.block.save()
-        assert_is_instance(self.block.field_b, set)
-        assert_equals(
-            {'$type': 'set', '$vals': [5, 6]},
+        assert isinstance(self.block.field_b, set)
+        assert {'$type': 'set', '$vals': [5, 6]} == \
             self.block._field_data.get(self.block, 'field_b')
-        )

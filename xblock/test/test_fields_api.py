@@ -35,15 +35,7 @@ from xblock.core import XBlock
 from xblock.fields import Integer, List, String, ScopeIds, UNIQUE_ID
 from xblock.field_data import DictFieldData
 
-from xblock.test.tools import (
-    assert_is,
-    assert_is_not,
-    assert_equals,
-    assert_not_equals,
-    assert_true,
-    assert_false,
-    TestRuntime,
-)
+from xblock.test.tools import TestRuntime
 
 # Ignore statements that 'have no effect', since the effect is to read
 # from the descriptor
@@ -120,23 +112,23 @@ class UniversalProperties(object):
         first_get = self.get()
         second_get = self.get()
 
-        assert_is(first_get, second_get)
+        assert first_get is second_get
 
     def test_get_with_save_preserves_identity(self):
         first_get = self.get()
         self.block.save()
         second_get = self.get()
 
-        assert_is(first_get, second_get)
+        assert first_get is second_get
 
     def test_set_preserves_identity(self):
         first_get = self.get()
-        assert_is_not(self.new_value, first_get)
+        assert self.new_value is not first_get
         self.set(self.new_value)
         second_get = self.get()
 
-        assert_is(self.new_value, second_get)
-        assert_is_not(first_get, second_get)
+        assert self.new_value is second_get
+        assert first_get is not second_get
 
     def test_set_with_save_preserves_identity(self):
         first_get = self.get()
@@ -144,28 +136,28 @@ class UniversalProperties(object):
         self.block.save()
         second_get = self.get()
 
-        assert_is(self.new_value, second_get)
-        assert_is_not(first_get, second_get)
+        assert self.new_value is second_get
+        assert first_get is not second_get
 
     def test_set_with_save_makes_non_default(self):
         self.set(self.new_value)
         self.block.save()
-        assert_false(self.is_default())
+        assert not self.is_default()
 
     def test_set_without_save_makes_non_default(self):
         self.set(self.new_value)
-        assert_false(self.is_default())
+        assert not self.is_default()
 
     def test_delete_without_save_writes(self):
         self.delete()
-        assert_false(self.field_data.has(self.block, 'field'))
-        assert_true(self.is_default())
+        assert not self.field_data.has(self.block, 'field')
+        assert self.is_default()
 
     def test_delete_with_save_writes(self):
         self.delete()
         self.block.save()
-        assert_false(self.field_data.has(self.block, 'field'))
-        assert_true(self.is_default())
+        assert not self.field_data.has(self.block, 'field')
+        assert self.is_default()
 
     def test_set_after_get_always_force_saves(self):
         with patch.object(self.field_data, 'set_many') as patched_set_many:
@@ -182,11 +174,11 @@ class UniversalProperties(object):
 
             self.set(self.get())
             self.block.save()
-            assert_false(patched_set_many.called)
+            assert not patched_set_many.called
 
             self.set(self.new_value)
             self.block.save()
-            assert_true(patched_set_many.called)
+            assert patched_set_many.called
 
 
 class MutationProperties(object):
@@ -206,36 +198,36 @@ class MutationProperties(object):
         self.mutate(reference_value)
 
         # Verify that the test isn't vacuously true
-        assert_not_equals(self.new_value, reference_value)
+        assert self.new_value != reference_value
 
         self.set(copy.deepcopy(self.new_value))
         self.block.save()
         self.mutate(self.get())
         self.block.save()
         final_value = self.field_data.get(self.block, 'field')
-        assert_equals(reference_value, final_value)
+        assert reference_value == final_value
 
     def test_mutation_with_save_makes_non_default(self):
         self.mutate(self.get())
         self.block.save()
-        assert_false(self.is_default())
+        assert not self.is_default()
 
     def test_mutation_without_save_makes_non_default(self):
         self.mutate(self.get())
-        assert_false(self.is_default())
+        assert not self.is_default()
 
     def test_mutate_pointer_after_save(self):
         pointer = self.get()
         self.mutate(pointer)
         self.block.save()
-        assert_equals(pointer, self.field_data.get(self.block, 'field'))
+        assert pointer == self.field_data.get(self.block, 'field')
 
         # now check what happens when we mutate a field
         # that we haven't retrieved through __get__
         # (which would have marked it as dirty)
         self.mutate(pointer)
         self.block.save()
-        assert_equals(pointer, self.field_data.get(self.block, 'field'))
+        assert pointer == self.field_data.get(self.block, 'field')
 
     def test_set_save_mutate_save(self):
         pointer = self.new_value
@@ -243,7 +235,7 @@ class MutationProperties(object):
         self.block.save()
         self.mutate(pointer)
         self.block.save()
-        assert_equals(pointer, self.field_data.get(self.block, 'field'))
+        assert pointer == self.field_data.get(self.block, 'field')
 
 
 class InitialValueProperties(object):
@@ -261,7 +253,7 @@ class InitialValueProperties(object):
         return DictFieldData({'field': copy.deepcopy(self.initial_value)})
 
     def test_get_gets_initial_value(self):
-        assert_equals(self.field_data.get(self.block, 'field'), self.get())
+        assert self.field_data.get(self.block, 'field') == self.get()
 
     def test_get_with_save_doesnt_write(self):
         initial_value = self.field_data.get(self.block, 'field')
@@ -269,14 +261,14 @@ class InitialValueProperties(object):
         self.block.save()
         final_value = self.field_data.get(self.block, 'field')
 
-        assert_equals(initial_value, final_value)
+        assert initial_value == final_value
 
     def test_set_with_save_writes(self):
         initial_value = self.field_data.get(self.block, 'field')
-        assert_is_not(self.new_value, initial_value)
+        assert self.new_value is not initial_value
         self.set(self.new_value)
         self.block.save()
-        assert_equals(self.new_value, self.field_data.get(self.block, 'field'))
+        assert self.new_value == self.field_data.get(self.block, 'field')
 
 
 class DefaultValueProperties(object):
@@ -289,28 +281,28 @@ class DefaultValueProperties(object):
         self.field_data  # The field_data used by self.block
     """
     def test_get_with_save_doesnt_write(self):
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
         self.get()
         self.block.save()
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
 
     def test_set_with_save_writes(self):
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
         self.set(self.new_value)
         self.block.save()
-        assert_equals(self.new_value, self.field_data.get(self.block, 'field'))
+        assert self.new_value == self.field_data.get(self.block, 'field')
 
     def test_delete_without_save_succeeds(self):
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
 
         self.delete()
 
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
 
     def test_delete_with_save_succeeds(self):
         self.delete()
         self.block.save()
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
 
 
 class DefaultValueMutationProperties(object):
@@ -323,28 +315,28 @@ class DefaultValueMutationProperties(object):
         self.field_data  # The field_data used by self.block
     """
     def test_mutation_without_save_doesnt_write(self):
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
 
         mutable = self.get()
         self.mutate(mutable)
 
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
 
     def test_mutation_with_save_writes(self):
-        assert_false(self.field_data.has(self.block, 'field'))
+        assert not self.field_data.has(self.block, 'field')
 
         mutable = self.get()
         reference_copy = copy.deepcopy(mutable)
         self.mutate(reference_copy)
 
         # Verify that the test isn't vacuously true
-        assert_not_equals(mutable, reference_copy)
+        assert mutable != reference_copy
 
         self.mutate(mutable)
         self.block.save()
 
         final_value = self.field_data.get(self.block, 'field')
-        assert_equals(reference_copy, final_value)
+        assert reference_copy == final_value
 
 
 class InitialValueMutationProperties(object):
@@ -364,11 +356,11 @@ class InitialValueMutationProperties(object):
         self.mutate(mutable)
 
         # Verify that the test isn't vacuously true
-        assert_not_equals(reference_copy, mutable)
+        assert reference_copy != mutable
 
         final_value = self.field_data.get(self.block, 'field')
-        assert_equals(reference_copy, final_value)
-        assert_equals(initial_value, final_value)
+        assert reference_copy == final_value
+        assert initial_value == final_value
 
     def test_mutation_with_save_writes(self):
         initial_value = self.field_data.get(self.block, 'field')
@@ -376,14 +368,14 @@ class InitialValueMutationProperties(object):
         self.mutate(reference_copy)
 
         # verify that the test isn't vacuously true
-        assert_not_equals(initial_value, reference_copy)
+        assert initial_value != reference_copy
 
         mutable = self.get()
         self.mutate(mutable)
         self.block.save()
 
         final_value = self.field_data.get(self.block, 'field')
-        assert_equals(reference_copy, final_value)
+        assert reference_copy == final_value
 
 
 # ~~~~~ Classes linking initial conditions to the properties that test them ~~~~~~
