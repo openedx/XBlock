@@ -8,8 +8,8 @@ alabaster==0.7.10         # via sphinx
 appdirs==1.4.3
 babel==2.6.0              # via sphinx
 backports.os==0.1.1
-boto3==1.7.32
-botocore==1.10.32
+boto3==1.7.35
+botocore==1.10.35
 certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.0
@@ -31,7 +31,7 @@ lxml==4.2.1
 markupsafe==1.0
 mock==2.0.0
 packaging==17.1           # via sphinx
-pbr==4.0.3                # via mock
+pbr==4.0.4                # via mock
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 python-dateutil==2.7.3
@@ -47,4 +47,4 @@ sphinxcontrib-websupport==1.1.0  # via sphinx
 typing==3.6.4
 urllib3==1.22             # via requests
 web-fragments==0.2.2
-webob==1.8.1
+webob==1.8.2
