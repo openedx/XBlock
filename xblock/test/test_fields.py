@@ -27,9 +27,7 @@ from xblock.fields import (
     ScopeIds, Sentinel, UNIQUE_ID, scope_key,
 )
 
-from xblock.test.tools import (
-    assert_equals, assert_not_equals, assert_in, assert_not_in, assert_false, TestRuntime
-)
+from xblock.test.tools import TestRuntime
 
 
 class FieldTest(unittest.TestCase):
@@ -496,7 +494,7 @@ def test_field_name_defaults():
     # Tests field display name default values
     attempts = Integer()
     attempts.__name__ = "max_problem_attempts"
-    assert_equals('max_problem_attempts', attempts.display_name)
+    assert attempts.display_name == 'max_problem_attempts'
 
     class TestBlock(XBlock):
         """
@@ -504,7 +502,7 @@ def test_field_name_defaults():
         """
         field_x = List()
 
-    assert_equals("field_x", TestBlock.field_x.display_name)
+    assert TestBlock.field_x.display_name == "field_x"
 
 
 def test_scope_key():
@@ -538,16 +536,16 @@ def test_scope_key():
                               [TestBlock.uss_lst, "__..../uss__lst/NONE.NONE"],
                               [TestBlock.settings_lst, "__..../settings__lst/NONE.NONE"]]:
         key = scope_key(item, block)
-        assert_equals(key, correct_key)
+        assert key == correct_key
 
 
 def test_field_display_name():
     attempts = Integer(display_name='Maximum Problem Attempts')
     attempts._name = "max_problem_attempts"
-    assert_equals("Maximum Problem Attempts", attempts.display_name)
+    assert attempts.display_name == "Maximum Problem Attempts"
 
     boolean_field = Boolean(display_name="boolean field")
-    assert_equals("boolean field", boolean_field.display_name)
+    assert boolean_field.display_name == "boolean field"
 
     class TestBlock(XBlock):
         """
@@ -555,7 +553,7 @@ def test_field_display_name():
         """
         field_x = List(display_name="Field Known as X")
 
-    assert_equals("Field Known as X", TestBlock.field_x.display_name)
+    assert TestBlock.field_x.display_name == "Field Known as X"
 
 
 def test_unique_id_default():
@@ -578,48 +576,46 @@ def test_unique_id_default():
     # Create another instance of the same block. Unique ID defaults should not change.
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
     block = TestBlock(runtime, DictFieldData({}), sids)
-    assert_equals(unique_a, block.field_a)
-    assert_equals(unique_b, block.field_b)
+    assert unique_a == block.field_a
+    assert unique_b == block.field_b
     # Change the user id. Unique ID default should change for field_b with
     # user_state scope, but not for field_a with scope=settings.
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
     block = TestBlock(runtime, DictFieldData({}), sids._replace(user_id='alice'))
-    assert_equals(unique_a, block.field_a)
-    assert_not_equals(unique_b, block.field_b)
+    assert unique_a == block.field_a
+    assert unique_b != block.field_b
     # Change the usage id. Unique ID default for both fields should change.
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
     block = TestBlock(runtime, DictFieldData({}), sids._replace(usage_id='usage-2'))
-    assert_not_equals(unique_a, block.field_a)
-    assert_not_equals(unique_b, block.field_b)
+    assert unique_a != block.field_a
+    assert unique_b != block.field_b
 
 
 def test_values():
     # static return value
     field_values = ['foo', 'bar']
     test_field = String(values=field_values)
-    assert_equals(field_values, test_field.values)
+    assert field_values == test_field.values
 
     # function to generate values
     test_field = String(values=lambda: [1, 4])
-    assert_equals([1, 4], test_field.values)
+    assert [1, 4] == test_field.values
 
     # default if nothing specified
-    assert_equals(None, String().values)
+    assert String().values is None
 
 
 def test_values_boolean():
     # Test Boolean, which has values defined
     test_field = Boolean()
-    assert_equals(
-        ({'display_name': "True", "value": True}, {'display_name': "False", "value": False}),
+    assert ({'display_name': "True", "value": True}, {'display_name': "False", "value": False}) == \
         test_field.values
-    )
 
 
 def test_values_dict():
     # Test that the format expected for integers is allowed
     test_field = Integer(values={"min": 1, "max": 100})
-    assert_equals({"min": 1, "max": 100}, test_field.values)
+    assert {"min": 1, "max": 100} == test_field.values
 
 
 def test_set_incomparable_fields():
@@ -636,7 +632,7 @@ def test_set_incomparable_fields():
     field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
     field_tester.incomparable = not_timezone_aware
     field_tester.incomparable = timezone_aware
-    assert_equals(field_tester.incomparable, timezone_aware)
+    assert field_tester.incomparable == timezone_aware
 
 
 def test_twofaced_field_access():
@@ -661,14 +657,14 @@ def test_twofaced_field_access():
     field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # Test that the native value isn't equal to the original json we specified.
-    assert_not_equals(field_tester.how_many, original_json)
+    assert field_tester.how_many != original_json
     # Test that the native -> json value isn't equal to the original json we specified.
-    assert_not_equals(TwoFacedField().to_json(field_tester.how_many), original_json)
+    assert TwoFacedField().to_json(field_tester.how_many) != original_json
 
     # The previous accesses will mark the field as dirty (via __get__)
-    assert_equals(len(field_tester._dirty_fields), 1)
+    assert len(field_tester._dirty_fields) == 1
     # However, the field should not ACTUALLY be marked as a field that is needing to be saved.
-    assert_not_in('how_many', field_tester._get_fields_to_save())   # pylint: disable=W0212
+    assert 'how_many' not in field_tester._get_fields_to_save()   # pylint: disable=W0212
 
 
 def test_setting_the_same_value_marks_field_as_dirty():
@@ -676,6 +672,7 @@ def test_setting_the_same_value_marks_field_as_dirty():
     Check that setting field to the same value marks mutable fields as dirty.
     However, since the value hasn't changed, these fields won't be saved.
     """
+    # pylint: disable=unsubscriptable-object
     class FieldTester(XBlock):
         """Test block for set - get test."""
         non_mutable = String(scope=Scope.settings)
@@ -686,22 +683,22 @@ def test_setting_the_same_value_marks_field_as_dirty():
     field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # precondition checks
-    assert_equals(len(field_tester._dirty_fields), 0)
-    assert_false(field_tester.fields['list_field'].is_set_on(field_tester))
-    assert_false(field_tester.fields['dict_field'].is_set_on(field_tester))
-    assert_false(field_tester.fields['non_mutable'].is_set_on(field_tester))
+    assert len(field_tester._dirty_fields) == 0
+    assert not field_tester.fields['list_field'].is_set_on(field_tester)
+    assert not field_tester.fields['dict_field'].is_set_on(field_tester)
+    assert not field_tester.fields['non_mutable'].is_set_on(field_tester)
 
     field_tester.non_mutable = field_tester.non_mutable
     field_tester.list_field = field_tester.list_field
     field_tester.dict_field = field_tester.dict_field
 
-    assert_not_in(field_tester.fields['non_mutable'], field_tester._dirty_fields)
-    assert_in(field_tester.fields['list_field'], field_tester._dirty_fields)
-    assert_in(field_tester.fields['dict_field'], field_tester._dirty_fields)
+    assert not field_tester.fields['non_mutable'] in field_tester._dirty_fields
+    assert field_tester.fields['list_field'] in field_tester._dirty_fields
+    assert field_tester.fields['dict_field'] in field_tester._dirty_fields
 
-    assert_false(field_tester.fields['non_mutable'].is_set_on(field_tester))
-    assert_false(field_tester.fields['list_field'].is_set_on(field_tester))
-    assert_false(field_tester.fields['dict_field'].is_set_on(field_tester))
+    assert not field_tester.fields['non_mutable'].is_set_on(field_tester)
+    assert not field_tester.fields['list_field'].is_set_on(field_tester)
+    assert not field_tester.fields['dict_field'].is_set_on(field_tester)
 
 
 class SentinelTest(unittest.TestCase):
