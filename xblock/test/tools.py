@@ -10,18 +10,6 @@ import warnings
 
 import six
 
-# nose.tools has convenient assert methods, but it defines them in a clever way
-# that baffles pylint.  Import them all here so we can keep the pylint clutter
-# out of the rest of our files.
-from nose.tools import (  # pylint: disable=no-name-in-module,unused-import
-    assert_true, assert_false,
-    assert_equals, assert_not_equals,
-    assert_is, assert_is_not,
-    assert_is_instance, assert_is_none,
-    assert_in, assert_not_in,
-    assert_raises, assert_raises_regexp,
-)
-
 from xblock.runtime import Runtime, MemoryIdManager
 
 
@@ -126,6 +114,8 @@ class TestRuntime(Runtime):
     """
     An empty runtime to be used in tests
     """
+    __test__ = False
+
     # unabc doesn't squash pylint errors
     # pylint: disable=abstract-method
     def __init__(self, *args, **kwargs):

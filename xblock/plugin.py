@@ -31,7 +31,7 @@ class AmbiguousPluginError(Exception):
         super(AmbiguousPluginError, self).__init__(msg)
 
 
-def default_select(identifier, all_entry_points):
+def default_select(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
     """
     Raise an exception when we have ambiguous entry points.
     """
