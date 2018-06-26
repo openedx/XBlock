@@ -61,7 +61,7 @@ class HandlersMixin(object):
             if request.method != "POST":
                 return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
             try:
-                request_json = json.loads(request.body)
+                request_json = request.json_data
             except ValueError:
                 return JsonHandlerError(400, "Invalid JSON").get_response()
             try:

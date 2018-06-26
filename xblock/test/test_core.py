@@ -15,7 +15,7 @@ import unittest
 
 import ddt
 import six
-from mock import patch, MagicMock, Mock
+from mock import patch, MagicMock, Mock, PropertyMock
 import pytest
 from webob import Response
 
@@ -827,7 +827,8 @@ def test_json_handler_basic():
     test_data = {"foo": "bar", "baz": "quux"}
     test_data_json = ['{"foo": "bar", "baz": "quux"}', '{"baz": "quux", "foo": "bar"}']
     test_suffix = "suff"
-    test_request = Mock(method="POST", body=test_data_json[0])
+    test_request = Mock(method="POST")
+    type(test_request).json_data = PropertyMock(return_value=test_data)
 
     @XBlock.json_handler
     def test_func(self, request, suffix):
@@ -844,6 +845,7 @@ def test_json_handler_basic():
 
 def test_json_handler_invalid_json():
     test_request = Mock(method="POST", body="{")
+    type(test_request).json_data = PropertyMock(side_effect=ValueError())
 
     @XBlock.json_handler
     def test_func(self, request, suffix):   # pylint: disable=unused-argument
@@ -872,6 +874,7 @@ def test_json_handler_get():
 
 def test_json_handler_empty_request():
     test_request = Mock(method="POST", body="")
+    type(test_request).json_data = PropertyMock(side_effect=ValueError())
 
     @XBlock.json_handler
     def test_func(self, request, suffix):   # pylint: disable=unused-argument
@@ -913,7 +916,7 @@ def test_json_handler_return_response():
 
 
 def test_json_handler_return_unicode():
-    test_request = Mock(method="POST", body='["foo", "bar"]')
+    test_request = Mock(method="POST", json_data='["foo", "bar"]')
 
     @XBlock.json_handler
     def test_func(self, request, suffix):  # pylint: disable=unused-argument

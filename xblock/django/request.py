@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import MutableMapping
 from itertools import chain, repeat
+import json
 from lazy import lazy
 
 import six
@@ -109,7 +110,7 @@ class DjangoUploadedFile(object):
 class DjangoWebobRequest(webob.Request):
     """
     An implementation of the webob request api, backed
-    by a django request
+    by django request or rest_framework request.
     """
     def __init__(self, request):
         self._request = request
@@ -145,6 +146,39 @@ class DjangoWebobRequest(webob.Request):
             querydict_to_multidict(self._request.POST),
             querydict_to_multidict(self._request.FILES, wrap=DjangoUploadedFile),
         )
+
+    @lazy
+    def json_data(self):  # pylint: disable=method-hidden
+        """
+        Return the content of the request body parsed as a dict.
+
+        Historically a check for content_type did not exist.
+        To maintain backwards compatibility we assume the content is json irrespective of the content_type.
+        """
+        try:
+            from rest_framework.request import Request as DRFRequest
+            from rest_framework.exceptions import ParseError
+        except ImportError:
+            pass
+        else:
+            # For DRF views, if drf_request.POST is called, in certain cases it consumes the request stream itself.
+            # Trying to read drf_request.body after this causes django_request.body to raise RawPostDataException.
+            # So return drf_request.data if self._request is a DRF Request object.
+            if isinstance(self._request, DRFRequest):
+                try:
+                    data = self._request.data
+                # ParseError is a DRF specific exception so raise a ValueError instead.
+                except ParseError:
+                    raise ValueError()
+                else:
+                    if self._request.content_type == 'application/json':
+                        return data
+                    else:
+                        # If content_type is application/x-www-form-urlencoded, json will be the key of the only item:
+                        # <QueryDict: {u'{"key1": "value1"}': [u'']}>
+                        return json.loads(list(data)[0])
+
+        return json.loads(self._request.body)
 
     @lazy
     def body(self):  # pylint: disable=method-hidden

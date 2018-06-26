@@ -11,11 +11,16 @@ from unittest import TestCase
 
 # pylint: disable=wrong-import-position
 try:
-    from django.test.client import RequestFactory  # pylint: disable=import-error
+    # pylint: disable=import-error
+    from django.test.client import RequestFactory
+    from django.http.request import RawPostDataException
+    from rest_framework.request import Request as DRFRequest
+    from rest_framework.parsers import FormParser, JSONParser
     HAS_DJANGO = True
 except ImportError:
     HAS_DJANGO = False
 
+import ddt
 import pytest
 from webob import Response
 
@@ -25,23 +30,87 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 
 
 @pytest.mark.skipif(not HAS_DJANGO, reason='Django not available')
+@ddt.ddt
 class TestDjangoWebobRequest(TestCase):
     """
     Tests of the django_to_webob_request function
     """
     def setUp(self):
-        self.req_factory = RequestFactory()
+        self.request_factory = RequestFactory()
 
-    def test_post_already_read(self):
+    def _django_request(self, data, content_type):
+        return self.request_factory.post(
+            '/xblock/handler/', data=data, content_type=content_type
+        )
+
+    def _drf_request(self, data, content_type):
+        return DRFRequest(
+            self._django_request(data, content_type), parsers=[FormParser(), JSONParser()]
+        )
+
+    def test_post_already_read_for_django_request(self):
         # Check that POST already having been read from doesn't
         # prevent access to the POST of the webob object
-        dj_req = self.req_factory.post('dummy_url', data={'foo': 'bar'})
+        dj_req = self.request_factory.post('dummy_url', data={'foo': 'bar'})
 
         # Read from POST before constructing the webob request
         self.assertEqual(dj_req.POST.getlist('foo'), ['bar'])  # pylint: disable=no-member
 
         webob_req = django_to_webob_request(dj_req)
         self.assertEqual(webob_req.POST.getall('foo'), ['bar'])
+
+    def test_json_data_already_read_for_drf_request(self):
+
+        drf_request = self._drf_request('{"key1": "value1"}', 'application/json')
+
+        # drf_request.POST is empty when content_type is application_json.
+        self.assertEqual(list(drf_request.POST), [])
+
+        webob_request = django_to_webob_request(drf_request)
+
+        # django_request.read() is called in drf_request.POST, so accessing body after that raises Exception.
+        with pytest.raises(RawPostDataException):
+            drf_request.body
+        with pytest.raises(RawPostDataException):
+            webob_request.body
+
+        # json_data should return drf_request.data instead of parsing body again.
+        webob_request.json_data
+
+    @ddt.data(
+        ('{"key1": "value1"}', 'application/json', True),
+        ('{"key1" "value1"}', 'application/json', False),
+        ('{"key1": "value1"}', 'application/x-www-form-urlencoded', True),  # Supported for backwards compatibility.
+        ('key1=value1&key2=value2', 'application/x-www-form-urlencoded', False),
+    )
+    @ddt.unpack
+    def test_json_data_with_django_request(self, data, content_type, success):
+
+        webob_request = django_to_webob_request(
+            self._django_request(data, content_type)
+        )
+        if success:
+            self.assertEqual(webob_request.json_data['key1'], 'value1')
+        else:
+            with pytest.raises(ValueError):
+                webob_request.json_data
+
+    @ddt.data(
+        ('{"key1": "value1"}', 'application/json', True),
+        ('{"key1" "value1"}', 'application/json', False),
+        ('{"key1": "value1"}', 'application/x-www-form-urlencoded', True),  # Supported for backwards compatibility.
+        ('key1=value1&key2=value2', 'application/x-www-form-urlencoded', False),
+    )
+    @ddt.unpack
+    def test_json_data_with_drf_request(self, data, content_type, success):
+        webob_request = django_to_webob_request(
+            self._drf_request(data, content_type)
+        )
+        if success:
+            self.assertEqual(webob_request.json_data['key1'], 'value1')
+        else:
+            with pytest.raises(ValueError):
+                webob_request.json_data
 
 
 @pytest.mark.skipif(not HAS_DJANGO, reason='Django not available')

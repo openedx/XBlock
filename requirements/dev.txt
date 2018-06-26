@@ -25,6 +25,7 @@ diff-cover==1.0.2
 distlib==0.2.7
 django-pyfs==2.0
 django==1.11.13
+-e git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 docutils==0.14
 enum34==1.1.6
 first==2.0.1
