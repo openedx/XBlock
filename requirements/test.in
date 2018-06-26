@@ -10,6 +10,7 @@ diff-cover >= 0.2.1
 hypothesis>=3.33.0,<4.0
 mock
 nose
+path.py
 pycodestyle
 pylint
 pytest

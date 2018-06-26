@@ -4,6 +4,12 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.2.1 - 2018-06-25
+------------------
+
+Suppress a spurious warning when using lazily-translated text as the default
+value of a String field.
+
 1.2.0 - Aside filtering
 -----------------------
 

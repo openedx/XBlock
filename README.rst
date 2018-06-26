@@ -183,16 +183,16 @@ Packaging
 
 To package a new release:
 
-#. Update the version number in setup.py and xblock/__init__.py.
+#. Update the version number in xblock/VERSION.txt.
 
 #. Tag the commit to be released::
 
     $VERSION=0.5
     git tag -a -m "XBlock version $VERSION" xblock-$VERSION
 
-#. Upload to PyPI::
+#. Push the tag and wait for Travis to upload to PyPI::
 
-    make package
+    git push --tags
 
 
 Mailing List and IRC Channel

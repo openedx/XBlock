@@ -8,12 +8,12 @@ certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
 codecov==2.0.15
 coverage==4.5.1           # via codecov
-idna==2.6                 # via requests
+idna==2.7                 # via requests
 pluggy==0.6.0             # via tox
 py==1.5.3                 # via tox
-requests==2.18.4          # via codecov
+requests==2.19.1          # via codecov
 six==1.11.0               # via tox
 tox-battery==0.5.1
 tox==3.0.0
-urllib3==1.22             # via requests
+urllib3==1.23             # via requests
 virtualenv==16.0.0        # via tox
