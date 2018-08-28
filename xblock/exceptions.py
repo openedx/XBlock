@@ -30,7 +30,7 @@ class XBlockSaveError(Exception):
         Create a new XBlockSaveError
 
         `saved_fields` - a set of fields that were successfully
-        saved before the error occured
+        saved before the error occurred
         `dirty_fields` - a set of fields that were left dirty after the save
         """
         # Exception is an old-style class, so can't use super
@@ -50,7 +50,7 @@ class KeyValueMultiSaveError(Exception):
         Create a new KeyValueMultiSaveError
 
         `saved_field_names` - an iterable of field names (strings) that were
-        successfully saved before the exception occured
+        successfully saved before the exception occurred
         """
         # Exception is an old-style class, so can't use super
         Exception.__init__(self)

@@ -476,7 +476,7 @@ def test_field_serialization():
 
     class CustomField(Field):
         """
-        Specifiy a custom field that defines its own serialization
+        Specify a custom field that defines its own serialization
         """
         def from_json(self, value):
             return value['value']
