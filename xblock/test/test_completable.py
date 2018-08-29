@@ -4,8 +4,10 @@ Tests of the CompletableXBlockMixin.
 from __future__ import absolute_import, unicode_literals
 
 import math
+from collections import namedtuple
 from unittest import TestCase
 
+import ddt
 import mock
 from hypothesis import given, example
 import hypothesis.strategies as strategies
@@ -14,6 +16,39 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import Runtime
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
+
+
+@ddt.ddt
+class XBlockCompletionModeTest(TestCase):
+    """
+    Tests for XBlockCompletionMode
+    """
+    blocklike = namedtuple('block_like', ['completion_mode'])
+
+    @ddt.data(
+        XBlockCompletionMode.COMPLETABLE,
+        XBlockCompletionMode.AGGREGATOR,
+        XBlockCompletionMode.EXCLUDED,
+    )
+    def test_explicit_mode(self, mode):
+        block = self.blocklike(mode)
+        self.assertEqual(
+            XBlockCompletionMode.get_mode(block),
+            mode
+        )
+
+    def test_no_mode(self):
+        self.assertEqual(
+            XBlockCompletionMode.get_mode(object()),
+            XBlockCompletionMode.COMPLETABLE,
+        )
+
+    def test_unknown_mode(self):
+        block = self.blocklike('somenewmode')
+        self.assertEqual(
+            XBlockCompletionMode.get_mode(block),
+            'somenewmode'
+        )
 
 
 class CompletableXBlockMixinTest(TestCase):
@@ -33,9 +68,9 @@ class CompletableXBlockMixinTest(TestCase):
 
     class TestIllegalCompletionMethodAttrXBlock(XBlock, CompletableXBlockMixin):
         """
-        XBlock extending CompletableXBlockMixin using illegal `completion_method` attribute.
+        XBlock extending CompletableXBlockMixin using illegal `completion_mode` attribute.
         """
-        completion_method = "something_else"
+        completion_mode = "something_else"
 
     def _make_block(self, runtime=None, block_type=None):
         """
@@ -54,13 +89,13 @@ class CompletableXBlockMixinTest(TestCase):
         self.assertTrue(block.has_custom_completion)
         self.assertTrue(getattr(block, 'has_custom_completion', False))
 
-    def test_completion_method_property(self):
+    def test_completion_mode_property(self):
         """
-        Test `completion_method` property is set by mixin.
+        Test `completion_mode` property is set by mixin.
         """
         block = self._make_block()
-        self.assertEqual(block.completion_method, XBlockCompletionMode.COMPLETABLE)
-        self.assertEqual(getattr(block, 'completion_method', ""), XBlockCompletionMode.COMPLETABLE)
+        self.assertEqual(XBlockCompletionMode.get_mode(block), XBlockCompletionMode.COMPLETABLE)
+        self.assertEqual(getattr(block, 'completion_mode'), XBlockCompletionMode.COMPLETABLE)
 
     @given(strategies.floats())
     def test_emit_completion_illegal_custom_completion(self, any_completion):
@@ -73,14 +108,14 @@ class CompletableXBlockMixinTest(TestCase):
             illegal_custom_completion_block.emit_completion(any_completion)
 
     @given(strategies.floats())
-    def test_emit_completion_completion_method(self, any_completion):
+    def test_emit_completion_completion_mode(self, any_completion):
         """
-        Test `emit_completion` raises exception when called on a XBlock with illegal `completion_method` value.
+        Test `emit_completion` raises exception when called on a XBlock with illegal `completion_mode` value.
         """
         runtime_mock = mock.Mock(spec=Runtime)
-        illegal_completion_method_block = self._make_block(runtime_mock, self.TestIllegalCompletionMethodAttrXBlock)
+        illegal_completion_mode_block = self._make_block(runtime_mock, self.TestIllegalCompletionMethodAttrXBlock)
         with self.assertRaises(AttributeError):
-            illegal_completion_method_block.emit_completion(any_completion)
+            illegal_completion_mode_block.emit_completion(any_completion)
 
     @given(strategies.floats(min_value=0.0, max_value=1.0))
     @example(1.0)
