@@ -1048,7 +1048,7 @@ def scope_key(instance, xblock):
 
     Our goal is to have a pretty, human-readable 1:1 encoding.
 
-    This encoding is as good as we can do. It's reversable, but not
+    This encoding is as good as we can do. It's reversible, but not
     trivial to reverse.
 
     Encoding scheme:
@@ -1059,7 +1059,7 @@ def scope_key(instance, xblock):
     We encode other common punctuation as pairs of ._-. This gives a total of 3*3=9 combinations.
     We're pretty careful to keep this nice. Where possible, we double characters. The most common
     other character (' ' and ':') are encoded as _- and -_
-    We seperate field portions with /. This gives a natural directory
+    We separate field portions with /. This gives a natural directory
     tree. This is nice in URLs and filenames (although not so nice in
     urls.py)
     If a field starts with punctuatation, we prefix a _. This prevents hidden files.

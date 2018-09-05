@@ -2,7 +2,7 @@
 XBlock Courseware Components
 """
 
-# For backwards compatability, provide the XBlockMixin in xblock.fields
+# For backwards compatibility, provide the XBlockMixin in xblock.fields
 # without causing a circular import
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -26,7 +26,7 @@ class XBlockMixin(xblock.core.XBlockMixin):
         super(XBlockMixin, self).__init__(*args, **kwargs)
 
 
-# For backwards compatability, provide the XBlockMixin in xblock.fields
+# For backwards compatibility, provide the XBlockMixin in xblock.fields
 # without causing a circular import
 xblock.fields.XBlockMixin = XBlockMixin
 
