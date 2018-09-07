@@ -12,6 +12,15 @@ class XBlockCompletionMode(object):
     AGGREGATOR = "aggregator"
     EXCLUDED = "excluded"
 
+    @classmethod
+    def get_mode(cls, block_class):
+        """
+        Return the effective completion mode for a given block.
+
+        Defaults to XBlockCompletionMode.COMPLETABLE.
+        """
+        return getattr(block_class, 'completion_mode', cls.COMPLETABLE)
+
 
 class CompletableXBlockMixin(object):
     """
@@ -19,7 +28,7 @@ class CompletableXBlockMixin(object):
     """
 
     has_custom_completion = True
-    completion_method = XBlockCompletionMode.COMPLETABLE
+    completion_mode = XBlockCompletionMode.COMPLETABLE
 
     # To read more on the debate about using the terms percent vs ratio, see:
     # https://openedx.atlassian.net/wiki/spaces/OpenDev/pages/245465398/Naming+with+Percent+or+Ratio
@@ -37,11 +46,12 @@ class CompletableXBlockMixin(object):
         Returns:
             None
         """
-        if not self.has_custom_completion or self.completion_method != 'completable':
+        completion_mode = XBlockCompletionMode.get_mode(self)
+        if not self.has_custom_completion or completion_mode != XBlockCompletionMode.COMPLETABLE:
             raise AttributeError(
                 "Using `emit_completion` requires `has_custom_completion == True` (was {}) "
-                "and `completion_method == 'completable'` (was {})".format(
-                    self.has_custom_completion, self.completion_method
+                "and `completion_mode == 'completable'` (was {})".format(
+                    self.has_custom_completion, completion_mode,
                 )
             )
 
