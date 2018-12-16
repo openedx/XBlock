@@ -819,6 +819,10 @@ class List(JSONField):
     _default = []
 
     def from_json(self, value):
+        # Empty strings are treated as empty lists
+        if isinstance(value, basestring) and not value:
+            value = self._default
+
         if value is None or isinstance(value, list):
             return value
         else:

@@ -382,6 +382,7 @@ class ListTest(FieldTest):
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals([], [])
+        self.assertJSONOrSetEquals([], '')
         self.assertJSONOrSetEquals(['foo', 'bar'], ['foo', 'bar'])
         self.assertJSONOrSetEquals([1, 3.4], [1, 3.4])
 
@@ -390,7 +391,6 @@ class ListTest(FieldTest):
 
     def test_error(self):
         self.assertJSONOrSetTypeError('abc')
-        self.assertJSONOrSetTypeError('')
         self.assertJSONOrSetTypeError('1.23')
         self.assertJSONOrSetTypeError('true')
         self.assertJSONOrSetTypeError(3.7)
@@ -451,6 +451,7 @@ class ReferenceListTest(FieldTest):
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals([], [])
+        self.assertJSONOrSetEquals([], '')
         self.assertJSONOrSetEquals(['foo', 'bar'], ['foo', 'bar'])
         self.assertJSONOrSetEquals([1, 3.4], [1, 3.4])
 
@@ -459,7 +460,6 @@ class ReferenceListTest(FieldTest):
 
     def test_error(self):
         self.assertJSONOrSetTypeError('abc')
-        self.assertJSONOrSetTypeError('')
         self.assertJSONOrSetTypeError('1.23')
         self.assertJSONOrSetTypeError('true')
         self.assertJSONOrSetTypeError(3.7)
