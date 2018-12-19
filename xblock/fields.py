@@ -820,8 +820,10 @@ class List(JSONField):
 
     def from_json(self, value):
         # Empty strings are treated as empty lists
-        if isinstance(value, basestring) and not value:
-            value = self._default
+        if isinstance(value, six.binary_type):
+            value = value.decode('utf-8')
+        if isinstance(value, six.text_type) and not value:
+            value = []
 
         if value is None or isinstance(value, list):
             return value
