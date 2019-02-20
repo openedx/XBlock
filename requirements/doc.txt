@@ -4,47 +4,47 @@
 #
 #    make upgrade
 #
-alabaster==0.7.11         # via sphinx
+alabaster==0.7.12         # via sphinx
 appdirs==1.4.3
 babel==2.6.0              # via sphinx
 backports.os==0.1.1
-boto3==1.7.44
-botocore==1.10.44
-certifi==2018.4.16        # via requests
+boto3==1.9.99
+botocore==1.12.99
+certifi==2018.11.29       # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.0
-django==1.11.13
+django==1.11.20
 docutils==0.14
-edx-sphinx-theme==1.3.0
+edx-sphinx-theme==1.4.0
 enum34==1.1.6
-fs-s3fs==0.1.8
-fs==2.0.23
+fs-s3fs==1.1.0
+fs==2.4.1
 funcsigs==1.0.2           # via mock
-future==0.16.0
+future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
-idna==2.7                 # via requests
-imagesize==1.0.0          # via sphinx
+idna==2.8                 # via requests
+imagesize==1.1.0          # via sphinx
 jinja2==2.10              # via sphinx
 jmespath==0.9.3
-lazy==1.3
-lxml==4.2.1
-markupsafe==1.0
+lazy==1.4
+lxml==4.3.1
+markupsafe==1.1.0
 mock==2.0.0
-packaging==17.1           # via sphinx
-pbr==4.0.4                # via mock
-pygments==2.2.0           # via sphinx
-pyparsing==2.2.0          # via packaging
-python-dateutil==2.7.3
-pytz==2018.4
-pyyaml==3.12
-requests==2.19.1          # via sphinx
-s3transfer==0.1.13
-simplejson==3.15.0
-six==1.11.0
+packaging==19.0           # via sphinx
+pbr==5.1.2                # via mock
+pygments==2.3.1           # via sphinx
+pyparsing==2.3.1          # via packaging
+python-dateutil==2.8.0
+pytz==2018.9
+pyyaml==3.13
+requests==2.21.0          # via sphinx
+s3transfer==0.2.0
+simplejson==3.16.0
+six==1.12.0
 snowballstemmer==1.2.1    # via sphinx
-sphinx==1.7.5
+sphinx==1.8.4
 sphinxcontrib-websupport==1.1.0  # via sphinx
-typing==3.6.4
-urllib3==1.23             # via requests
-web-fragments==0.2.2
-webob==1.8.2
+typing==3.6.6
+urllib3==1.24.1
+web-fragments==0.3.0
+webob==1.8.5
