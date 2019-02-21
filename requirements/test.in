@@ -5,7 +5,7 @@
 astroid
 caniusepython3
 coverage
-ddt==0.8.0
+ddt
 diff-cover >= 0.2.1
 hypothesis>=3.33.0,<4.0
 mock
