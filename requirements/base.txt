@@ -7,14 +7,14 @@
 appdirs==1.4.3            # via fs
 backports.os==0.1.1       # via fs
 enum34==1.1.6             # via fs
-fs==2.4.1
+fs==2.4.5
 future==0.17.1            # via backports.os
 futures==3.2.0 ; python_version == "2.7"
-lxml==4.3.1
-markupsafe==1.1.0
+lxml==4.3.3
+markupsafe==1.1.1
 python-dateutil==2.8.0
-pytz==2018.9
-pyyaml==3.13
+pytz==2019.1
+pyyaml==5.1
 simplejson==3.16.0
 six==1.12.0
 typing==3.6.6             # via fs
