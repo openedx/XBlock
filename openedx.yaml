@@ -4,7 +4,9 @@
 nick: xblk
 oeps:
     oep-2: true
+    oep-7: true
     oep-18: true
 owner: edx/platform-team
-tags: [xblock]
-track-pulls: true
+tags:
+    - xblock
+    - library
