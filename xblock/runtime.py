@@ -9,6 +9,7 @@ from collections import namedtuple
 import functools
 import gettext
 from io import BytesIO, StringIO
+import importlib
 import itertools
 import json
 import logging
@@ -1211,10 +1212,22 @@ class Mixologist(object):
     """
     def __init__(self, mixins):
         """
-        :param mixins: Classes to mixin
+        :param mixins: Classes to mixin or names of classes to mixin.
         :type mixins: `iterable` of `class`
         """
-        self._mixins = tuple(mixins)
+
+        mixin_classes = []
+        for mixin in mixins:
+            if isinstance(mixin, six.text_type):
+                module, cls = mixin.rsplit('.', 1)
+                imported_module = importlib.import_module(module)
+                # Should I catch the attribute error and raise a clearer error on failure?
+                mixin_class = getattr(imported_module, cls)
+                mixin_classes.append(mixin_class)
+            else:
+                mixin_classes.append(mixin)
+
+        self._mixins = tuple(mixin_classes)
 
     def mix(self, cls):
         """
