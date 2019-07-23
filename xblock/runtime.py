@@ -1221,8 +1221,12 @@ class Mixologist(object):
             if isinstance(mixin, six.text_type):
                 module, cls = mixin.rsplit('.', 1)
                 imported_module = importlib.import_module(module)
-                # Should I catch the attribute error and raise a clearer error on failure?
-                mixin_class = getattr(imported_module, cls)
+                try:
+                    mixin_class = getattr(imported_module, cls)
+                except AttributeError as e:
+                    msg = "Couldn't import class {}: {}".format(mixin, str(e))
+                    raise AttributeError(msg)
+
                 mixin_classes.append(mixin_class)
             else:
                 mixin_classes.append(mixin)

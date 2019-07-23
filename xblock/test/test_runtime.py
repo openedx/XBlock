@@ -492,6 +492,14 @@ class TestMixologist(object):
         assert len(post_mixed.__bases__) == 4
 
 
+class TestMixologistErrors(object):
+    """ Test failures in Mixologist initialization. """
+    def test_bad_class_name(self):
+        bad_class_name = 'xblock.test.test_runtime.NonExistentMixin'
+        with pytest.raises(AttributeError, match="Couldn't import class {}".format(bad_class_name)):
+            Mixologist([bad_class_name])
+
+
 @XBlock.needs("i18n", "no_such_service")
 @XBlock.wants("secret_service", "another_not_service")
 class XBlockWithServices(XBlock):
