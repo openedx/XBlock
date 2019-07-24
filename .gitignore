@@ -3,8 +3,11 @@
 *.pyc
 local_settings.py
 *.egg-info
-.treerc
 .coverage
+.hypothesis
+.pytest_cache
+.tox
+.treerc
 htmlcov
 *~
 

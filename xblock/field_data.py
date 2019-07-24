@@ -5,20 +5,23 @@ provide varied persistence backends while keeping the API used by the `XBlock`
 simple.
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+
 import copy
 
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
+import six
+
 from xblock.exceptions import InvalidScopeError
 
 
-class FieldData(object):
+class FieldData(six.with_metaclass(ABCMeta, object)):
     """
     An interface allowing access to an XBlock's field values indexed by field names.
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get(self, block, name):
@@ -87,7 +90,7 @@ class FieldData(object):
         :param update_dict: A map of field names to their new values
         :type update_dict: dict
         """
-        for key, value in update_dict.items():
+        for key, value in six.iteritems(update_dict):
             self.set(block, key, value)
 
     def default(self, block, name):  # pylint: disable=unused-argument
@@ -161,10 +164,10 @@ class SplitFieldData(FieldData):
 
     def set_many(self, block, update_dict):
         update_dicts = defaultdict(dict)
-        for key, value in update_dict.items():
+        for key, value in six.iteritems(update_dict):
             update_dicts[self._field_data(block, key)][key] = value
-        for field_data, update_dict in update_dicts.items():
-            field_data.set_many(block, update_dict)
+        for field_data, new_update_dict in six.iteritems(update_dicts):
+            field_data.set_many(block, new_update_dict)
 
     def delete(self, block, name):
         self._field_data(block, name).delete(block, name)

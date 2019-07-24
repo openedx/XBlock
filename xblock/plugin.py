@@ -1,8 +1,10 @@
-"""Generic plugin support so we can find XBlocks.
+"""
+Generic plugin support so we can find XBlocks.
 
 This code is in the Runtime layer.
-
 """
+
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
 import itertools
@@ -29,7 +31,7 @@ class AmbiguousPluginError(Exception):
         super(AmbiguousPluginError, self).__init__(msg)
 
 
-def default_select(identifier, all_entry_points):
+def default_select(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
     """
     Raise an exception when we have ambiguous entry points.
     """
@@ -130,7 +132,7 @@ class Plugin(object):
         plugin cannot import. The goal is to be able to use part of
         libraries from an XBlock (and thus have it installed), even if
         the overall XBlock cannot be used (e.g. depends on Django in a
-        non-Django application). There is diagreement about whether
+        non-Django application). There is disagreement about whether
         this is a good idea, or whether we should see failures early
         (e.g. on startup or first page load), and in what
         contexts. Hence, the flag.
@@ -173,7 +175,7 @@ class Plugin(object):
         def _decorator(func):                           # pylint: disable=C0111
             @functools.wraps(func)
             def _inner(*args, **kwargs):                # pylint: disable=C0111
-                global PLUGIN_CACHE
+                global PLUGIN_CACHE  # pylint: disable=global-statement
 
                 old = list(cls.extra_entry_points)
                 old_cache = PLUGIN_CACHE

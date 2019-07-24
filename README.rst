@@ -42,9 +42,7 @@ to give us a virtual machine image which ran it.
 Installation
 ------------
 
-This code runs on Python 2.7. If you prefer to use Python 3, there is `a fork
-of XBlock that provides Python 3 support`_, but this fork is not yet supported
-by edX.
+This code runs and is tested on Python 2.7 and 3.5.
 
 1.  Get a local copy of this repo.
 
@@ -53,9 +51,7 @@ by edX.
 3.  Install the requirements and register the XBlock entry points with (you may
     need to sudo this if you don't use virtualenv):
 
-        $ pip install -r requirements.txt
-
-.. _a fork of XBlock that provides Python 3 support: https://github.com/singingwolfboy/XBlock/tree/py3
+        $ make requirements
 
 
 Testing
@@ -63,17 +59,13 @@ Testing
 
 To run the test suite:
 
-    $ nosetests
+    $ pytest
 
 This will run:
 
-    * Unit tests of the XBlock core and runtime.
+    * Unit tests of the XBlock core and runtime, with coverage data collected.
 
-To run the test suite under coverage:
-
-    $ coverage run -m nose
-
-to execute the tests. Then to view the coverage report:
+To view the coverage report:
 
     $ coverage report
 
@@ -191,16 +183,16 @@ Packaging
 
 To package a new release:
 
-#. Update the version number in setup.py and xblock/__init__.py.
+#. Update the version number in xblock/VERSION.txt.
 
 #. Tag the commit to be released::
 
     $VERSION=0.5
     git tag -a -m "XBlock version $VERSION" xblock-$VERSION
 
-#. Upload to PyPI::
+#. Push the tag and wait for Travis to upload to PyPI::
 
-    make package
+    git push --tags
 
 
 Mailing List and IRC Channel
@@ -213,5 +205,5 @@ __ https://groups.google.com/group/edx-code
 
 .. |build-status| image:: https://travis-ci.org/edx/XBlock.svg?branch=master
    :target: https://travis-ci.org/edx/XBlock
-.. |coverage-status| image:: https://coveralls.io/repos/edx/XBlock/badge.svg
-   :target: https://coveralls.io/r/edx/XBlock
+.. |coverage-status| image:: http://codecov.io/github/edx/XBlock/coverage.svg?branch=master
+   :target: https://codecov.io/github/edx/XBlock?branch=master

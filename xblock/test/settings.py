@@ -1,11 +1,12 @@
 """Django settings for toy runtime project."""
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
+from path import Path as path
+from six import text_type
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
-# The variable doesn't seem to actually get interpolated in
-TEMPLATE_STRING_IF_INVALID = "<MISSING VARIABLE '%s'>"
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -50,6 +51,9 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname().dirname()  # pylint: disable=invalid-name, no-value-for-parameter
+LOCALE_PATHS = [text_type(PROJECT_ROOT + '/xblock/test/locale')]
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
 MEDIA_ROOT = ''
@@ -87,14 +91,7 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '5ftdd9(@p)tg&amp;bqv$(^d!63psz9+g+_i5om_e%!32%po2_+%l7'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    # 'django.template.loaders.eggs.Loader',
-)
-
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -110,7 +107,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_nose',
 
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
@@ -118,8 +114,6 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

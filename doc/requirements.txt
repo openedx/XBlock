@@ -1,7 +1,4 @@
-# Packages we need in order to build the docs, separated out so that rtfd.org
-# can install them.
+# Requirements file currently used by Read the Docs.  To be deleted once that
+# is updated to use the referenced requirements file directly.
 
-lazy
-sphinx
-sphinxcontrib-napoleon==0.2.6
-path.py
+-r ../requirements/doc.txt

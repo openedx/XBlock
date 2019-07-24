@@ -10,11 +10,10 @@ set -x
 export PIP_DOWNLOAD_CACHE=${PIP_DOWNLOAD_CACHE-.pip_cache}
 
 # Install requirements
-pip install -r requirements.txt
-pip install -r django_requirements.txt
+make requirements
 
 # Run the tests
-coverage run -m nose
+pytest
 
 # Compute coverage
 coverage html

@@ -1,16 +1,30 @@
 language: python
 sudo: false
-branches:
-    only:
-      - master
 python:
-  - "2.7"
+  - 2.7
+  - 3.6
 cache: pip
 install:
-  - pip install -r requirements.txt
-  - pip install -r django_requirements.txt
-  - pip install coveralls
+  - pip install -r requirements/travis.txt
+env:
+  - TOX_ENV=django111
+matrix:
+  include:
+    - python: 3.6
+      env: TOX_ENV=docs
+    - python: 3.6
+      env: TOX_ENV=quality
 script:
-  - make test doc quality
+  - tox -e $TOX_ENV
 after_success:
-  - coveralls
+  - codecov
+deploy:
+  provider: pypi
+  user: edx
+  password:
+    secure: GMMSN5LVnZjrolwh293uIM9oxdl7NP6ksUzuiupHuFhW6KdxL9YWmQ+XNal6uThPoShmOdjpAvjAmff2q+mp495bH8epiRt700VHw4t+3eUmdUD2Xan3dg+iX3mg6jaDRwmgALd6NAbUSI9GPffd8m3SrvmwjyHMcM+/JWpjlcY=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    python: 3.6
+    condition: '$TOX_ENV = django111'

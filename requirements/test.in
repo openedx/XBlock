@@ -1,0 +1,19 @@
+# Requirements for test runs
+
+-r django.txt                       # Package dependencies, including optional Django support
+
+astroid
+caniusepython3
+coverage
+ddt
+diff-cover >= 0.2.1
+hypothesis>=3.33.0,<4.0
+mock
+nose
+path.py
+pycodestyle
+pylint
+pytest
+pytest-cov
+pytest-django
+tox

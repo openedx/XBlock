@@ -3,19 +3,19 @@ This module defines all of the Mixins that provide components of XBlock-family
 functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+
+from collections import OrderedDict
+import copy
 import functools
 import inspect
 import logging
-from lxml import etree
-import copy
-from collections import OrderedDict
-
-try:
-    import simplejson as json   # pylint: disable=F0401
-except ImportError:
-    import json
 import warnings
+import json
 
+from lxml import etree
+import six
 from webob import Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
@@ -71,7 +71,7 @@ class HandlersMixin(object):
             if isinstance(response, Response):
                 return response
             else:
-                return Response(json.dumps(response), content_type='application/json')
+                return Response(json.dumps(response), content_type='application/json', charset='utf8')
         return wrapper
 
     @classmethod
@@ -151,20 +151,19 @@ class RuntimeServicesMixin(object):
         This function finds those declarations for a block.
 
         Arguments:
-            service_name (string): the name of the service requested.
+            service_name (str): the name of the service requested.
 
         Returns:
             One of "need", "want", or None.
         """
-        return cls._combined_services.get(service_name)
+        return cls._combined_services.get(service_name)  # pylint: disable=no-member
 
 
 @RuntimeServicesMixin.needs('field-data')
-class ScopedStorageMixin(RuntimeServicesMixin):
+class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeServicesMixin)):
     """
     This mixin provides scope for Fields and the associated Scoped storage.
     """
-    __metaclass__ = NamedAttributesMetaclass
 
     @class_lazy
     def fields(cls):  # pylint: disable=no-self-argument
@@ -269,7 +268,8 @@ class ScopedStorageMixin(RuntimeServicesMixin):
             # Throws KeyValueMultiSaveError if things go wrong
             self._field_data.set_many(self, fields_to_save_json)
         except KeyValueMultiSaveError as save_error:
-            saved_fields = [field for field in fields if field.name in save_error.saved_field_names]
+            saved_fields = [field for field in fields
+                            if field.name in save_error.saved_field_names]  # pylint: disable=exception-escape
             for field in saved_fields:
                 # should only find one corresponding field
                 fields.remove(field)
@@ -311,14 +311,16 @@ class ScopedStorageMixin(RuntimeServicesMixin):
         # Since this is not understood by static analysis, silence this error.
         # pylint: disable=E1101
         attrs = []
-        for field in self.fields.values():
+        for field in six.itervalues(self.fields):
             try:
                 value = getattr(self, field.name)
-            except Exception:  # pylint: disable=W0703
+            except Exception:  # pylint: disable=broad-except
                 # Ensure we return a string, even if unanticipated exceptions.
                 attrs.append(" %s=???" % (field.name,))
             else:
-                if isinstance(value, basestring):
+                if isinstance(value, six.binary_type):
+                    value = value.decode('utf-8', errors='escape')
+                if isinstance(value, six.text_type):
                     value = value.strip()
                     if len(value) > 40:
                         value = value[:37] + "..."
@@ -337,8 +339,7 @@ class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
 
     """
     def __new__(mcs, name, bases, attrs):
-        if (attrs.get('has_children', False) or
-                any(getattr(base, 'has_children', False) for base in bases)):
+        if (attrs.get('has_children', False) or any(getattr(base, 'has_children', False) for base in bases)):
             attrs['children'] = ReferenceList(
                 help='The ids of the children of this XBlock',
                 scope=Scope.children)
@@ -348,11 +349,10 @@ class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
         return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
-class HierarchyMixin(ScopedStorageMixin):
+class HierarchyMixin(six.with_metaclass(ChildrenModelMetaclass, ScopedStorageMixin)):
     """
     This adds Fields for parents and children.
     """
-    __metaclass__ = ChildrenModelMetaclass
 
     parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
 
@@ -434,7 +434,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         Use `node` to construct a new block.
 
         Arguments:
-            node (etree.Element): The xml node to parse into an xblock.
+            node (:class:`~xml.etree.ElementTree.Element`): The xml node to parse into an xblock.
 
             runtime (:class:`.Runtime`): The runtime to use while parsing.
 
@@ -463,7 +463,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
                 block.runtime.add_node_as_child(block, child, id_generator)
 
         # Attributes become fields.
-        for name, value in node.items():
+        for name, value in node.items():  # lxml has no iteritems
             cls._set_field_if_present(block, name, value, {})
 
         # Text content becomes "content", if such a field exists.
@@ -486,7 +486,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         node.set('xblock-family', self.entry_point)
 
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():
+        for field_name, field in self.fields.items():
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self) or field.force_export:
@@ -519,7 +519,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
             else:
                 setattr(block, name, value)
         else:
-            logging.warn("XBlock %s does not contain field %s", type(block), name)
+            logging.warning("XBlock %s does not contain field %s", type(block), name)
 
     def _add_field(self, node, field_name, field):
         """
@@ -603,7 +603,7 @@ class ViewsMixin(object):
 
         Arguments:
             view (object): The view of the xBlock.
-            functionality (string): A functionality of the view.
+            functionality (str): A functionality of the view.
                 For example: "multi_device".
 
         Returns:

@@ -2,22 +2,30 @@
 Machinery to make the common case easy when building new runtimes
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from abc import ABCMeta, abstractmethod
+from collections import namedtuple
 import functools
 import gettext
+from io import BytesIO, StringIO
+import importlib
 import itertools
-import markupsafe
+import json
+import logging
 import re
 import threading
 import warnings
 
-from abc import ABCMeta, abstractmethod
 from lxml import etree
-from StringIO import StringIO
+import markupsafe
+import six
 
-from collections import namedtuple
+from web_fragments.fragment import Fragment
+
+from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
-from xblock.fragment import Fragment
 from xblock.exceptions import (
     NoSuchViewError,
     NoSuchHandlerError,
@@ -26,18 +34,13 @@ from xblock.exceptions import (
     NoSuchDefinition,
     FieldDataDeprecationWarning,
 )
-from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 
-import logging
-import json
 
 log = logging.getLogger(__name__)
 
 
-class KeyValueStore(object):
+class KeyValueStore(six.with_metaclass(ABCMeta, object)):
     """The abstract interface for Key Value Stores."""
-
-    __metaclass__ = ABCMeta
 
     class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
         """
@@ -85,7 +88,7 @@ class KeyValueStore(object):
 
         :update_dict: field_name, field_value pairs for all cached changes
         """
-        for key, value in update_dict.iteritems():
+        for key, value in six.iteritems(update_dict):
             self.set(key, value)
 
 
@@ -223,7 +226,7 @@ class KvsFieldData(FieldData):
         updated_dict = {}
 
         # Generate a new dict with the correct mappings.
-        for (key, value) in update_dict.items():
+        for (key, value) in six.iteritems(update_dict):
             updated_dict[self._key(block, key)] = value
 
         self._kvs.set_many(updated_dict)
@@ -243,9 +246,8 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData                                  # pylint: disable=C0103
 
 
-class IdReader(object):
+class IdReader(six.with_metaclass(ABCMeta, object)):
     """An abstract object that stores usages and definitions."""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_usage_id_from_aside(self, aside_id):
@@ -326,9 +328,8 @@ class IdReader(object):
         raise NotImplementedError()
 
 
-class IdGenerator(object):
+class IdGenerator(six.with_metaclass(ABCMeta, object)):
     """An abstract object that creates usage and definition ids"""
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_aside(self, definition_id, usage_id, aside_type):
@@ -438,12 +439,10 @@ class MemoryIdManager(IdReader, IdGenerator):
         return aside_id.aside_type
 
 
-class Runtime(object):
+class Runtime(six.with_metaclass(ABCMeta, object)):
     """
     Access to the runtime environment for XBlocks.
     """
-
-    __metaclass__ = ABCMeta
 
     # Abstract methods
     @abstractmethod
@@ -508,11 +507,13 @@ class Runtime(object):
         changes.
 
         In this case the `event_type` would be `grade`, and the `event_data`
-        would be a dictionary of the following form:
+        would be a dictionary of the following form::
+
             {
                 'value': <number>,
                 'max_value': <number>,
             }
+
         The grade event represents a grade of value/max_value for the current
         user.
 
@@ -539,7 +540,7 @@ class Runtime(object):
             mixins (tuple): Classes that should be mixed in with every :class:`.XBlock`
                 created by this `Runtime`.
 
-            services (dictionary): Services to make available through the
+            services (dict): Services to make available through the
                 :meth:`service` method.  There's no point passing anything here
                 if you are overriding :meth:`service` in your sub-class.
 
@@ -678,7 +679,11 @@ class Runtime(object):
             )
 
         id_generator = id_generator or self.id_generator
-        return self.parse_xml_file(StringIO(xml), id_generator)
+        if isinstance(xml, six.binary_type):
+            io_type = BytesIO
+        else:
+            io_type = StringIO
+        return self.parse_xml_file(io_type(xml), id_generator)
 
     def parse_xml_file(self, fileobj, id_generator=None):
         """Parse an open XML file, returning a usage id."""
@@ -766,7 +771,7 @@ class Runtime(object):
                 aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
                 aside.add_xml_to_node(aside_node)
                 block.append(aside_node)
-        tree.write(xmlfile, xml_declaration=True, pretty_print=True, encoding="utf8")
+        tree.write(xmlfile, xml_declaration=True, pretty_print=True, encoding='utf-8')
 
     def add_block_as_child_node(self, block, node):
         """
@@ -893,8 +898,10 @@ class Runtime(object):
         # for at least a little while so as not to adversely effect developers.
         # pmitros/Jun 28, 2014.
         if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-            json_init = u'<script type="json/xblock-args" class="xblock_json_init_args">' + \
-                u'{data}</script>'.format(data=json.dumps(frag.json_init_args))
+            json_init = (
+                '<script type="json/xblock-args" class="xblock_json_init_args">'
+                '{data}</script>'
+            ).format(data=json.dumps(frag.json_init_args))
 
         block_css_entrypoint = block.entry_point.replace('.', '-')
         css_classes = [
@@ -902,14 +909,14 @@ class Runtime(object):
             '{}-{}'.format(block_css_entrypoint, view),
         ]
 
-        html = u"<div class='{}'{properties}>{body}{js}</div>".format(
+        html = "<div class='{}'{properties}>{body}{js}</div>".format(
             markupsafe.escape(' '.join(css_classes)),
-            properties="".join(" data-%s='%s'" % item for item in data.items()),
+            properties="".join(" data-%s='%s'" % item for item in list(data.items())),
             body=frag.body_html(),
             js=json_init)
 
         wrapped.add_content(html)
-        wrapped.add_frag_resources(frag)
+        wrapped.add_fragment_resources(frag)
         return wrapped
 
     # Asides
@@ -923,15 +930,21 @@ class Runtime(object):
 
     def get_asides(self, block):
         """
-        Return all of the asides which might be decorating this `block`.
+        Return instances for all of the asides that will decorate this `block`.
 
         Arguments:
             block (:class:`.XBlock`): The block to render retrieve asides for.
+
+        Returns:
+            List of XBlockAside instances
         """
-        return [
+        aside_instances = [
             self.get_aside_of_type(block, aside_type)
-            for aside_type
-            in self.applicable_aside_types(block)
+            for aside_type in self.applicable_aside_types(block)
+        ]
+        return [
+            aside_instance for aside_instance in aside_instances
+            if aside_instance.should_apply_to_block(block)
         ]
 
     # pylint: disable=unused-argument
@@ -996,13 +1009,13 @@ class Runtime(object):
             aside_frag_fns list((aside, aside_fn)): The asides and closures for rendering to call
         """
         result = Fragment(frag.content)
-        result.add_frag_resources(frag)
+        result.add_fragment_resources(frag)
 
         for aside, aside_fn in aside_frag_fns:
             aside_frag = self.wrap_aside(block, aside, view_name, aside_fn(block, context), context)
             aside.save()
             result.add_content(aside_frag.content)
-            result.add_frag_resources(aside_frag)
+            result.add_fragment_resources(aside_frag)
 
         return result
 
@@ -1053,9 +1066,9 @@ class Runtime(object):
         finding and delivering services.
 
         Arguments:
-            block (an XBlock): this block's class will be examined for service
+            block (XBlock): this block's class will be examined for service
                 decorators.
-            service_name (string): the name of the service requested.
+            service_name (str): the name of the service requested.
 
         Returns:
             An object implementing the requested service, or None.
@@ -1086,7 +1099,7 @@ class Runtime(object):
             """Bad path exception thrown when path cannot be found."""
             pass
         results = self.query(block)
-        ROOT, SEP, WORD, FINAL = range(4)               # pylint: disable=C0103
+        ROOT, SEP, WORD, FINAL = six.moves.range(4)               # pylint: disable=C0103
         state = ROOT
         lexer = RegexLexer(
             ("dotdot", r"\.\."),
@@ -1150,7 +1163,7 @@ class Runtime(object):
         for family in [XBlock, XBlockAside]:
             if family_id == family.entry_point:
                 return family
-        raise ValueError(u'No such family: {}'.format(family_id))
+        raise ValueError('No such family: {}'.format(family_id))
 
 
 class ObjectAggregator(object):
@@ -1199,10 +1212,26 @@ class Mixologist(object):
     """
     def __init__(self, mixins):
         """
-        :param mixins: Classes to mixin
+        :param mixins: Classes to mixin or names of classes to mixin.
         :type mixins: `iterable` of `class`
         """
-        self._mixins = tuple(mixins)
+
+        mixin_classes = []
+        for mixin in mixins:
+            if isinstance(mixin, six.text_type):
+                try:
+                    module, cls = mixin.rsplit('.', 1)
+                    imported_module = importlib.import_module(module)
+                    mixin_class = getattr(imported_module, cls)
+                except Exception as e:
+                    msg = "Couldn't import class {!r}: {}: {}".format(mixin, e.__class__.__name__, e)
+                    raise ImportError(msg)
+
+                mixin_classes.append(mixin_class)
+            else:
+                mixin_classes.append(mixin)
+
+        self._mixins = tuple(mixin_classes)
 
     def mix(self, cls):
         """
@@ -1233,7 +1262,7 @@ class Mixologist(object):
                 # created a class before we got the lock, we don't
                 # overwrite it
                 return _CLASS_CACHE.setdefault(mixin_key, type(
-                    base_class.__name__ + 'WithMixins',
+                    base_class.__name__ + str('WithMixins'),  # type() requires native str
                     (base_class, ) + mixins,
                     {'unmixed_class': base_class}
                 ))
@@ -1278,6 +1307,37 @@ class NullI18nService(object):
         Locale-aware strftime, with format short-cuts.
         """
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if isinstance(format, unicode):
+        if six.PY2 and isinstance(format, six.text_type):
             format = format.encode("utf8")
-        return dtime.strftime(format).decode("utf8")
+        timestring = dtime.strftime(format)
+        if six.PY2:
+            timestring = timestring.decode("utf8")
+        return timestring
+
+    @property
+    def ugettext(self):
+        """
+        Dispatch to the appropriate gettext method to handle text objects.
+
+        Note that under python 3, this uses `gettext()`, while under python 2,
+        it uses `ugettext()`.  This should not be used with bytestrings.
+        """
+        # pylint: disable=no-member
+        if six.PY2:
+            return self._translations.ugettext
+        else:
+            return self._translations.gettext
+
+    @property
+    def ungettext(self):
+        """
+        Dispatch to the appropriate ngettext method to handle text objects.
+
+        Note that under python 3, this uses `ngettext()`, while under python 2,
+        it uses `ungettext()`.  This should not be used with bytestrings.
+        """
+        # pylint: disable=no-member
+        if six.PY2:
+            return self._translations.ungettext
+        else:
+            return self._translations.ngettext

@@ -6,26 +6,31 @@ for each scope.
 
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import namedtuple
 import copy
 import datetime
-import dateutil.parser
 import hashlib
 import itertools
-import pytz
-import traceback
-import warnings
 import json
+import traceback
+import unicodedata
+import warnings
+
+import dateutil.parser
+from lxml import etree
+import pytz
+import six
 import yaml
 
 from xblock.internal import Nameable
-
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
     'BlockScope', 'UserScope', 'Scope', 'ScopeIds',
     'Field',
-    'Boolean', 'Dict', 'Float', 'Integer', 'List', 'Set', 'String',
+    'Boolean', 'Dict', 'Float', 'Integer', 'List', 'Set', 'String', 'XMLString',
     'XBlockMixin',
 ]
 
@@ -152,6 +157,7 @@ UNSET = Sentinel("fields.UNSET")
 ScopeBase = namedtuple('ScopeBase', 'user block name')
 
 
+@six.python_2_unicode_compatible
 class Scope(ScopeBase):
     """
     Defines six types of scopes to be used: `content`, `settings`,
@@ -185,12 +191,12 @@ class Scope(ScopeBase):
     the points scored by all users attempting a problem.
 
     """
-    content = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, u'content')
-    settings = ScopeBase(UserScope.NONE, BlockScope.USAGE, u'settings')
-    user_state = ScopeBase(UserScope.ONE, BlockScope.USAGE, u'user_state')
-    preferences = ScopeBase(UserScope.ONE, BlockScope.TYPE, u'preferences')
-    user_info = ScopeBase(UserScope.ONE, BlockScope.ALL, u'user_info')
-    user_state_summary = ScopeBase(UserScope.ALL, BlockScope.USAGE, u'user_state_summary')
+    content = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, 'content')
+    settings = ScopeBase(UserScope.NONE, BlockScope.USAGE, 'settings')
+    user_state = ScopeBase(UserScope.ONE, BlockScope.USAGE, 'user_state')
+    preferences = ScopeBase(UserScope.ONE, BlockScope.TYPE, 'preferences')
+    user_info = ScopeBase(UserScope.ONE, BlockScope.ALL, 'user_info')
+    user_state_summary = ScopeBase(UserScope.ALL, BlockScope.USAGE, 'user_state_summary')
 
     @classmethod
     def named_scopes(cls):
@@ -219,18 +225,21 @@ class Scope(ScopeBase):
         """Create a new Scope, with an optional name."""
 
         if name is None:
-            name = u'{}_{}'.format(user, block)
+            name = '{}_{}'.format(user, block)
 
         return ScopeBase.__new__(cls, user, block, name)
 
     children = Sentinel('Scope.children')
     parent = Sentinel('Scope.parent')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def __eq__(self, other):
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
+
+    def __hash__(self):
+        return hash(('xblock.fields.Scope', self.user, self.block))
 
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
@@ -425,6 +434,12 @@ class Field(Nameable):
         baseline = xblock._dirty_fields[self]
         return baseline is EXPLICITLY_SET or xblock._field_data_cache[self.name] != baseline
 
+    def _is_lazy(self, value):
+        """
+        Detect if a value is being evaluated lazily by Django.
+        """
+        return 'django.utils.functional.' in str(type(value))
+
     def _check_or_enforce_type(self, value):
         """
         Depending on whether enforce_type is enabled call self.enforce_type and
@@ -441,7 +456,7 @@ class Field(Nameable):
         try:
             new_value = self.enforce_type(value)
         except:  # pylint: disable=bare-except
-            message = u"The value {} could not be enforced ({})".format(
+            message = "The value {!r} could not be enforced ({})".format(
                 value, traceback.format_exc().splitlines()[-1])
             warnings.warn(message, FailingEnforceTypeWarning, stacklevel=3)
         else:
@@ -450,7 +465,7 @@ class Field(Nameable):
             except TypeError:
                 equal = False
             if not equal:
-                message = u"The value {} would be enforced to {}".format(
+                message = "The value {!r} would be enforced to {!r}".format(
                     value, new_value)
                 warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
 
@@ -464,7 +479,7 @@ class Field(Nameable):
         for the field in its given scope.
         """
         key = scope_key(self, xblock)
-        return hashlib.sha1(key).hexdigest()
+        return hashlib.sha1(key.encode('utf-8')).hexdigest()
 
     def _get_default_value_to_cache(self, xblock):
         """
@@ -478,6 +493,13 @@ class Field(Nameable):
                 return self._check_or_enforce_type(self._calculate_unique_id(xblock))
             else:
                 return self.default
+
+    def _sanitize(self, value):
+        """
+        Allow the individual fields to sanitize the value being set -or- "get".
+        For example, a String field wants to remove control characters.
+        """
+        return value
 
     def __get__(self, xblock, xblock_class):
         """
@@ -507,7 +529,7 @@ class Field(Nameable):
         if self.MUTABLE:
             self._mark_dirty(xblock, value)
 
-        return value
+        return self._sanitize(value)
 
     def __set__(self, xblock, value):
         """
@@ -520,6 +542,7 @@ class Field(Nameable):
         we're trying to cache, we won't do anything.
         """
         value = self._check_or_enforce_type(value)
+        value = self._sanitize(value)
         cached_value = self._get_cached_value(xblock)
         try:
             value_has_changed = cached_value != value
@@ -604,8 +627,11 @@ class Field(Nameable):
         """
         self._warn_deprecated_outside_JSONField()
         value = json.dumps(
-            self.to_json(value), indent=2,
-            sort_keys=True, separators=(',', ': '))
+            self.to_json(value),
+            indent=2,
+            sort_keys=True,
+            separators=(',', ': '),
+        )
         return value
 
     def from_string(self, serialized):
@@ -743,7 +769,9 @@ class Boolean(JSONField):
                                       **kwargs)
 
     def from_json(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.binary_type):
+            value = value.decode('ascii', errors='replace')
+        if isinstance(value, six.text_type):
             return value.lower() == 'true'
         else:
             return bool(value)
@@ -767,6 +795,18 @@ class Dict(JSONField):
             raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
 
     enforce_type = from_json
+
+    def to_string(self, value):
+        """
+        In python3, json.dumps() cannot sort keys of different types,
+        so preconvert None to 'null'.
+        """
+        self.enforce_type(value)
+        if isinstance(value, dict) and None in value:
+            value = value.copy()
+            value['null'] = value[None]
+            del value[None]
+        return super(Dict, self).to_string(value)
 
 
 class List(JSONField):
@@ -823,9 +863,36 @@ class String(JSONField):
 
     """
     MUTABLE = False
+    VALID_CONTROLS = {'\n', '\r', '\t'}
+
+    def _valid_char(self, character):
+        """
+        Strip invalid control characters from a unicode text object.
+        """
+        return unicodedata.category(character)[0] != 'C' or character in self.VALID_CONTROLS
+
+    def _sanitize(self, value):
+        """
+        Remove the control characters that are not allowed in XML:
+        https://www.w3.org/TR/xml/#charsets
+        Leave all other characters.
+        """
+        if isinstance(value, six.binary_type):
+            value = value.decode('utf-8')
+        if isinstance(value, six.text_type):
+            new_value = ''.join(ch for ch in value if self._valid_char(ch))
+        else:
+            return value
+        # The new string will be equivalent to the original string if no control characters are present.
+        # If equivalent, return the original string - some tests check for object equality instead of string equality.
+        return value if value == new_value else new_value
 
     def from_json(self, value):
-        if value is None or isinstance(value, basestring):
+        if value is None or isinstance(value, (six.binary_type, six.text_type)):
+            return self._sanitize(value)
+        elif self._is_lazy(value):
+            # Allow lazily translated strings to be used as String default values.
+            # The translated values are *not* sanitized.
             return value
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
@@ -836,6 +903,8 @@ class String(JSONField):
 
     def to_string(self, value):
         """String gets serialized and deserialized without quote marks."""
+        if isinstance(value, six.binary_type):
+            value = value.decode('utf-8')
         return self.to_json(value)
 
     @property
@@ -844,6 +913,32 @@ class String(JSONField):
         return True
 
     enforce_type = from_json
+
+
+class XMLString(String):
+    """
+    A field class for representing an XML string.
+
+    The value, as loaded or enforced, can either be None or a basestring instance.
+    If it is a basestring instance, it must be valid XML.  If it is not valid XML,
+    an lxml.etree.XMLSyntaxError will be raised.
+    """
+
+    def to_json(self, value):
+        """
+        Serialize the data, ensuring that it is valid XML (or None).
+
+        Raises an lxml.etree.XMLSyntaxError if it is a basestring but not valid
+        XML.
+        """
+        if self._enable_enforce_type:
+            value = self.enforce_type(value)
+        return super(XMLString, self).to_json(value)
+
+    def enforce_type(self, value):
+        if value is not None:
+            etree.XML(value)
+        return value
 
 
 class DateTime(JSONField):
@@ -863,7 +958,10 @@ class DateTime(JSONField):
         if value is None:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.binary_type):
+            value = value.decode('utf-8')
+
+        if isinstance(value, six.text_type):
             # Parser interprets empty string as now by default
             if value == "":
                 return None
@@ -950,7 +1048,7 @@ def scope_key(instance, xblock):
 
     Our goal is to have a pretty, human-readable 1:1 encoding.
 
-    This encoding is as good as we can do. It's reversable, but not
+    This encoding is as good as we can do. It's reversible, but not
     trivial to reverse.
 
     Encoding scheme:
@@ -961,7 +1059,7 @@ def scope_key(instance, xblock):
     We encode other common punctuation as pairs of ._-. This gives a total of 3*3=9 combinations.
     We're pretty careful to keep this nice. Where possible, we double characters. The most common
     other character (' ' and ':') are encoded as _- and -_
-    We seperate field portions with /. This gives a natural directory
+    We separate field portions with /. This gives a natural directory
     tree. This is nice in URLs and filenames (although not so nice in
     urls.py)
     If a field starts with punctuatation, we prefix a _. This prevents hidden files.
@@ -988,23 +1086,23 @@ def scope_key(instance, xblock):
     if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
         pass
     elif instance.scope.user == UserScope.ONE:
-        scope_key_dict['user'] = unicode(xblock.scope_ids.user_id)
+        scope_key_dict['user'] = six.text_type(xblock.scope_ids.user_id)
     else:
         raise NotImplementedError()
 
     if instance.scope.block == BlockScope.TYPE:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.block_type)
+        scope_key_dict['block'] = six.text_type(xblock.scope_ids.block_type)
     elif instance.scope.block == BlockScope.USAGE:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.usage_id)
+        scope_key_dict['block'] = six.text_type(xblock.scope_ids.usage_id)
     elif instance.scope.block == BlockScope.DEFINITION:
-        scope_key_dict['block'] = unicode(xblock.scope_ids.def_id)
+        scope_key_dict['block'] = six.text_type(xblock.scope_ids.def_id)
     elif instance.scope.block == BlockScope.ALL:
         pass
     else:
         raise NotImplementedError()
 
-    replacements = list(itertools.product("._-", "._-"))
-    substitution_list = dict(zip("./\\,_ +:-", ("".join(x) for x in replacements)))
+    replacements = itertools.product("._-", "._-")
+    substitution_list = dict(six.moves.zip("./\\,_ +:-", ("".join(x) for x in replacements)))
     # Above runs in 4.7us, and generates a list of common substitutions:
     # {' ': '_-', '+': '-.', '-': '--', ',': '_.', '/': '._', '.': '..', ':': '-_', '\\': '.-', '_': '__'}
 
@@ -1013,7 +1111,7 @@ def scope_key(instance, xblock):
     def encode(char):
         """
         Replace all non-alphanumeric characters with -n- where n
-        is their UTF8 code.
+        is their Unicode codepoint.
         TODO: Test for UTF8 which is not ASCII
         """
         if char.isalnum():

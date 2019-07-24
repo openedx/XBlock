@@ -1,22 +1,14 @@
 """
 Tools for testing XBlocks
 """
-import warnings
+
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from contextlib import contextmanager
 from functools import partial
+import warnings
 
-# nose.tools has convenient assert methods, but it defines them in a clever way
-# that baffles pylint.  Import them all here so we can keep the pylint clutter
-# out of the rest of our files.
-from nose.tools import (                        # pylint: disable=W0611,E0611
-    assert_true, assert_false,
-    assert_equals, assert_not_equals,
-    assert_is, assert_is_not,
-    assert_is_instance, assert_is_none,
-    assert_in, assert_not_in,
-    assert_raises, assert_raises_regexp,
-)
+import six
 
 from xblock.runtime import Runtime, MemoryIdManager
 
@@ -47,7 +39,7 @@ def blocks_are_equivalent(block1, block2):
         if len(block1.children) != len(block2.children):
             return False
 
-        for child_id1, child_id2 in zip(block1.children, block2.children):
+        for child_id1, child_id2 in six.moves.zip(block1.children, block2.children):
             if child_id1 == child_id2:
                 # Equal ids mean they must be equal, check the next child.
                 continue
@@ -71,6 +63,7 @@ def _unabc(cls, msg="{} isn't implemented"):
         return dummy_method
 
     for ab_name in cls.__abstractmethods__:
+        print(cls, ab_name)
         setattr(cls, ab_name, make_dummy_method(ab_name))
 
     cls.__abstractmethods__ = ()
@@ -121,6 +114,8 @@ class TestRuntime(Runtime):
     """
     An empty runtime to be used in tests
     """
+    __test__ = False
+
     # unabc doesn't squash pylint errors
     # pylint: disable=abstract-method
     def __init__(self, *args, **kwargs):
@@ -130,3 +125,15 @@ class TestRuntime(Runtime):
             kwargs.setdefault('id_reader', memory_id_manager)
         kwargs.setdefault('id_generator', memory_id_manager)
         super(TestRuntime, self).__init__(*args, **kwargs)
+
+    def handler_url(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def local_resource_url(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def publish(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def resource_url(self, *args, **kwargs):
+        raise NotImplementedError

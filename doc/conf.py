@@ -11,16 +11,20 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
+import codecs
+import datetime
 import os
-from path import path
 import sys
+
+import edx_theme
 import mock
 
 MOCK_MODULES = [
     'webob',
     'lxml'
 ]
+
+VERSION_FILE = os.path.join(os.path.dirname(__file__), '..', 'xblock', 'VERSION.txt')
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock(class_that_is_extended=object)
@@ -39,11 +43,13 @@ sys.path.insert(0, os.path.abspath('..'))
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
+    'edx_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
-    'sphinxcontrib.napoleon',
 ]
 
 # The suffix of source filenames.
@@ -53,15 +59,16 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
+author = edx_theme.AUTHOR
 project = u'XBlock API Guide'
-copyright = u'2015, edX.org'
+copyright = '{year}, edX Inc.'.format(year=datetime.datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '0.4'
+version = codecs.open(VERSION_FILE, encoding='ascii').read().strip()
 # The full version, including alpha/beta/rc tags.
 #release = '0.3'
 
@@ -112,7 +119,7 @@ nitpick_ignore = [
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#html_theme = 'pyramid'
+html_theme = 'edx_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -120,7 +127,7 @@ nitpick_ignore = [
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = [edx_theme.get_html_theme_path()]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -136,7 +143,7 @@ nitpick_ignore = [
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+html_favicon = os.path.join(html_theme_path[0], 'edx_theme', 'static', 'css', 'favicon.ico')
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -207,13 +214,6 @@ nitpick_ignore = [
 # If false, no module index is generated.
 #latex_domain_indices = True
 
-
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
 
@@ -224,3 +224,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 #texinfo_show_urls = 'footnote'
 
 exclude_patterns = ['api/*', 'links.rst']
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+}

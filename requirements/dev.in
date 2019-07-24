@@ -1,0 +1,6 @@
+# Dependencies that are used in development environments.
+# Please do not use this file for packages that are needed for package installation or for test runs.
+
+-r pip-tools.txt                    # pip-tools and its dependencies, for managing requirements files
+-r test.txt                         # Dependencies for running the various test suites
+-r travis.txt                       # tox and related dependencies

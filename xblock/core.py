@@ -5,12 +5,18 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
-import inspect
-import pkg_resources
-import warnings
-import os
-from collections import defaultdict
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from collections import defaultdict
+import inspect
+import os
+import warnings
+
+import pkg_resources
+import six
+
+import xblock.exceptions
 from xblock.exceptions import DisallowedFileError
 from xblock.fields import String, List, Scope
 from xblock.internal import class_lazy
@@ -89,6 +95,9 @@ class SharedBlockBase(Plugin):
         matched against a whitelist regex to ensure that you do not serve an
         unauthorized resource.
         """
+
+        if isinstance(uri, six.binary_type):
+            uri = uri.decode('utf-8')
 
         # If no resources_dir is set, then this XBlock cannot serve local resources.
         if cls.resources_dir is None:
@@ -247,6 +256,14 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
             return func
         return _decorator
 
+    @classmethod
+    def should_apply_to_block(cls, block):  # pylint: disable=unused-argument
+        """
+        Return True if the aside should be applied to a given block. This can be overridden
+        if some aside should only wrap blocks with certain properties.
+        """
+        return True
+
     @class_lazy
     def _combined_asides(cls):  # pylint: disable=no-self-argument
         """
@@ -275,8 +292,8 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         Returns:
             either the function or None
         """
-        if view_name in self._combined_asides:
-            return getattr(self, self._combined_asides[view_name])
+        if view_name in self._combined_asides:  # pylint: disable=unsupported-membership-test
+            return getattr(self, self._combined_asides[view_name])  # pylint: disable=unsubscriptable-object
         else:
             return None
 
@@ -287,11 +304,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         If all of the aside's data is empty or a default value, then the aside shouldn't
         be serialized as XML at all.
         """
-        return any([field.is_set_on(self) for field in self.fields.itervalues()])
-
-
-# Maintain backwards compatibility
-import xblock.exceptions
+        return any(field.is_set_on(self) for field in six.itervalues(self.fields))
 
 
 class KeyValueMultiSaveError(xblock.exceptions.KeyValueMultiSaveError):
