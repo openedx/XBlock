@@ -4,6 +4,15 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.2.3 - 2019-07-24
+------------------
+Allow Mixologist class to consume both class objects and string paths to classes as a part of initialization.
+
+1.2.1 - 2018-09-05
+------------------
+
+Add a method to get completion mode for a block.
+
 1.2.1 - 2018-06-25
 ------------------
 
