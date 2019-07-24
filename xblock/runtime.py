@@ -1219,13 +1219,13 @@ class Mixologist(object):
         mixin_classes = []
         for mixin in mixins:
             if isinstance(mixin, six.text_type):
-                module, cls = mixin.rsplit('.', 1)
-                imported_module = importlib.import_module(module)
                 try:
+                    module, cls = mixin.rsplit('.', 1)
+                    imported_module = importlib.import_module(module)
                     mixin_class = getattr(imported_module, cls)
-                except AttributeError as e:
-                    msg = "Couldn't import class {}: {}".format(mixin, str(e))
-                    raise AttributeError(msg)
+                except Exception as e:
+                    msg = "Couldn't import class {!r}: {}: {}".format(mixin, e.__class__.__name__, e)
+                    raise ImportError(msg)
 
                 mixin_classes.append(mixin_class)
             else:

@@ -496,7 +496,7 @@ class TestMixologistErrors(object):
     """ Test failures in Mixologist initialization. """
     def test_bad_class_name(self):
         bad_class_name = 'xblock.test.test_runtime.NonExistentMixin'
-        with pytest.raises(AttributeError, match="Couldn't import class {}".format(bad_class_name)):
+        with pytest.raises(ImportError, match="Couldn't import class .*'{}'".format(bad_class_name)):
             Mixologist([bad_class_name])
 
 
