@@ -675,3 +675,24 @@ class TestRuntimeDeprecation(WarningTestMixin, TestCase):
             runtime.field_data = field_data
         with self.assertWarns(FieldDataDeprecationWarning):
             self.assertEqual(runtime.field_data, field_data)
+
+
+class RuntimeWithCustomCSS(TestRuntime):  # pylint: disable=abstract-method
+    """
+    A runtime that adds extra CSS classes to rendered XBlocks
+    """
+    def _css_classes_for(self, block, view):
+        css_classes = super(RuntimeWithCustomCSS, self)._css_classes_for(block, view)
+        css_classes.append('test-extra-class')
+        return css_classes
+
+
+def test_runtime_css_class_extensions():
+    """
+    Test that runtimes can easily add custom CSS classes to wrapped XBlocks by
+    overriding _css_classes_for
+    """
+    runtime = RuntimeWithCustomCSS(Mock(spec=IdReader), services={'field-data': DictFieldData({})})
+    block = TestXBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+    fragment = runtime.render(block, 'student_view', ["inner html"])
+    assert 'test-extra-class' in fragment.content

@@ -253,6 +253,7 @@ class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeSer
         fields_to_save = self._get_fields_to_save()
         if fields_to_save:
             self.force_save_fields(fields_to_save)
+        self.runtime.save_block(self)
 
     def force_save_fields(self, field_names):
         """

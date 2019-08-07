@@ -18,6 +18,7 @@ from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, Dat
 from xblock.field_data import DictFieldData
 from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin, ViewsMixin, XML_NAMESPACES
 from xblock.runtime import Runtime
+from xblock.test.tools import TestRuntime
 
 
 class AttrAssertionMixin(TestCase):
@@ -95,6 +96,23 @@ class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
         self.assertHasAttr(self.MixinGrandchildClass, 'field_c')
         self.assertIs(self.MixinGrandchildClass.field_a, self.MixinGrandchildClass.fields['field_a'])
         self.assertIs(self.MixinGrandchildClass.field_c, self.MixinGrandchildClass.fields['field_c'])
+
+    def test_save_calls_runtime_save_block(self):
+        """
+        Make sure that when block.save() is called, ScopedStorageMixin will let
+        the runtime know that the entire block should be saved.
+        """
+        class SaveTestBlock(XBlock):
+            """ Block for this test """
+            field_a = Integer(scope=Scope.settings)
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        runtime.save_block = mock.Mock()
+        block = SaveTestBlock(runtime, scope_ids=mock.Mock(spec=ScopeIds))
+        block.field_a = 15
+        runtime.save_block.assert_not_called()
+        block.save()
+        runtime.save_block.assert_called_once_with(block)
 
 
 class TestHierarchyMixin(AttrAssertionMixin, TestCase):

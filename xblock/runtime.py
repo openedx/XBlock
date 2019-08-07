@@ -666,6 +666,26 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         block = self.create_aside(aside_type, keys)
         return block
 
+    # Saving field data changes
+
+    def save_block(self, block):  # pylint: disable=unused-argument
+        """
+        Finalize/commit changes for the field data from the specified block.
+        Called at the end of an XBlock's save() method. Runtimes may ignore this
+        as generally the field data implementation is responsible for persisting
+        changes.
+
+        (The main use case here is a runtime and field data implementation that
+        want to store field data in XML format - the only way to correctly
+        serialize a block to XML is to ask the block to serialize itself all at
+        once, so such implementations cannot persist changes on a field-by-field
+        basis.)
+
+        :param block: the block being saved
+        :type block: :class:`~xblock.core.XBlock`
+        """
+        # Implementing this is optional.
+
     # Parsing XML
 
     def parse_xml_string(self, xml, id_generator=None):
@@ -903,12 +923,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
                 '{data}</script>'
             ).format(data=json.dumps(frag.json_init_args))
 
-        block_css_entrypoint = block.entry_point.replace('.', '-')
-        css_classes = [
-            block_css_entrypoint,
-            '{}-{}'.format(block_css_entrypoint, view),
-        ]
-
+        css_classes = self._css_classes_for(block, view)
         html = "<div class='{}'{properties}>{body}{js}</div>".format(
             markupsafe.escape(' '.join(css_classes)),
             properties="".join(" data-%s='%s'" % item for item in list(data.items())),
@@ -918,6 +933,18 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         wrapped.add_content(html)
         wrapped.add_fragment_resources(frag)
         return wrapped
+
+    def _css_classes_for(self, block, view):
+        """
+        Get the list of CSS classes that the wrapping <div> should have for the
+        specified xblock or aside's view.
+        """
+        block_css_entrypoint = block.entry_point.replace('.', '-')
+        css_classes = [
+            block_css_entrypoint,
+            '{}-{}'.format(block_css_entrypoint, view),
+        ]
+        return css_classes
 
     # Asides
 
