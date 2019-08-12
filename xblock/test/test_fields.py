@@ -305,6 +305,26 @@ class DateTest(FieldTest):
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc),
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)
         )
+        self.assertJSONOrSetEquals(
+            dt.timedelta(days=1, seconds=1),
+            dt.timedelta(days=1, seconds=1),
+        )
+        self.assertJSONOrSetEquals(
+            dt.timedelta(days=1, seconds=1),
+            dt.timedelta(seconds=86401),
+        )
+        self.assertJSONOrSetEquals(
+            dt.timedelta(days=1, seconds=1),
+            86401,
+        )
+        self.assertJSONOrSetEquals(
+            dt.timedelta(days=-2, seconds=86399),
+            -86401,
+        )
+        self.assertJSONOrSetEquals(
+            dt.timedelta(days=-1, seconds=86399),
+            -1,
+        )
 
     def test_serialize(self):
         self.assertToJSONEquals(
@@ -315,6 +335,22 @@ class DateTest(FieldTest):
         self.assertToJSONEquals(
             '2014-04-01T02:03:04.000000',
             dt.datetime(2014, 4, 1, 2, 3, 4).replace(tzinfo=pytz.utc)
+        )
+        self.assertToJSONEquals(
+            86401.0,
+            dt.timedelta(days=1, seconds=1),
+        )
+        self.assertToJSONEquals(
+            -1.0,
+            dt.timedelta(days=-1, seconds=86399),
+        )
+        self.assertToJSONEquals(
+            86401,
+            dt.timedelta(days=1, seconds=1),
+        )
+        self.assertToJSONEquals(
+            -1,
+            dt.timedelta(days=-1, seconds=86399),
         )
 
     @ddt.unpack
@@ -344,8 +380,6 @@ class DateTest(FieldTest):
 
     def test_error(self):
         self.assertJSONOrSetTypeError(['a'])
-        self.assertJSONOrSetTypeError(5)
-        self.assertJSONOrSetTypeError(5.123)
 
     def test_date_format_error(self):
         with self.assertRaises(ValueError):

@@ -946,7 +946,7 @@ class DateTime(JSONField):
     A field for representing a datetime.
 
     The value, as loaded or enforced, can either be an ISO-formatted date string, a native datetime,
-    or None.
+    a timedelta (for a time relative to course start), or None.
     """
 
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
@@ -965,20 +965,28 @@ class DateTime(JSONField):
             # Parser interprets empty string as now by default
             if value == "":
                 return None
+
             try:
                 value = dateutil.parser.parse(value)
             except (TypeError, ValueError):
                 raise ValueError("Could not parse {} as a date".format(value))
 
-        if not isinstance(value, datetime.datetime):
+        # Interpret raw numbers as a relative dates
+        if isinstance(value, (int, float)):
+            value = datetime.timedelta(seconds=value)
+
+        if not isinstance(value, (datetime.datetime, datetime.timedelta)):
             raise TypeError(
-                "Value should be loaded from a string, a datetime object or None, not {}".format(type(value))
+                "Value should be loaded from a string, a datetime object, a timedelta object, or None, not {}".format(type(value))
             )
 
-        if value.tzinfo is not None:  # pylint: disable=maybe-no-member
-            return value.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
+        if isinstance(value, datetime.datetime):
+            if value.tzinfo is not None:  # pylint: disable=maybe-no-member
+                return value.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
+            else:
+                return value.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
         else:
-            return value.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
+            return value
 
     def to_json(self, value):
         """
@@ -986,9 +994,14 @@ class DateTime(JSONField):
         """
         if isinstance(value, datetime.datetime):
             return value.strftime(self.DATETIME_FORMAT)
+
+        if isinstance(value, datetime.timedelta):
+            return value.total_seconds()
+
         if value is None:
             return None
-        raise TypeError("Value stored must be a datetime object, not {}".format(type(value)))
+
+        raise TypeError("Value stored must be a datetime or timedelta object, not {}".format(type(value)))
 
     def to_string(self, value):
         """DateTime fields get serialized without quote marks."""
