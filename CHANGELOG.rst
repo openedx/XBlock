@@ -4,6 +4,15 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.2.4 - 2019-08-27
+------------------
+
+* Added an API for notifying the Runtime when an XBlock's ``save()`` method is
+  called.
+
+* Added a mechanism for Runtime subclasses to more easily add extra CSS classes
+  to the ``<div>`` that wraps rendered XBlocks
+
 1.2.3 - 2019-07-24
 ------------------
 Allow Mixologist class to consume both class objects and string paths to classes as a part of initialization.
