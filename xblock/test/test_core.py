@@ -827,7 +827,7 @@ def test_json_handler_basic():
     test_data = {"foo": "bar", "baz": "quux"}
     test_data_json = ['{"foo": "bar", "baz": "quux"}', '{"baz": "quux", "foo": "bar"}']
     test_suffix = "suff"
-    test_request = Mock(method="POST", body=test_data_json[0])
+    test_request = Mock(method="POST", body=test_data_json[0].encode('utf-8'))
 
     @XBlock.json_handler
     def test_func(self, request, suffix):
@@ -843,7 +843,7 @@ def test_json_handler_basic():
 
 
 def test_json_handler_invalid_json():
-    test_request = Mock(method="POST", body="{")
+    test_request = Mock(method="POST", body=b"{")
 
     @XBlock.json_handler
     def test_func(self, request, suffix):   # pylint: disable=unused-argument
@@ -871,7 +871,7 @@ def test_json_handler_get():
 
 
 def test_json_handler_empty_request():
-    test_request = Mock(method="POST", body="")
+    test_request = Mock(method="POST", body=b"")
 
     @XBlock.json_handler
     def test_func(self, request, suffix):   # pylint: disable=unused-argument
@@ -887,7 +887,7 @@ def test_json_handler_empty_request():
 def test_json_handler_error():
     test_status_code = 418
     test_message = "I'm a teapot"
-    test_request = Mock(method="POST", body="{}")
+    test_request = Mock(method="POST", body=b"{}")
 
     @XBlock.json_handler
     def test_func(self, request, suffix):   # pylint: disable=unused-argument
@@ -900,7 +900,7 @@ def test_json_handler_error():
 
 
 def test_json_handler_return_response():
-    test_request = Mock(method="POST", body="{}")
+    test_request = Mock(method="POST", body=b"{}")
 
     @XBlock.json_handler
     def test_func(self, request, suffix):  # pylint: disable=unused-argument
@@ -913,7 +913,7 @@ def test_json_handler_return_response():
 
 
 def test_json_handler_return_unicode():
-    test_request = Mock(method="POST", body='["foo", "bar"]')
+    test_request = Mock(method="POST", body=b'["foo", "bar"]')
 
     @XBlock.json_handler
     def test_func(self, request, suffix):  # pylint: disable=unused-argument
