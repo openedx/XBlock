@@ -14,6 +14,8 @@ import datetime
 import hashlib
 import itertools
 import json
+import re
+import sys
 import traceback
 import unicodedata
 import warnings
@@ -863,13 +865,7 @@ class String(JSONField):
 
     """
     MUTABLE = False
-    VALID_CONTROLS = {'\n', '\r', '\t'}
-
-    def _valid_char(self, character):
-        """
-        Strip invalid control characters from a unicode text object.
-        """
-        return unicodedata.category(character)[0] != 'C' or character in self.VALID_CONTROLS
+    BAD_REGEX = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]', flags=re.UNICODE)
 
     def _sanitize(self, value):
         """
@@ -880,15 +876,20 @@ class String(JSONField):
         if isinstance(value, six.binary_type):
             value = value.decode('utf-8')
         if isinstance(value, six.text_type):
-            new_value = ''.join(ch for ch in value if self._valid_char(ch))
+            if re.search(self.BAD_REGEX, value):
+                new_value = re.sub(self.BAD_REGEX, u"", value)
+                # The new string will be equivalent to the original string if no control characters are present.
+                # If equivalent, return the original string - some tests check for object equality instead of string equality.
+                return value if value == new_value else new_value
+            else:
+                return value
         else:
             return value
-        # The new string will be equivalent to the original string if no control characters are present.
-        # If equivalent, return the original string - some tests check for object equality instead of string equality.
-        return value if value == new_value else new_value
 
     def from_json(self, value):
-        if value is None or isinstance(value, (six.binary_type, six.text_type)):
+        if value is None:
+            return None
+        elif isinstance(value, (six.binary_type, six.text_type)):
             return self._sanitize(value)
         elif self._is_lazy(value):
             # Allow lazily translated strings to be used as String default values.
