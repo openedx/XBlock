@@ -5,11 +5,7 @@ __ http://code.edx.org/
 XBlock Courseware Components |build-status| |coverage-status|
 =============================================================
 
-XBlock is a component architecture by edX.org for building courseware.
-
-This is a pre-alpha release of the XBlock API, to gather input from potential
-users of the API.  We like what is here, but are open to suggestions for
-changes. We will be implementing this shortly in the edX LMS.
+XBlock is the Open edX component architecture for building courseware.
 
 This repo contains the core code for implementing XBlocks.
 
@@ -17,13 +13,10 @@ This repo contains the core code for implementing XBlocks.
 Background
 ----------
 
-EdX courseware is built out of components that are combined hierarchically.
+Open edX courseware is built out of components that are combined hierarchically.
 These include components like the video player, `LON-CAPA`_ problems, as well
-as compound components like learning sequences. We are developing a
-second-generation API for these components called XBlocks. Although they're in
-a prototype stage, we like the API, and want to collaborate with others to
-develop them into an industry standard. This is our proposed API and
-specification for XBlocks.
+as compound components like learning sequences. The
+API for these components is called XBlocks.
 
 .. _LON-CAPA: http://www.lon-capa.org/
 
@@ -59,19 +52,10 @@ Testing
 
 To run the test suite:
 
-    $ pytest
+    $ tox
 
-This will run:
-
-    * Unit tests of the XBlock core and runtime, with coverage data collected.
-
-To view the coverage report:
-
-    $ coverage report
-
-See the `coverage.py`_ docs for more info and options.
-
-.. _coverage.py: http://nedbatchelder.com/code/coverage/
+This will run the XBlock core and runtime unit tests, and print coverage
+reports.
 
 
 Style Testing
@@ -187,21 +171,20 @@ To package a new release:
 
 #. Tag the commit to be released::
 
-    $VERSION=0.5
-    git tag -a -m "XBlock version $VERSION" xblock-$VERSION
+    git tag v1.2.17
 
 #. Push the tag and wait for Travis to upload to PyPI::
 
     git push --tags
 
 
-Mailing List and IRC Channel
-----------------------------
+Getting Help
+------------
 
-You can discuss this code on the `edx-code Google Group`__ or in the
-``#edx-code`` IRC channel on Freenode.
+If you need help, you can find online resources, including discussions,
+at the `Open edX Getting Help`_ page.
 
-__ https://groups.google.com/group/edx-code
+.. _Open edX Getting Help: https://openedx.org/getting-help
 
 .. |build-status| image:: https://travis-ci.org/edx/XBlock.svg?branch=master
    :target: https://travis-ci.org/edx/XBlock
