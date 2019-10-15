@@ -4,6 +4,23 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.2.7 - 2019-10-15
+------------------
+
+* Changed how illegal XML characters are sanitized, to speed the operation.
+  The old way was removing more characters than are required by the XML
+  specification.
+
+1.2.6 - 2019-09-24
+------------------
+
+* Add support for relative dates to DateTime fields.
+
+1.2.5 - 2019-09-19
+------------------
+
+* Changes for Python 2/3 compatibility.
+
 1.2.4 - 2019-08-27
 ------------------
 
@@ -15,6 +32,7 @@ These are notable changes in XBlock.
 
 1.2.3 - 2019-07-24
 ------------------
+
 Allow Mixologist class to consume both class objects and string paths to classes as a part of initialization.
 
 1.2.1 - 2018-09-05

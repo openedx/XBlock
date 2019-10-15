@@ -167,6 +167,8 @@ Packaging
 
 To package a new release:
 
+#. Describe the release in CHANGELOG.rst
+
 #. Update the version number in xblock/VERSION.txt.
 
 #. Tag the commit to be released::
