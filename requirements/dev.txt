@@ -34,7 +34,7 @@ fs==2.4.11
 funcsigs==1.0.2
 future==0.18.1
 futures==3.3.0 ; python_version == "2.7"
-hypothesis==3.88.3
+hypothesis==4.41.3
 idna==2.8
 importlib-metadata==0.23
 inflect==2.1.0
