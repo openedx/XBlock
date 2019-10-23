@@ -11,10 +11,12 @@ import os.path
 from setuptools import setup
 
 VERSION_FILE = os.path.join(os.path.dirname(__file__), 'xblock/VERSION.txt')
+with codecs.open(VERSION_FILE, encoding='ascii') as f:
+    VERSION = f.read().strip()
 
 setup(
     name='XBlock',
-    version=codecs.open(VERSION_FILE, encoding='ascii').read().strip(),
+    version=VERSION,
     description='XBlock Core Library',
     packages=[
         'xblock',

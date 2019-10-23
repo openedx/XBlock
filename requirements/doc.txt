@@ -6,44 +6,47 @@
 #
 alabaster==0.7.12         # via sphinx
 appdirs==1.4.3
-babel==2.6.0              # via sphinx
+babel==2.7.0              # via sphinx
 backports.os==0.1.1
-boto3==1.9.145
-botocore==1.12.145
-certifi==2019.3.9         # via requests
+boto3==1.10.0
+botocore==1.13.0
+certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.0
-django==1.11.20
-docutils==0.14
-edx-sphinx-theme==1.4.0
+django==1.11.25
+docutils==0.15.2
+edx-sphinx-theme==1.5.0
 enum34==1.1.6
-fs-s3fs==1.1.0
-fs==2.4.5
+fs-s3fs==1.1.1
+fs==2.4.11
 funcsigs==1.0.2           # via mock
-future==0.17.1
-futures==3.2.0 ; python_version == "2.7"
+future==0.18.1
+futures==3.3.0 ; python_version == "2.7"
 idna==2.8                 # via requests
 imagesize==1.1.0          # via sphinx
-jinja2==2.10.1            # via sphinx
+jinja2==2.10.3            # via sphinx
 jmespath==0.9.4
 lazy==1.4
-lxml==4.3.3
+lxml==4.4.1
 markupsafe==1.1.1
 mock==3.0.5
-packaging==19.0           # via sphinx
-pygments==2.4.0           # via sphinx
-pyparsing==2.4.0          # via packaging
+packaging==19.2           # via sphinx
+pygments==2.4.2           # via sphinx
+pyparsing==2.4.2          # via packaging
 python-dateutil==2.8.0
-pytz==2019.1
-pyyaml==5.1
-requests==2.21.0          # via sphinx
-s3transfer==0.2.0
+pytz==2019.3
+pyyaml==5.1.2
+requests==2.22.0          # via sphinx
+s3transfer==0.2.1
 simplejson==3.16.0
 six==1.12.0
-snowballstemmer==1.2.1    # via sphinx
+snowballstemmer==2.0.0    # via sphinx
 sphinx==1.8.5
-sphinxcontrib-websupport==1.1.0  # via sphinx
-typing==3.6.6
-urllib3==1.24.3
+sphinxcontrib-websupport==1.1.2  # via sphinx
+typing==3.7.4.1
+urllib3==1.25.6
 web-fragments==0.3.0
 webob==1.8.5
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools==41.4.0        # via fs, sphinx
