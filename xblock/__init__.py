@@ -32,4 +32,5 @@ xblock.fields.XBlockMixin = XBlockMixin
 
 VERSION_FILE = os.path.join(os.path.dirname(__file__), 'VERSION.txt')
 
-__version__ = codecs.open(VERSION_FILE, encoding='ascii').read().strip()
+with codecs.open(VERSION_FILE, encoding='ascii') as f:
+    __version__ = f.read().strip()

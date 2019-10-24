@@ -4,6 +4,11 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.2.8 - 2019-10-24
+------------------
+
+* Ensure the version file is closed after reading its content.
+
 1.2.7 - 2019-10-15
 ------------------
 
