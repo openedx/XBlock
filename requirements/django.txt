@@ -9,13 +9,12 @@ backports.os==0.1.1
 boto3==1.10.0             # via fs-s3fs
 botocore==1.13.0          # via boto3, s3transfer
 django-pyfs==2.0
-django==1.11.25
+django==2.2.6
 docutils==0.15.2          # via botocore
 enum34==1.1.6
 fs-s3fs==1.1.1            # via django-pyfs
 fs==2.4.11
 future==0.18.1
-futures==3.3.0 ; python_version == "2.7"
 jmespath==0.9.4           # via boto3, botocore
 lazy==1.4
 lxml==4.4.1
@@ -26,6 +25,7 @@ pyyaml==5.1.2
 s3transfer==0.2.1         # via boto3
 simplejson==3.16.0
 six==1.12.0
+sqlparse==0.3.0           # via django
 typing==3.7.4.1
 urllib3==1.25.6           # via botocore
 web-fragments==0.3.0
