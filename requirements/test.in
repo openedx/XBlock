@@ -1,5 +1,7 @@
 # Requirements for test runs
 
+-c constraints.txt
+
 -r django.txt                       # Package dependencies, including optional Django support
 
 astroid

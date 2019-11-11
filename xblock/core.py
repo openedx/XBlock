@@ -173,6 +173,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
             if tag in class_._class_tags:
                 yield name, class_
 
+    # pylint: disable=keyword-arg-before-vararg
     def __init__(self, runtime, field_data=None, scope_ids=UNSET, *args, **kwargs):
         """
         Construct a new XBlock.

@@ -8,18 +8,17 @@ appdirs==1.4.3            # via fs
 backports.os==0.1.1       # via fs
 enum34==1.1.6             # via fs
 fs==2.4.11
-future==0.18.1            # via backports.os
-futures==3.3.0 ; python_version == "2.7"
+future==0.18.2            # via backports.os
 lxml==4.4.1
 markupsafe==1.1.1
 python-dateutil==2.8.0
 pytz==2019.3
 pyyaml==5.1.2
 simplejson==3.16.0
-six==1.12.0
+six==1.13.0
 typing==3.7.4.1           # via fs
-web-fragments==0.3.0
+web-fragments==0.3.1
 webob==1.8.5
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.4.0        # via fs
+# setuptools==41.6.0        # via fs

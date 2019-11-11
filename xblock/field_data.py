@@ -179,6 +179,7 @@ class SplitFieldData(FieldData):
         return self._field_data(block, name).default(block, name)
 
     def save_block(self, block):
+        """ saving data """
         field_datas = set(six.itervalues(self._scope_mappings))
         for field_data in field_datas:
             field_data.save_block(block)
