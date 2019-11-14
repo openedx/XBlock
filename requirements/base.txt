@@ -11,7 +11,7 @@ fs==2.4.11
 future==0.18.2            # via backports.os
 lxml==4.4.1
 markupsafe==1.1.1
-python-dateutil==2.8.0
+python-dateutil==2.8.1
 pytz==2019.3
 pyyaml==5.1.2
 simplejson==3.16.0

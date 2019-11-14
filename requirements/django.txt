@@ -6,28 +6,26 @@
 #
 appdirs==1.4.3
 backports.os==0.1.1
-boto3==1.10.17            # via fs-s3fs
-botocore==1.13.17         # via boto3, s3transfer
+boto3==1.10.18            # via fs-s3fs
+botocore==1.13.18         # via boto3, s3transfer
 django-pyfs==2.0
 django==1.11.26
-docutils==0.15.2          # via botocore
 enum34==1.1.6
 fs-s3fs==1.1.1            # via django-pyfs
 fs==2.4.11
 future==0.18.2
 futures==3.3.0 ; python_version == "2.7"  # via s3transfer
-jmespath==0.9.4           # via boto3, botocore
+jmespath==0.9.4           # via boto3
 lazy==1.4
 lxml==4.4.1
 markupsafe==1.1.1
-python-dateutil==2.8.0
+python-dateutil==2.8.1
 pytz==2019.3
 pyyaml==5.1.2
 s3transfer==0.2.1         # via boto3
 simplejson==3.16.0
 six==1.13.0
 typing==3.7.4.1
-urllib3==1.25.7           # via botocore
 web-fragments==0.3.1
 webob==1.8.5
 
