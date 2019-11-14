@@ -15,9 +15,7 @@ import hashlib
 import itertools
 import json
 import re
-import sys
 import traceback
-import unicodedata
 import warnings
 
 import dateutil.parser
@@ -879,7 +877,8 @@ class String(JSONField):
             if re.search(self.BAD_REGEX, value):
                 new_value = re.sub(self.BAD_REGEX, u"", value)
                 # The new string will be equivalent to the original string if no control characters are present.
-                # If equivalent, return the original string - some tests check for object equality instead of string equality.
+                # If equivalent, return the original string - some tests
+                # check for object equality instead of string equality.
                 return value if value == new_value else new_value
             else:
                 return value
@@ -978,7 +977,9 @@ class DateTime(JSONField):
 
         if not isinstance(value, (datetime.datetime, datetime.timedelta)):
             raise TypeError(
-                "Value should be loaded from a string, a datetime object, a timedelta object, or None, not {}".format(type(value))
+                "Value should be loaded from a string, a datetime object, a timedelta object, or None, not {}".format(
+                    type(value)
+                )
             )
 
         if isinstance(value, datetime.datetime):

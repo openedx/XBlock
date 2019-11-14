@@ -1,8 +1,10 @@
 # Install Django requirements, if we're using the optional Django-integrated
 # parts of XBlock
 
+-c constraints.txt
+
 -r base.txt                         # Core XBlock dependencies
 
-Django>=1.8,<2.0
+Django>=1.11
 django-pyfs>=1.0.5
 lazy

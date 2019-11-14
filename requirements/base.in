@@ -1,7 +1,7 @@
 # Core requirements for using this package
+-c constraints.txt
 
 fs
-futures ; python_version == "2.7"   # via s3transfer
 lxml
 markupsafe
 python-dateutil

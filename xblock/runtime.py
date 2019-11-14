@@ -612,6 +612,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         """
         return XBlockAside.load_class(aside_type, select=self.select)
 
+    # pylint: disable = pylint: disable=keyword-arg-before-vararg
     def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
         r"""
         Construct a new xblock of the type identified by block_type,
@@ -624,6 +625,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             *args, **kwargs
         )
 
+    # pylint: disable=keyword-arg-before-vararg
     def construct_xblock_from_class(self, cls, scope_ids, field_data=None, *args, **kwargs):
         """
         Construct a new xblock of type cls, mixing in the mixins

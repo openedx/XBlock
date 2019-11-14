@@ -9,11 +9,11 @@ argparse==1.4.0           # via caniusepython3
 astroid==1.6.6
 atomicwrites==1.3.0       # via pytest
 attrs==19.3.0             # via hypothesis, pytest
-backports.functools-lru-cache==1.5  # via astroid, caniusepython3, isort, pylint
+backports.functools-lru-cache==1.6.1  # via astroid, caniusepython3, isort, pylint
 backports.os==0.1.1
-boto3==1.10.0
-botocore==1.13.0
-caniusepython3==7.1.0
+boto3==1.10.17
+botocore==1.13.17
+caniusepython3==7.2.0
 certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
 configparser==4.0.2       # via importlib-metadata, pylint
@@ -21,7 +21,7 @@ contextlib2==0.6.0.post1  # via importlib-metadata
 coverage==4.5.4
 ddt==1.2.1
 diff-cover==2.4.0
-distlib==0.2.9.post0      # via caniusepython3
+distlib==0.3.0            # via caniusepython3
 django-pyfs==2.0
 docutils==0.15.2
 enum34==1.1.6
@@ -29,17 +29,17 @@ filelock==3.0.12          # via tox
 fs-s3fs==1.1.1
 fs==2.4.11
 funcsigs==1.0.2           # via mock, pytest
-future==0.18.1
+future==0.18.2
 futures==3.3.0 ; python_version == "2.7"
-hypothesis==4.41.3
+hypothesis==4.44.2
 idna==2.8                 # via requests
-importlib-metadata==0.23  # via path.py, pluggy, pytest, tox
-inflect==2.1.0            # via jinja2-pluralize
+importlib-metadata==0.23  # via inflect, path.py, pluggy, pytest, tox
+inflect==3.0.2            # via jinja2-pluralize
 isort==4.3.21             # via pylint
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10.3            # via diff-cover, jinja2-pluralize
 jmespath==0.9.4
-lazy-object-proxy==1.4.2  # via astroid
+lazy-object-proxy==1.4.3  # via astroid
 lazy==1.4
 lxml==4.4.1
 markupsafe==1.1.1
@@ -55,9 +55,9 @@ py==1.8.0                 # via pytest, tox
 pycodestyle==2.5.0
 pygments==2.4.2           # via diff-cover
 pylint==1.9.5
-pyparsing==2.4.2          # via packaging
+pyparsing==2.4.5          # via packaging
 pytest-cov==2.8.1
-pytest-django==3.6.0
+pytest-django==3.7.0
 pytest==4.6.6
 python-dateutil==2.8.0
 pytz==2019.3
@@ -67,17 +67,17 @@ s3transfer==0.2.1
 scandir==1.10.0           # via pathlib2
 simplejson==3.16.0
 singledispatch==3.4.0.3   # via astroid, pylint
-six==1.12.0
+six==1.13.0
 toml==0.10.0              # via tox
-tox==3.14.0
+tox==3.14.1
 typing==3.7.4.1
-urllib3==1.25.6
+urllib3==1.25.7
 virtualenv==16.7.7        # via tox
 wcwidth==0.1.7            # via pytest
-web-fragments==0.3.0
+web-fragments==0.3.1
 webob==1.8.5
 wrapt==1.11.2             # via astroid
 zipp==0.6.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.4.0        # via caniusepython3, fs
+# setuptools==41.6.0        # via caniusepython3, fs

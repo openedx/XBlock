@@ -18,13 +18,13 @@ packaging==19.2           # via tox
 pathlib2==2.3.5           # via importlib-metadata
 pluggy==0.13.0            # via tox
 py==1.8.0                 # via tox
-pyparsing==2.4.2          # via packaging
+pyparsing==2.4.5          # via packaging
 requests==2.22.0          # via codecov
 scandir==1.10.0           # via pathlib2
-six==1.12.0               # via more-itertools, packaging, pathlib2, tox
+six==1.13.0               # via more-itertools, packaging, pathlib2, tox
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.14.0
-urllib3==1.25.6           # via requests
+tox==3.14.1
+urllib3==1.25.7           # via requests
 virtualenv==16.7.7        # via tox
 zipp==0.6.0               # via importlib-metadata
