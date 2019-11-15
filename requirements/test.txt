@@ -23,7 +23,7 @@ ddt==1.2.1
 diff-cover==2.4.0
 distlib==0.3.0            # via caniusepython3
 django-pyfs==2.0
-docutils==0.15.2          # via botocore
+docutils==0.15.2
 enum34==1.1.6
 filelock==3.0.12          # via tox
 fs-s3fs==1.1.1
@@ -71,7 +71,7 @@ six==1.13.0
 toml==0.10.0              # via tox
 tox==3.14.1
 typing==3.7.4.1
-urllib3==1.25.7           # via botocore, requests
+urllib3==1.25.7
 virtualenv==16.7.7        # via tox
 wcwidth==0.1.7            # via pytest
 web-fragments==0.3.1
