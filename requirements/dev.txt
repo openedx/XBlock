@@ -26,6 +26,7 @@ diff-cover==2.4.0
 distlib==0.3.0
 django-pyfs==2.0
 django==1.11.26
+docutils==0.15.2
 enum34==1.1.6
 filelock==3.0.12
 fs-s3fs==1.1.1
@@ -62,7 +63,7 @@ pyparsing==2.4.5
 pytest-cov==2.8.1
 pytest-django==3.7.0
 pytest==4.6.6
-python-dateutil==2.8.1
+python-dateutil==2.8.0
 pytz==2019.3
 pyyaml==5.1.2
 requests==2.22.0

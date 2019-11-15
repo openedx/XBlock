@@ -14,7 +14,7 @@ certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.0
 django==1.11.26
-docutils==0.15.2          # via sphinx
+docutils==0.15.2          # via botocore, sphinx
 edx-sphinx-theme==1.5.0
 enum34==1.1.6
 fs-s3fs==1.1.1
@@ -33,7 +33,7 @@ mock==3.0.5
 packaging==19.2           # via sphinx
 pygments==2.4.2           # via sphinx
 pyparsing==2.4.5          # via packaging
-python-dateutil==2.8.1
+python-dateutil==2.8.0
 pytz==2019.3
 pyyaml==5.1.2
 requests==2.22.0          # via sphinx
@@ -44,7 +44,7 @@ snowballstemmer==2.0.0    # via sphinx
 sphinx==1.8.5
 sphinxcontrib-websupport==1.1.2  # via sphinx
 typing==3.7.4.1
-urllib3==1.25.7           # via requests
+urllib3==1.25.7           # via botocore, requests
 web-fragments==0.3.1
 webob==1.8.5
 
