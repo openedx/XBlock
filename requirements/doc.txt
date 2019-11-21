@@ -8,8 +8,8 @@ alabaster==0.7.12         # via sphinx
 appdirs==1.4.3
 babel==2.7.0              # via sphinx
 backports.os==0.1.1
-boto3==1.10.17
-botocore==1.13.17
+boto3==1.10.18
+botocore==1.13.18
 certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.0

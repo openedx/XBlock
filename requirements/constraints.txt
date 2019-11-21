@@ -13,6 +13,8 @@
 futures ; python_version == "2.7"
 
 
-# latest botocore release cap upper version of python-dateutil to 2.8.0 and that is not
-# compatible with other packages. That's why adding a cap here to avoid boto latest release untill they fix the issue.
-botocore<1.14.0,>=1.13.17
+# latest botocore release cap upper version of python-dateutil<2.8.1, this conflicts
+# with our dependencies due to the order in which the dependecies are pip-compiled.
+# Adding this constraint till botocore can figure out a fix around this, keep a look at
+# https://github.com/boto/botocore/issues/1872
+python-dateutil<2.8.1
