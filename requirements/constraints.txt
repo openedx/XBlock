@@ -16,5 +16,5 @@ futures ; python_version == "2.7"
 # latest botocore release cap upper version of python-dateutil<2.8.1, this conflicts
 # with our dependencies due to the order in which the dependecies are pip-compiled.
 # Adding this constraint till botocore can figure out a fix around this, keep a look at
-# https://github.com/edx/XBlock/pull/437
+# https://github.com/boto/botocore/issues/1872
 python-dateutil<2.8.1
