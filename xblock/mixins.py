@@ -12,7 +12,7 @@ import functools
 import inspect
 import logging
 import warnings
-import json
+import simplejson as json
 
 from lxml import etree
 import six
@@ -61,7 +61,7 @@ class HandlersMixin(object):
             if request.method != "POST":
                 return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
             try:
-                request_json = json.loads(request.body.decode('utf-8'))
+                request_json = json.loads(request.body)
             except ValueError:
                 return JsonHandlerError(400, "Invalid JSON").get_response()
             try:
