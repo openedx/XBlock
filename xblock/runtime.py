@@ -523,8 +523,8 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
 
     # Construction
     def __init__(
-            self, id_reader, field_data=None, mixins=(), services=None,
-            default_class=None, select=None, id_generator=None
+            self, id_reader, id_generator, field_data=None, mixins=(),
+            services=None, default_class=None, select=None
     ):
         """
         Arguments:
@@ -575,8 +575,6 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         self._view_name = None
 
         self.id_generator = id_generator
-        if id_generator is None:
-            warnings.warn("IdGenerator will be required in the future in order to support XBlockAsides", FutureWarning)
 
     # Block operations
 
@@ -690,54 +688,33 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
 
     # Parsing XML
 
-    def parse_xml_string(self, xml, id_generator=None):
+    def parse_xml_string(self, xml):
         """Parse a string of XML, returning a usage id."""
-        if id_generator is not None:
-            warnings.warn(
-                "Passing an id_generator directly is deprecated "
-                "in favor of constructing the Runtime with the id_generator",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-
-        id_generator = id_generator or self.id_generator
         if isinstance(xml, six.binary_type):
             io_type = BytesIO
         else:
             io_type = StringIO
-        return self.parse_xml_file(io_type(xml), id_generator)
+        return self.parse_xml_file(io_type(xml))
 
-    def parse_xml_file(self, fileobj, id_generator=None):
+    def parse_xml_file(self, fileobj):
         """Parse an open XML file, returning a usage id."""
         root = etree.parse(fileobj).getroot()
-        usage_id = self._usage_id_from_node(root, None, id_generator)
+        usage_id = self._usage_id_from_node(root, None)
         return usage_id
 
-    def _usage_id_from_node(self, node, parent_id, id_generator=None):
+    def _usage_id_from_node(self, node, parent_id):
         """Create a new usage id from an XML dom node.
 
         Args:
             node (lxml.etree.Element): The DOM node to interpret.
-            parent_id: The usage ID of the parent block
-            id_generator (IdGenerator): The :class:`.IdGenerator` to use
-                for creating ids
+            parent_id: The usage ID of the parent block.
         """
-        if id_generator is not None:
-            warnings.warn(
-                "Passing an id_generator directly is deprecated "
-                "in favor of constructing the Runtime with the id_generator",
-                DeprecationWarning,
-                stacklevel=3,
-            )
-
-        id_generator = id_generator or self.id_generator
-
         block_type = node.tag
         # remove xblock-family from elements
         node.attrib.pop('xblock-family', None)
         # TODO: a way for this node to be a usage to an existing definition?
-        def_id = id_generator.create_definition(block_type)
-        usage_id = id_generator.create_usage(def_id)
+        def_id = self.id_generator.create_definition(block_type)
+        usage_id = self.id_generator.create_usage(def_id)
         keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
         # pull the asides out of the xml payload
@@ -751,31 +728,29 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
                     aside_children.append(child)
         # now process them & remove them from the xml payload
         for child in aside_children:
-            self._aside_from_xml(child, def_id, usage_id, id_generator)
+            self._aside_from_xml(child, def_id, usage_id)
             node.remove(child)
-        block = block_class.parse_xml(node, self, keys, id_generator)
+        block = block_class.parse_xml(node, self, keys)
         block.parent = parent_id
         block.save()
         return usage_id
 
-    def _aside_from_xml(self, node, block_def_id, block_usage_id, id_generator):
+    def _aside_from_xml(self, node, block_def_id, block_usage_id):
         """
         Create an aside from the xml and attach it to the given block
         """
-        id_generator = id_generator or self.id_generator
-
         aside_type = node.tag
         aside_class = self.load_aside_type(aside_type)
-        aside_def_id, aside_usage_id = id_generator.create_aside(block_def_id, block_usage_id, aside_type)
+        aside_def_id, aside_usage_id = self.id_generator.create_aside(block_def_id, block_usage_id, aside_type)
         keys = ScopeIds(None, aside_type, aside_def_id, aside_usage_id)
-        aside = aside_class.parse_xml(node, self, keys, id_generator)
+        aside = aside_class.parse_xml(node, self, keys)
         aside.save()
 
-    def add_node_as_child(self, block, node, id_generator=None):
+    def add_node_as_child(self, block, node):
         """
         Called by XBlock.parse_xml to treat a child node as a child block.
         """
-        usage_id = self._usage_id_from_node(node, block.scope_ids.usage_id, id_generator)
+        usage_id = self._usage_id_from_node(node, block.scope_ids.usage_id)
         block.children.append(usage_id)
 
     # Exporting XML

@@ -19,7 +19,6 @@ in depth and guides developers through the process of creating an XBlock.
     xblock
     fields
     runtime
-    fragment
     exceptions
 
 .. _EdX XBlock Tutorial: http://edx.readthedocs.org/projects/xblock-tutorial/en/latest/index.html

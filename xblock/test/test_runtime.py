@@ -655,28 +655,6 @@ class TestRuntimeGetBlock(TestCase):
             self.runtime.get_block(self.usage_id)
 
 
-class TestRuntimeDeprecation(WarningTestMixin, TestCase):
-    """
-    Tests to make sure that deprecated Runtime apis stay usable,
-    but raise warnings.
-    """
-
-    def test_passed_field_data(self):
-        field_data = Mock(spec=FieldData)
-        with self.assertWarns(FieldDataDeprecationWarning):
-            runtime = TestRuntime(Mock(spec=IdReader), field_data)
-        with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEqual(runtime.field_data, field_data)
-
-    def test_set_field_data(self):
-        field_data = Mock(spec=FieldData)
-        runtime = TestRuntime(Mock(spec=IdReader), None)
-        with self.assertWarns(FieldDataDeprecationWarning):
-            runtime.field_data = field_data
-        with self.assertWarns(FieldDataDeprecationWarning):
-            self.assertEqual(runtime.field_data, field_data)
-
-
 class RuntimeWithCustomCSS(TestRuntime):  # pylint: disable=abstract-method
     """
     A runtime that adds extra CSS classes to rendered XBlocks
