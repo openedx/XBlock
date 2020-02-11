@@ -1,4 +1,4 @@
 # Install Django requirements, if we're using the optional Django-integrated
 # parts of XBlock
-Django >= 1.8, < 1.9
+Django >= 1.8, < 1.12
 django-pyfs >= 1.0.5
