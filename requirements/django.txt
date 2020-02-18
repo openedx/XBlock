@@ -6,10 +6,10 @@
 #
 appdirs==1.4.3
 backports.os==0.1.1
-boto3==1.10.18            # via fs-s3fs
-botocore==1.13.18         # via boto3, s3transfer
-django-pyfs==2.0
-django==1.11.26
+boto3==1.12.1             # via fs-s3fs
+botocore==1.15.1          # via boto3, s3transfer
+django-pyfs==2.1
+django==1.11.28
 docutils==0.15.2          # via botocore
 enum34==1.1.6
 fs-s3fs==1.1.1            # via django-pyfs
@@ -18,18 +18,18 @@ future==0.18.2
 futures==3.3.0 ; python_version == "2.7"  # via s3transfer
 jmespath==0.9.4           # via boto3, botocore
 lazy==1.4
-lxml==4.4.1
+lxml==4.5.0
 markupsafe==1.1.1
 python-dateutil==2.8.0
 pytz==2019.3
-pyyaml==5.1.2
-s3transfer==0.2.1         # via boto3
-simplejson==3.16.0
-six==1.13.0
+pyyaml==5.3
+s3transfer==0.3.3         # via boto3
+simplejson==3.17.0
+six==1.14.0
 typing==3.7.4.1
-urllib3==1.25.7           # via botocore
+urllib3==1.25.8           # via botocore
 web-fragments==0.3.1
-webob==1.8.5
+webob==1.8.6
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.6.0        # via fs
+# setuptools
