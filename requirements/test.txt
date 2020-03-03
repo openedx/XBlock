@@ -11,8 +11,8 @@ atomicwrites==1.3.0       # via pytest
 attrs==19.3.0             # via hypothesis, pytest
 backports.functools-lru-cache==1.6.1  # via astroid, caniusepython3, isort, pylint
 backports.os==0.1.1
-boto3==1.12.1
-botocore==1.15.1
+boto3==1.12.12
+botocore==1.15.12
 caniusepython3==7.2.0
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
@@ -24,7 +24,7 @@ diff-cover==2.6.0
 distlib==0.3.0            # via caniusepython3, virtualenv
 django-pyfs==2.1
 docutils==0.15.2
-enum34==1.1.6
+enum34==1.1.9
 filelock==3.0.12          # via tox, virtualenv
 fs-s3fs==1.1.1
 fs==2.4.11
@@ -32,14 +32,14 @@ funcsigs==1.0.2           # via mock, pytest
 future==0.18.2
 futures==3.3.0 ; python_version == "2.7"
 hypothesis==4.57.1
-idna==2.8                 # via requests
-importlib-metadata==1.5.0  # via inflect, path.py, pluggy, pytest, tox, virtualenv
-importlib-resources==1.0.2  # via virtualenv
+idna==2.9                 # via requests
+importlib-metadata==1.5.0  # via importlib-resources, inflect, path.py, pluggy, pytest, tox, virtualenv
+importlib-resources==1.2.0  # via virtualenv
 inflect==3.0.2            # via jinja2-pluralize
 isort==4.3.21             # via pylint
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.11.1            # via diff-cover, jinja2-pluralize
-jmespath==0.9.4
+jmespath==0.9.5
 lazy-object-proxy==1.4.3  # via astroid
 lazy==1.4
 lxml==4.5.0
@@ -63,23 +63,23 @@ pytest==4.6.9
 python-dateutil==2.8.0
 pytz==2019.3
 pyyaml==5.3
-requests==2.22.0          # via caniusepython3
+requests==2.23.0          # via caniusepython3
 s3transfer==0.3.3
 scandir==1.10.0           # via pathlib2
 simplejson==3.17.0
-singledispatch==3.4.0.3   # via astroid, pylint
+singledispatch==3.4.0.3   # via astroid, importlib-resources, pylint
 six==1.14.0
 sortedcontainers==2.1.0   # via hypothesis
 toml==0.10.0              # via tox
 tox==3.14.5
 typing==3.7.4.1
 urllib3==1.25.8
-virtualenv==20.0.4        # via tox
+virtualenv==20.0.7        # via tox
 wcwidth==0.1.8            # via pytest
 web-fragments==0.3.1
 webob==1.8.6
 wrapt==1.12.0             # via astroid
-zipp==1.2.0               # via importlib-metadata
+zipp==1.2.0               # via importlib-metadata, importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
