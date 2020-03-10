@@ -4,81 +4,81 @@
 #
 #    make upgrade
 #
-appdirs==1.4.3
+appdirs==1.4.3            # via -r requirements/django.txt, fs, virtualenv
 argparse==1.4.0           # via caniusepython3
-astroid==1.6.6
+astroid==1.6.6            # via -r requirements/test.in, pylint
 atomicwrites==1.3.0       # via pytest
 attrs==19.3.0             # via hypothesis, pytest
 backports.functools-lru-cache==1.6.1  # via astroid, caniusepython3, isort, pylint
-backports.os==0.1.1
-boto3==1.12.12
-botocore==1.15.12
-caniusepython3==7.2.0
+backports.os==0.1.1       # via -r requirements/django.txt, fs, path.py
+boto3==1.12.17            # via -r requirements/django.txt, fs-s3fs
+botocore==1.15.17         # via -r requirements/django.txt, boto3, s3transfer
+caniusepython3==7.2.0     # via -r requirements/test.in
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 configparser==4.0.2       # via importlib-metadata, pylint
-contextlib2==0.6.0.post1  # via importlib-metadata, virtualenv, zipp
-coverage==5.0.3
-ddt==1.2.2
-diff-cover==2.6.0
+contextlib2==0.6.0.post1  # via importlib-metadata, importlib-resources, virtualenv, zipp
+coverage==5.0.3           # via -r requirements/test.in, pytest-cov
+ddt==1.3.0                # via -r requirements/test.in
+diff-cover==2.6.0         # via -r requirements/test.in
 distlib==0.3.0            # via caniusepython3, virtualenv
-django-pyfs==2.1
-docutils==0.15.2
-enum34==1.1.9
+django-pyfs==2.1          # via -r requirements/django.txt
+docutils==0.15.2          # via -r requirements/django.txt, botocore
+enum34==1.1.9             # via -r requirements/django.txt, astroid, fs, hypothesis
 filelock==3.0.12          # via tox, virtualenv
-fs-s3fs==1.1.1
-fs==2.4.11
+fs-s3fs==1.1.1            # via -r requirements/django.txt, django-pyfs
+fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs
 funcsigs==1.0.2           # via mock, pytest
-future==0.18.2
-futures==3.3.0 ; python_version == "2.7"
-hypothesis==4.57.1
+future==0.18.2            # via -r requirements/django.txt, backports.os
+futures==3.3.0 ; python_version == "2.7"  # via -c requirements/constraints.txt, -r requirements/django.txt, caniusepython3, isort, s3transfer
+hypothesis==4.57.1        # via -r requirements/test.in
 idna==2.9                 # via requests
 importlib-metadata==1.5.0  # via importlib-resources, inflect, path.py, pluggy, pytest, tox, virtualenv
-importlib-resources==1.2.0  # via virtualenv
+importlib-resources==1.3.1  # via virtualenv
 inflect==3.0.2            # via jinja2-pluralize
 isort==4.3.21             # via pylint
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.11.1            # via diff-cover, jinja2-pluralize
-jmespath==0.9.5
+jmespath==0.9.5           # via -r requirements/django.txt, boto3, botocore
 lazy-object-proxy==1.4.3  # via astroid
-lazy==1.4
-lxml==4.5.0
-markupsafe==1.1.1
+lazy==1.4                 # via -r requirements/django.txt
+lxml==4.5.0               # via -r requirements/django.txt
+markupsafe==1.1.1         # via -r requirements/django.txt, jinja2
 mccabe==0.6.1             # via pylint
-mock==3.0.5
+mock==3.0.5               # via -r requirements/test.in
 more-itertools==5.0.0     # via pytest
-nose==1.3.7
-packaging==20.1           # via caniusepython3, pytest, tox
-path.py==11.5.2
+nose==1.3.7               # via -r requirements/test.in
+packaging==20.3           # via caniusepython3, pytest, tox
+path.py==11.5.2           # via -r requirements/test.in
 pathlib2==2.3.5           # via importlib-metadata, importlib-resources, pytest, pytest-django, virtualenv
 pluggy==0.13.1            # via diff-cover, pytest, tox
 py==1.8.1                 # via pytest, tox
-pycodestyle==2.5.0
+pycodestyle==2.5.0        # via -r requirements/test.in
 pygments==2.5.2           # via diff-cover
-pylint==1.9.5
+pylint==1.9.5             # via -r requirements/test.in
 pyparsing==2.4.6          # via packaging
-pytest-cov==2.8.1
-pytest-django==3.8.0
-pytest==4.6.9
-python-dateutil==2.8.0
-pytz==2019.3
-pyyaml==5.3
+pytest-cov==2.8.1         # via -r requirements/test.in
+pytest-django==3.8.0      # via -r requirements/test.in
+pytest==4.6.9             # via -r requirements/test.in, pytest-cov, pytest-django
+python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/django.txt, botocore
+pytz==2019.3              # via -r requirements/django.txt, django, fs
+pyyaml==5.3               # via -r requirements/django.txt
 requests==2.23.0          # via caniusepython3
-s3transfer==0.3.3
+s3transfer==0.3.3         # via -r requirements/django.txt, boto3
 scandir==1.10.0           # via pathlib2
-simplejson==3.17.0
+simplejson==3.17.0        # via -r requirements/django.txt
 singledispatch==3.4.0.3   # via astroid, importlib-resources, pylint
-six==1.14.0
+six==1.14.0               # via -r requirements/django.txt, astroid, diff-cover, django-pyfs, fs, fs-s3fs, mock, more-itertools, packaging, pathlib2, pylint, pytest, python-dateutil, singledispatch, tox, virtualenv
 sortedcontainers==2.1.0   # via hypothesis
 toml==0.10.0              # via tox
-tox==3.14.5
-typing==3.7.4.1
-urllib3==1.25.8
-virtualenv==20.0.7        # via tox
+tox==3.14.5               # via -r requirements/test.in
+typing==3.7.4.1           # via -r requirements/django.txt, fs, importlib-resources
+urllib3==1.25.8           # via -r requirements/django.txt, botocore, requests
+virtualenv==20.0.10       # via tox
 wcwidth==0.1.8            # via pytest
-web-fragments==0.3.1
-webob==1.8.6
-wrapt==1.12.0             # via astroid
+web-fragments==0.3.1      # via -r requirements/django.txt
+webob==1.8.6              # via -r requirements/django.txt
+wrapt==1.12.1             # via astroid
 zipp==1.2.0               # via importlib-metadata, importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
