@@ -7,18 +7,18 @@
 appdirs==1.4.3            # via fs
 backports.os==0.1.1       # via fs
 enum34==1.1.9             # via fs
-fs==2.4.11
+fs==2.4.11                # via -r requirements/base.in
 future==0.18.2            # via backports.os
-lxml==4.5.0
-markupsafe==1.1.1
-python-dateutil==2.8.0
-pytz==2019.3
-pyyaml==5.3
-simplejson==3.17.0
-six==1.14.0
+lxml==4.5.0               # via -r requirements/base.in
+markupsafe==1.1.1         # via -r requirements/base.in
+python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/base.in
+pytz==2019.3              # via -r requirements/base.in, fs
+pyyaml==5.3               # via -r requirements/base.in
+simplejson==3.17.0        # via -r requirements/base.in
+six==1.14.0               # via -r requirements/base.in, fs, python-dateutil
 typing==3.7.4.1           # via fs
-web-fragments==0.3.1
-webob==1.8.6
+web-fragments==0.3.1      # via -r requirements/base.in
+webob==1.8.6              # via -r requirements/base.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

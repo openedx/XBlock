@@ -4,32 +4,32 @@
 #
 #    make upgrade
 #
-appdirs==1.4.3
-backports.os==0.1.1
-boto3==1.12.12            # via fs-s3fs
-botocore==1.15.12         # via boto3, s3transfer
-django-pyfs==2.1
-django==1.11.28
+appdirs==1.4.3            # via -r requirements/base.txt, fs
+backports.os==0.1.1       # via -r requirements/base.txt, fs
+boto3==1.12.17            # via fs-s3fs
+botocore==1.15.17         # via boto3, s3transfer
+django-pyfs==2.1          # via -r requirements/django.in
+django==1.11.29           # via -r requirements/django.in, django-pyfs
 docutils==0.15.2          # via botocore
-enum34==1.1.9
+enum34==1.1.9             # via -r requirements/base.txt, fs
 fs-s3fs==1.1.1            # via django-pyfs
-fs==2.4.11
-future==0.18.2
-futures==3.3.0 ; python_version == "2.7"  # via s3transfer
+fs==2.4.11                # via -r requirements/base.txt, django-pyfs, fs-s3fs
+future==0.18.2            # via -r requirements/base.txt, backports.os
+futures==3.3.0 ; python_version == "2.7"  # via -c requirements/constraints.txt, s3transfer
 jmespath==0.9.5           # via boto3, botocore
-lazy==1.4
-lxml==4.5.0
-markupsafe==1.1.1
-python-dateutil==2.8.0
-pytz==2019.3
-pyyaml==5.3
+lazy==1.4                 # via -r requirements/django.in
+lxml==4.5.0               # via -r requirements/base.txt
+markupsafe==1.1.1         # via -r requirements/base.txt
+python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/base.txt, botocore
+pytz==2019.3              # via -r requirements/base.txt, django, fs
+pyyaml==5.3               # via -r requirements/base.txt
 s3transfer==0.3.3         # via boto3
-simplejson==3.17.0
-six==1.14.0
-typing==3.7.4.1
+simplejson==3.17.0        # via -r requirements/base.txt
+six==1.14.0               # via -r requirements/base.txt, django-pyfs, fs, fs-s3fs, python-dateutil
+typing==3.7.4.1           # via -r requirements/base.txt, fs
 urllib3==1.25.8           # via botocore
-web-fragments==0.3.1
-webob==1.8.6
+web-fragments==0.3.1      # via -r requirements/base.txt
+webob==1.8.6              # via -r requirements/base.txt
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
