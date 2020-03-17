@@ -11,20 +11,20 @@ atomicwrites==1.3.0       # via pytest
 attrs==19.3.0             # via hypothesis, pytest
 backports.functools-lru-cache==1.6.1  # via astroid, caniusepython3, isort, pylint
 backports.os==0.1.1       # via -r requirements/django.txt, fs, path.py
-boto3==1.12.17            # via -r requirements/django.txt, fs-s3fs
-botocore==1.15.17         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.12.22            # via -r requirements/django.txt, fs-s3fs
+botocore==1.15.22         # via -r requirements/django.txt, boto3, s3transfer
 caniusepython3==7.2.0     # via -r requirements/test.in
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 configparser==4.0.2       # via importlib-metadata, pylint
 contextlib2==0.6.0.post1  # via importlib-metadata, importlib-resources, virtualenv, zipp
-coverage==5.0.3           # via -r requirements/test.in, pytest-cov
+coverage==5.0.4           # via -r requirements/test.in, pytest-cov
 ddt==1.3.0                # via -r requirements/test.in
 diff-cover==2.6.0         # via -r requirements/test.in
 distlib==0.3.0            # via caniusepython3, virtualenv
 django-pyfs==2.1          # via -r requirements/django.txt
 docutils==0.15.2          # via -r requirements/django.txt, botocore
-enum34==1.1.9             # via -r requirements/django.txt, astroid, fs, hypothesis
+enum34==1.1.10            # via -r requirements/django.txt, astroid, fs, hypothesis
 filelock==3.0.12          # via tox, virtualenv
 fs-s3fs==1.1.1            # via -r requirements/django.txt, django-pyfs
 fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs

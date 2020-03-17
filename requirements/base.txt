@@ -6,7 +6,7 @@
 #
 appdirs==1.4.3            # via fs
 backports.os==0.1.1       # via fs
-enum34==1.1.9             # via fs
+enum34==1.1.10            # via fs
 fs==2.4.11                # via -r requirements/base.in
 future==0.18.2            # via backports.os
 lxml==4.5.0               # via -r requirements/base.in

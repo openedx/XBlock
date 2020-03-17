@@ -6,12 +6,12 @@
 #
 appdirs==1.4.3            # via -r requirements/base.txt, fs
 backports.os==0.1.1       # via -r requirements/base.txt, fs
-boto3==1.12.17            # via fs-s3fs
-botocore==1.15.17         # via boto3, s3transfer
+boto3==1.12.22            # via fs-s3fs
+botocore==1.15.22         # via boto3, s3transfer
 django-pyfs==2.1          # via -r requirements/django.in
 django==1.11.29           # via -r requirements/django.in, django-pyfs
 docutils==0.15.2          # via botocore
-enum34==1.1.9             # via -r requirements/base.txt, fs
+enum34==1.1.10            # via -r requirements/base.txt, fs
 fs-s3fs==1.1.1            # via django-pyfs
 fs==2.4.11                # via -r requirements/base.txt, django-pyfs, fs-s3fs
 future==0.18.2            # via -r requirements/base.txt, backports.os

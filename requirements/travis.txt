@@ -10,7 +10,7 @@ chardet==3.0.4            # via requests
 codecov==2.0.16           # via -r requirements/travis.in
 configparser==4.0.2       # via importlib-metadata
 contextlib2==0.6.0.post1  # via importlib-metadata, importlib-resources, virtualenv, zipp
-coverage==5.0.3           # via codecov
+coverage==5.0.4           # via codecov
 distlib==0.3.0            # via virtualenv
 filelock==3.0.12          # via tox, virtualenv
 idna==2.9                 # via requests

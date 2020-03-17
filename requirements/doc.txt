@@ -8,15 +8,15 @@ alabaster==0.7.12         # via sphinx
 appdirs==1.4.3            # via -r requirements/django.txt, fs
 babel==2.8.0              # via sphinx
 backports.os==0.1.1       # via -r requirements/django.txt, fs
-boto3==1.12.17            # via -r requirements/django.txt, fs-s3fs
-botocore==1.15.17         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.12.22            # via -r requirements/django.txt, fs-s3fs
+botocore==1.15.22         # via -r requirements/django.txt, boto3, s3transfer
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.1          # via -r requirements/django.txt
 django==1.11.29           # via -r requirements/django.txt, django-pyfs
 docutils==0.15.2          # via -r requirements/django.txt, botocore, sphinx
 edx-sphinx-theme==1.5.0   # via -r requirements/doc.in
-enum34==1.1.9             # via -r requirements/django.txt, fs
+enum34==1.1.10            # via -r requirements/django.txt, fs
 fs-s3fs==1.1.1            # via -r requirements/django.txt, django-pyfs
 fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs
 funcsigs==1.0.2           # via mock
