@@ -11,8 +11,8 @@ atomicwrites==1.3.0       # via -r requirements/test.txt, pytest
 attrs==19.3.0             # via -r requirements/test.txt, hypothesis, pytest
 backports.functools-lru-cache==1.6.1  # via -r requirements/test.txt, astroid, caniusepython3, isort, pylint
 backports.os==0.1.1       # via -r requirements/test.txt, fs, path.py
-boto3==1.12.27            # via -r requirements/test.txt, fs-s3fs
-botocore==1.15.27         # via -r requirements/test.txt, boto3, s3transfer
+boto3==1.12.28            # via -r requirements/test.txt, fs-s3fs
+botocore==1.15.28         # via -r requirements/test.txt, boto3, s3transfer
 caniusepython3==7.2.0     # via -r requirements/test.txt
 certifi==2019.11.28       # via -r requirements/test.txt, -r requirements/travis.txt, requests
 chardet==3.0.4            # via -r requirements/test.txt, -r requirements/travis.txt, requests
@@ -79,7 +79,7 @@ tox-battery==0.5.2        # via -r requirements/travis.txt
 tox==3.14.5               # via -r requirements/test.txt, -r requirements/travis.txt, tox-battery
 typing==3.7.4.1           # via -r requirements/test.txt, -r requirements/travis.txt, fs, importlib-resources
 urllib3==1.25.8           # via -r requirements/test.txt, -r requirements/travis.txt, botocore, requests
-virtualenv==20.0.13       # via -r requirements/test.txt, -r requirements/travis.txt, tox
+virtualenv==20.0.14       # via -r requirements/test.txt, -r requirements/travis.txt, tox
 wcwidth==0.1.9            # via -r requirements/test.txt, pytest
 web-fragments==0.3.1      # via -r requirements/test.txt
 webob==1.8.6              # via -r requirements/test.txt
