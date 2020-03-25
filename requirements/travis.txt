@@ -30,5 +30,5 @@ tox-battery==0.5.2        # via -r requirements/travis.in
 tox==3.14.5               # via -r requirements/travis.in, tox-battery
 typing==3.7.4.1           # via importlib-resources
 urllib3==1.25.8           # via requests
-virtualenv==20.0.13       # via tox
+virtualenv==20.0.14       # via tox
 zipp==1.2.0               # via importlib-metadata, importlib-resources
