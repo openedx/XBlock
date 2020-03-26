@@ -8,8 +8,8 @@ alabaster==0.7.12         # via sphinx
 appdirs==1.4.3            # via -r requirements/django.txt, fs
 babel==2.8.0              # via sphinx
 backports.os==0.1.1       # via -r requirements/django.txt, fs
-boto3==1.12.28            # via -r requirements/django.txt, fs-s3fs
-botocore==1.15.28         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.12.29            # via -r requirements/django.txt, fs-s3fs
+botocore==1.15.29         # via -r requirements/django.txt, boto3, s3transfer
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.1          # via -r requirements/django.txt
