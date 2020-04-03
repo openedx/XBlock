@@ -11,8 +11,8 @@ atomicwrites==1.3.0       # via pytest
 attrs==19.3.0             # via hypothesis, pytest
 backports.functools-lru-cache==1.6.1  # via astroid, caniusepython3, isort, pylint
 backports.os==0.1.1       # via -r requirements/django.txt, fs, path.py
-boto3==1.12.29            # via -r requirements/django.txt, fs-s3fs
-botocore==1.15.29         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.12.35            # via -r requirements/django.txt, fs-s3fs
+botocore==1.15.35         # via -r requirements/django.txt, boto3, s3transfer
 caniusepython3==7.2.0     # via -r requirements/test.in
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
@@ -33,7 +33,7 @@ future==0.18.2            # via -r requirements/django.txt, backports.os
 futures==3.3.0 ; python_version == "2.7"  # via -c requirements/constraints.txt, -r requirements/django.txt, caniusepython3, isort, s3transfer
 hypothesis==4.57.1        # via -r requirements/test.in
 idna==2.9                 # via requests
-importlib-metadata==1.5.2  # via importlib-resources, inflect, path.py, pluggy, pytest, tox, virtualenv
+importlib-metadata==1.6.0  # via importlib-resources, inflect, path.py, pluggy, pytest, tox, virtualenv
 importlib-resources==1.4.0  # via virtualenv
 inflect==3.0.2            # via jinja2-pluralize
 isort==4.3.21             # via pylint
@@ -58,7 +58,7 @@ pygments==2.5.2           # via diff-cover
 pylint==1.9.5             # via -r requirements/test.in
 pyparsing==2.4.6          # via packaging
 pytest-cov==2.8.1         # via -r requirements/test.in
-pytest-django==3.8.0      # via -r requirements/test.in
+pytest-django==3.9.0      # via -r requirements/test.in
 pytest==4.6.9             # via -r requirements/test.in, pytest-cov, pytest-django
 python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/django.txt, botocore
 pytz==2019.3              # via -r requirements/django.txt, django, fs
@@ -74,7 +74,7 @@ toml==0.10.0              # via tox
 tox==3.14.6               # via -r requirements/test.in
 typing==3.7.4.1           # via -r requirements/django.txt, fs, importlib-resources
 urllib3==1.25.8           # via -r requirements/django.txt, botocore, requests
-virtualenv==20.0.14       # via tox
+virtualenv==20.0.15       # via tox
 wcwidth==0.1.9            # via pytest
 web-fragments==0.3.1      # via -r requirements/django.txt
 webob==1.8.6              # via -r requirements/django.txt
