@@ -92,7 +92,7 @@ def unabc(msg):
         return partial(_unabc, msg=msg)
 
 
-class WarningTestMixin(object):
+class WarningTestMixin:
     """
     Add the ability to assert on warnings raised by a chunk of code.
     """

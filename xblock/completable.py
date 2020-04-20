@@ -4,7 +4,7 @@ This module defines CompletableXBlockMixin and completion mode enumeration.
 from __future__ import absolute_import, unicode_literals
 
 
-class XBlockCompletionMode(object):
+class XBlockCompletionMode:
     """
     Enumeration for completion modes.
     """
@@ -22,7 +22,7 @@ class XBlockCompletionMode(object):
         return getattr(block_class, 'completion_mode', cls.COMPLETABLE)
 
 
-class CompletableXBlockMixin(object):
+class CompletableXBlockMixin:
     """
     This mixin sets attributes and provides helper method to integrate XBlock with Completion API.
     """

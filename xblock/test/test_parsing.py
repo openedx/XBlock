@@ -96,7 +96,7 @@ class CustomXml(XBlock):
 # Helpers
 
 
-class XmlTestMixin(object):
+class XmlTestMixin:
     """
     Wraps parsing and exporting and other things to return more useful values. Does not define
     a runtime (thus calling it a mixin)

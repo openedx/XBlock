@@ -7,11 +7,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from datetime import datetime
 from unittest import TestCase
 
-import ddt as ddt
-from lxml import etree
+import ddt
 import mock
 import pytz
 import six
+from lxml import etree
 
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
@@ -45,19 +45,16 @@ class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
 
     class ChildClass(ScopedStorageMixinTester):
         """Toy class for ModelMetaclass testing"""
-        pass
 
-    class FieldsMixin(object):
+    class FieldsMixin:
         """Toy mixin for field testing"""
         field_c = Integer(scope=Scope.settings)
 
     class MixinChildClass(FieldsMixin, ScopedStorageMixinTester):
         """Toy class for ScopedStorageMixin testing with mixed-in fields"""
-        pass
 
     class MixinGrandchildClass(MixinChildClass):
         """Toy class for ScopedStorageMixin testing with inherited mixed-in fields"""
-        pass
 
     def test_scoped_storage_mixin(self):
 
@@ -124,11 +121,9 @@ class TestHierarchyMixin(AttrAssertionMixin, TestCase):
 
     class WithoutChildren(HierarchyMixin):
         """Toy class for ChildrenModelMetaclass testing"""
-        pass
 
     class InheritedChildren(HasChildren):
         """Toy class for ChildrenModelMetaclass testing"""
-        pass
 
     def test_children_metaclass(self):
         # `HasChildren` and `WithoutChildren` both obtain the `children` attribute and
@@ -156,7 +151,6 @@ class TestIndexInfoMixin(AttrAssertionMixin):
     """
     class IndexInfoMixinTester(IndexInfoMixin):
         """Test class for index mixin"""
-        pass
 
     def test_index_info(self):
         self.assertHasAttr(self.IndexInfoMixinTester, 'index_dictionary')
@@ -182,20 +176,20 @@ class TestViewsMixin(TestCase):
                 """
                 A view that supports a functionality
                 """
-                pass  # pragma: no cover
+                # pragma: no cover
 
             @ViewsMixin.supports("functionality1", "functionality2")
             def multi_featured_view(self):
                 """
                 A view that supports multiple functionalities
                 """
-                pass  # pragma: no cover
+                # pragma: no cover
 
             def an_unsupported_view(self):
                 """
                 A view that does not support any functionality
                 """
-                pass  # pragma: no cover
+                # pragma: no cover
 
         test_xblock = SupportsDecoratorTester()
 
@@ -309,7 +303,7 @@ class TestXmlSerializationMixin(TestCase):
         Checks XML node elements to match expected elements.
         """
         node_elements = list(node)
-        self.assertEqual(set([elem.tag for elem in node_elements]), set(expected_elements.keys()))
+        self.assertEqual({elem.tag for elem in node_elements}, set(expected_elements.keys()))
         # All elements on the node are expected to have a "none"="true" attribute.
         for elem in node:
             self.assertEqual(elem.get('none'), 'true')
@@ -486,7 +480,7 @@ class TestXmlSerializationMixin(TestCase):
         """
         node = etree.Element(self.test_xblock_datetime_tag)
 
-        self.test_xblock_datetime.datetime = value
+        self.test_xblock_datetime.datetime = value  # pylint: disable=attribute-defined-outside-init
 
         self.test_xblock_datetime.add_xml_to_node(node)
 

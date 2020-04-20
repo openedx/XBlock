@@ -39,17 +39,15 @@ class FailingEnforceTypeWarning(DeprecationWarning):
     """
     A warning triggered when enforce_type would cause a exception if enabled
     """
-    pass
 
 
 class ModifyingEnforceTypeWarning(DeprecationWarning):
     """
     A warning triggered when enforce_type would change a value if enabled
     """
-    pass
 
 
-class Sentinel(object):
+class Sentinel:
     """
     Class for implementing sentinel objects (only equal to themselves).
     """
@@ -81,7 +79,7 @@ class Sentinel(object):
         return hash(self.name)
 
 
-class BlockScope(object):
+class BlockScope:
     """
     Enumeration of block scopes.
 
@@ -117,7 +115,7 @@ class BlockScope(object):
         return [cls.USAGE, cls.DEFINITION, cls.TYPE, cls.ALL]
 
 
-class UserScope(object):
+class UserScope:
     """
     Enumeration of user scopes.
 
@@ -695,7 +693,7 @@ class JSONField(Field):
     """
     Field type which has a convenient JSON representation.
     """
-    pass  # for now; we'll bubble functions down when we finish deprecation in Field
+    # for now; we'll bubble functions down when we finish deprecation in Field
 
 
 class Integer(JSONField):
@@ -1020,7 +1018,6 @@ class Any(JSONField):
 
     THIS SHOULD BE DEPRECATED. THIS SHOULD EITHER BE ANY JSON DATA, OR IT MAKES NO SENSE
     """
-    pass
 
 
 class Reference(JSONField):
@@ -1030,7 +1027,6 @@ class Reference(JSONField):
     It's up to the runtime to know how to dereference this field type, but the field type enables the
     runtime to know that it must do the interpretation.
     """
-    pass
 
 
 class ReferenceList(List):
@@ -1042,7 +1038,6 @@ class ReferenceList(List):
     """
     # this could define from_json and to_json as list comprehensions calling from/to_json on the list eles,
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
-    pass
 
 
 class ReferenceValueDict(Dict):
@@ -1054,7 +1049,6 @@ class ReferenceValueDict(Dict):
     """
     # this could define from_json and to_json as list comprehensions calling from/to_json on the list eles,
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
-    pass
 
 
 def scope_key(instance, xblock):

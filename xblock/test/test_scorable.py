@@ -45,8 +45,8 @@ class StubScorableBlock(scorable.ScorableXBlockMixin):
     def calculate_score(self):
         if self._scoring_error:
             raise RuntimeError('Whoops')  # Any error will do
-        else:
-            return scorable.Score(raw_earned=1.6, raw_possible=2.0)
+
+        return scorable.Score(raw_earned=1.6, raw_possible=2.0)
 
 
 @ddt.ddt

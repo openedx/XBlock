@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 Score = namedtuple('Score', ['raw_earned', 'raw_possible'])
 
 
-class ScorableXBlockMixin(object):
+class ScorableXBlockMixin:
     """
     Mixin to handle functionality related to scoring.
 

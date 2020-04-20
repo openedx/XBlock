@@ -23,7 +23,7 @@ class UserService(Service):
         raise NotImplementedError()
 
 
-class XBlockUser(object):
+class XBlockUser:
     """
     A model representation of user data returned by the `UserService`.
 

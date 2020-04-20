@@ -37,7 +37,7 @@ from xblock.field_data import DictFieldData, FieldData
 from xblock.test.tools import unabc, WarningTestMixin, TestRuntime
 
 
-class TestMixin(object):
+class TestMixin:
     """
     Set up namespaces for each scope to use.
     """
@@ -75,7 +75,6 @@ class TestXBlockNoFallback(XBlock):
 
     def handler_without_correct_decoration(self, request, suffix=''):
         """a handler which is missing the @XBlock.handler decoration."""
-        pass
 
 
 class TestXBlock(TestXBlockNoFallback):
@@ -316,7 +315,7 @@ def test_default_fn():
     assert second_call == 2
 
 
-class TestSimpleMixin(object):
+class TestSimpleMixin:
     """Toy class for mixin testing"""
     field_x = List(scope=Scope.content)
     field_y = String(scope=Scope.user_state, default="default_value")
@@ -370,7 +369,7 @@ def test_mixin_field_access():
     assert not field_tester._field_data.has(field_tester, 'field_z')
 
 
-class Dynamic(object):
+class Dynamic:
     """
     Object for testing that sets attrs based on __init__ kwargs
     """
@@ -379,7 +378,7 @@ class Dynamic(object):
             setattr(self, name, value)
 
 
-class TestObjectAggregator(object):
+class TestObjectAggregator:
     """
     Test that the ObjectAggregator behaves correctly
     """
@@ -440,7 +439,7 @@ class ThirdMixin(XBlockMixin):
     field = Integer(default=3)
 
 
-class TestMixologist(object):
+class TestMixologist:
     """Test that the Mixologist class behaves correctly."""
     def setup_method(self):
         """
@@ -492,7 +491,7 @@ class TestMixologist(object):
         assert len(post_mixed.__bases__) == 4
 
 
-class TestMixologistErrors(object):
+class TestMixologistErrors:
     """ Test failures in Mixologist initialization. """
     def test_bad_class_name(self):
         bad_class_name = 'xblock.test.test_runtime.NonExistentMixin'

@@ -10,7 +10,7 @@ import inspect
 import six
 
 
-class LazyClassProperty(object):
+class LazyClassProperty:
     """
     A descriptor that acts as a class-level @lazy.
 
@@ -57,14 +57,12 @@ class NamedAttributesMetaclass(type):
         return super(NamedAttributesMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
-class Nameable(object):
+class Nameable:
     """
     A base class for class attributes which, when used in concert with
     :class:`.NamedAttributesMetaclass`, will be assigned a `__name__`
     attribute based on what class attribute they are bound to.
     """
-    if six.PY2:
-        __slots__ = ('__name__',)
     __name__ = None
 
     @staticmethod

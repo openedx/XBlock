@@ -8,12 +8,12 @@ from lazy import lazy
 
 import six
 import webob
+from django.http import HttpResponse
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
 def webob_to_django_response(webob_response):
     """Returns a django response to the `webob_response`"""
-    from django.http import HttpResponse
     django_response = HttpResponse(
         webob_response.app_iter,
         content_type=webob_response.content_type,
@@ -87,7 +87,7 @@ def querydict_to_multidict(query_dict, wrap=None):
     ))
 
 
-class DjangoUploadedFile(object):
+class DjangoUploadedFile:
     """
     Looks like a cgi.FieldStorage, but wraps a Django UploadedFile.
     """
@@ -146,15 +146,15 @@ class DjangoWebobRequest(webob.Request):
             querydict_to_multidict(self._request.FILES, wrap=DjangoUploadedFile),
         )
 
-    @lazy
-    def body(self):  # pylint: disable=method-hidden
+    @property
+    def body(self):
         """
         Return the content of the request body.
         """
         return self._request.body
 
-    @lazy
-    def body_file(self):  # pylint: disable=method-hidden
+    @property
+    def body_file(self):
         """
         Input stream of the request
         """
