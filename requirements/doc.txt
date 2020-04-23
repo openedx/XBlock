@@ -8,8 +8,8 @@ alabaster==0.7.12         # via sphinx
 appdirs==1.4.3            # via -r requirements/django.txt, fs
 babel==2.8.0              # via sphinx
 backports.os==0.1.1       # via -r requirements/django.txt, fs
-boto3==1.12.39            # via -r requirements/django.txt, fs-s3fs
-botocore==1.15.39         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.12.40            # via -r requirements/django.txt, fs-s3fs
+botocore==1.15.40         # via -r requirements/django.txt, boto3, s3transfer
 certifi==2020.4.5.1       # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.1          # via -r requirements/django.txt
@@ -24,7 +24,7 @@ future==0.18.2            # via -r requirements/django.txt, backports.os
 futures==3.3.0 ; python_version == "2.7"  # via -c requirements/constraints.txt, -r requirements/django.txt, s3transfer
 idna==2.9                 # via requests
 imagesize==1.2.0          # via sphinx
-jinja2==2.11.1            # via sphinx
+jinja2==2.11.2            # via sphinx
 jmespath==0.9.5           # via -r requirements/django.txt, boto3, botocore
 lazy==1.4                 # via -r requirements/django.txt
 lxml==4.5.0               # via -r requirements/django.txt
@@ -44,7 +44,7 @@ snowballstemmer==2.0.0    # via sphinx
 sphinx==1.8.5             # via -r requirements/doc.in, edx-sphinx-theme
 sphinxcontrib-websupport==1.1.2  # via sphinx
 typing==3.7.4.1           # via -r requirements/django.txt, fs, sphinx
-urllib3==1.25.8           # via -r requirements/django.txt, botocore, requests
+urllib3==1.25.9           # via -r requirements/django.txt, botocore, requests
 web-fragments==0.3.1      # via -r requirements/django.txt
 webob==1.8.6              # via -r requirements/django.txt
 
