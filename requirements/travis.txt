@@ -13,7 +13,7 @@ distlib==0.3.0            # via virtualenv
 filelock==3.0.12          # via tox, virtualenv
 idna==2.9                 # via requests
 importlib-metadata==1.6.0  # via importlib-resources, pluggy, tox, virtualenv
-importlib-resources==1.4.0  # via virtualenv
+importlib-resources==1.5.0  # via virtualenv
 packaging==20.3           # via tox
 pluggy==0.13.1            # via tox
 py==1.8.1                 # via tox
