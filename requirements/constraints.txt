@@ -9,10 +9,6 @@
 # linking to it here is good.
 
 
-# futures is part of the builtin python in python3
-futures ; python_version == "2.7"
-
-
 # latest botocore release cap upper version of python-dateutil<2.8.1, this conflicts
 # with our dependencies due to the order in which the dependecies are pip-compiled.
 # Adding this constraint till botocore can figure out a fix around this, keep a look at

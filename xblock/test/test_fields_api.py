@@ -46,7 +46,7 @@ from xblock.test.tools import TestRuntime
 # without pylint complaining
 # pylint: disable=no-member
 # ~~~~~~~~~~~~~ Classes defining test operations ~~~~~~~~~~~~~~~~~~~~~~
-class BlockFirstOperations(object):
+class BlockFirstOperations:
     """
     Defines operations using the block-first implementations
 
@@ -71,7 +71,7 @@ class BlockFirstOperations(object):
         return not self.block.__class__.field.is_set_on(self.block)
 
 
-class FieldFirstOperations(object):
+class FieldFirstOperations:
     """
     Defines operations using the field-first implementations
 
@@ -97,7 +97,7 @@ class FieldFirstOperations(object):
 
 
 # ~~~~~~~~~~~~~ Classes defining test properties ~~~~~~~~~~~~~~~~~~~~~~
-class UniversalProperties(object):
+class UniversalProperties:
     """
     Properties that can be tested without knowing whether a field
     has an initial value or a default value
@@ -181,7 +181,7 @@ class UniversalProperties(object):
             assert patched_set_many.called
 
 
-class MutationProperties(object):
+class MutationProperties:
     """
     Properties of mutable fields that can be tested without knowing
     whether the field has an initial value or a default value
@@ -238,7 +238,7 @@ class MutationProperties(object):
         assert pointer == self.field_data.get(self.block, 'field')
 
 
-class InitialValueProperties(object):
+class InitialValueProperties:
     """
     Properties dependent on the field having an initial value
 
@@ -271,7 +271,7 @@ class InitialValueProperties(object):
         assert self.new_value == self.field_data.get(self.block, 'field')
 
 
-class DefaultValueProperties(object):
+class DefaultValueProperties:
     """
     Properties dependent on the field not having an initial value
 
@@ -305,7 +305,7 @@ class DefaultValueProperties(object):
         assert not self.field_data.has(self.block, 'field')
 
 
-class DefaultValueMutationProperties(object):
+class DefaultValueMutationProperties:
     """
     Properties testing mutation of default field values
 
@@ -339,7 +339,7 @@ class DefaultValueMutationProperties(object):
         assert reference_copy == final_value
 
 
-class InitialValueMutationProperties(object):
+class InitialValueMutationProperties:
     """
     Properties testing mutation of set field value
 
@@ -502,7 +502,7 @@ class TestImmutableWithInitialValueAndUniqueIdDefault(UniqueIdTestCases, Initial
 # Allow base classes to leave out class attributes and that they access
 # without pylint complaining
 # pylint: disable=no-member
-class GetNoopPrefix(object):
+class GetNoopPrefix:
     """
     Mixin that prefixes existing field tests with a call to `self.block.field`.
 
@@ -516,7 +516,7 @@ class GetNoopPrefix(object):
         self.get()
 
 
-class GetSaveNoopPrefix(object):
+class GetSaveNoopPrefix:
     """
     Mixin that prefixes existing field tests with a call to `self.block.field` and then `self.block.save()`
 
@@ -531,7 +531,7 @@ class GetSaveNoopPrefix(object):
         self.block.save()
 
 
-class SaveNoopPrefix(object):
+class SaveNoopPrefix:
     """
     Mixin that prefixes existing field tests with a call to `self.block.save()`
 

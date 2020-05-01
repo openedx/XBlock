@@ -10,6 +10,8 @@ import functools
 import itertools
 import logging
 import pkg_resources
+from mock import Mock
+
 from xblock.internal import class_lazy
 
 log = logging.getLogger(__name__)
@@ -19,7 +21,6 @@ PLUGIN_CACHE = {}
 
 class PluginMissingError(Exception):
     """Raised when trying to load a plugin from an entry_point that cannot be found."""
-    pass
 
 
 class AmbiguousPluginError(Exception):
@@ -38,15 +39,13 @@ def default_select(identifier, all_entry_points):  # pylint: disable=inconsisten
 
     if len(all_entry_points) == 0:
         raise PluginMissingError(identifier)
-
-    elif len(all_entry_points) == 1:
+    if len(all_entry_points) == 1:
         return all_entry_points[0]
-
     elif len(all_entry_points) > 1:
         raise AmbiguousPluginError(all_entry_points)
 
 
-class Plugin(object):
+class Plugin:
     """Base class for a system that uses entry_points to load plugins.
 
     Implementing classes are expected to have the following attributes:
@@ -106,7 +105,7 @@ class Plugin(object):
                 select = default_select
 
             all_entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
-            for extra_identifier, extra_entry_point in cls.extra_entry_points:
+            for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
                 if identifier == extra_identifier:
                     all_entry_points.append(extra_entry_point)
 
@@ -139,7 +138,7 @@ class Plugin(object):
         """
         all_classes = itertools.chain(
             pkg_resources.iter_entry_points(cls.entry_point),
-            (entry_point for identifier, entry_point in cls.extra_entry_points),
+            (entry_point for identifier, entry_point in iter(cls.extra_entry_points)),
         )
         for class_ in all_classes:
             try:
@@ -161,7 +160,6 @@ class Plugin(object):
                 # Here I can load MyXBlockClass by name.
 
         """
-        from mock import Mock
 
         if identifier is None:
             identifier = class_.__name__.lower()
@@ -180,7 +178,7 @@ class Plugin(object):
                 old = list(cls.extra_entry_points)
                 old_cache = PLUGIN_CACHE
 
-                cls.extra_entry_points.append((identifier, entry_point))
+                cls.extra_entry_points.append((identifier, entry_point))  # pylint: disable=no-member
                 PLUGIN_CACHE = {}
 
                 try:

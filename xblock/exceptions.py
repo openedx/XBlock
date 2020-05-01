@@ -93,24 +93,20 @@ class NoSuchHandlerError(Exception):
     """
     Raised to indicate that the requested handler was not found.
     """
-    pass
 
 
 class NoSuchServiceError(Exception):
     """
     Raised to indicate that a requested service was not found.
     """
-    pass
 
 
 class NoSuchUsage(Exception):
     """Raised by :meth:`.IdReader.get_definition_id` if the usage doesn't exist."""
-    pass
 
 
 class NoSuchDefinition(Exception):
     """Raised by :meth:`.IdReader.get_block_type` if the definition doesn't exist."""
-    pass
 
 
 class JsonHandlerError(Exception):
@@ -141,9 +137,7 @@ class JsonHandlerError(Exception):
 
 class DisallowedFileError(Exception):
     """Raised by :meth:`open_local_resource` if the requested file is not allowed."""
-    pass
 
 
 class FieldDataDeprecationWarning(DeprecationWarning):
     """Warning for use of deprecated _field_data accessor"""
-    pass

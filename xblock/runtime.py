@@ -54,22 +54,18 @@ class KeyValueStore(six.with_metaclass(ABCMeta, object)):
     @abstractmethod
     def get(self, key):
         """Reads the value of the given `key` from storage."""
-        pass
 
     @abstractmethod
     def set(self, key, value):
         """Sets `key` equal to `value` in storage."""
-        pass
 
     @abstractmethod
     def delete(self, key):
         """Deletes `key` from storage."""
-        pass
 
     @abstractmethod
     def has(self, key):
         """Returns whether or not `key` is present in storage."""
-        pass
 
     def default(self, key):
         """
@@ -1126,7 +1122,6 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         """An XPath-like interface to `query`."""
         class BadPath(Exception):
             """Bad path exception thrown when path cannot be found."""
-            pass
         results = self.query(block)
         ROOT, SEP, WORD, FINAL = six.moves.range(4)               # pylint: disable=C0103
         state = ROOT
@@ -1176,7 +1171,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
                 results = results.attr(toktext[1:])
                 state = FINAL
             elif tokname == "word":
-                # xxx (tag selection)
+                # xxx (tag selection)  # pylint: disable=fixme
                 if state != SEP:
                     raise BadPath()
                 results = results.children().tagged(toktext)
@@ -1195,7 +1190,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         raise ValueError('No such family: {}'.format(family_id))
 
 
-class ObjectAggregator(object):
+class ObjectAggregator:
     """
     Provides a single object interface that combines many smaller objects.
 
@@ -1235,7 +1230,7 @@ _CLASS_CACHE = {}
 _CLASS_CACHE_LOCK = threading.RLock()
 
 
-class Mixologist(object):
+class Mixologist:
     """
     Provides a facility to dynamically generate classes with additional mixins.
     """
@@ -1299,7 +1294,7 @@ class Mixologist(object):
             return _CLASS_CACHE[mixin_key]
 
 
-class RegexLexer(object):
+class RegexLexer:
     """Split text into lexical tokens based on regexes."""
     def __init__(self, *toks):
         parts = []
@@ -1314,7 +1309,7 @@ class RegexLexer(object):
             yield (name, match.group(name))
 
 
-class NullI18nService(object):
+class NullI18nService:
     """
     A simple implementation of the runtime "i18n" service.
     """

@@ -31,7 +31,7 @@ XML_NAMESPACES = OrderedDict([
 ])
 
 
-class HandlersMixin(object):
+class HandlersMixin:
     """
     A mixin provides all of the machinery needed for working with XBlock-style handlers.
     """
@@ -89,7 +89,7 @@ class HandlersMixin(object):
         return self.runtime.handle(self, handler_name, request, suffix)
 
 
-class RuntimeServicesMixin(object):
+class RuntimeServicesMixin:
     """
     This mixin provides all of the machinery needed for an XBlock-style object
     to declare dependencies on particular runtime services.
@@ -550,7 +550,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
             node.set(field_name, text_value)
 
 
-class IndexInfoMixin(object):
+class IndexInfoMixin:
     """
     This mixin provides interface for classes that wish to provide index
     information which might be used within a search index
@@ -565,7 +565,7 @@ class IndexInfoMixin(object):
         return {}
 
 
-class ViewsMixin(object):
+class ViewsMixin:
     """
     This mixin provides decorators that can be used on xBlock view methods.
     """

@@ -13,7 +13,7 @@ class TestLazyClassProperty(TestCase):
     """
     Tests of @class_lazy.
     """
-    class Base(object):
+    class Base:
         """Test class that uses @class_lazy."""
         @class_lazy
         def isolated_dict(cls):  # pylint: disable=no-self-argument
@@ -22,7 +22,6 @@ class TestLazyClassProperty(TestCase):
 
     class Derived(Base):
         """Test class that inherits a @class_lazy definition."""
-        pass
 
     def test_isolation(self):
         self.assertEqual({}, self.Base.isolated_dict)
@@ -54,12 +53,10 @@ class NamingTester(six.with_metaclass(NamedAttributesMetaclass, object)):
 
     def meth(self):
         "An empty method."
-        pass
 
     @property
     def prop(self):
         "An empty property."
-        pass
 
 
 class InheritedNamingTester(NamingTester):

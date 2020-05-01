@@ -20,7 +20,6 @@ except ImportError:
         either in a proper Django app, or don't have Django installed
         at all.
         '''
-        pass
 
 try:
     from djpyfs import djpyfs  # pylint: disable=import-error
@@ -66,7 +65,7 @@ def public(type=None, **kwargs):  # pylint: disable=unused-argument, redefined-b
     return wrapper
 
 
-class Service(object):
+class Service:
     """
     Top-level definition for an XBlocks service.
 

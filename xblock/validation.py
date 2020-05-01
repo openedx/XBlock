@@ -7,7 +7,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import six
 
 
-class ValidationMessage(object):
+class ValidationMessage:
     """
     A message containing validation information about an xblock.
     """
@@ -45,7 +45,7 @@ class ValidationMessage(object):
         }
 
 
-class Validation(object):
+class Validation:
     """
     An object containing validation information for an xblock instance.
 

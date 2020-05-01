@@ -506,11 +506,10 @@ def test_field_serialization():
 
 def test_class_tags():
     xblock = XBlock(None, None, None)
-    assert xblock._class_tags == set()
+    assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable
 
     class Sub1Block(XBlock):
         """Toy XBlock"""
-        pass
 
     sub1block = Sub1Block(None, None, None)
     assert sub1block._class_tags == set()
@@ -518,14 +517,12 @@ def test_class_tags():
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
         """Toy XBlock"""
-        pass
 
     sub2block = Sub2Block(None, None, None)
     assert sub2block._class_tags == set(["cat", "dog"])
 
     class Sub3Block(Sub2Block):
         """Toy XBlock"""
-        pass
 
     sub3block = Sub3Block(None, None, None)
     assert sub3block._class_tags == set(["cat", "dog"])
@@ -533,11 +530,9 @@ def test_class_tags():
     @XBlock.tag("mixin")
     class MixinBlock(XBlock):
         """Toy XBlock"""
-        pass
 
     class Sub4Block(MixinBlock, Sub3Block):
         """Toy XBlock"""
-        pass
 
     sub4block = Sub4Block(None, None, None)
     assert sub4block._class_tags == set(["cat", "dog", "mixin"])
@@ -548,15 +543,12 @@ def test_loading_tagged_classes():
     @XBlock.tag("thetag")
     class HasTag1(XBlock):
         """Toy XBlock"""
-        pass
 
     class HasTag2(HasTag1):
         """Toy XBlock"""
-        pass
 
     class HasntTag(XBlock):
         """Toy XBlock"""
-        pass
 
     the_classes = [('hastag1', HasTag1), ('hastag2', HasTag2), ('hasnttag', HasntTag)]
     tagged_classes = [('hastag1', HasTag1), ('hastag2', HasTag2)]
@@ -757,13 +749,12 @@ def test_services_decorators():
     # A default XBlock has requested no services
     xblock = XBlock(None, None, None)
     assert XBlock._services_requested == {}
-    assert xblock._services_requested == {}
+    assert xblock._services_requested == {}  # pylint: disable=comparison-with-callable
 
     @XBlock.needs("n")
     @XBlock.wants("w")
     class ServiceUsingBlock(XBlock):
         """XBlock using some services."""
-        pass
 
     service_using_block = ServiceUsingBlock(None, scope_ids=None)
     assert ServiceUsingBlock._services_requested == {'n': 'need', 'w': 'want'}
@@ -775,13 +766,11 @@ def test_services_decorators_with_inheritance():
     @XBlock.wants("w1")
     class ServiceUsingBlock(XBlock):
         """XBlock using some services."""
-        pass
 
     @XBlock.needs("n2")
     @XBlock.wants("w2")
     class SubServiceUsingBlock(ServiceUsingBlock):
         """Does this class properly inherit services from ServiceUsingBlock?"""
-        pass
 
     sub_service_using_block = SubServiceUsingBlock(None, scope_ids=None)
     assert sub_service_using_block.service_declaration("n1") == "need"
@@ -796,7 +785,6 @@ def test_cached_parent():
         """
         Dummy empty class
         """
-        pass
 
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
     runtime.get_block = Mock()
@@ -930,7 +918,6 @@ class OpenLocalResourceTest(unittest.TestCase):
 
     class LoadableXBlock(XBlock):
         """Just something to load resources from."""
-        pass
 
     class UnloadableXBlock(XBlock):
         """Just something to load resources from."""
@@ -1031,7 +1018,6 @@ class TestXBlockDeprecation(WarningTestMixin, unittest.TestCase):
 
     class TestBlock(XBlock):
         """An empty XBlock for testing"""
-        pass
 
     def test_field_data_paramater(self):
         field_data = Mock(spec=FieldData)
@@ -1056,7 +1042,6 @@ class TestIndexResults(unittest.TestCase):
         """
         Class to test default Xblock provides a dictionary
         """
-        pass
 
     class TestIndexedXBlock(XBlock):
         """

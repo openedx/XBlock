@@ -22,7 +22,7 @@ help: ## display this help message
 quality: ## check coding style with pycodestyle and pylint
 	pycodestyle
 	script/max_pylint_violations
-	pylint --py3k xblock
+	pylint xblock
 
 test: ## run tests on every supported Python/Django combination
 	tox

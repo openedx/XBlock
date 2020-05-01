@@ -36,13 +36,11 @@ class Abstract(six.with_metaclass(ABCMeta, object)):
 @unabc                      # pylint: disable=abstract-method
 class ForceConcrete(Abstract):
     """Ha-ha! Can't make me implement what I don't want to!"""
-    pass
 
 
 @unabc("Sorry, no {}")      # pylint: disable=abstract-method
 class ForceConcreteMessage(Abstract):
     """I'll implement what I want to implement."""
-    pass
 
 
 class TestUnAbc(unittest.TestCase):

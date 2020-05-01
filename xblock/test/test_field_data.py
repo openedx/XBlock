@@ -28,7 +28,7 @@ class TestingBlock(XBlock):
     user_state = String(scope=Scope.user_state)
 
 
-class TestSplitFieldData(object):
+class TestSplitFieldData:
     """
     Tests of :ref:`SplitFieldData`.
     """
@@ -85,7 +85,7 @@ class TestSplitFieldData(object):
         assert not self.settings.default.called
 
 
-class TestReadOnlyFieldData(object):
+class TestReadOnlyFieldData:
     """
     Tests of :ref:`ReadOnlyFieldData`.
     """

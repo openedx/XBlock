@@ -19,7 +19,6 @@ persistent=yes
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins=caniusepython3.pylint_checker
 
 
 [MESSAGES CONTROL]
@@ -62,6 +61,7 @@ disable=
     too-many-locals,
     duplicate-code,
     len-as-condition,
+    fixme,
 
 
 [REPORTS]

@@ -50,7 +50,6 @@ class XBlockMixin(ScopedStorageMixin):
     created by a particular runtime.
 
     """
-    pass
 
 
 class SharedBlockBase(Plugin):
