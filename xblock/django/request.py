@@ -2,7 +2,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from collections import MutableMapping
+from collections import MutableMapping  # pylint: disable=no-name-in-module
 from itertools import chain, repeat
 from lazy import lazy
 
@@ -24,7 +24,7 @@ def webob_to_django_response(webob_response):
     return django_response
 
 
-class HeaderDict(MutableMapping, six.Iterator):
+class HeaderDict(MutableMapping, six.Iterator):  # pylint: disable=useless-object-inheritance
     """
     Provide a dictionary view of the HTTP headers in a
     Django request.META dictionary that translates the

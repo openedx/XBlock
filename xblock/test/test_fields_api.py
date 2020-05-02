@@ -554,7 +554,7 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
                 TestImmutableWithUniqueIdDefault, TestImmutableWithInitialValueAndUniqueIdDefault
         ):
 
-            test_name = base_test_case.__name__ + "With" + operation_backend.__name__
+            test_name = base_test_case.__name__ + "With" + operation_backend.__name__  # pylint: disable=invalid-name
             test_classes = (operation_backend, base_test_case)
             if noop_prefix is not None:
                 test_name += "And" + noop_prefix.__name__

@@ -2,6 +2,13 @@
 Change history for XBlock
 =========================
 
+
+* Drop support to python 2.7 and add support to python 3.8.
+  typing package failing on py3.8 so add constraint.
+
+1.3.0 - 2020-05-04
+------------------
+
 These are notable changes in XBlock.
 
 1.2.8 - 2019-10-24
