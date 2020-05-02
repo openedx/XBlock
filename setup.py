@@ -36,6 +36,7 @@ setup(
         'six',
         'webob',
         'web-fragments',
+        'typing; python_version=="3.5"'
     ],
     extras_require={
         'django': ['django-pyfs >= 1.0.5', 'lazy']
@@ -53,5 +54,6 @@ setup(
         'Natural Language :: English',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.8",
     ]
 )

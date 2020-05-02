@@ -126,7 +126,7 @@ class TestRuntime(Runtime):
         kwargs.setdefault('id_generator', memory_id_manager)
         super(TestRuntime, self).__init__(*args, **kwargs)
 
-    def handler_url(self, *args, **kwargs):
+    def handler_url(self, *args, **kwargs):  # pylint: disable=signature-differs
         raise NotImplementedError
 
     def local_resource_url(self, *args, **kwargs):

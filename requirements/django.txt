@@ -5,8 +5,8 @@
 #    make upgrade
 #
 appdirs==1.4.3            # via -r requirements/base.txt, fs
-boto3==1.12.46            # via fs-s3fs
-botocore==1.15.46         # via boto3, s3transfer
+boto3==1.13.1             # via fs-s3fs
+botocore==1.16.1          # via boto3, s3transfer
 django-pyfs==2.1          # via -r requirements/django.in
 django==2.2.12            # via -r requirements/django.in, django-pyfs
 docutils==0.15.2          # via botocore
@@ -17,7 +17,7 @@ lazy==1.4                 # via -r requirements/django.in
 lxml==4.5.0               # via -r requirements/base.txt
 markupsafe==1.1.1         # via -r requirements/base.txt
 python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/base.txt, botocore
-pytz==2019.3              # via -r requirements/base.txt, django, fs
+pytz==2020.1              # via -r requirements/base.txt, django, fs
 pyyaml==5.3.1             # via -r requirements/base.txt
 s3transfer==0.3.3         # via boto3
 simplejson==3.17.0        # via -r requirements/base.txt

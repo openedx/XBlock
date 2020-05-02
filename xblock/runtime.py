@@ -92,7 +92,7 @@ class DictKeyValueStore(KeyValueStore):
     """
     A `KeyValueStore` that stores everything into a Python dictionary.
     """
-    def __init__(self, storage=None):
+    def __init__(self, storage=None):  # pylint: disable=super-init-not-called
         self.db_dict = storage if storage is not None else {}
 
     def get(self, key):
@@ -365,7 +365,7 @@ class MemoryIdManager(IdReader, IdGenerator):
     ASIDE_USAGE_ID = namedtuple('MemoryAsideUsageId', 'usage_id aside_type')
     ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')
 
-    def __init__(self):
+    def __init__(self):  # pylint: disable=super-init-not-called
         self._ids = itertools.count()
         self._usages = {}
         self._definitions = {}
@@ -608,7 +608,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         """
         return XBlockAside.load_class(aside_type, select=self.select)
 
-    # pylint: disable = pylint: disable=keyword-arg-before-vararg
+    # pylint: disable=keyword-arg-before-vararg, bad-option-value
     def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
         r"""
         Construct a new xblock of the type identified by block_type,
