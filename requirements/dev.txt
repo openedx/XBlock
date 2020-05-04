@@ -67,7 +67,7 @@ toml==0.10.0              # via -r requirements/test.txt, -r requirements/travis
 tox-battery==0.5.2        # via -r requirements/travis.txt
 tox==3.15.0               # via -r requirements/test.txt, -r requirements/travis.txt, tox-battery
 typed-ast==1.4.1          # via -r requirements/test.txt, astroid
-typing==3.7.4.1           # via -r requirements/test.txt, fs
+typing==3.7.4.1 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/test.txt, fs
 urllib3==1.25.9           # via -r requirements/test.txt, -r requirements/travis.txt, botocore, requests
 virtualenv==20.0.20       # via -r requirements/test.txt, -r requirements/travis.txt, tox
 wcwidth==0.1.9            # via -r requirements/test.txt, pytest

@@ -14,3 +14,6 @@
 # Adding this constraint till botocore can figure out a fix around this, keep a look at
 # https://github.com/boto/botocore/issues/1872
 python-dateutil<2.8.1
+
+
+typing; python_version == "3.5"

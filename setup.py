@@ -36,10 +36,10 @@ setup(
         'six',
         'webob',
         'web-fragments',
-        'typing; python_version=="3.5"'
     ],
     extras_require={
-        'django': ['django-pyfs >= 1.0.5', 'lazy']
+        'django': ['django-pyfs >= 1.0.5', 'lazy'],
+        ":python_version < '3.6'": ["typing~=3.6"],
     },
     author='edX',
     author_email='oscm@edx.org',

@@ -44,7 +44,7 @@ sphinxcontrib-jsmath==1.0.1  # via sphinx
 sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.3.1           # via -r requirements/django.txt, django
-typing==3.7.4.1           # via -r requirements/django.txt, fs
+typing==3.7.4.1 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
 urllib3==1.25.9           # via -r requirements/django.txt, botocore, requests
 web-fragments==0.3.1      # via -r requirements/django.txt
 webob==1.8.6              # via -r requirements/django.txt
