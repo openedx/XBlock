@@ -34,12 +34,12 @@ class Abstract(six.with_metaclass(ABCMeta, object)):
 
 
 @unabc                      # pylint: disable=abstract-method
-class ForceConcrete(Abstract):
+class ForceConcrete(Abstract):  # pylint: disable=W0223
     """Ha-ha! Can't make me implement what I don't want to!"""
 
 
 @unabc("Sorry, no {}")      # pylint: disable=abstract-method
-class ForceConcreteMessage(Abstract):
+class ForceConcreteMessage(Abstract):  # pylint: disable=W0223
     """I'll implement what I want to implement."""
 
 

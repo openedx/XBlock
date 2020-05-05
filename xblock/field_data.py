@@ -111,7 +111,7 @@ class DictFieldData(FieldData):
     """
     A FieldData that uses a single supplied dictionary to store fields by name.
     """
-    def __init__(self, data):
+    def __init__(self, data):  # pylint: disable=super-init-not-called
         self._data = data
 
     def get(self, block, name):
@@ -130,13 +130,13 @@ class DictFieldData(FieldData):
         self._data.update(copy.deepcopy(update_dict))
 
 
-class SplitFieldData(FieldData):
+class SplitFieldData(FieldData):  # pylint: disable=super-init-not-called
     """
     A FieldData that uses divides particular scopes between
     several backing FieldData objects.
     """
 
-    def __init__(self, scope_mappings):
+    def __init__(self, scope_mappings):  # pylint: disable=super-init-not-called
         """
         `scope_mappings` defines :class:`~xblock.field_data.FieldData` objects to use
         for each scope. If a scope is not a key in `scope_mappings`, then using
@@ -190,7 +190,7 @@ class ReadOnlyFieldData(FieldData):
     A FieldData that wraps another FieldData an makes all calls to set and delete
     raise :class:`~xblock.exceptions.InvalidScopeError`s.
     """
-    def __init__(self, source):
+    def __init__(self, source):  # pylint: disable=super-init-not-called
         self._source = source
 
     def get(self, block, name):
