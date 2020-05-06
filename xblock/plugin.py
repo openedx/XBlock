@@ -10,7 +10,6 @@ import functools
 import itertools
 import logging
 import pkg_resources
-from mock import Mock
 
 from xblock.internal import class_lazy
 
@@ -160,6 +159,7 @@ class Plugin:
                 # Here I can load MyXBlockClass by name.
 
         """
+        from mock import Mock  # pylint: disable=import-outside-toplevel
 
         if identifier is None:
             identifier = class_.__name__.lower()
