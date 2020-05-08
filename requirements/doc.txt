@@ -7,8 +7,8 @@
 alabaster==0.7.12         # via sphinx
 appdirs==1.4.3            # via -r requirements/django.txt, fs
 babel==2.8.0              # via sphinx
-boto3==1.13.1             # via -r requirements/django.txt, fs-s3fs
-botocore==1.16.1          # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.13.5             # via -r requirements/django.txt, fs-s3fs
+botocore==1.16.5          # via -r requirements/django.txt, boto3, s3transfer
 certifi==2020.4.5.1       # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.1          # via -r requirements/django.txt
@@ -46,7 +46,7 @@ sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.3.1           # via -r requirements/django.txt, django
 typing==3.7.4.1 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
 urllib3==1.25.9           # via -r requirements/django.txt, botocore, requests
-web-fragments==0.3.1      # via -r requirements/django.txt
+web-fragments==0.3.2      # via -r requirements/django.txt
 webob==1.8.6              # via -r requirements/django.txt
 
 # The following packages are considered to be unsafe in a requirements file:
