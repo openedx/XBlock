@@ -5,8 +5,8 @@
 #    make upgrade
 #
 appdirs==1.4.3            # via -r requirements/base.txt, fs
-boto3==1.13.1             # via fs-s3fs
-botocore==1.16.1          # via boto3, s3transfer
+boto3==1.13.5             # via fs-s3fs
+botocore==1.16.5          # via boto3, s3transfer
 django-pyfs==2.1          # via -r requirements/django.in
 django==2.2.12            # via -r requirements/django.in, django-pyfs
 docutils==0.15.2          # via botocore
@@ -25,7 +25,7 @@ six==1.14.0               # via -r requirements/base.txt, django-pyfs, fs, fs-s3
 sqlparse==0.3.1           # via django
 typing==3.7.4.1 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/base.txt, fs
 urllib3==1.25.9           # via botocore
-web-fragments==0.3.1      # via -r requirements/base.txt
+web-fragments==0.3.2      # via -r requirements/base.txt
 webob==1.8.6              # via -r requirements/base.txt
 
 # The following packages are considered to be unsafe in a requirements file:
