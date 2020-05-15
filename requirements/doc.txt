@@ -5,10 +5,10 @@
 #    make upgrade
 #
 alabaster==0.7.12         # via sphinx
-appdirs==1.4.3            # via -r requirements/django.txt, fs
+appdirs==1.4.4            # via -r requirements/django.txt, fs
 babel==2.8.0              # via sphinx
-boto3==1.13.5             # via -r requirements/django.txt, fs-s3fs
-botocore==1.16.5          # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.13.10            # via -r requirements/django.txt, fs-s3fs
+botocore==1.16.10         # via -r requirements/django.txt, boto3, s3transfer
 certifi==2020.4.5.1       # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.1          # via -r requirements/django.txt
@@ -20,7 +20,7 @@ fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs
 idna==2.9                 # via requests
 imagesize==1.2.0          # via sphinx
 jinja2==2.11.2            # via sphinx
-jmespath==0.9.5           # via -r requirements/django.txt, boto3, botocore
+jmespath==0.10.0          # via -r requirements/django.txt, boto3, botocore
 lazy==1.4                 # via -r requirements/django.txt
 lxml==4.5.0               # via -r requirements/django.txt
 markupsafe==1.1.1         # via -r requirements/django.txt, jinja2
