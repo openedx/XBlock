@@ -10,6 +10,17 @@ env:
   - TOX_ENV=django22
   - TOX_ENV=docs
   - TOX_ENV=quality
+  - TOX_ENV=django30
+
+matrix:
+  exclude:
+  - python: 3.5
+    env: TOX_ENV=django30
+
+  allow_failures:
+  - python: 3.8
+    env: TOX_ENV=django30
+
 script:
   - tox -e $TOX_ENV
 after_success:
