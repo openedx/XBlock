@@ -24,7 +24,7 @@ quality: ## check coding style with pycodestyle and pylint
 	script/max_pylint_violations
 	pylint xblock
 
-test: ## run tests on every supported Python/Django combination
+test: ### run tests on every supported Python/Django combination
 	tox
 
 docs: ## generate Sphinx HTML documentation, including API docs
