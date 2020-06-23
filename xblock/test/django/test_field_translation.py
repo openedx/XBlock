@@ -32,7 +32,8 @@ class TestXBlockStringFieldDefaultTranslation(TestCase):
 
             class XBlockTest(XBlock):
                 """
-                Set up a class that contains a single string field with a translated default.
+                Set up a class that contains a single string field with a translated
+                default.
                 """
                 STR_DEFAULT_ENG = 'ENG: String to be translated'
                 str_field = String(scope=Scope.settings, default=_('ENG: String to be translated'))
