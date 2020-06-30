@@ -1,9 +1,6 @@
 """
 Test xblock/core/plugin.py
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from mock import patch, Mock
 import pytest
 

@@ -6,9 +6,6 @@ The README file in this directory contains much more information.
 
 Much of this still needs to be organized.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 try:
     from django.core.exceptions import ImproperlyConfigured
 except ImportError:

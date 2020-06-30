@@ -3,9 +3,6 @@ Tests of our testing tools.
 
 "The only code you have to test is the code you want to work."
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from abc import ABCMeta, abstractmethod
 import unittest
 

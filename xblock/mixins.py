@@ -2,10 +2,6 @@
 This module defines all of the Mixins that provide components of XBlock-family
 functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-
 from collections import OrderedDict
 import copy
 import functools
@@ -464,7 +460,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
                 block.runtime.add_node_as_child(block, child, id_generator)
 
         # Attributes become fields.
-        for name, value in node.items():  # lxml has no iteritems
+        for name, value in list(node.items()):  # lxml has no iteritems
             cls._set_field_if_present(block, name, value, {})
 
         # Text content becomes "content", if such a field exists.
@@ -487,7 +483,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
         node.set('xblock-family', self.entry_point)
 
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.items():
+        for field_name, field in list(self.fields.items()):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self) or field.force_export:

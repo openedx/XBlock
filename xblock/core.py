@@ -5,9 +5,6 @@ This code is in the Runtime layer, because it is authored once by edX
 and used by all runtimes.
 
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import defaultdict
 import inspect
 import os

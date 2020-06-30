@@ -23,9 +23,6 @@ covered, we define sets of test properties (which actually implement the
 tests of the various operations), and test setup (which set up the
 particular combination of initial conditions that we want to test)
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 
 from mock import Mock, patch

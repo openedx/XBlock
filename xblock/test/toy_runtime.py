@@ -1,13 +1,6 @@
 """A very basic toy runtime for XBlock tests."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import logging
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
+import json
 
 import six
 
