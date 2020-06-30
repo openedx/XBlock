@@ -1,7 +1,4 @@
 """Django settings for toy runtime project."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 from path import Path as path
 from six import text_type
