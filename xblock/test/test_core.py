@@ -1059,7 +1059,7 @@ class TestIndexResults(unittest.TestCase):
         test_xblock = self.TestXBlock(test_runtime, scope_ids=Mock(spec=ScopeIds))
 
         index_info = test_xblock.index_dictionary()
-        self.assertFalse(index_info)
+        self.assertEqual(index_info, {"content_type": "Component", "content": {"display_name": None}})
         self.assertTrue(isinstance(index_info, dict))
 
     def test_override_index_view(self):
