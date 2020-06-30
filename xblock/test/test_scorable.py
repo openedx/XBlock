@@ -3,9 +3,6 @@ Test Scorable block.
 """
 
 # pylint: disable=protected-access
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from unittest import TestCase
 
 import ddt

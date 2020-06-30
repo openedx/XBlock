@@ -60,7 +60,7 @@ master_doc = 'index'
 
 # General information about the project.
 author = edx_theme.AUTHOR
-project = u'XBlock API Guide'
+project = 'XBlock API Guide'
 copyright = '{year}, edX Inc.'.format(year=datetime.datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for

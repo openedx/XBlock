@@ -1,9 +1,6 @@
 """
 Tests of the utility FieldData's defined by xblock
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from mock import Mock
 import pytest
 

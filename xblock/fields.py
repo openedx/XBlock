@@ -5,9 +5,6 @@ The hosting runtime application decides what actual storage mechanism to use
 for each scope.
 
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import namedtuple
 import copy
 import datetime
@@ -861,7 +858,7 @@ class String(JSONField):
 
     """
     MUTABLE = False
-    BAD_REGEX = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]', flags=re.UNICODE)
+    BAD_REGEX = re.compile('[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]', flags=re.UNICODE)
 
     def _sanitize(self, value):
         """
@@ -873,7 +870,7 @@ class String(JSONField):
             value = value.decode('utf-8')
         if isinstance(value, six.text_type):
             if re.search(self.BAD_REGEX, value):
-                new_value = re.sub(self.BAD_REGEX, u"", value)
+                new_value = re.sub(self.BAD_REGEX, "", value)
                 # The new string will be equivalent to the original string if no control characters are present.
                 # If equivalent, return the original string - some tests
                 # check for object equality instead of string equality.
