@@ -1,14 +1,9 @@
 """
 Module for all xblock exception classes
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
+import json
 
 from webob import Response
-try:
-    import simplejson as json   # pylint: disable=F0401
-except ImportError:
-    import json
 
 
 class XBlockNotFoundError(Exception):

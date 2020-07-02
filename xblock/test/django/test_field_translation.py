@@ -2,9 +2,6 @@
 Test the case when a lazily-translated string is given as a default for
 an XBlock String field.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import warnings
 
 from django.test import TestCase

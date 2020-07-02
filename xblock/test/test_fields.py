@@ -1,11 +1,7 @@
 """
 Tests for classes extending Field.
 """
-
 # pylint: disable=abstract-class-instantiated, protected-access
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from contextlib import contextmanager
 import datetime as dt
 import itertools

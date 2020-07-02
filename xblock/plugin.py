@@ -3,9 +3,6 @@ Generic plugin support so we can find XBlocks.
 
 This code is in the Runtime layer.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import functools
 import itertools
 import logging

@@ -1,9 +1,6 @@
 """
 This file supports the XBlock service that returns data about users.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from xblock.reference.plugins import Service
 
 
