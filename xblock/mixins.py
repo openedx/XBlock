@@ -582,6 +582,7 @@ class IndexInfoMixin:
 
         return _index_dictionary
 
+
 class ViewsMixin:
     """
     This mixin provides decorators that can be used on xBlock view methods.
