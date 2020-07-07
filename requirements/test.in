@@ -10,7 +10,6 @@ ddt
 diff-cover >= 0.2.1
 hypothesis
 mock
-nose
 path.py
 pycodestyle
 pylint
