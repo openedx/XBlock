@@ -1,9 +1,6 @@
 """
 Internal machinery used to make building XBlock family base classes easier.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import functools
 import inspect
 

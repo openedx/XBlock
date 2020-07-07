@@ -3,9 +3,6 @@
 Tests the fundamentals of XBlocks including - but not limited to -
 metaclassing, field access, caching, serialization, and bulk saves.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # Allow accessing protected members for testing purposes
 # pylint: disable=protected-access
 from datetime import datetime
