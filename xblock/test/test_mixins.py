@@ -155,7 +155,7 @@ class TestIndexInfoMixin(AttrAssertionMixin):
     def test_index_info(self):
         self.assertHasAttr(self.IndexInfoMixinTester, 'index_dictionary')
         with_index_info = self.IndexInfoMixinTester().index_dictionary()
-        self.assertEqual(with_index_info, {"content_type": "Component", "content": {"display_name": None}})
+        self.assertFalse(with_index_info)
         self.assertTrue(isinstance(with_index_info, dict))
 
 

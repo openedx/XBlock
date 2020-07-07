@@ -567,16 +567,24 @@ class IndexInfoMixin:
         # a str after the class instance is created. So, we can only access the default value
         # of display_name field by accessing class variable of same name
         content_type = getattr(
-            getattr(self.__class__, "display_name", None), "default", "Component"
+            getattr(self.__class__, "display_name", None), "default", None
         )
 
-        return {
-            "content_type": content_type,  # e.g ORA, Video, HTML etc.
-            "content": {
-                "display_name": display_name
-            }
-        }
+        _index_dictionary = dict()
 
+        if display_name is not None:
+            _index_dictionary.update({
+                "content": {
+                    "display_name": display_name
+                }
+            })
+
+        if content_type is not None:
+            _index_dictionary.update({
+                "content_type": content_type
+            })
+
+        return _index_dictionary
 
 class ViewsMixin:
     """
