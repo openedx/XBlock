@@ -7,11 +7,11 @@
 alabaster==0.7.12         # via sphinx
 appdirs==1.4.4            # via -r requirements/django.txt, fs
 babel==2.8.0              # via sphinx
-boto3==1.14.16            # via -r requirements/django.txt, fs-s3fs
-botocore==1.17.16         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.14.18            # via -r requirements/django.txt, fs-s3fs
+botocore==1.17.18         # via -r requirements/django.txt, boto3, s3transfer
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
-django-pyfs==2.1          # via -r requirements/django.txt
+django-pyfs==2.2          # via -r requirements/django.txt
 django==2.2.14            # via -r requirements/django.txt, django-pyfs
 docutils==0.15.2          # via -r requirements/django.txt, botocore, sphinx
 edx-sphinx-theme==1.5.0   # via -r requirements/doc.in
@@ -34,9 +34,9 @@ pyyaml==5.3.1             # via -r requirements/django.txt
 requests==2.24.0          # via sphinx
 s3transfer==0.3.3         # via -r requirements/django.txt, boto3
 simplejson==3.17.0        # via -r requirements/django.txt
-six==1.15.0               # via -r requirements/django.txt, django-pyfs, edx-sphinx-theme, fs, fs-s3fs, mock, packaging, python-dateutil
+six==1.15.0               # via -r requirements/django.txt, edx-sphinx-theme, fs, fs-s3fs, mock, packaging, python-dateutil
 snowballstemmer==2.0.0    # via sphinx
-sphinx==3.1.1             # via -r requirements/doc.in, edx-sphinx-theme
+sphinx==3.1.2             # via -r requirements/doc.in, edx-sphinx-theme
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
