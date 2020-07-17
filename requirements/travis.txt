@@ -7,7 +7,7 @@
 appdirs==1.4.4            # via virtualenv
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
-codecov==2.1.7            # via -r requirements/travis.in
+codecov==2.1.8            # via -r requirements/travis.in
 coverage==5.2             # via codecov
 distlib==0.3.1            # via virtualenv
 filelock==3.0.12          # via tox, virtualenv
@@ -22,7 +22,7 @@ requests==2.24.0          # via codecov
 six==1.15.0               # via packaging, tox, virtualenv
 toml==0.10.1              # via tox
 tox-battery==0.6.1        # via -r requirements/travis.in
-tox==3.16.1               # via -r requirements/travis.in, tox-battery
+tox==3.17.1               # via -r requirements/travis.in, tox-battery
 urllib3==1.25.9           # via requests
-virtualenv==20.0.26       # via tox
+virtualenv==20.0.27       # via tox
 zipp==1.2.0               # via importlib-metadata, importlib-resources
