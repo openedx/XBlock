@@ -556,9 +556,31 @@ class IndexInfoMixin:
         """
         return key/value fields to feed an index within in a Python dict object
         values may be numeric / string or dict
-        default implementation is an empty dict
         """
-        return {}
+        display_name = getattr(self, "display_name", None)
+
+        # Getting self.display_name.default wouldn't work as self.display_name is actually
+        # a str after the class instance is created. So, we can only access the default value
+        # of display_name field by accessing class variable of same name
+        content_type = getattr(
+            getattr(self.__class__, "display_name", None), "default", None
+        )
+
+        _index_dictionary = dict()
+
+        if display_name is not None:
+            _index_dictionary.update({
+                "content": {
+                    "display_name": display_name
+                }
+            })
+
+        if content_type is not None:
+            _index_dictionary.update({
+                "content_type": content_type
+            })
+
+        return _index_dictionary
 
 
 class ViewsMixin:
