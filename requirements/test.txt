@@ -7,8 +7,8 @@
 appdirs==1.4.4            # via -r requirements/django.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.in, pylint
 attrs==19.3.0             # via hypothesis, pytest
-boto3==1.14.32            # via -r requirements/django.txt, fs-s3fs
-botocore==1.17.32         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.14.37            # via -r requirements/django.txt, fs-s3fs
+botocore==1.17.37         # via -r requirements/django.txt, boto3, s3transfer
 coverage==5.2.1           # via -r requirements/test.in, pytest-cov
 ddt==1.4.1                # via -r requirements/test.in
 diff-cover==3.0.1         # via -r requirements/test.in
@@ -18,11 +18,11 @@ docutils==0.15.2          # via -r requirements/django.txt, botocore
 filelock==3.0.12          # via tox, virtualenv
 fs-s3fs==1.1.1            # via -r requirements/django.txt, django-pyfs
 fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs
-hypothesis==5.23.7        # via -r requirements/test.in
+hypothesis==5.23.11       # via -r requirements/test.in
 importlib-metadata==1.7.0  # via inflect, path, pluggy, pytest, tox, virtualenv
 importlib-resources==3.0.0  # via virtualenv
 inflect==3.0.2            # via jinja2-pluralize
-iniconfig==1.0.0          # via pytest
+iniconfig==1.0.1          # via pytest
 isort==4.3.21             # via pylint
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.11.2            # via diff-cover, jinja2-pluralize
@@ -56,11 +56,11 @@ six==1.15.0               # via -r requirements/django.txt, astroid, diff-cover,
 sortedcontainers==2.2.2   # via hypothesis
 sqlparse==0.3.1           # via -r requirements/django.txt, django
 toml==0.10.1              # via pylint, pytest, tox
-tox==3.18.1               # via -r requirements/test.in
+tox==3.19.0               # via -r requirements/test.in
 typed-ast==1.4.1          # via astroid
 typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
 urllib3==1.25.10          # via -r requirements/django.txt, botocore
-virtualenv==20.0.28       # via tox
+virtualenv==20.0.30       # via tox
 web-fragments==0.3.2      # via -r requirements/django.txt
 webob==1.8.6              # via -r requirements/django.txt
 wrapt==1.12.1             # via astroid
