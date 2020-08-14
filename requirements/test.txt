@@ -7,8 +7,8 @@
 appdirs==1.4.4            # via -r requirements/django.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.in, pylint
 attrs==19.3.0             # via hypothesis, pytest
-boto3==1.14.38            # via -r requirements/django.txt, fs-s3fs
-botocore==1.17.38         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.14.42            # via -r requirements/django.txt, fs-s3fs
+botocore==1.17.42         # via -r requirements/django.txt, boto3, s3transfer
 coverage==5.2.1           # via -r requirements/test.in, pytest-cov
 ddt==1.4.1                # via -r requirements/test.in
 diff-cover==3.0.1         # via -r requirements/test.in
@@ -18,7 +18,7 @@ docutils==0.15.2          # via -r requirements/django.txt, botocore
 filelock==3.0.12          # via tox, virtualenv
 fs-s3fs==1.1.1            # via -r requirements/django.txt, django-pyfs
 fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs
-hypothesis==5.23.12       # via -r requirements/test.in
+hypothesis==5.24.3        # via -r requirements/test.in
 importlib-metadata==1.7.0  # via inflect, path, pluggy, pytest, tox, virtualenv
 importlib-resources==3.0.0  # via virtualenv
 inflect==3.0.2            # via jinja2-pluralize
