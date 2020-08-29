@@ -32,7 +32,6 @@ from xblock.exceptions import (
     FieldDataDeprecationWarning,
 )
 
-
 log = logging.getLogger(__name__)
 
 
@@ -45,6 +44,7 @@ class KeyValueStore(six.with_metaclass(ABCMeta, object)):
         Stores can use this information however they like to store and retrieve
         data.
         """
+
         def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1'):
             return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family)
 
@@ -89,6 +89,7 @@ class DictKeyValueStore(KeyValueStore):
     """
     A `KeyValueStore` that stores everything into a Python dictionary.
     """
+
     def __init__(self, storage=None):  # pylint: disable=super-init-not-called
         self.db_dict = storage if storage is not None else {}
 
@@ -115,7 +116,7 @@ class KvsFieldData(FieldData):
     """
 
     def __init__(self, kvs, **kwargs):
-        super(KvsFieldData, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._kvs = kvs
 
     def __repr__(self):
@@ -236,7 +237,7 @@ class KvsFieldData(FieldData):
 
 
 # The old name for KvsFieldData, to ease transition.
-DbModel = KvsFieldData                                  # pylint: disable=C0103
+DbModel = KvsFieldData  # pylint: disable=C0103
 
 
 class IdReader(six.with_metaclass(ABCMeta, object)):
@@ -402,7 +403,7 @@ class MemoryIdManager(IdReader, IdGenerator):
         try:
             return self._usages[usage_id]
         except KeyError:
-            raise NoSuchUsage(repr(usage_id))
+            raise NoSuchUsage(repr(usage_id))  # pylint: disable= raise-missing-from
 
     def create_definition(self, block_type, slug=None):
         """Make a definition, storing its block type."""
@@ -421,7 +422,7 @@ class MemoryIdManager(IdReader, IdGenerator):
             try:
                 return def_id.aside_type
             except AttributeError:
-                raise NoSuchDefinition(repr(def_id))
+                raise NoSuchDefinition(repr(def_id))  # pylint: disable= raise-missing-from
 
     def get_aside_type_from_definition(self, aside_id):
         """Get an aside's type from its definition id."""
@@ -641,7 +642,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         try:
             block_type = self.id_reader.get_block_type(def_id)
         except NoSuchDefinition:
-            raise NoSuchUsage(repr(usage_id))
+            raise NoSuchUsage(repr(usage_id))  # pylint: disable= raise-missing-from
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
         block = self.construct_xblock(block_type, keys, for_parent=for_parent)
         return block
@@ -1117,10 +1118,12 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
 
     def querypath(self, block, path):
         """An XPath-like interface to `query`."""
+
         class BadPath(Exception):
             """Bad path exception thrown when path cannot be found."""
+
         results = self.query(block)
-        ROOT, SEP, WORD, FINAL = six.moves.range(4)               # pylint: disable=C0103
+        ROOT, SEP, WORD, FINAL = six.moves.range(4)  # pylint: disable=C0103
         state = ROOT
         lexer = RegexLexer(
             ("dotdot", r"\.\."),
@@ -1231,6 +1234,7 @@ class Mixologist:
     """
     Provides a facility to dynamically generate classes with additional mixins.
     """
+
     def __init__(self, mixins):
         """
         :param mixins: Classes to mixin or names of classes to mixin.
@@ -1246,7 +1250,7 @@ class Mixologist:
                     mixin_class = getattr(imported_module, cls)
                 except Exception as e:
                     msg = "Couldn't import class {!r}: {}: {}".format(mixin, e.__class__.__name__, e)
-                    raise ImportError(msg)
+                    raise ImportError(msg)  # pylint: disable= raise-missing-from
 
                 mixin_classes.append(mixin_class)
             else:
@@ -1284,7 +1288,7 @@ class Mixologist:
                 # overwrite it
                 return _CLASS_CACHE.setdefault(mixin_key, type(
                     base_class.__name__ + str('WithMixins'),  # type() requires native str
-                    (base_class, ) + mixins,
+                    (base_class,) + mixins,
                     {'unmixed_class': base_class}
                 ))
         else:
@@ -1293,6 +1297,7 @@ class Mixologist:
 
 class RegexLexer:
     """Split text into lexical tokens based on regexes."""
+
     def __init__(self, *toks):
         parts = []
         for name, regex in toks:
@@ -1310,6 +1315,7 @@ class NullI18nService:
     """
     A simple implementation of the runtime "i18n" service.
     """
+
     def __init__(self):
         self._translations = gettext.NullTranslations()
 
@@ -1323,7 +1329,7 @@ class NullI18nService:
         "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
     }
 
-    def strftime(self, dtime, format):      # pylint: disable=redefined-builtin
+    def strftime(self, dtime, format):  # pylint: disable=redefined-builtin
         """
         Locale-aware strftime, with format short-cuts.
         """

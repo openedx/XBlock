@@ -114,7 +114,7 @@ class XmlTestMixin:
 class XmlTest(XmlTestMixin, unittest.TestCase):
     """Helpful things for XML tests."""
     def setUp(self):
-        super(XmlTest, self).setUp()
+        super().setUp()
         self.runtime = ToyRuntime()
 
 

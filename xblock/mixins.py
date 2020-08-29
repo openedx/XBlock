@@ -117,7 +117,7 @@ class RuntimeServicesMixin:
                 It is available in XBlock code as ``self.runtime``.
         """
         self.runtime = runtime
-        super(RuntimeServicesMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @classmethod
     def needs(cls, *service_names):
@@ -217,7 +217,7 @@ class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeSer
         self._dirty_fields = {}
         self.scope_ids = scope_ids
 
-        super(ScopedStorageMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def _field_data(self):
@@ -273,7 +273,7 @@ class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeSer
                 # if the field was dirty, delete from dirty fields
                 self._reset_dirty_field(field)
             msg = 'Error saving fields {}'.format(save_error.saved_field_names)
-            raise XBlockSaveError(saved_fields, fields, msg)
+            raise XBlockSaveError(saved_fields, fields, msg)  # pylint: disable= raise-missing-from
 
         # Remove all dirty fields, since the save was successful
         for field in fields:
@@ -343,7 +343,7 @@ class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
         else:
             attrs['has_children'] = False
 
-        return super(ChildrenModelMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        return super().__new__(mcs, name, bases, attrs)
 
 
 class HierarchyMixin(six.with_metaclass(ChildrenModelMetaclass, ScopedStorageMixin)):
@@ -365,7 +365,7 @@ class HierarchyMixin(six.with_metaclass(ChildrenModelMetaclass, ScopedStorageMix
             self._parent_block = for_parent
             self._parent_block_id = for_parent.scope_ids.usage_id
 
-        super(HierarchyMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def get_parent(self):
         """Return the parent block of this block, or None if there isn't one."""

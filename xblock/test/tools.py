@@ -121,7 +121,7 @@ class TestRuntime(Runtime):
         if not args:
             kwargs.setdefault('id_reader', memory_id_manager)
         kwargs.setdefault('id_generator', memory_id_manager)
-        super(TestRuntime, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def handler_url(self, *args, **kwargs):  # pylint: disable=signature-differs
         raise NotImplementedError

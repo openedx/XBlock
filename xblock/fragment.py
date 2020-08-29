@@ -19,7 +19,7 @@ class Fragment(web_fragments.fragment.Fragment):
             DeprecationWarning,
             stacklevel=2
         )
-        super(Fragment, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     # Provide older names for renamed methods
     add_frag_resources = web_fragments.fragment.Fragment.add_fragment_resources

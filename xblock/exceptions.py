@@ -58,7 +58,7 @@ class InvalidScopeError(Exception):
     Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
     """
     def __init__(self, invalid_scope, valid_scopes=None):
-        super(InvalidScopeError, self).__init__()
+        super().__init__()
         if valid_scopes:
             self.message = "Invalid scope: {}. Valid scopes are: {}".format(
                 invalid_scope,
@@ -110,7 +110,7 @@ class JsonHandlerError(Exception):
     error response should be returned.
     """
     def __init__(self, status_code, message):
-        super(JsonHandlerError, self).__init__()
+        super().__init__()
         self.status_code = status_code
         self.message = message
 

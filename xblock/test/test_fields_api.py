@@ -403,7 +403,7 @@ class UniversalTestCases(UniversalProperties):
 class DictFieldDataWithSequentialDefault(DictFieldData):
     """:class:`~xblock.test.tools.DictFieldData` that generates a sequence of default values"""
     def __init__(self, storage, sequence):
-        super(DictFieldDataWithSequentialDefault, self).__init__(storage)
+        super().__init__(storage)
         self._sequence = sequence
 
     def default(self, block, name):
@@ -509,7 +509,7 @@ class GetNoopPrefix:
         self.block  # An initialized xblock with a field named `field`
     """
     def setup_method(self):
-        super(GetNoopPrefix, self).setup_method()
+        super().setup_method()
         self.get()
 
 
@@ -523,7 +523,7 @@ class GetSaveNoopPrefix:
         self.block  # An initialized xblock with a field named `field`
     """
     def setup_method(self):
-        super(GetSaveNoopPrefix, self).setup_method()
+        super().setup_method()
         self.get()
         self.block.save()
 
@@ -538,7 +538,7 @@ class SaveNoopPrefix:
         self.block  # An initialized xblock with a field named `field`
     """
     def setup_method(self):
-        super(SaveNoopPrefix, self).setup_method()
+        super().setup_method()
         self.block.save()
 # pylint: enable=no-member
 

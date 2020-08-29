@@ -30,7 +30,7 @@ class HeaderDict(MutableMapping, six.Iterator):  # pylint: disable=useless-objec
     UNPREFIXED_HEADERS = ('CONTENT_TYPE', 'CONTENT_LENGTH')
 
     def __init__(self, meta):
-        super(HeaderDict, self).__init__()
+        super().__init__()
         self._meta = meta
 
     def _meta_name(self, name):
@@ -110,7 +110,7 @@ class DjangoWebobRequest(webob.Request):
     """
     def __init__(self, request):
         self._request = request
-        super(DjangoWebobRequest, self).__init__(self.environ)
+        super().__init__(self.environ)
 
     @lazy
     def environ(self):

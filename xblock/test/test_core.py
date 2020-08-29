@@ -417,7 +417,7 @@ def test_object_identity():
     # each time it's actually queried, so that the caching is
     # doing the work to maintain object identity.
     field_data = MagicMock(spec=FieldData)
-    field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
+    field_data.get = lambda block, name, default=None: [name]
     field_data.default = mock_default
     field_tester = FieldTester(
         runtime=TestRuntime(services={'field-data': field_data}),
@@ -447,7 +447,7 @@ def test_caching_is_per_instance():
         field_a = List(scope=Scope.settings)
 
     field_data = MagicMock(spec=FieldData)
-    field_data.get = lambda block, name, default=None: [name]  # pylint: disable=C0322
+    field_data.get = lambda block, name, default=None: [name]
 
     # Same field_data used in different objects should result
     # in separately-cached values, so that changing a value
@@ -558,7 +558,7 @@ def setup_save_failure(set_many):
     Set up tests for when there's a save error in the underlying KeyValueStore
     """
     field_data = MagicMock(spec=FieldData)
-    field_data.get = lambda block, name, default=None: 99  # pylint: disable=C0322
+    field_data.get = lambda block, name, default=None: 99
 
     field_data.set_many = set_many
 

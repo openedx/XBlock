@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests the features of xblock/runtime"""
 # pylint: disable=protected-access
 
@@ -177,7 +176,7 @@ class MockRuntimeForQuerying(TestRuntime):
     # pylint: disable=abstract-method
     def __init__(self, **kwargs):
         self.mock_query = Mock()
-        super(MockRuntimeForQuerying, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def query(self, block):
         return self.mock_query
@@ -272,7 +271,7 @@ class SerialDefaultKVS(DictKeyValueStore):
     A kvs which gives each call to default the next int (nonsensical but for testing default fn)
     """
     def __init__(self, *args, **kwargs):
-        super(SerialDefaultKVS, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default_counter = 0
 
     def default(self, _key):
@@ -580,7 +579,7 @@ class SubXBlockWithServices(XBlockWithServices):
     def student_view(self, context):
         """Try the services."""
         # First, call the super class, its assertions should still pass.
-        super(SubXBlockWithServices, self).student_view(context)
+        super().student_view(context)
 
         # no_such_service_sub is not available, and raises an exception,
         # because we said we needed it.
@@ -678,7 +677,7 @@ class RuntimeWithCustomCSS(TestRuntime):  # pylint: disable=abstract-method
     A runtime that adds extra CSS classes to rendered XBlocks
     """
     def _css_classes_for(self, block, view):
-        css_classes = super(RuntimeWithCustomCSS, self)._css_classes_for(block, view)
+        css_classes = super()._css_classes_for(block, view)
         css_classes.append('test-extra-class')
         return css_classes
 
