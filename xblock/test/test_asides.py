@@ -63,7 +63,7 @@ class TestAsides(AsideRuntimeSetup):
     Tests of XBlockAsides.
     """
     def setUp(self):
-        super(TestAsides, self).setUp()
+        super().setUp()
         block_type = 'test_aside'
         def_id = self.runtime.id_generator.create_definition(block_type)
         usage_id = self.runtime.id_generator.create_usage(def_id)

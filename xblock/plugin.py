@@ -25,7 +25,7 @@ class AmbiguousPluginError(Exception):
         classes = (entpt.load() for entpt in all_entry_points)
         desc = ", ".join("{0.__module__}.{0.__name__}".format(cls) for cls in classes)
         msg = "Ambiguous entry points for {}: {}".format(all_entry_points[0].name, desc)
-        super(AmbiguousPluginError, self).__init__(msg)
+        super().__init__(msg)
 
 
 def default_select(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements

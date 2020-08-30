@@ -22,7 +22,7 @@ class ToyRuntimeKeyValueStore(KeyValueStore):
 
     """
     def __init__(self, db_dict):
-        super(ToyRuntimeKeyValueStore, self).__init__()
+        super().__init__()
         self.db_dict = db_dict
 
     # ToyRuntime-special methods.
@@ -99,7 +99,7 @@ class ToyRuntime(Runtime):
     # pylint: disable=abstract-method
 
     def __init__(self, user_id=None):
-        super(ToyRuntime, self).__init__(ID_MANAGER, services={'field-data': KvsFieldData(TOYRUNTIME_KVS)})
+        super().__init__(ID_MANAGER, services={'field-data': KvsFieldData(TOYRUNTIME_KVS)})
         self.id_generator = ID_MANAGER
         self.user_id = user_id
 

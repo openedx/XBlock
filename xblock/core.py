@@ -192,7 +192,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
             raise TypeError('scope_ids are required')
 
         # Provide backwards compatibility for external access through _field_data
-        super(XBlock, self).__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
+        super().__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
 
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""
@@ -220,7 +220,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         """
         For exporting, set data on etree.Element `node`.
         """
-        super(XBlock, self).add_xml_to_node(node)
+        super().add_xml_to_node(node)
         # Add children for each of our children.
         self.add_children_to_node(node)
 
@@ -310,7 +310,7 @@ class KeyValueMultiSaveError(xblock.exceptions.KeyValueMultiSaveError):
     """
     def __init__(self, *args, **kwargs):
         warnings.warn("Please use xblock.exceptions.KeyValueMultiSaveError", DeprecationWarning, stacklevel=2)
-        super(KeyValueMultiSaveError, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class XBlockSaveError(xblock.exceptions.XBlockSaveError):
@@ -319,4 +319,4 @@ class XBlockSaveError(xblock.exceptions.XBlockSaveError):
     """
     def __init__(self, *args, **kwargs):
         warnings.warn("Please use xblock.exceptions.XBlockSaveError", DeprecationWarning, stacklevel=2)
-        super(XBlockSaveError, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

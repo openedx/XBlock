@@ -51,7 +51,7 @@ class NamedAttributesMetaclass(type):
             for attr_name, attr in inspect.getmembers(base, Nameable.needs_name):
                 attr.__name__ = attr_name
 
-        return super(NamedAttributesMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        return super().__new__(mcs, name, bases, attrs)
 
 
 class Nameable:

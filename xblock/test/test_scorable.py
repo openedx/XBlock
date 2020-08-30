@@ -28,7 +28,7 @@ class StubScorableBlock(scorable.ScorableXBlockMixin):
         if self._allows_rescore is not None:
             return self._allows_rescore
         else:
-            return super(StubScorableBlock, self).allows_rescore()
+            return super().allows_rescore()
 
     def has_submitted_answer(self):
         return self.get_score() is not None

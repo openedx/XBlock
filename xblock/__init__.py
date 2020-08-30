@@ -20,7 +20,7 @@ class XBlockMixin(xblock.core.XBlockMixin):
     """
     def __init__(self, *args, **kwargs):
         warnings.warn("Please use xblock.core.XBlockMixin", DeprecationWarning, stacklevel=2)
-        super(XBlockMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 # For backwards compatibility, provide the XBlockMixin in xblock.fields

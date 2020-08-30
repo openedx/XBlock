@@ -48,6 +48,7 @@ class Sentinel:
     """
     Class for implementing sentinel objects (only equal to themselves).
     """
+
     def __init__(self, name):
         """
         `name` is the name used to identify the sentinel (which will
@@ -147,7 +148,6 @@ class UserScope:
 
 
 UNSET = Sentinel("fields.UNSET")
-
 
 ScopeBase = namedtuple('ScopeBase', 'user block name')
 
@@ -757,11 +757,11 @@ class Boolean(JSONField):
     MUTABLE = False
 
     # We're OK redefining built-in `help`
-    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None, **kwargs):  # pylint: disable=redefined-builtin
-        super(Boolean, self).__init__(help, default, scope, display_name,
-                                      values=({'display_name': "True", "value": True},
-                                              {'display_name': "False", "value": False}),
-                                      **kwargs)
+    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None,
+                 **kwargs):  # pylint: disable=redefined-builtin
+        super().__init__(help, default, scope, display_name,
+                         values=({'display_name': "True", "value": True},
+                                 {'display_name': "False", "value": False}), **kwargs)
 
     def from_json(self, value):
         if isinstance(value, six.binary_type):
@@ -801,7 +801,7 @@ class Dict(JSONField):
             value = value.copy()
             value['null'] = value[None]
             del value[None]
-        return super(Dict, self).to_string(value)
+        return super().to_string(value)
 
 
 class List(JSONField):
@@ -837,7 +837,7 @@ class Set(JSONField):
 
         Redefined in order to convert default values to sets.
         """
-        super(Set, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self._default = set(self._default)
 
@@ -928,7 +928,7 @@ class XMLString(String):
         """
         if self._enable_enforce_type:
             value = self.enforce_type(value)
-        return super(XMLString, self).to_json(value)
+        return super().to_json(value)
 
     def enforce_type(self, value):
         if value is not None:
@@ -964,7 +964,7 @@ class DateTime(JSONField):
             try:
                 value = dateutil.parser.parse(value)
             except (TypeError, ValueError):
-                raise ValueError("Could not parse {} as a date".format(value))
+                raise ValueError("Could not parse {} as a date".format(value))  # pylint: disable= raise-missing-from
 
         # Interpret raw numbers as a relative dates
         if isinstance(value, (int, float)):
