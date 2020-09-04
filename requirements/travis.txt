@@ -22,7 +22,7 @@ requests==2.24.0          # via codecov
 six==1.15.0               # via packaging, tox, virtualenv
 toml==0.10.1              # via tox
 tox-battery==0.6.1        # via -r requirements/travis.in
-tox==3.19.0               # via -r requirements/travis.in, tox-battery
+tox==3.20.0               # via -r requirements/travis.in, tox-battery
 urllib3==1.25.10          # via requests
 virtualenv==20.0.31       # via tox
 zipp==1.2.0               # via importlib-metadata, importlib-resources

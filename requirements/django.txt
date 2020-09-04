@@ -5,10 +5,10 @@
 #    make upgrade
 #
 appdirs==1.4.4            # via -r requirements/base.txt, fs
-boto3==1.14.50            # via fs-s3fs
-botocore==1.17.50         # via boto3, s3transfer
+boto3==1.14.55            # via fs-s3fs
+botocore==1.17.55         # via boto3, s3transfer
 django-pyfs==2.2          # via -r requirements/django.in
-django==2.2.15            # via -r requirements/django.in, django-pyfs
+django==2.2.16            # via -r requirements/django.in, django-pyfs
 docutils==0.15.2          # via botocore
 fs-s3fs==1.1.1            # via django-pyfs
 fs==2.4.11                # via -r requirements/base.txt, django-pyfs, fs-s3fs
