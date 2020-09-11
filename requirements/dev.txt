@@ -6,9 +6,9 @@
 #
 appdirs==1.4.4            # via -r requirements/test.txt, -r requirements/travis.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.txt, pylint
-attrs==20.1.0             # via -r requirements/test.txt, hypothesis, pytest
-boto3==1.14.55            # via -r requirements/test.txt, fs-s3fs
-botocore==1.17.55         # via -r requirements/test.txt, boto3, s3transfer
+attrs==20.2.0             # via -r requirements/test.txt, hypothesis, pytest
+boto3==1.14.59            # via -r requirements/test.txt, fs-s3fs
+botocore==1.17.59         # via -r requirements/test.txt, boto3, s3transfer
 certifi==2020.6.20        # via -r requirements/travis.txt, requests
 chardet==3.0.4            # via -r requirements/travis.txt, requests
 click==7.1.2              # via -r requirements/pip-tools.txt, pip-tools
@@ -23,7 +23,7 @@ docutils==0.15.2          # via -r requirements/test.txt, botocore
 filelock==3.0.12          # via -r requirements/test.txt, -r requirements/travis.txt, tox, virtualenv
 fs-s3fs==1.1.1            # via -r requirements/test.txt, django-pyfs
 fs==2.4.11                # via -r requirements/test.txt, django-pyfs, fs-s3fs
-hypothesis==5.30.1        # via -r requirements/test.txt
+hypothesis==5.33.2        # via -r requirements/test.txt
 idna==2.10                # via -r requirements/travis.txt, requests
 importlib-metadata==1.7.0  # via -r requirements/test.txt, -r requirements/travis.txt, inflect, path, pluggy, pytest, tox, virtualenv
 importlib-resources==3.0.0  # via -r requirements/test.txt, -r requirements/travis.txt, virtualenv
