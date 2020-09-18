@@ -8,7 +8,7 @@ appdirs==1.4.4            # via virtualenv
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 codecov==2.1.9            # via -r requirements/travis.in
-coverage==5.2.1           # via codecov
+coverage==5.3             # via codecov
 distlib==0.3.1            # via virtualenv
 filelock==3.0.12          # via tox, virtualenv
 idna==2.10                # via requests
