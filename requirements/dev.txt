@@ -7,15 +7,15 @@
 appdirs==1.4.4            # via -r requirements/test.txt, -r requirements/travis.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.txt, pylint
 attrs==20.2.0             # via -r requirements/test.txt, hypothesis, pytest
-boto3==1.15.0             # via -r requirements/test.txt, fs-s3fs
-botocore==1.18.0          # via -r requirements/test.txt, boto3, s3transfer
+boto3==1.15.5             # via -r requirements/test.txt, fs-s3fs
+botocore==1.18.5          # via -r requirements/test.txt, boto3, s3transfer
 certifi==2020.6.20        # via -r requirements/travis.txt, requests
 chardet==3.0.4            # via -r requirements/travis.txt, requests
 click==7.1.2              # via -r requirements/pip-tools.txt, pip-tools
 codecov==2.1.9            # via -r requirements/travis.txt
 coverage==5.3             # via -r requirements/test.txt, -r requirements/travis.txt, codecov, pytest-cov
 ddt==1.4.1                # via -r requirements/test.txt
-diff-cover==4.0.0         # via -r requirements/test.txt
+diff-cover==4.0.1         # via -r requirements/test.txt
 distlib==0.3.1            # via -r requirements/test.txt, -r requirements/travis.txt, virtualenv
 django-pyfs==2.2          # via -r requirements/test.txt
 django==2.2.16            # via -r requirements/test.txt, django-pyfs
