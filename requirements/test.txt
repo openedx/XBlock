@@ -6,9 +6,9 @@
 #
 appdirs==1.4.4            # via -r requirements/django.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.in, pylint
-attrs==20.2.0             # via hypothesis, pytest
-boto3==1.16.8             # via -r requirements/django.txt, fs-s3fs
-botocore==1.19.8          # via -r requirements/django.txt, boto3, s3transfer
+attrs==20.3.0             # via hypothesis, pytest
+boto3==1.16.12            # via -r requirements/django.txt, fs-s3fs
+botocore==1.19.12         # via -r requirements/django.txt, boto3, s3transfer
 coverage==5.3             # via -r requirements/test.in, pytest-cov
 ddt==1.4.1                # via -r requirements/test.in
 diff-cover==4.0.1         # via -r requirements/test.in
@@ -46,14 +46,14 @@ pytest-cov==2.10.1        # via -r requirements/test.in
 pytest-django==4.1.0      # via -r requirements/test.in
 pytest==6.1.2             # via -r requirements/test.in, pytest-cov, pytest-django
 python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/django.txt, botocore
-pytz==2020.1              # via -r requirements/django.txt, django, fs
+pytz==2020.4              # via -r requirements/django.txt, django, fs
 pyyaml==5.3.1             # via -r requirements/django.txt
 s3transfer==0.3.3         # via -r requirements/django.txt, boto3
 simplejson==3.17.2        # via -r requirements/django.txt
 six==1.15.0               # via -r requirements/django.txt, astroid, fs, fs-s3fs, mock, packaging, pathlib2, python-dateutil, tox, virtualenv
 sortedcontainers==2.2.2   # via hypothesis
 sqlparse==0.4.1           # via -r requirements/django.txt, django
-toml==0.10.1              # via pylint, pytest, tox
+toml==0.10.2              # via pylint, pytest, tox
 tox==3.20.1               # via -r requirements/test.in
 typed-ast==1.4.1          # via astroid
 typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
