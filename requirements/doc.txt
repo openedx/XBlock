@@ -6,10 +6,10 @@
 #
 alabaster==0.7.12         # via sphinx
 appdirs==1.4.4            # via -r requirements/django.txt, fs
-babel==2.8.0              # via sphinx
-boto3==1.16.12            # via -r requirements/django.txt, fs-s3fs
-botocore==1.19.12         # via -r requirements/django.txt, boto3, s3transfer
-certifi==2020.6.20        # via requests
+babel==2.9.0              # via sphinx
+boto3==1.16.17            # via -r requirements/django.txt, fs-s3fs
+botocore==1.19.17         # via -r requirements/django.txt, boto3, s3transfer
+certifi==2020.11.8        # via requests
 chardet==3.0.4            # via requests
 django-pyfs==2.2          # via -r requirements/django.txt
 django==2.2.17            # via -r requirements/django.txt, django-pyfs
@@ -31,12 +31,12 @@ pyparsing==2.4.7          # via packaging
 python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/django.txt, botocore
 pytz==2020.4              # via -r requirements/django.txt, babel, django, fs
 pyyaml==5.3.1             # via -r requirements/django.txt
-requests==2.24.0          # via sphinx
+requests==2.25.0          # via sphinx
 s3transfer==0.3.3         # via -r requirements/django.txt, boto3
 simplejson==3.17.2        # via -r requirements/django.txt
 six==1.15.0               # via -r requirements/django.txt, edx-sphinx-theme, fs, fs-s3fs, mock, packaging, python-dateutil
 snowballstemmer==2.0.0    # via sphinx
-sphinx==3.3.0             # via -r requirements/doc.in, edx-sphinx-theme
+sphinx==3.3.1             # via -r requirements/doc.in, edx-sphinx-theme
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
@@ -45,7 +45,7 @@ sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.4.1           # via -r requirements/django.txt, django
 typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
-urllib3==1.25.11          # via -r requirements/django.txt, botocore, requests
+urllib3==1.26.2           # via -r requirements/django.txt, botocore, requests
 web-fragments==0.3.2      # via -r requirements/django.txt
 webob==1.8.6              # via -r requirements/django.txt
 
