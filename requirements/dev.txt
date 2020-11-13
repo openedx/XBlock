@@ -7,9 +7,9 @@
 appdirs==1.4.4            # via -r requirements/test.txt, -r requirements/travis.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.txt, pylint
 attrs==20.3.0             # via -r requirements/test.txt, hypothesis, pytest
-boto3==1.16.12            # via -r requirements/test.txt, fs-s3fs
-botocore==1.19.12         # via -r requirements/test.txt, boto3, s3transfer
-certifi==2020.6.20        # via -r requirements/travis.txt, requests
+boto3==1.16.17            # via -r requirements/test.txt, fs-s3fs
+botocore==1.19.17         # via -r requirements/test.txt, boto3, s3transfer
+certifi==2020.11.8        # via -r requirements/travis.txt, requests
 chardet==3.0.4            # via -r requirements/travis.txt, requests
 click==7.1.2              # via -r requirements/pip-tools.txt, pip-tools
 codecov==2.1.10           # via -r requirements/travis.txt
@@ -55,18 +55,18 @@ pytest==6.1.2             # via -r requirements/test.txt, pytest-cov, pytest-dja
 python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/test.txt, botocore
 pytz==2020.4              # via -r requirements/test.txt, django, fs
 pyyaml==5.3.1             # via -r requirements/test.txt
-requests==2.24.0          # via -r requirements/travis.txt, codecov
+requests==2.25.0          # via -r requirements/travis.txt, codecov
 s3transfer==0.3.3         # via -r requirements/test.txt, boto3
 simplejson==3.17.2        # via -r requirements/test.txt
 six==1.15.0               # via -r requirements/pip-tools.txt, -r requirements/test.txt, -r requirements/travis.txt, astroid, fs, fs-s3fs, mock, packaging, pathlib2, pip-tools, python-dateutil, tox, virtualenv
-sortedcontainers==2.2.2   # via -r requirements/test.txt, hypothesis
+sortedcontainers==2.3.0   # via -r requirements/test.txt, hypothesis
 sqlparse==0.4.1           # via -r requirements/test.txt, django
 toml==0.10.2              # via -r requirements/test.txt, -r requirements/travis.txt, pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/travis.txt
 tox==3.20.1               # via -r requirements/test.txt, -r requirements/travis.txt, tox-battery
 typed-ast==1.4.1          # via -r requirements/test.txt, astroid
 typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/test.txt, fs
-urllib3==1.25.11          # via -r requirements/test.txt, -r requirements/travis.txt, botocore, requests
+urllib3==1.26.2           # via -r requirements/test.txt, -r requirements/travis.txt, botocore, requests
 virtualenv==20.1.0        # via -r requirements/test.txt, -r requirements/travis.txt, tox
 web-fragments==0.3.2      # via -r requirements/test.txt
 webob==1.8.6              # via -r requirements/test.txt

@@ -7,8 +7,8 @@
 appdirs==1.4.4            # via -r requirements/django.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.in, pylint
 attrs==20.3.0             # via hypothesis, pytest
-boto3==1.16.12            # via -r requirements/django.txt, fs-s3fs
-botocore==1.19.12         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.16.17            # via -r requirements/django.txt, fs-s3fs
+botocore==1.19.17         # via -r requirements/django.txt, boto3, s3transfer
 coverage==5.3             # via -r requirements/test.in, pytest-cov
 ddt==1.4.1                # via -r requirements/test.in
 diff-cover==4.0.1         # via -r requirements/test.in
@@ -51,13 +51,13 @@ pyyaml==5.3.1             # via -r requirements/django.txt
 s3transfer==0.3.3         # via -r requirements/django.txt, boto3
 simplejson==3.17.2        # via -r requirements/django.txt
 six==1.15.0               # via -r requirements/django.txt, astroid, fs, fs-s3fs, mock, packaging, pathlib2, python-dateutil, tox, virtualenv
-sortedcontainers==2.2.2   # via hypothesis
+sortedcontainers==2.3.0   # via hypothesis
 sqlparse==0.4.1           # via -r requirements/django.txt, django
 toml==0.10.2              # via pylint, pytest, tox
 tox==3.20.1               # via -r requirements/test.in
 typed-ast==1.4.1          # via astroid
 typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
-urllib3==1.25.11          # via -r requirements/django.txt, botocore
+urllib3==1.26.2           # via -r requirements/django.txt, botocore
 virtualenv==20.1.0        # via tox
 web-fragments==0.3.2      # via -r requirements/django.txt
 webob==1.8.6              # via -r requirements/django.txt
