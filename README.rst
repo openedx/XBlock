@@ -188,7 +188,7 @@ at the `Open edX Getting Help`_ page.
 
 .. _Open edX Getting Help: https://openedx.org/getting-help
 
-.. |build-status| image:: https://travis-ci.org/edx/XBlock.svg?branch=master
-   :target: https://travis-ci.org/edx/XBlock
+.. |build-status| image:: https://travis-ci.com/edx/XBlock.svg?branch=master
+   :target: https://travis-ci.com/edx/XBlock
 .. |coverage-status| image:: http://codecov.io/github/edx/XBlock/coverage.svg?branch=master
    :target: https://codecov.io/github/edx/XBlock?branch=master
