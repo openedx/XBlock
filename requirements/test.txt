@@ -7,8 +7,8 @@
 appdirs==1.4.4            # via -r requirements/django.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.in, pylint
 attrs==20.3.0             # via hypothesis, pytest
-boto3==1.16.17            # via -r requirements/django.txt, fs-s3fs
-botocore==1.19.17         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.16.22            # via -r requirements/django.txt, fs-s3fs
+botocore==1.19.22         # via -r requirements/django.txt, boto3, s3transfer
 coverage==5.3             # via -r requirements/test.in, pytest-cov
 ddt==1.4.1                # via -r requirements/test.in
 diff-cover==4.0.1         # via -r requirements/test.in
