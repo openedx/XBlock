@@ -12,14 +12,14 @@ coverage==5.3             # via codecov
 distlib==0.3.1            # via virtualenv
 filelock==3.0.12          # via tox, virtualenv
 idna==2.10                # via requests
-importlib-metadata==2.1.0  # via pluggy, tox, virtualenv
+importlib-metadata==2.1.1  # via pluggy, tox, virtualenv
 importlib-resources==3.2.1  # via virtualenv
-packaging==20.4           # via tox
+packaging==20.7           # via tox
 pluggy==0.13.1            # via tox
 py==1.9.0                 # via tox
 pyparsing==2.4.7          # via packaging
 requests==2.25.0          # via codecov
-six==1.15.0               # via packaging, tox, virtualenv
+six==1.15.0               # via tox, virtualenv
 toml==0.10.2              # via tox
 tox-battery==0.6.1        # via -r requirements/travis.in
 tox==3.20.1               # via -r requirements/travis.in, tox-battery
