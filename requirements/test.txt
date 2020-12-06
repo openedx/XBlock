@@ -7,8 +7,8 @@
 appdirs==1.4.4            # via -r requirements/django.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.in, pylint
 attrs==20.3.0             # via hypothesis, pytest
-boto3==1.16.25            # via -r requirements/django.txt, fs-s3fs
-botocore==1.19.25         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.16.28            # via -r requirements/django.txt, fs-s3fs
+botocore==1.19.28         # via -r requirements/django.txt, boto3, s3transfer
 coverage==5.3             # via -r requirements/test.in, pytest-cov
 ddt==1.4.1                # via -r requirements/test.in
 diff-cover==4.0.1         # via -r requirements/test.in
@@ -18,7 +18,7 @@ filelock==3.0.12          # via tox, virtualenv
 fs-s3fs==1.1.1            # via -r requirements/django.txt, django-pyfs
 fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs
 hypothesis==5.33.2        # via -r requirements/test.in
-importlib-metadata==2.1.0  # via inflect, path, pluggy, pytest, tox, virtualenv
+importlib-metadata==2.1.1  # via inflect, path, pluggy, pytest, tox, virtualenv
 importlib-resources==3.2.1  # via virtualenv
 inflect==3.0.2            # via jinja2-pluralize
 iniconfig==1.1.1          # via pytest
@@ -28,11 +28,11 @@ jinja2==2.11.2            # via diff-cover, jinja2-pluralize
 jmespath==0.10.0          # via -r requirements/django.txt, boto3, botocore
 lazy-object-proxy==1.4.3  # via astroid
 lazy==1.4                 # via -r requirements/django.txt
-lxml==4.6.1               # via -r requirements/django.txt
+lxml==4.6.2               # via -r requirements/django.txt
 markupsafe==1.1.1         # via -r requirements/django.txt, jinja2
 mccabe==0.6.1             # via pylint
 mock==3.0.5               # via -r requirements/test.in
-packaging==20.4           # via pytest, tox
+packaging==20.7           # via pytest, tox
 path.py==12.5.0           # via -r requirements/test.in
 path==13.1.0              # via path.py
 pathlib2==2.3.5           # via pytest
@@ -50,7 +50,7 @@ pytz==2020.4              # via -r requirements/django.txt, django, fs
 pyyaml==5.3.1             # via -r requirements/django.txt
 s3transfer==0.3.3         # via -r requirements/django.txt, boto3
 simplejson==3.17.2        # via -r requirements/django.txt
-six==1.15.0               # via -r requirements/django.txt, astroid, fs, fs-s3fs, mock, packaging, pathlib2, python-dateutil, tox, virtualenv
+six==1.15.0               # via -r requirements/django.txt, astroid, fs, fs-s3fs, mock, pathlib2, python-dateutil, tox, virtualenv
 sortedcontainers==2.3.0   # via hypothesis
 sqlparse==0.4.1           # via -r requirements/django.txt, django
 toml==0.10.2              # via pylint, pytest, tox
