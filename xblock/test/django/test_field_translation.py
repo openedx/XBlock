@@ -4,11 +4,10 @@ an XBlock String field.
 """
 import warnings
 
+from unittest.mock import Mock
 from django.test import TestCase
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _  # pylint: disable=import-error
-from mock import Mock
-from six import text_type
 
 from xblock.core import XBlock
 from xblock.fields import FailingEnforceTypeWarning, Scope, String, ScopeIds
@@ -52,4 +51,4 @@ class TestXBlockStringFieldDefaultTranslation(TestCase):
             assert 'django.utils.functional.' in str(type(tester.str_field))
 
             # Assert str_field *is* translated when the value is used.
-            assert text_type(tester.str_field) == 'DEU: Translated string'
+            assert str(tester.str_field) == 'DEU: Translated string'

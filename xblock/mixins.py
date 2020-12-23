@@ -11,7 +11,6 @@ import warnings
 import json
 
 from lxml import etree
-import six
 from webob import Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
@@ -156,7 +155,7 @@ class RuntimeServicesMixin:
 
 
 @RuntimeServicesMixin.needs('field-data')
-class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeServicesMixin)):
+class ScopedStorageMixin(RuntimeServicesMixin, metaclass=NamedAttributesMetaclass):
     """
     This mixin provides scope for Fields and the associated Scoped storage.
     """
@@ -272,7 +271,7 @@ class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeSer
                 fields.remove(field)
                 # if the field was dirty, delete from dirty fields
                 self._reset_dirty_field(field)
-            msg = 'Error saving fields {}'.format(save_error.saved_field_names)
+            msg = f'Error saving fields {save_error.saved_field_names}'
             raise XBlockSaveError(saved_fields, fields, msg)  # pylint: disable= raise-missing-from
 
         # Remove all dirty fields, since the save was successful
@@ -308,21 +307,21 @@ class ScopedStorageMixin(six.with_metaclass(NamedAttributesMetaclass, RuntimeSer
         # Since this is not understood by static analysis, silence this error.
         # pylint: disable=E1101
         attrs = []
-        for field in six.itervalues(self.fields):
+        for field in self.fields.values():
             try:
                 value = getattr(self, field.name)
             except Exception:  # pylint: disable=broad-except
                 # Ensure we return a string, even if unanticipated exceptions.
-                attrs.append(" %s=???" % (field.name,))
+                attrs.append(" {}=???".format(field.name))
             else:
-                if isinstance(value, six.binary_type):
+                if isinstance(value, bytes):
                     value = value.decode('utf-8', errors='escape')
-                if isinstance(value, six.text_type):
+                if isinstance(value, str):
                     value = value.strip()
                     if len(value) > 40:
                         value = value[:37] + "..."
-                attrs.append(" %s=%r" % (field.name, value))
-        return "<%s @%04X%s>" % (
+                attrs.append(" {}={!r}".format(field.name, value))
+        return "<{} @{:04X}{}>".format(
             self.__class__.__name__,
             id(self) % 0xFFFF,
             ','.join(attrs)
@@ -346,7 +345,7 @@ class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
         return super().__new__(mcs, name, bases, attrs)
 
 
-class HierarchyMixin(six.with_metaclass(ChildrenModelMetaclass, ScopedStorageMixin)):
+class HierarchyMixin(ScopedStorageMixin, metaclass=ChildrenModelMetaclass):
     """
     This adds Fields for parents and children.
     """

@@ -4,9 +4,9 @@ Test Scorable block.
 
 # pylint: disable=protected-access
 from unittest import TestCase
+from unittest.mock import Mock
 
 import ddt
-from mock import Mock
 
 from xblock import scorable
 

@@ -3,11 +3,10 @@ Tests of the XBlock-family functionality mixins
 """
 from datetime import datetime
 from unittest import TestCase
+from unittest import mock
 
 import ddt
-import mock
 import pytz
-import six
 from lxml import etree
 
 from xblock.core import XBlock, XBlockAside
@@ -24,11 +23,11 @@ class AttrAssertionMixin(TestCase):
     """
     def assertHasAttr(self, obj, attr):
         "Assert that `obj` has the attribute named `attr`."
-        self.assertTrue(hasattr(obj, attr), "{!r} doesn't have attribute {!r}".format(obj, attr))
+        self.assertTrue(hasattr(obj, attr), f"{obj!r} doesn't have attribute {attr!r}")
 
     def assertNotHasAttr(self, obj, attr):
         "Assert that `obj` doesn't have the attribute named `attr`."
-        self.assertFalse(hasattr(obj, attr), "{!r} has attribute {!r}".format(obj, attr))
+        self.assertFalse(hasattr(obj, attr), f"{obj!r} has attribute {attr!r}")
 
 
 class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
@@ -289,7 +288,7 @@ class TestXmlSerializationMixin(TestCase):
         self.assertEqual(node.get('xblock-family'), entry_point if entry_point else self.TestXBlock.entry_point)
         self.assertEqual(set(node_attributes), set(expected_attributes.keys()))
 
-        for key, value in six.iteritems(expected_attributes):
+        for key, value in expected_attributes.items():
             if value != UNIQUE_ID:
                 self.assertEqual(node.get(key), value)
             else:
@@ -313,7 +312,7 @@ class TestXmlSerializationMixin(TestCase):
         node = etree.Element(self.test_xblock_tag)
 
         # Precondition check: no fields are set.
-        for field_name in six.iterkeys(self.test_xblock.fields):
+        for field_name in self.test_xblock.fields.keys():
             self.assertFalse(self.test_xblock.fields[field_name].is_set_on(self.test_xblock))
 
         self.test_xblock.add_xml_to_node(node)

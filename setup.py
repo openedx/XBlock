@@ -30,7 +30,6 @@ setup(
         'python-dateutil',
         'pytz',
         'pyyaml',
-        'six',
         'webob',
         'web-fragments',
     ],

@@ -13,7 +13,7 @@ class XBlockNotFoundError(Exception):
     def __init__(self, usage_id):
         # Exception is an old-style class, so can't use super
         Exception.__init__(self)
-        self.message = "Unable to load an xblock for usage_id {!r}".format(usage_id)
+        self.message = f"Unable to load an xblock for usage_id {usage_id!r}"
 
 
 class XBlockSaveError(Exception):
@@ -65,7 +65,7 @@ class InvalidScopeError(Exception):
                 valid_scopes,
             )
         else:
-            self.message = "Invalid scope: {}".format(invalid_scope)
+            self.message = f"Invalid scope: {invalid_scope}"
 
 
 class NoSuchViewError(Exception):
@@ -81,7 +81,7 @@ class NoSuchViewError(Exception):
         """
         # Can't use super because Exception is an old-style class
         Exception.__init__(self)
-        self.message = "Unable to find view {!r} on block {!r}".format(view_name, block)
+        self.message = f"Unable to find view {view_name!r} on block {block!r}"
 
 
 class NoSuchHandlerError(Exception):

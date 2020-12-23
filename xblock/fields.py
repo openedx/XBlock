@@ -18,7 +18,6 @@ import warnings
 import dateutil.parser
 from lxml import etree
 import pytz
-import six
 import yaml
 
 from xblock.internal import Nameable
@@ -152,7 +151,6 @@ UNSET = Sentinel("fields.UNSET")
 ScopeBase = namedtuple('ScopeBase', 'user block name')
 
 
-@six.python_2_unicode_compatible
 class Scope(ScopeBase):
     """
     Defines six types of scopes to be used: `content`, `settings`,
@@ -220,7 +218,7 @@ class Scope(ScopeBase):
         """Create a new Scope, with an optional name."""
 
         if name is None:
-            name = '{}_{}'.format(user, block)
+            name = f'{user}_{block}'
 
         return ScopeBase.__new__(cls, user, block, name)
 
@@ -589,7 +587,7 @@ class Field(Nameable):
         """
         if not isinstance(self, JSONField) and not self.warned:
             warnings.warn(
-                "Deprecated. JSONifiable fields should derive from JSONField ({name})".format(name=self.name),
+                f"Deprecated. JSONifiable fields should derive from JSONField ({self.name})",
                 DeprecationWarning,
                 stacklevel=3
             )
@@ -764,9 +762,9 @@ class Boolean(JSONField):
                                  {'display_name': "False", "value": False}), **kwargs)
 
     def from_json(self, value):
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             value = value.decode('ascii', errors='replace')
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             return value.lower() == 'true'
         else:
             return bool(value)
@@ -866,9 +864,9 @@ class String(JSONField):
         https://www.w3.org/TR/xml/#charsets
         Leave all other characters.
         """
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             value = value.decode('utf-8')
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             if re.search(self.BAD_REGEX, value):
                 new_value = re.sub(self.BAD_REGEX, "", value)
                 # The new string will be equivalent to the original string if no control characters are present.
@@ -883,7 +881,7 @@ class String(JSONField):
     def from_json(self, value):
         if value is None:
             return None
-        elif isinstance(value, (six.binary_type, six.text_type)):
+        elif isinstance(value, (bytes, str)):
             return self._sanitize(value)
         elif self._is_lazy(value):
             # Allow lazily translated strings to be used as String default values.
@@ -898,7 +896,7 @@ class String(JSONField):
 
     def to_string(self, value):
         """String gets serialized and deserialized without quote marks."""
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             value = value.decode('utf-8')
         return self.to_json(value)
 
@@ -953,10 +951,10 @@ class DateTime(JSONField):
         if value is None:
             return None
 
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             value = value.decode('utf-8')
 
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             # Parser interprets empty string as now by default
             if value == "":
                 return None
@@ -964,7 +962,7 @@ class DateTime(JSONField):
             try:
                 value = dateutil.parser.parse(value)
             except (TypeError, ValueError):
-                raise ValueError("Could not parse {} as a date".format(value))  # pylint: disable= raise-missing-from
+                raise ValueError(f"Could not parse {value} as a date")  # pylint: disable= raise-missing-from
 
         # Interpret raw numbers as a relative dates
         if isinstance(value, (int, float)):
@@ -1092,23 +1090,23 @@ def scope_key(instance, xblock):
     if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
         pass
     elif instance.scope.user == UserScope.ONE:
-        scope_key_dict['user'] = six.text_type(xblock.scope_ids.user_id)
+        scope_key_dict['user'] = str(xblock.scope_ids.user_id)
     else:
         raise NotImplementedError()
 
     if instance.scope.block == BlockScope.TYPE:
-        scope_key_dict['block'] = six.text_type(xblock.scope_ids.block_type)
+        scope_key_dict['block'] = str(xblock.scope_ids.block_type)
     elif instance.scope.block == BlockScope.USAGE:
-        scope_key_dict['block'] = six.text_type(xblock.scope_ids.usage_id)
+        scope_key_dict['block'] = str(xblock.scope_ids.usage_id)
     elif instance.scope.block == BlockScope.DEFINITION:
-        scope_key_dict['block'] = six.text_type(xblock.scope_ids.def_id)
+        scope_key_dict['block'] = str(xblock.scope_ids.def_id)
     elif instance.scope.block == BlockScope.ALL:
         pass
     else:
         raise NotImplementedError()
 
     replacements = itertools.product("._-", "._-")
-    substitution_list = dict(six.moves.zip("./\\,_ +:-", ("".join(x) for x in replacements)))
+    substitution_list = dict(zip("./\\,_ +:-", ("".join(x) for x in replacements)))
     # Above runs in 4.7us, and generates a list of common substitutions:
     # {' ': '_-', '+': '-.', '-': '--', ',': '_.', '/': '._', '.': '..', ':': '-_', '\\': '.-', '_': '__'}
 

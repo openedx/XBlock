@@ -1,7 +1,6 @@
 """Django settings for toy runtime project."""
 import os
 from path import Path as path
-from six import text_type
 
 DEBUG = True
 
@@ -49,7 +48,7 @@ USE_L10N = True
 USE_TZ = True
 
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname().dirname()  # pylint: disable=invalid-name, no-value-for-parameter
-LOCALE_PATHS = [text_type(PROJECT_ROOT + '/xblock/test/locale')]
+LOCALE_PATHS = [str(PROJECT_ROOT + '/xblock/test/locale')]
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"

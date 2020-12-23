@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # XBlock documentation build configuration file, created by
 # sphinx-quickstart on Fri Dec 28 11:23:23 2012.
@@ -17,7 +16,7 @@ import os
 import sys
 
 import edx_theme
-import mock
+from unittest import mock
 
 MOCK_MODULES = [
     'webob',
@@ -61,7 +60,7 @@ master_doc = 'index'
 # General information about the project.
 author = edx_theme.AUTHOR
 project = 'XBlock API Guide'
-copyright = '{year}, edX Inc.'.format(year=datetime.datetime.now().year)
+copyright = f'{datetime.datetime.now().year}, edX Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

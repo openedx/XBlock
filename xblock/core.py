@@ -11,7 +11,6 @@ import os
 import warnings
 
 import pkg_resources
-import six
 
 import xblock.exceptions
 from xblock.exceptions import DisallowedFileError
@@ -92,7 +91,7 @@ class SharedBlockBase(Plugin):
         unauthorized resource.
         """
 
-        if isinstance(uri, six.binary_type):
+        if isinstance(uri, bytes):
             uri = uri.decode('utf-8')
 
         # If no resources_dir is set, then this XBlock cannot serve local resources.
@@ -101,7 +100,7 @@ class SharedBlockBase(Plugin):
 
         # Make sure the path starts with whatever public_dir is set to.
         if not uri.startswith(cls.public_dir + '/'):
-            raise DisallowedFileError("Only files from %r/ are allowed: %r" % (cls.public_dir, uri))
+            raise DisallowedFileError("Only files from {!r}/ are allowed: {!r}".format(cls.public_dir, uri))
 
         # Disalow paths that have a '/.' component, as `/./` is a no-op and `/../`
         # can be used to recurse back past the entry point of this XBlock.
@@ -301,7 +300,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         If all of the aside's data is empty or a default value, then the aside shouldn't
         be serialized as XML at all.
         """
-        return any(field.is_set_on(self) for field in six.itervalues(self.fields))
+        return any(field.is_set_on(self) for field in self.fields.values())  # pylint: disable=no-member
 
 
 class KeyValueMultiSaveError(xblock.exceptions.KeyValueMultiSaveError):

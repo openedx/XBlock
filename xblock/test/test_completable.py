@@ -6,9 +6,9 @@ Tests of the CompletableXBlockMixin.
 import math
 from collections import namedtuple
 from unittest import TestCase
+from unittest import mock
 
 import ddt
-import mock
 from hypothesis import given, example
 import hypothesis.strategies as strategies
 

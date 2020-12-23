@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests the fundamentals of XBlocks including - but not limited to -
 metaclassing, field access, caching, serialization, and bulk saves.
@@ -9,10 +8,9 @@ from datetime import datetime
 import json
 import re
 import unittest
+from unittest.mock import patch, MagicMock, Mock
 
 import ddt
-import six
-from mock import patch, MagicMock, Mock
 import pytest
 from webob import Response
 
@@ -157,9 +155,9 @@ def test_set_field_access():
     field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]}), Mock())
 
     # Check initial values have been set properly
-    assert set([200]) == field_tester.field_a
-    assert set([11, 12, 13]) == field_tester.field_b
-    assert set([4, 5, 6]) == field_tester.field_c
+    assert {200} == field_tester.field_a
+    assert {11, 12, 13} == field_tester.field_b
+    assert {4, 5, 6} == field_tester.field_c
     assert set() == field_tester.field_d
 
     # Update the fields
@@ -169,10 +167,10 @@ def test_set_field_access():
     field_tester.field_d.add(1)
 
     # The fields should be update in the cache, but /not/ in the underlying kvstore.
-    assert set([200, 1]) == field_tester.field_a
-    assert set([11, 12, 13, 14]) == field_tester.field_b
-    assert set([4, 6]) == field_tester.field_c
-    assert set([1]) == field_tester.field_d
+    assert {200, 1} == field_tester.field_a
+    assert {11, 12, 13, 14} == field_tester.field_b
+    assert {4, 6} == field_tester.field_c
+    assert {1} == field_tester.field_d
 
     # Examine model data directly
     #  Caveat: there's not a clean way to copy the originally provided values for `field_a` and `field_b`
@@ -186,16 +184,16 @@ def test_set_field_access():
     field_tester.save()
 
     # verify that the fields have been updated correctly
-    assert set([200, 1]) == field_tester.field_a
-    assert set([11, 12, 13, 14]) == field_tester.field_b
-    assert set([4, 6]) == field_tester.field_c
-    assert set([1]) == field_tester.field_d
+    assert {200, 1} == field_tester.field_a
+    assert {11, 12, 13, 14} == field_tester.field_b
+    assert {4, 6} == field_tester.field_c
+    assert {1} == field_tester.field_d
     # Now, the fields should be updated in the underlying kvstore
 
-    assert set([200, 1]) == field_tester._field_data.get(field_tester, 'field_a')
-    assert set([11, 12, 13, 14]) == field_tester._field_data.get(field_tester, 'field_b')
-    assert set([4, 6]) == field_tester._field_data.get(field_tester, 'field_c')
-    assert set([1]) == field_tester._field_data.get(field_tester, 'field_d')
+    assert {200, 1} == field_tester._field_data.get(field_tester, 'field_a')
+    assert {11, 12, 13, 14} == field_tester._field_data.get(field_tester, 'field_b')
+    assert {4, 6} == field_tester._field_data.get(field_tester, 'field_c')
+    assert {1} == field_tester._field_data.get(field_tester, 'field_d')
 
 
 def test_mutable_none_values():
@@ -516,13 +514,13 @@ def test_class_tags():
         """Toy XBlock"""
 
     sub2block = Sub2Block(None, None, None)
-    assert sub2block._class_tags == set(["cat", "dog"])
+    assert sub2block._class_tags == {"cat", "dog"}
 
     class Sub3Block(Sub2Block):
         """Toy XBlock"""
 
     sub3block = Sub3Block(None, None, None)
-    assert sub3block._class_tags == set(["cat", "dog"])
+    assert sub3block._class_tags == {"cat", "dog"}
 
     @XBlock.tag("mixin")
     class MixinBlock(XBlock):
@@ -532,7 +530,7 @@ def test_class_tags():
         """Toy XBlock"""
 
     sub4block = Sub4Block(None, None, None)
-    assert sub4block._class_tags == set(["cat", "dog", "mixin"])
+    assert sub4block._class_tags == {"cat", "dog", "mixin"}
 
 
 def test_loading_tagged_classes():
@@ -906,7 +904,7 @@ def test_json_handler_return_unicode():
 
     response = test_func(Mock(), test_request, "dummy_suffix")
     for request_part in response.request:  # pylint: disable=not-an-iterable
-        assert isinstance(request_part, six.text_type)
+        assert isinstance(request_part, str)
 
 
 @ddt.ddt
@@ -940,12 +938,12 @@ class OpenLocalResourceTest(unittest.TestCase):
             assert loadable.open_local_resource(uri.encode('utf-8')) == "!" + uri + "!"
 
     @ddt.data(
-        "public/hey.js".encode('utf-8'),
-        "public/sub/hey.js".encode('utf-8'),
-        "public/js/vendor/jNotify.jQuery.min.js".encode('utf-8'),
-        "public/something.foo".encode('utf-8'),         # Unknown file extension is fine
-        "public/a/long/PATH/no-problem=here$123.ext".encode('utf-8'),
-        "public/\N{SNOWMAN}.js".encode('utf-8'),
+        b"public/hey.js",
+        b"public/sub/hey.js",
+        b"public/js/vendor/jNotify.jQuery.min.js",
+        b"public/something.foo",         # Unknown file extension is fine
+        b"public/a/long/PATH/no-problem=here$123.ext",
+        "public/\N{SNOWMAN}.js".encode(),
     )
     def test_open_good_local_resource_binary(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)
@@ -969,13 +967,13 @@ class OpenLocalResourceTest(unittest.TestCase):
                 loadable.open_local_resource(uri)
 
     @ddt.data(
-        "public/../secret.js".encode('utf-8'),
-        "public/.git/secret.js".encode('utf-8'),
-        "static/secret.js".encode('utf-8'),
-        "../public/no-no.bad".encode('utf-8'),
-        "image.png".encode('utf-8'),
-        ".git/secret.js".encode('utf-8'),
-        "static/\N{SNOWMAN}.js".encode('utf-8'),
+        b"public/../secret.js",
+        b"public/.git/secret.js",
+        b"static/secret.js",
+        b"../public/no-no.bad",
+        b"image.png",
+        b".git/secret.js",
+        "static/\N{SNOWMAN}.js".encode(),
     )
     def test_open_bad_local_resource_binary(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)

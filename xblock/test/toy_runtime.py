@@ -2,8 +2,6 @@
 import logging
 import json
 
-import six
-
 from xblock.fields import Scope
 from xblock.runtime import (
     KvsFieldData, KeyValueStore, Runtime, MemoryIdManager
@@ -81,7 +79,7 @@ class ToyRuntimeKeyValueStore(KeyValueStore):
         `update_dict`: A dictionary of keys: values.
         This method sets the value of each key to the specified new value.
         """
-        for key, value in six.iteritems(update_dict):
+        for key, value in update_dict.items():
             # We just call `set` directly here, because this is an in-memory representation
             # thus we don't concern ourselves with bulk writes.
             self.set(key, value)
@@ -111,15 +109,15 @@ class ToyRuntime(Runtime):
         # Be sure this really is a handler.
         func = getattr(block, handler_name, None)
         if not func:
-            raise ValueError("{!r} is not a function name".format(handler_name))
+            raise ValueError(f"{handler_name!r} is not a function name")
         if not getattr(func, "_is_xblock_handler", False):
-            raise ValueError("{!r} is not a handler name".format(handler_name))
+            raise ValueError(f"{handler_name!r} is not a handler name")
 
         url = ''
 
         has_query = False
         if not thirdparty:
-            url += "?student={student}".format(student=block.scope_ids.user_id)
+            url += f"?student={block.scope_ids.user_id}"
             has_query = True
         if query:
             url += "&" if has_query else "?"

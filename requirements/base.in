@@ -8,6 +8,5 @@ python-dateutil
 pytz
 pyyaml
 simplejson
-six
 web-fragments
 webob>=1.6.0

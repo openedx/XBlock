@@ -5,8 +5,6 @@ from contextlib import contextmanager
 from functools import partial
 import warnings
 
-import six
-
 from xblock.runtime import Runtime, MemoryIdManager
 
 
@@ -36,7 +34,7 @@ def blocks_are_equivalent(block1, block2):
         if len(block1.children) != len(block2.children):
             return False
 
-        for child_id1, child_id2 in six.moves.zip(block1.children, block2.children):
+        for child_id1, child_id2 in zip(block1.children, block2.children):
             if child_id1 == child_id2:
                 # Equal ids mean they must be equal, check the next child.
                 continue

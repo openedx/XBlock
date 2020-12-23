@@ -55,7 +55,7 @@ class CompletableXBlockMixin:
             )
 
         if completion_percent is None or not 0.0 <= completion_percent <= 1.0:
-            raise ValueError("Completion percent must be in [0.0; 1.0] interval, {} given".format(completion_percent))
+            raise ValueError(f"Completion percent must be in [0.0; 1.0] interval, {completion_percent} given")
 
         self.runtime.publish(
             self,

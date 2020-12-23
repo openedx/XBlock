@@ -9,12 +9,10 @@ import copy
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-import six
-
 from xblock.exceptions import InvalidScopeError
 
 
-class FieldData(six.with_metaclass(ABCMeta, object)):
+class FieldData(metaclass=ABCMeta):
     """
     An interface allowing access to an XBlock's field values indexed by field names.
     """
@@ -86,7 +84,7 @@ class FieldData(six.with_metaclass(ABCMeta, object)):
         :param update_dict: A map of field names to their new values
         :type update_dict: dict
         """
-        for key, value in six.iteritems(update_dict):
+        for key, value in update_dict.items():
             self.set(block, key, value)
 
     def default(self, block, name):  # pylint: disable=unused-argument
@@ -160,9 +158,9 @@ class SplitFieldData(FieldData):  # pylint: disable=super-init-not-called
 
     def set_many(self, block, update_dict):
         update_dicts = defaultdict(dict)
-        for key, value in six.iteritems(update_dict):
+        for key, value in update_dict.items():
             update_dicts[self._field_data(block, key)][key] = value
-        for field_data, new_update_dict in six.iteritems(update_dicts):
+        for field_data, new_update_dict in update_dicts.items():
             field_data.set_many(block, new_update_dict)
 
     def delete(self, block, name):
@@ -176,7 +174,7 @@ class SplitFieldData(FieldData):  # pylint: disable=super-init-not-called
 
     def save_block(self, block):
         """ saving data """
-        field_datas = set(six.itervalues(self._scope_mappings))
+        field_datas = set(self._scope_mappings.values())
         for field_data in field_datas:
             field_data.save_block(block)
 
@@ -193,10 +191,10 @@ class ReadOnlyFieldData(FieldData):
         return self._source.get(block, name)
 
     def set(self, block, name, value):
-        raise InvalidScopeError("{block}.{name} is read-only, cannot set".format(block=block, name=name))
+        raise InvalidScopeError(f"{block}.{name} is read-only, cannot set")
 
     def delete(self, block, name):
-        raise InvalidScopeError("{block}.{name} is read-only, cannot delete".format(block=block, name=name))
+        raise InvalidScopeError(f"{block}.{name} is read-only, cannot delete")
 
     def has(self, block, name):
         return self._source.has(block, name)
@@ -205,4 +203,4 @@ class ReadOnlyFieldData(FieldData):
         return self._source.default(block, name)
 
     def __repr__(self):
-        return "ReadOnlyFieldData({!r})".format(self._source)
+        return f"ReadOnlyFieldData({self._source!r})"
