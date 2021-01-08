@@ -7,11 +7,11 @@
 appdirs==1.4.4            # via -r requirements/django.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.in, pylint
 attrs==20.3.0             # via hypothesis, pytest
-boto3==1.16.43            # via -r requirements/django.txt, fs-s3fs
-botocore==1.19.43         # via -r requirements/django.txt, boto3, s3transfer
+boto3==1.16.51            # via -r requirements/django.txt, fs-s3fs
+botocore==1.19.51         # via -r requirements/django.txt, boto3, s3transfer
 coverage==5.3.1           # via -r requirements/test.in, pytest-cov
 ddt==1.4.1                # via -r requirements/test.in
-diff-cover==4.0.1         # via -r requirements/test.in
+diff-cover==4.1.0         # via -r requirements/test.in
 distlib==0.3.1            # via virtualenv
 django-pyfs==2.2          # via -r requirements/django.txt
 filelock==3.0.12          # via tox, virtualenv
@@ -55,7 +55,7 @@ sortedcontainers==2.3.0   # via hypothesis
 sqlparse==0.4.1           # via -r requirements/django.txt, django
 toml==0.10.2              # via pylint, pytest, tox
 tox==3.20.1               # via -r requirements/test.in
-typed-ast==1.4.1          # via astroid
+typed-ast==1.4.2          # via astroid
 typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
 urllib3==1.26.2           # via -r requirements/django.txt, botocore
 virtualenv==20.2.2        # via tox
