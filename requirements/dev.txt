@@ -7,15 +7,15 @@
 appdirs==1.4.4            # via -r requirements/test.txt, -r requirements/travis.txt, fs, virtualenv
 astroid==2.4.2            # via -r requirements/test.txt, pylint
 attrs==20.3.0             # via -r requirements/test.txt, hypothesis, pytest
-boto3==1.16.43            # via -r requirements/test.txt, fs-s3fs
-botocore==1.19.43         # via -r requirements/test.txt, boto3, s3transfer
+boto3==1.16.51            # via -r requirements/test.txt, fs-s3fs
+botocore==1.19.51         # via -r requirements/test.txt, boto3, s3transfer
 certifi==2020.12.5        # via -r requirements/travis.txt, requests
 chardet==4.0.0            # via -r requirements/travis.txt, requests
 click==7.1.2              # via -r requirements/pip-tools.txt, pip-tools
 codecov==2.1.11           # via -r requirements/travis.txt
 coverage==5.3.1           # via -r requirements/test.txt, -r requirements/travis.txt, codecov, pytest-cov
 ddt==1.4.1                # via -r requirements/test.txt
-diff-cover==4.0.1         # via -r requirements/test.txt
+diff-cover==4.1.0         # via -r requirements/test.txt
 distlib==0.3.1            # via -r requirements/test.txt, -r requirements/travis.txt, virtualenv
 django-pyfs==2.2          # via -r requirements/test.txt
 django==2.2.17            # via -r requirements/test.txt, django-pyfs
@@ -42,7 +42,7 @@ packaging==20.8           # via -r requirements/test.txt, -r requirements/travis
 path.py==12.5.0           # via -r requirements/test.txt
 path==13.1.0              # via -r requirements/test.txt, path.py
 pathlib2==2.3.5           # via -r requirements/test.txt, pytest
-pip-tools==5.4.0          # via -r requirements/pip-tools.txt
+pip-tools==5.5.0          # via -r requirements/pip-tools.txt
 pluggy==0.13.1            # via -r requirements/test.txt, -r requirements/travis.txt, diff-cover, pytest, tox
 py==1.10.0                # via -r requirements/test.txt, -r requirements/travis.txt, pytest, tox
 pycodestyle==2.6.0        # via -r requirements/test.txt
@@ -58,13 +58,13 @@ pyyaml==5.3.1             # via -r requirements/test.txt
 requests==2.25.1          # via -r requirements/travis.txt, codecov
 s3transfer==0.3.3         # via -r requirements/test.txt, boto3
 simplejson==3.17.2        # via -r requirements/test.txt
-six==1.15.0               # via -r requirements/pip-tools.txt, -r requirements/test.txt, -r requirements/travis.txt, astroid, fs, fs-s3fs, mock, pathlib2, pip-tools, python-dateutil, tox, virtualenv
+six==1.15.0               # via -r requirements/test.txt, -r requirements/travis.txt, astroid, fs, fs-s3fs, mock, pathlib2, python-dateutil, tox, virtualenv
 sortedcontainers==2.3.0   # via -r requirements/test.txt, hypothesis
 sqlparse==0.4.1           # via -r requirements/test.txt, django
 toml==0.10.2              # via -r requirements/test.txt, -r requirements/travis.txt, pylint, pytest, tox
 tox-battery==0.6.1        # via -r requirements/travis.txt
 tox==3.20.1               # via -r requirements/test.txt, -r requirements/travis.txt, tox-battery
-typed-ast==1.4.1          # via -r requirements/test.txt, astroid
+typed-ast==1.4.2          # via -r requirements/test.txt, astroid
 typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/test.txt, fs
 urllib3==1.26.2           # via -r requirements/test.txt, -r requirements/travis.txt, botocore, requests
 virtualenv==20.2.2        # via -r requirements/test.txt, -r requirements/travis.txt, tox
