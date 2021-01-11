@@ -3,8 +3,6 @@ Script execution for script fragments in content.
 """
 import textwrap
 
-import six
-
 
 def run_script(pycode):
     """Run the Python in `pycode`, and return a dict of the resulting globals."""
@@ -16,6 +14,6 @@ def run_script(pycode):
 
     # execute it.
     globs = {}
-    six.exec_(pycode, globs, globs)  # pylint: disable=W0122
+    exec(pycode, globs, globs)  # pylint: disable=W0122
 
     return globs

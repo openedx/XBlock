@@ -10,11 +10,10 @@ import textwrap
 import unittest
 import warnings
 
+from unittest.mock import Mock
 import ddt
 from lxml import etree
-from mock import Mock
 import pytz
-import six
 
 from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
@@ -436,15 +435,15 @@ class SetTest(FieldTest):
 
     def test_json_equals(self):
         self.assertJSONOrSetEquals(set(), set())
-        self.assertJSONOrSetEquals(set(['foo', 'bar']), set(['foo', 'bar']))
-        self.assertJSONOrSetEquals(set(['bar', 'foo']), set(['foo', 'bar']))
-        self.assertJSONOrSetEquals(set([1, 3.14]), set([1, 3.14]))
-        self.assertJSONOrSetEquals(set([1, 3.14]), set([1, 3.14, 1]))
+        self.assertJSONOrSetEquals({'foo', 'bar'}, {'foo', 'bar'})
+        self.assertJSONOrSetEquals({'bar', 'foo'}, {'foo', 'bar'})
+        self.assertJSONOrSetEquals({1, 3.14}, {1, 3.14})
+        self.assertJSONOrSetEquals({1, 3.14}, {1, 3.14, 1})
 
     def test_hashable_converts(self):
-        self.assertJSONOrSetEquals(set([1, 3.4]), [1, 3.4])
-        self.assertJSONOrSetEquals(set(['a', 'b']), 'ab')
-        self.assertJSONOrSetEquals(set(['k1', 'k2']), {'k1': 1, 'k2': '2'})
+        self.assertJSONOrSetEquals({1, 3.4}, [1, 3.4])
+        self.assertJSONOrSetEquals({'a', 'b'}, 'ab')
+        self.assertJSONOrSetEquals({'k1', 'k2'}, {'k1': 1, 'k2': '2'})
 
     def test_none(self):
         self.assertJSONOrSetEquals(None, None)
@@ -833,7 +832,7 @@ class FieldSerializationTest(unittest.TestCase):
         (Float, -10.0, r"-10|-10\.0*"))
     def test_to_string_regexp_matches(self, _type, value, regexp):
         result = _type().to_string(value)
-        six.assertRegex(self, result, regexp)
+        self.assertRegex(result, regexp)
 
     # Test data for non-canonical serialisations of values that we should be able to correctly
     # deserialise.  These values are not serialised to the representation given here for various

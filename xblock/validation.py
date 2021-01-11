@@ -1,7 +1,6 @@
 """
 Validation information for an xblock instance.
 """
-import six
 
 
 class ValidationMessage:
@@ -24,7 +23,7 @@ class ValidationMessage:
         """
         if message_type not in self.TYPES:
             raise TypeError("Unknown message_type: " + message_type)
-        if not isinstance(message_text, six.text_type):
+        if not isinstance(message_text, str):
             raise TypeError("Message text must be unicode")
         self.type = message_type
         self.text = message_text
@@ -113,7 +112,7 @@ class Validation:
             dict: A dict representation that is json-serializable.
         """
         return {
-            "xblock_id": six.text_type(self.xblock_id),
+            "xblock_id": str(self.xblock_id),
             "messages": [message.to_json() for message in self.messages],
             "empty": self.empty
         }

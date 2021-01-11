@@ -4,8 +4,6 @@ Internal machinery used to make building XBlock family base classes easier.
 import functools
 import inspect
 
-import six
-
 
 class LazyClassProperty:
     """
@@ -40,7 +38,7 @@ class NamedAttributesMetaclass(type):
     def __new__(mcs, name, bases, attrs):
         # Iterate over the attrs before they're bound to the class
         # so that we don't accidentally trigger any __get__ methods
-        for attr_name, attr in six.iteritems(attrs):
+        for attr_name, attr in attrs.items():
             if Nameable.needs_name(attr):
                 attr.__name__ = attr_name
 

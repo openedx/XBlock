@@ -25,8 +25,7 @@ particular combination of initial conditions that we want to test)
 """
 import copy
 
-from mock import Mock, patch
-import six
+from unittest.mock import Mock, patch
 
 from xblock.core import XBlock
 from xblock.fields import Integer, List, String, ScopeIds, UNIQUE_ID
@@ -464,7 +463,7 @@ class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCa
 
     @property
     def default_iterator(self):
-        return six.moves.range(1000)
+        return range(1000)
 
 
 class TestMutableWithStaticDefault(MutableTestCases, StaticDefaultTestCases, DefaultValueMutationProperties):
@@ -481,7 +480,7 @@ class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases,
 
     @property
     def default_iterator(self):
-        return ([None] * i for i in six.moves.range(1000))
+        return ([None] * i for i in range(1000))
 
 
 class TestImmutableWithInitialValue(ImmutableTestCases, InitialValueProperties):

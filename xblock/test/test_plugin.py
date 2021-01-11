@@ -1,7 +1,7 @@
 """
 Test xblock/core/plugin.py
 """
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 import pytest
 
 from xblock.core import XBlock

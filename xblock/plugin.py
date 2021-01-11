@@ -156,7 +156,7 @@ class Plugin:
                 # Here I can load MyXBlockClass by name.
 
         """
-        from mock import Mock  # pylint: disable=import-outside-toplevel
+        from unittest.mock import Mock  # pylint: disable=import-outside-toplevel
 
         if identifier is None:
             identifier = class_.__name__.lower()

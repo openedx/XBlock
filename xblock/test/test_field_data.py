@@ -1,7 +1,7 @@
 """
 Tests of the utility FieldData's defined by xblock
 """
-from mock import Mock
+from unittest.mock import Mock
 import pytest
 
 from xblock.core import XBlock

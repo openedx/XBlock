@@ -4,9 +4,8 @@
 from datetime import datetime
 from unittest import TestCase
 
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 import pytest
-import six
 
 from web_fragments.fragment import Fragment
 
@@ -104,7 +103,7 @@ class TestXBlock(TestXBlockNoFallback):
         if view_name == 'test_fallback_view':
             return Fragment(self.preferences)
         else:
-            return Fragment("{} default".format(view_name))
+            return Fragment(f"{view_name} default")
 
 
 def test_db_model_keys():
@@ -117,7 +116,7 @@ def test_db_model_keys():
 
     assert not field_data.has(tester, 'not a field')
 
-    for field in six.itervalues(tester.fields):
+    for field in tester.fields.values():
         new_value = 'new ' + field.name
         assert not field_data.has(tester, field.name)
         if isinstance(field, List):
@@ -128,7 +127,7 @@ def test_db_model_keys():
     tester.save()
 
     # Make sure everything saved correctly
-    for field in six.itervalues(tester.fields):
+    for field in tester.fields.values():
         assert field_data.has(tester, field.name)
 
     def get_key_value(scope, user_id, block_scope_id, field_name):
@@ -370,7 +369,7 @@ class Dynamic:
     Object for testing that sets attrs based on __init__ kwargs
     """
     def __init__(self, **kwargs):
-        for name, value in six.iteritems(kwargs):
+        for name, value in kwargs.items():
             setattr(self, name, value)
 
 
@@ -451,8 +450,8 @@ class TestMixologist:
 
     # Test that mixins are applied in order
     def test_mixin_order(self):
-        assert 1 is self.mixologist.mix(FieldTester).number
-        assert 1 is self.mixologist.mix(FieldTester).fields['field'].default
+        assert self.mixologist.mix(FieldTester).number == 1
+        assert self.mixologist.mix(FieldTester).fields['field'].default == 1
 
     def test_unmixed_class(self):
         assert FieldTester is self.mixologist.mix(FieldTester).unmixed_class
@@ -491,7 +490,7 @@ class TestMixologistErrors:
     """ Test failures in Mixologist initialization. """
     def test_bad_class_name(self):
         bad_class_name = 'xblock.test.test_runtime.NonExistentMixin'
-        with pytest.raises(ImportError, match="Couldn't import class .*'{}'".format(bad_class_name)):
+        with pytest.raises(ImportError, match=f"Couldn't import class .*'{bad_class_name}'"):
             Mixologist([bad_class_name])
 
 
@@ -507,8 +506,8 @@ class XBlockWithServices(XBlock):
         def assert_equals_unicode(str1, str2):
             """`str1` equals `str2`, and both are Unicode strings."""
             assert str1 == str2
-            assert isinstance(str1, six.text_type)
-            assert isinstance(str2, six.text_type)
+            assert isinstance(str1, str)
+            assert isinstance(str2, str)
 
         i18n = self.runtime.service(self, "i18n")
         assert_equals_unicode("Welcome!", i18n.ugettext("Welcome!"))
@@ -559,7 +558,7 @@ def test_ugettext_calls():
     runtime = TestRuntime()
     block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
     assert block.ugettext('test') == 'test'
-    assert isinstance(block.ugettext('test'), six.text_type)
+    assert isinstance(block.ugettext('test'), str)
 
     # NoSuchServiceError exception should raise if i18n is none/empty.
     runtime = TestRuntime(services={

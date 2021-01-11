@@ -4,50 +4,131 @@
 #
 #    make upgrade
 #
-alabaster==0.7.12         # via sphinx
-appdirs==1.4.4            # via -r requirements/django.txt, fs
-babel==2.9.0              # via sphinx
-boto3==1.16.51            # via -r requirements/django.txt, fs-s3fs
-botocore==1.19.51         # via -r requirements/django.txt, boto3, s3transfer
-certifi==2020.12.5        # via requests
-chardet==4.0.0            # via requests
-django-pyfs==2.2          # via -r requirements/django.txt
-django==2.2.17            # via -r requirements/django.txt, django-pyfs
-docutils==0.16            # via sphinx
-edx-sphinx-theme==1.6.0   # via -r requirements/doc.in
-fs-s3fs==1.1.1            # via -r requirements/django.txt, django-pyfs
-fs==2.4.11                # via -r requirements/django.txt, django-pyfs, fs-s3fs
-idna==2.10                # via requests
-imagesize==1.2.0          # via sphinx
-jinja2==2.11.2            # via sphinx
-jmespath==0.10.0          # via -r requirements/django.txt, boto3, botocore
-lazy==1.4                 # via -r requirements/django.txt
-lxml==4.6.2               # via -r requirements/django.txt
-markupsafe==1.1.1         # via -r requirements/django.txt, jinja2
-mock==3.0.5               # via -r requirements/doc.in
-packaging==20.8           # via sphinx
-pygments==2.7.3           # via sphinx
-pyparsing==2.4.7          # via packaging
-python-dateutil==2.8.0    # via -c requirements/constraints.txt, -r requirements/django.txt, botocore
-pytz==2020.5              # via -r requirements/django.txt, babel, django, fs
-pyyaml==5.3.1             # via -r requirements/django.txt
-requests==2.25.1          # via sphinx
-s3transfer==0.3.3         # via -r requirements/django.txt, boto3
-simplejson==3.17.2        # via -r requirements/django.txt
-six==1.15.0               # via -r requirements/django.txt, edx-sphinx-theme, fs, fs-s3fs, mock, python-dateutil
-snowballstemmer==2.0.0    # via sphinx
-sphinx==3.4.3             # via -r requirements/doc.in, edx-sphinx-theme
-sphinxcontrib-applehelp==1.0.2  # via sphinx
-sphinxcontrib-devhelp==1.0.2  # via sphinx
-sphinxcontrib-htmlhelp==1.0.3  # via sphinx
-sphinxcontrib-jsmath==1.0.1  # via sphinx
-sphinxcontrib-qthelp==1.0.3  # via sphinx
-sphinxcontrib-serializinghtml==1.1.4  # via sphinx
-sqlparse==0.4.1           # via -r requirements/django.txt, django
-typing==3.7.4.3 ; python_version == "3.5"  # via -c requirements/constraints.txt, -r requirements/django.txt, fs
-urllib3==1.26.2           # via -r requirements/django.txt, botocore, requests
-web-fragments==0.3.2      # via -r requirements/django.txt
-webob==1.8.6              # via -r requirements/django.txt
+alabaster==0.7.12
+    # via sphinx
+appdirs==1.4.4
+    # via
+    #   -r requirements/django.txt
+    #   fs
+babel==2.9.0
+    # via sphinx
+boto3==1.16.51
+    # via
+    #   -r requirements/django.txt
+    #   fs-s3fs
+botocore==1.19.51
+    # via
+    #   -r requirements/django.txt
+    #   boto3
+    #   s3transfer
+certifi==2020.12.5
+    # via requests
+chardet==4.0.0
+    # via requests
+django-pyfs==2.2
+    # via -r requirements/django.txt
+django==2.2.17
+    # via
+    #   -r requirements/django.txt
+    #   django-pyfs
+docutils==0.16
+    # via sphinx
+edx-sphinx-theme==1.6.0
+    # via -r requirements/doc.in
+fs-s3fs==1.1.1
+    # via
+    #   -r requirements/django.txt
+    #   django-pyfs
+fs==2.4.11
+    # via
+    #   -r requirements/django.txt
+    #   django-pyfs
+    #   fs-s3fs
+idna==2.10
+    # via requests
+imagesize==1.2.0
+    # via sphinx
+jinja2==2.11.2
+    # via sphinx
+jmespath==0.10.0
+    # via
+    #   -r requirements/django.txt
+    #   boto3
+    #   botocore
+lazy==1.4
+    # via -r requirements/django.txt
+lxml==4.6.2
+    # via -r requirements/django.txt
+markupsafe==1.1.1
+    # via
+    #   -r requirements/django.txt
+    #   jinja2
+mock==4.0.3
+    # via -r requirements/doc.in
+packaging==20.8
+    # via sphinx
+pygments==2.7.3
+    # via sphinx
+pyparsing==2.4.7
+    # via packaging
+python-dateutil==2.8.1
+    # via
+    #   -r requirements/django.txt
+    #   botocore
+pytz==2020.5
+    # via
+    #   -r requirements/django.txt
+    #   babel
+    #   django
+    #   fs
+pyyaml==5.3.1
+    # via -r requirements/django.txt
+requests==2.25.1
+    # via sphinx
+s3transfer==0.3.3
+    # via
+    #   -r requirements/django.txt
+    #   boto3
+simplejson==3.17.2
+    # via -r requirements/django.txt
+six==1.15.0
+    # via
+    #   -r requirements/django.txt
+    #   edx-sphinx-theme
+    #   fs
+    #   fs-s3fs
+    #   python-dateutil
+snowballstemmer==2.0.0
+    # via sphinx
+sphinx==3.4.3
+    # via
+    #   -r requirements/doc.in
+    #   edx-sphinx-theme
+sphinxcontrib-applehelp==1.0.2
+    # via sphinx
+sphinxcontrib-devhelp==1.0.2
+    # via sphinx
+sphinxcontrib-htmlhelp==1.0.3
+    # via sphinx
+sphinxcontrib-jsmath==1.0.1
+    # via sphinx
+sphinxcontrib-qthelp==1.0.3
+    # via sphinx
+sphinxcontrib-serializinghtml==1.1.4
+    # via sphinx
+sqlparse==0.4.1
+    # via
+    #   -r requirements/django.txt
+    #   django
+urllib3==1.26.2
+    # via
+    #   -r requirements/django.txt
+    #   botocore
+    #   requests
+web-fragments==0.3.2
+    # via -r requirements/django.txt
+webob==1.8.6
+    # via -r requirements/django.txt
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

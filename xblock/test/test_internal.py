@@ -1,8 +1,6 @@
 """Tests of the xblock.internal module."""
 from unittest import TestCase
 
-import six
-
 from xblock.internal import class_lazy, NamedAttributesMetaclass, Nameable
 
 
@@ -41,7 +39,7 @@ class TestGetSetDescriptor(Nameable):
         pass
 
 
-class NamingTester(six.with_metaclass(NamedAttributesMetaclass, object)):
+class NamingTester(metaclass=NamedAttributesMetaclass):
     """Class with several descriptors that should get names."""
 
     test_descriptor = TestDescriptor()

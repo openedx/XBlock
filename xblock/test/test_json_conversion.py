@@ -4,7 +4,7 @@ with ModelDatas
 """
 # Allow inspection of private class members
 # pylint: disable=protected-access
-from mock import Mock
+from unittest.mock import Mock
 
 from xblock.core import XBlock
 from xblock.fields import Field, Scope, ScopeIds
@@ -67,7 +67,7 @@ class TestJsonConversion:
         assert isinstance(self.block.field_b, set)
 
     def test_set(self):
-        self.block.field_b = set([5, 6, 5])
+        self.block.field_b = {5, 6, 5}
         self.block.save()
         assert isinstance(self.block.field_b, set)
         assert {'$type': 'set', '$vals': [5, 6]} == \

@@ -16,7 +16,6 @@ import warnings
 
 from lxml import etree
 import markupsafe
-import six
 
 from web_fragments.fragment import Fragment
 
@@ -35,7 +34,7 @@ from xblock.exceptions import (
 log = logging.getLogger(__name__)
 
 
-class KeyValueStore(six.with_metaclass(ABCMeta, object)):
+class KeyValueStore(metaclass=ABCMeta):
     """The abstract interface for Key Value Stores."""
 
     class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
@@ -81,7 +80,7 @@ class KeyValueStore(six.with_metaclass(ABCMeta, object)):
 
         :update_dict: field_name, field_value pairs for all cached changes
         """
-        for key, value in six.iteritems(update_dict):
+        for key, value in update_dict.items():
             self.set(key, value)
 
 
@@ -220,7 +219,7 @@ class KvsFieldData(FieldData):
         updated_dict = {}
 
         # Generate a new dict with the correct mappings.
-        for (key, value) in six.iteritems(update_dict):
+        for (key, value) in update_dict.items():
             updated_dict[self._key(block, key)] = value
 
         self._kvs.set_many(updated_dict)
@@ -240,7 +239,7 @@ class KvsFieldData(FieldData):
 DbModel = KvsFieldData  # pylint: disable=C0103
 
 
-class IdReader(six.with_metaclass(ABCMeta, object)):
+class IdReader(metaclass=ABCMeta):
     """An abstract object that stores usages and definitions."""
 
     @abstractmethod
@@ -322,7 +321,7 @@ class IdReader(six.with_metaclass(ABCMeta, object)):
         raise NotImplementedError()
 
 
-class IdGenerator(six.with_metaclass(ABCMeta, object)):
+class IdGenerator(metaclass=ABCMeta):
     """An abstract object that creates usage and definition ids"""
 
     @abstractmethod
@@ -433,7 +432,7 @@ class MemoryIdManager(IdReader, IdGenerator):
         return aside_id.aside_type
 
 
-class Runtime(six.with_metaclass(ABCMeta, object)):
+class Runtime(metaclass=ABCMeta):
     """
     Access to the runtime environment for XBlocks.
     """
@@ -695,7 +694,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             )
 
         id_generator = id_generator or self.id_generator
-        if isinstance(xml, six.binary_type):
+        if isinstance(xml, bytes):
             io_type = BytesIO
         else:
             io_type = StringIO
@@ -938,7 +937,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         block_css_entrypoint = block.entry_point.replace('.', '-')
         css_classes = [
             block_css_entrypoint,
-            '{}-{}'.format(block_css_entrypoint, view),
+            f'{block_css_entrypoint}-{view}',
         ]
         return css_classes
 
@@ -1065,7 +1064,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
                 # Cache results of the handler call for later saving
                 results = fallback_handler(handler_name, request, suffix)
             else:
-                raise NoSuchHandlerError("Couldn't find handler %r for %r" % (handler_name, block))
+                raise NoSuchHandlerError("Couldn't find handler {!r} for {!r}".format(handler_name, block))
 
         # Write out dirty fields
         block.save()
@@ -1099,10 +1098,10 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         """
         declaration = block.service_declaration(service_name)
         if declaration is None:
-            raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
+            raise NoSuchServiceError(f"Service {service_name!r} was not requested.")
         service = self._services.get(service_name)
         if service is None and declaration == "need":
-            raise NoSuchServiceError("Service {!r} is not available.".format(service_name))
+            raise NoSuchServiceError(f"Service {service_name!r} is not available.")
         return service
 
     # Querying
@@ -1123,7 +1122,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
             """Bad path exception thrown when path cannot be found."""
 
         results = self.query(block)
-        ROOT, SEP, WORD, FINAL = six.moves.range(4)  # pylint: disable=C0103
+        ROOT, SEP, WORD, FINAL = range(4)  # pylint: disable=C0103
         state = ROOT
         lexer = RegexLexer(
             ("dotdot", r"\.\."),
@@ -1187,7 +1186,7 @@ class Runtime(six.with_metaclass(ABCMeta, object)):
         for family in [XBlock, XBlockAside]:
             if family_id == family.entry_point:
                 return family
-        raise ValueError('No such family: {}'.format(family_id))
+        raise ValueError(f'No such family: {family_id}')
 
 
 class ObjectAggregator:
@@ -1213,7 +1212,7 @@ class ObjectAggregator:
             if hasattr(obj, name):
                 return obj
 
-        raise AttributeError("No object has attribute {!r}".format(name))
+        raise AttributeError(f"No object has attribute {name!r}")
 
     def __getattr__(self, name):
         return getattr(self._object_with_attr(name), name)
@@ -1243,13 +1242,13 @@ class Mixologist:
 
         mixin_classes = []
         for mixin in mixins:
-            if isinstance(mixin, six.text_type):
+            if isinstance(mixin, str):
                 try:
                     module, cls = mixin.rsplit('.', 1)
                     imported_module = importlib.import_module(module)
                     mixin_class = getattr(imported_module, cls)
                 except Exception as e:
-                    msg = "Couldn't import class {!r}: {}: {}".format(mixin, e.__class__.__name__, e)
+                    msg = f"Couldn't import class {mixin!r}: {e.__class__.__name__}: {e}"
                     raise ImportError(msg)  # pylint: disable= raise-missing-from
 
                 mixin_classes.append(mixin_class)
@@ -1287,7 +1286,7 @@ class Mixologist:
                 # created a class before we got the lock, we don't
                 # overwrite it
                 return _CLASS_CACHE.setdefault(mixin_key, type(
-                    base_class.__name__ + str('WithMixins'),  # type() requires native str
+                    base_class.__name__ + 'WithMixins',  # type() requires native str
                     (base_class,) + mixins,
                     {'unmixed_class': base_class}
                 ))
@@ -1301,7 +1300,7 @@ class RegexLexer:
     def __init__(self, *toks):
         parts = []
         for name, regex in toks:
-            parts.append("(?P<%s>%s)" % (name, regex))
+            parts.append("(?P<{}>{})".format(name, regex))
         self.regex = re.compile("|".join(parts))
 
     def lex(self, text):
@@ -1334,11 +1333,7 @@ class NullI18nService:
         Locale-aware strftime, with format short-cuts.
         """
         format = self.STRFTIME_FORMATS.get(format + "_FORMAT", format)
-        if six.PY2 and isinstance(format, six.text_type):
-            format = format.encode("utf8")
         timestring = dtime.strftime(format)
-        if six.PY2:
-            timestring = timestring.decode("utf8")
         return timestring
 
     @property
@@ -1350,10 +1345,7 @@ class NullI18nService:
         it uses `ugettext()`.  This should not be used with bytestrings.
         """
         # pylint: disable=no-member
-        if six.PY2:
-            return self._translations.ugettext
-        else:
-            return self._translations.gettext
+        return self._translations.gettext
 
     @property
     def ungettext(self):
@@ -1364,7 +1356,4 @@ class NullI18nService:
         it uses `ungettext()`.  This should not be used with bytestrings.
         """
         # pylint: disable=no-member
-        if six.PY2:
-            return self._translations.ungettext
-        else:
-            return self._translations.ngettext
+        return self._translations.ngettext

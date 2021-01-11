@@ -63,7 +63,7 @@ class TestDjangoWebobResponse(TestCase):
         self.assertEqual(self._as_django(app_iter=(c for c in "foo")).content, b"foo")
         self.assertEqual(self._as_django(body=b"foo", charset="utf-8").content, b"foo")
 
-        encoded_snowman = "\N{SNOWMAN}".encode('utf-8')
+        encoded_snowman = "\N{SNOWMAN}".encode()
         self.assertEqual(self._as_django(body=encoded_snowman, charset="utf-8").content, encoded_snowman)
 
     def test_headers(self):

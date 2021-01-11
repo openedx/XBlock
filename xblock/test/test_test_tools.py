@@ -6,13 +6,11 @@ Tests of our testing tools.
 from abc import ABCMeta, abstractmethod
 import unittest
 
-import six
-
 
 from xblock.test.tools import unabc
 
 
-class Abstract(six.with_metaclass(ABCMeta, object)):
+class Abstract(metaclass=ABCMeta):
     """Our test subject: an abstract class with two abstract methods."""
 
     def concrete(self, arg):
@@ -44,7 +42,7 @@ class TestUnAbc(unittest.TestCase):
     """Test the @unabc decorator."""
 
     def test_cant_abstract(self):
-        with six.assertRaisesRegex(self, TypeError, r"Can't instantiate .*"):
+        with self.assertRaisesRegex(TypeError, r"Can't instantiate .*"):
             Abstract()
 
     def test_concrete(self):
@@ -53,14 +51,14 @@ class TestUnAbc(unittest.TestCase):
 
     def test_concrete_absmeth(self):
         conc = ForceConcrete()
-        with six.assertRaisesRegex(self, NotImplementedError, r"absmeth1 isn't implemented"):
+        with self.assertRaisesRegex(NotImplementedError, r"absmeth1 isn't implemented"):
             conc.absmeth1()
-        with six.assertRaisesRegex(self, NotImplementedError, r"absmeth2 isn't implemented"):
+        with self.assertRaisesRegex(NotImplementedError, r"absmeth2 isn't implemented"):
             conc.absmeth2()
 
     def test_concrete_absmeth_message(self):
         conc = ForceConcreteMessage()
-        with six.assertRaisesRegex(self, NotImplementedError, r"Sorry, no absmeth1"):
+        with self.assertRaisesRegex(NotImplementedError, r"Sorry, no absmeth1"):
             conc.absmeth1()
-        with six.assertRaisesRegex(self, NotImplementedError, r"Sorry, no absmeth2"):
+        with self.assertRaisesRegex(NotImplementedError, r"Sorry, no absmeth2"):
             conc.absmeth2()

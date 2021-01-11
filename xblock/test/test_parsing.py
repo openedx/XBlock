@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 Test XML parsing in XBlocks.
 """
+import io
 import re
 import textwrap
 import unittest
+from unittest import mock
 
 import ddt
 from lxml import etree
-import mock
-import six
 
 from xblock.core import XBlock, XML_NAMESPACES
 from xblock.fields import Scope, String, Integer, Dict, List
@@ -21,7 +20,7 @@ from xblock.test.toy_runtime import ToyRuntime
 
 def get_namespace_attrs():
     """ Returns string suitable to be used as an xmlns parameters in XBlock XML representation """
-    return " ".join('xmlns:{}="{}"'.format(k, v) for k, v in six.iteritems(XML_NAMESPACES))
+    return " ".join(f'xmlns:{k}="{v}"' for k, v in XML_NAMESPACES.items())
 
 
 class Leaf(XBlock):
@@ -85,7 +84,7 @@ class CustomXml(XBlock):
     def add_xml_to_node(self, node):
         """ For exporting, set data on `node` from ourselves. """
         node.tag = self.xml_element_name()
-        parsed_inner_xml = etree.XML('<x>{}</x>'.format(self.inner_xml))
+        parsed_inner_xml = etree.XML(f'<x>{self.inner_xml}</x>')
         node.text = parsed_inner_xml.text
         for child in parsed_inner_xml:
             node.append(child)
@@ -106,7 +105,7 @@ class XmlTestMixin:
 
     def export_xml_for_block(self, block):
         """A helper to return the XML string for a block."""
-        output = six.BytesIO()
+        output = io.BytesIO()
         self.runtime.export_to_xml(block, output)
         return output.getvalue()
 
@@ -344,7 +343,7 @@ class ExportTest(XmlTest, unittest.TestCase):
     )
     def test_unknown_field_as_attribute_raises_warning(self, parameter_name):
         with mock.patch('logging.warning') as patched_warn:
-            block = self.parse_xml_to_block("<leaf {0}='something irrelevant'></leaf>".format(parameter_name))
+            block = self.parse_xml_to_block(f"<leaf {parameter_name}='something irrelevant'></leaf>")
             patched_warn.assert_called_once_with("XBlock %s does not contain field %s", type(block), parameter_name)
 
     @XBlock.register_temp_plugin(LeafWithOption)
@@ -392,14 +391,7 @@ class TestRoundTrip(XmlTest, unittest.TestCase):
         expected_dict = {b'1': b'1', b'ping': b'ack'}
         block.sequence = expected_seq
         block.dictionary = expected_dict
-        if six.PY3:
-            self.assertRaises(TypeError, self.export_xml_for_block, block)
-        else:
-            xml = self.export_xml_for_block(block)
-            parsed = self.parse_xml_to_block(xml)
-
-            self.assertEqual(parsed.sequence, expected_seq)
-            self.assertEqual(parsed.dictionary, expected_dict)
+        self.assertRaises(TypeError, self.export_xml_for_block, block)
 
     @XBlock.register_temp_plugin(LeafWithDictAndList)
     def test_unicode_roundtrip(self):
@@ -431,7 +423,7 @@ class TestRoundTrip(XmlTest, unittest.TestCase):
 
         self.assertEqual(parsed.sequence, expected_seq)
         self.assertNotEqual(parsed.dictionary, expected_dict)
-        self.assertEqual(parsed.dictionary, {six.text_type(key): value for key, value in six.iteritems(expected_dict)})
+        self.assertEqual(parsed.dictionary, {str(key): value for key, value in expected_dict.items()})
 
     @XBlock.register_temp_plugin(LeafWithDictAndList)
     def test_none_contents_roundtrip(self):
