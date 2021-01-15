@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.16.51
+boto3==1.16.55
     # via fs-s3fs
-botocore==1.19.51
+botocore==1.19.55
     # via
     #   boto3
     #   s3transfer
@@ -22,7 +22,7 @@ django==2.2.17
     #   django-pyfs
 fs-s3fs==1.1.1
     # via django-pyfs
-fs==2.4.11
+fs==2.4.12
     # via
     #   -r requirements/base.txt
     #   django-pyfs
@@ -48,7 +48,7 @@ pytz==2020.5
     #   fs
 pyyaml==5.3.1
     # via -r requirements/base.txt
-s3transfer==0.3.3
+s3transfer==0.3.4
     # via boto3
 simplejson==3.17.2
     # via -r requirements/base.txt
@@ -60,6 +60,10 @@ six==1.15.0
     #   python-dateutil
 sqlparse==0.4.1
     # via django
+typing==3.7.4.3
+    # via
+    #   -r requirements/base.txt
+    #   fs
 urllib3==1.26.2
     # via botocore
 web-fragments==0.3.2

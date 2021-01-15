@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.16.51
+boto3==1.16.55
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.19.51
+botocore==1.19.55
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -73,18 +73,33 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-fs==2.4.11
+fs==2.4.12
     # via
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.0.0
+hypothesis==5.33.2
     # via -r requirements/test.txt
 idna==2.10
     # via
     #   -r requirements/travis.txt
     #   requests
-inflect==5.0.2
+importlib-metadata==2.1.1
+    # via
+    #   -r requirements/test.txt
+    #   -r requirements/travis.txt
+    #   inflect
+    #   path
+    #   pluggy
+    #   pytest
+    #   tox
+    #   virtualenv
+importlib-resources==3.2.1
+    # via
+    #   -r requirements/test.txt
+    #   -r requirements/travis.txt
+    #   virtualenv
+inflect==3.0.2
     # via
     #   -r requirements/test.txt
     #   jinja2-pluralize
@@ -92,7 +107,7 @@ iniconfig==1.1.1
     # via
     #   -r requirements/test.txt
     #   pytest
-isort==5.7.0
+isort==4.3.21
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -126,7 +141,7 @@ mccabe==0.6.1
     # via
     #   -r requirements/test.txt
     #   pylint
-mock==4.0.3
+mock==3.0.5
     # via -r requirements/test.txt
 packaging==20.8
     # via
@@ -136,10 +151,14 @@ packaging==20.8
     #   tox
 path.py==12.5.0
     # via -r requirements/test.txt
-path==15.0.1
+path==13.1.0
     # via
     #   -r requirements/test.txt
     #   path.py
+pathlib2==2.3.5
+    # via
+    #   -r requirements/test.txt
+    #   pytest
 pip-tools==5.5.0
     # via -r requirements/pip-tools.txt
 pluggy==0.13.1
@@ -157,7 +176,7 @@ py==1.10.0
     #   tox
 pycodestyle==2.6.0
     # via -r requirements/test.txt
-pygments==2.7.3
+pygments==2.7.4
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -172,7 +191,7 @@ pytest-cov==2.10.1
     # via -r requirements/test.txt
 pytest-django==4.1.0
     # via -r requirements/test.txt
-pytest==6.2.1
+pytest==6.1.2
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -192,7 +211,7 @@ requests==2.25.1
     # via
     #   -r requirements/travis.txt
     #   codecov
-s3transfer==0.3.3
+s3transfer==0.3.4
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -205,6 +224,8 @@ six==1.15.0
     #   astroid
     #   fs
     #   fs-s3fs
+    #   mock
+    #   pathlib2
     #   python-dateutil
     #   tox
     #   virtualenv
@@ -225,18 +246,26 @@ toml==0.10.2
     #   tox
 tox-battery==0.6.1
     # via -r requirements/travis.txt
-tox==3.21.0
+tox==3.21.1
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   tox-battery
+typed-ast==1.4.2
+    # via
+    #   -r requirements/test.txt
+    #   astroid
+typing==3.7.4.3
+    # via
+    #   -r requirements/test.txt
+    #   fs
 urllib3==1.26.2
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   botocore
     #   requests
-virtualenv==20.3.0
+virtualenv==20.3.1
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -249,6 +278,12 @@ wrapt==1.12.1
     # via
     #   -r requirements/test.txt
     #   astroid
+zipp==1.2.0
+    # via
+    #   -r requirements/test.txt
+    #   -r requirements/travis.txt
+    #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
