@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.16.51
+boto3==1.16.56
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.19.51
+botocore==1.19.56
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -73,12 +73,12 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-fs==2.4.11
+fs==2.4.12
     # via
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.0.0
+hypothesis==6.0.2
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -157,7 +157,7 @@ py==1.10.0
     #   tox
 pycodestyle==2.6.0
     # via -r requirements/test.txt
-pygments==2.7.3
+pygments==2.7.4
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -168,7 +168,7 @@ pyparsing==2.4.7
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   packaging
-pytest-cov==2.10.1
+pytest-cov==2.11.0
     # via -r requirements/test.txt
 pytest-django==4.1.0
     # via -r requirements/test.txt
@@ -192,7 +192,7 @@ requests==2.25.1
     # via
     #   -r requirements/travis.txt
     #   codecov
-s3transfer==0.3.3
+s3transfer==0.3.4
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -225,7 +225,7 @@ toml==0.10.2
     #   tox
 tox-battery==0.6.1
     # via -r requirements/travis.txt
-tox==3.21.0
+tox==3.21.2
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -236,7 +236,7 @@ urllib3==1.26.2
     #   -r requirements/travis.txt
     #   botocore
     #   requests
-virtualenv==20.3.0
+virtualenv==20.4.0
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt

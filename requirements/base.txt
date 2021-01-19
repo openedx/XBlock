@@ -6,7 +6,7 @@
 #
 appdirs==1.4.4
     # via fs
-fs==2.4.11
+fs==2.4.12
     # via -r requirements/base.in
 lxml==4.6.2
     # via -r requirements/base.in

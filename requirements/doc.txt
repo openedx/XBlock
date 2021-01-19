@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.9.0
     # via sphinx
-boto3==1.16.51
+boto3==1.16.56
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.19.51
+botocore==1.19.56
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -39,7 +39,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-fs==2.4.11
+fs==2.4.12
     # via
     #   -r requirements/django.txt
     #   django-pyfs
@@ -67,7 +67,7 @@ mock==4.0.3
     # via -r requirements/doc.in
 packaging==20.8
     # via sphinx
-pygments==2.7.3
+pygments==2.7.4
     # via sphinx
 pyparsing==2.4.7
     # via packaging
@@ -85,7 +85,7 @@ pyyaml==5.3.1
     # via -r requirements/django.txt
 requests==2.25.1
     # via sphinx
-s3transfer==0.3.3
+s3transfer==0.3.4
     # via
     #   -r requirements/django.txt
     #   boto3
