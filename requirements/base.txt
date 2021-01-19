@@ -26,8 +26,6 @@ six==1.15.0
     # via
     #   fs
     #   python-dateutil
-typing==3.7.4.3
-    # via fs
 web-fragments==0.3.2
     # via -r requirements/base.in
 webob==1.8.6

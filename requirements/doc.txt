@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.9.0
     # via sphinx
-boto3==1.16.55
+boto3==1.16.56
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.19.55
+botocore==1.19.56
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -63,7 +63,7 @@ markupsafe==1.1.1
     # via
     #   -r requirements/django.txt
     #   jinja2
-mock==3.0.5
+mock==4.0.3
     # via -r requirements/doc.in
 packaging==20.8
     # via sphinx
@@ -97,7 +97,6 @@ six==1.15.0
     #   edx-sphinx-theme
     #   fs
     #   fs-s3fs
-    #   mock
     #   python-dateutil
 snowballstemmer==2.0.0
     # via sphinx
@@ -121,10 +120,6 @@ sqlparse==0.4.1
     # via
     #   -r requirements/django.txt
     #   django
-typing==3.7.4.3
-    # via
-    #   -r requirements/django.txt
-    #   fs
 urllib3==1.26.2
     # via
     #   -r requirements/django.txt
