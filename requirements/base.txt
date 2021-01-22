@@ -18,7 +18,7 @@ pytz==2020.5
     # via
     #   -r requirements/base.in
     #   fs
-pyyaml==5.3.1
+pyyaml==5.4.1
     # via -r requirements/base.in
 simplejson==3.17.2
     # via -r requirements/base.in
@@ -26,7 +26,7 @@ six==1.15.0
     # via
     #   fs
     #   python-dateutil
-web-fragments==0.3.2
+web-fragments==1.0.0
     # via -r requirements/base.in
 webob==1.8.6
     # via -r requirements/base.in
