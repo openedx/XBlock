@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.16.56
+boto3==1.16.58
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.19.56
+botocore==1.19.58
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -34,7 +34,9 @@ certifi==2020.12.5
     #   requests
 chardet==4.0.0
     # via
+    #   -r requirements/test.txt
     #   -r requirements/travis.txt
+    #   diff-cover
     #   requests
 click==7.1.2
     # via
@@ -50,14 +52,14 @@ coverage==5.3.1
     #   pytest-cov
 ddt==1.4.1
     # via -r requirements/test.txt
-diff-cover==4.1.1
+diff-cover==4.2.0
     # via -r requirements/test.txt
 distlib==0.3.1
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   virtualenv
-django-pyfs==2.2
+django-pyfs==3.0
     # via -r requirements/test.txt
 django==2.2.17
     # via
@@ -168,7 +170,7 @@ pyparsing==2.4.7
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   packaging
-pytest-cov==2.11.0
+pytest-cov==2.11.1
     # via -r requirements/test.txt
 pytest-django==4.1.0
     # via -r requirements/test.txt
@@ -186,7 +188,7 @@ pytz==2020.5
     #   -r requirements/test.txt
     #   django
     #   fs
-pyyaml==5.3.1
+pyyaml==5.4.1
     # via -r requirements/test.txt
 requests==2.25.1
     # via
@@ -241,7 +243,7 @@ virtualenv==20.4.0
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   tox
-web-fragments==0.3.2
+web-fragments==1.0.0
     # via -r requirements/test.txt
 webob==1.8.6
     # via -r requirements/test.txt

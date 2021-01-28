@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.9.0
     # via sphinx
-boto3==1.16.56
+boto3==1.16.58
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.19.56
+botocore==1.19.58
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -25,7 +25,7 @@ certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
-django-pyfs==2.2
+django-pyfs==3.0
     # via -r requirements/django.txt
 django==2.2.17
     # via
@@ -33,7 +33,7 @@ django==2.2.17
     #   django-pyfs
 docutils==0.16
     # via sphinx
-edx-sphinx-theme==1.6.0
+edx-sphinx-theme==1.6.1
     # via -r requirements/doc.in
 fs-s3fs==1.1.1
     # via
@@ -81,7 +81,7 @@ pytz==2020.5
     #   babel
     #   django
     #   fs
-pyyaml==5.3.1
+pyyaml==5.4.1
     # via -r requirements/django.txt
 requests==2.25.1
     # via sphinx
@@ -98,7 +98,7 @@ six==1.15.0
     #   fs
     #   fs-s3fs
     #   python-dateutil
-snowballstemmer==2.0.0
+snowballstemmer==2.1.0
     # via sphinx
 sphinx==3.4.3
     # via
@@ -125,7 +125,7 @@ urllib3==1.26.2
     #   -r requirements/django.txt
     #   botocore
     #   requests
-web-fragments==0.3.2
+web-fragments==1.0.0
     # via -r requirements/django.txt
 webob==1.8.6
     # via -r requirements/django.txt

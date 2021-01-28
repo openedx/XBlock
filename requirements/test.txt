@@ -17,26 +17,28 @@ attrs==20.3.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.16.56
+boto3==1.16.58
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.19.56
+botocore==1.19.58
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
+chardet==4.0.0
+    # via diff-cover
 coverage==5.3.1
     # via
     #   -r requirements/test.in
     #   pytest-cov
 ddt==1.4.1
     # via -r requirements/test.in
-diff-cover==4.1.1
+diff-cover==4.2.0
     # via -r requirements/test.in
 distlib==0.3.1
     # via virtualenv
-django-pyfs==2.2
+django-pyfs==3.0
     # via -r requirements/django.txt
     # via
     #   -r requirements/django.txt
@@ -112,7 +114,7 @@ pylint==2.6.0
     # via -r requirements/test.in
 pyparsing==2.4.7
     # via packaging
-pytest-cov==2.11.0
+pytest-cov==2.11.1
     # via -r requirements/test.in
 pytest-django==4.1.0
     # via -r requirements/test.in
@@ -130,7 +132,7 @@ pytz==2020.5
     #   -r requirements/django.txt
     #   django
     #   fs
-pyyaml==5.3.1
+pyyaml==5.4.1
     # via -r requirements/django.txt
 s3transfer==0.3.4
     # via
@@ -166,7 +168,7 @@ urllib3==1.26.2
     #   botocore
 virtualenv==20.4.0
     # via tox
-web-fragments==0.3.2
+web-fragments==1.0.0
     # via -r requirements/django.txt
 webob==1.8.6
     # via -r requirements/django.txt
