@@ -41,6 +41,7 @@ distlib==0.3.2
 django-pyfs==3.0
     # via -r requirements/django.txt
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
     #   django-pyfs
 filelock==3.0.12
