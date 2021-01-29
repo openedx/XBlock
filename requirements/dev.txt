@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.16.58
+boto3==1.16.62
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.19.58
+botocore==1.19.62
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -44,7 +44,7 @@ click==7.1.2
     #   pip-tools
 codecov==2.1.11
     # via -r requirements/travis.txt
-coverage==5.3.1
+coverage==5.4
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -80,7 +80,7 @@ fs==2.4.12
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.0.2
+hypothesis==6.0.4
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -138,7 +138,7 @@ packaging==20.8
     #   tox
 path.py==12.5.0
     # via -r requirements/test.txt
-path==15.0.1
+path==15.1.0
     # via
     #   -r requirements/test.txt
     #   path.py
@@ -174,7 +174,7 @@ pytest-cov==2.11.1
     # via -r requirements/test.txt
 pytest-django==4.1.0
     # via -r requirements/test.txt
-pytest==6.2.1
+pytest==6.2.2
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -227,12 +227,12 @@ toml==0.10.2
     #   tox
 tox-battery==0.6.1
     # via -r requirements/travis.txt
-tox==3.21.2
+tox==3.21.3
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   tox-battery
-urllib3==1.26.2
+urllib3==1.26.3
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt

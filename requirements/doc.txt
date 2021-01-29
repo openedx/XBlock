@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.9.0
     # via sphinx
-boto3==1.16.58
+boto3==1.16.62
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.19.58
+botocore==1.19.62
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -120,7 +120,7 @@ sqlparse==0.4.1
     # via
     #   -r requirements/django.txt
     #   django
-urllib3==1.26.2
+urllib3==1.26.3
     # via
     #   -r requirements/django.txt
     #   botocore
