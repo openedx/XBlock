@@ -10,7 +10,7 @@ appdirs==1.4.4
     #   -r requirements/travis.txt
     #   fs
     #   virtualenv
-astroid==2.4.2
+astroid==2.5.0
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.11
+boto3==1.17.16
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.11
+botocore==1.20.16
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -61,7 +61,7 @@ distlib==0.3.1
     #   virtualenv
 django-pyfs==3.0
     # via -r requirements/test.txt
-django==2.2.18
+django==2.2.19
     # via
     #   -r requirements/test.txt
     #   django-pyfs
@@ -80,13 +80,13 @@ fs==2.4.12
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.2.0
+hypothesis==6.3.2
     # via -r requirements/test.txt
 idna==2.10
     # via
     #   -r requirements/travis.txt
     #   requests
-inflect==5.0.2
+inflect==5.2.0
     # via
     #   -r requirements/test.txt
     #   jinja2-pluralize
@@ -112,7 +112,7 @@ jmespath==0.10.0
     #   -r requirements/test.txt
     #   boto3
     #   botocore
-lazy-object-proxy==1.4.3
+lazy-object-proxy==1.5.2
     # via
     #   -r requirements/test.txt
     #   astroid
@@ -138,7 +138,7 @@ packaging==20.9
     #   tox
 path.py==12.5.0
     # via -r requirements/test.txt
-path==15.1.0
+path==15.1.2
     # via
     #   -r requirements/test.txt
     #   path.py
@@ -163,7 +163,7 @@ pygments==2.8.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.6.2
+pylint==2.7.1
     # via -r requirements/test.txt
 pyparsing==2.4.7
     # via
@@ -204,7 +204,6 @@ six==1.15.0
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
-    #   astroid
     #   fs
     #   fs-s3fs
     #   python-dateutil

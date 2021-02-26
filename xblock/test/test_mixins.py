@@ -312,7 +312,7 @@ class TestXmlSerializationMixin(TestCase):
         node = etree.Element(self.test_xblock_tag)
 
         # Precondition check: no fields are set.
-        for field_name in self.test_xblock.fields.keys():
+        for field_name in self.test_xblock.fields.keys():  # pylint: disable=no-member
             self.assertFalse(self.test_xblock.fields[field_name].is_set_on(self.test_xblock))
 
         self.test_xblock.add_xml_to_node(node)
