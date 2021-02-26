@@ -501,26 +501,26 @@ def test_field_serialization():
 
 def test_class_tags():
     xblock = XBlock(None, None, None)
-    assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable
+    assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable, bad-option-value
 
     class Sub1Block(XBlock):
         """Toy XBlock"""
 
     sub1block = Sub1Block(None, None, None)
-    assert sub1block._class_tags == set()
+    assert sub1block._class_tags == set()  # pylint: disable=comparison-with-callable, bad-option-value
 
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
         """Toy XBlock"""
 
     sub2block = Sub2Block(None, None, None)
-    assert sub2block._class_tags == {"cat", "dog"}
+    assert sub2block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable, bad-option-value
 
     class Sub3Block(Sub2Block):
         """Toy XBlock"""
 
     sub3block = Sub3Block(None, None, None)
-    assert sub3block._class_tags == {"cat", "dog"}
+    assert sub3block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable, bad-option-value
 
     @XBlock.tag("mixin")
     class MixinBlock(XBlock):
@@ -530,7 +530,9 @@ def test_class_tags():
         """Toy XBlock"""
 
     sub4block = Sub4Block(None, None, None)
-    assert sub4block._class_tags == {"cat", "dog", "mixin"}
+    assert sub4block._class_tags == {  # pylint: disable=comparison-with-callable, bad-option-value
+        "cat", "dog", "mixin"
+    }
 
 
 def test_loading_tagged_classes():
@@ -744,7 +746,7 @@ def test_services_decorators():
     # A default XBlock has requested no services
     xblock = XBlock(None, None, None)
     assert XBlock._services_requested == {}
-    assert xblock._services_requested == {}  # pylint: disable=comparison-with-callable
+    assert xblock._services_requested == {}  # pylint: disable=comparison-with-callable, bad-option-value
 
     @XBlock.needs("n")
     @XBlock.wants("w")
@@ -752,8 +754,12 @@ def test_services_decorators():
         """XBlock using some services."""
 
     service_using_block = ServiceUsingBlock(None, scope_ids=None)
-    assert ServiceUsingBlock._services_requested == {'n': 'need', 'w': 'want'}
-    assert service_using_block._services_requested == {'n': 'need', 'w': 'want'}
+    assert ServiceUsingBlock._services_requested == {  # pylint: disable=comparison-with-callable, bad-option-value
+        'n': 'need', 'w': 'want'
+    }
+    assert service_using_block._services_requested == {  # pylint: disable=comparison-with-callable, bad-option-value
+        'n': 'need', 'w': 'want'
+    }
 
 
 def test_services_decorators_with_inheritance():
