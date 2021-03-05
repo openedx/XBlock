@@ -10,7 +10,7 @@ appdirs==1.4.4
     #   -r requirements/travis.txt
     #   fs
     #   virtualenv
-astroid==2.5.0
+astroid==2.5.1
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.16
+boto3==1.17.21
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.16
+botocore==1.20.21
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -44,7 +44,7 @@ click==7.1.2
     #   pip-tools
 codecov==2.1.11
     # via -r requirements/travis.txt
-coverage==5.4
+coverage==5.5
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -52,7 +52,7 @@ coverage==5.4
     #   pytest-cov
 ddt==1.4.1
     # via -r requirements/test.txt
-diff-cover==4.2.1
+diff-cover==4.2.3
     # via -r requirements/test.txt
 distlib==0.3.1
     # via
@@ -80,15 +80,20 @@ fs==2.4.12
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.3.2
+hypothesis==6.4.3
     # via -r requirements/test.txt
 idna==2.10
     # via
     #   -r requirements/travis.txt
     #   requests
-inflect==5.2.0
+importlib-metadata==3.7.0
     # via
     #   -r requirements/test.txt
+    #   inflect
+inflect==3.0.2
+    # via
+    #   -r requirements/test.txt
+    #   diff-cover
     #   jinja2-pluralize
 iniconfig==1.1.1
     # via
@@ -163,7 +168,7 @@ pygments==2.8.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.7.1
+pylint==2.7.2
     # via -r requirements/test.txt
 pyparsing==2.4.7
     # via
@@ -226,7 +231,7 @@ toml==0.10.2
     #   tox
 tox-battery==0.6.1
     # via -r requirements/travis.txt
-tox==3.22.0
+tox==3.23.0
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -250,6 +255,10 @@ wrapt==1.12.1
     # via
     #   -r requirements/test.txt
     #   astroid
+zipp==3.4.0
+    # via
+    #   -r requirements/test.txt
+    #   importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
