@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.21
+boto3==1.17.26
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.21
+botocore==1.20.26
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -52,7 +52,7 @@ coverage==5.5
     #   pytest-cov
 ddt==1.4.1
     # via -r requirements/test.txt
-diff-cover==4.2.3
+diff-cover==5.0.1
     # via -r requirements/test.txt
 distlib==0.3.1
     # via
@@ -80,20 +80,15 @@ fs==2.4.12
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.4.3
+hypothesis==6.8.0
     # via -r requirements/test.txt
 idna==2.10
     # via
     #   -r requirements/travis.txt
     #   requests
-importlib-metadata==3.7.0
+inflect==5.3.0
     # via
     #   -r requirements/test.txt
-    #   inflect
-inflect==3.0.2
-    # via
-    #   -r requirements/test.txt
-    #   diff-cover
     #   jinja2-pluralize
 iniconfig==1.1.1
     # via
@@ -164,7 +159,7 @@ py==1.10.0
     #   tox
 pycodestyle==2.6.0
     # via -r requirements/test.txt
-pygments==2.8.0
+pygments==2.8.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -255,10 +250,6 @@ wrapt==1.12.1
     # via
     #   -r requirements/test.txt
     #   astroid
-zipp==3.4.0
-    # via
-    #   -r requirements/test.txt
-    #   importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
