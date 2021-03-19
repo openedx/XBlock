@@ -17,11 +17,11 @@ attrs==20.3.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.17.26
+boto3==1.17.32
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.20.26
+botocore==1.20.32
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -32,7 +32,7 @@ coverage==5.5
     # via
     #   -r requirements/test.in
     #   pytest-cov
-ddt==1.4.1
+ddt==1.4.2
     # via -r requirements/test.in
 diff-cover==5.0.1
     # via -r requirements/test.in
@@ -56,7 +56,7 @@ fs==2.4.12
     #   -r requirements/django.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.8.0
+hypothesis==6.8.1
     # via -r requirements/test.in
 inflect==5.3.0
     # via jinja2-pluralize
@@ -106,7 +106,7 @@ py==1.10.0
     # via
     #   pytest
     #   tox
-pycodestyle==2.6.0
+pycodestyle==2.7.0
     # via -r requirements/test.in
 pygments==2.8.1
     # via diff-cover
@@ -134,7 +134,7 @@ pytz==2021.1
     #   fs
 pyyaml==5.4.1
     # via -r requirements/django.txt
-s3transfer==0.3.4
+s3transfer==0.3.6
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -161,11 +161,11 @@ toml==0.10.2
     #   tox
 tox==3.23.0
     # via -r requirements/test.in
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.4.2
+virtualenv==20.4.3
     # via tox
 web-fragments==1.0.0
     # via -r requirements/django.txt

@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.26
+boto3==1.17.32
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.26
+botocore==1.20.32
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -50,7 +50,7 @@ coverage==5.5
     #   -r requirements/travis.txt
     #   codecov
     #   pytest-cov
-ddt==1.4.1
+ddt==1.4.2
     # via -r requirements/test.txt
 diff-cover==5.0.1
     # via -r requirements/test.txt
@@ -80,7 +80,7 @@ fs==2.4.12
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.8.0
+hypothesis==6.8.1
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -142,7 +142,11 @@ path==15.1.2
     # via
     #   -r requirements/test.txt
     #   path.py
-pip-tools==5.5.0
+pep517==0.10.0
+    # via
+    #   -r requirements/pip-tools.txt
+    #   pip-tools
+pip-tools==6.0.1
     # via -r requirements/pip-tools.txt
 pluggy==0.13.1
     # via
@@ -157,7 +161,7 @@ py==1.10.0
     #   -r requirements/travis.txt
     #   pytest
     #   tox
-pycodestyle==2.6.0
+pycodestyle==2.7.0
     # via -r requirements/test.txt
 pygments==2.8.1
     # via
@@ -194,7 +198,7 @@ requests==2.25.1
     # via
     #   -r requirements/travis.txt
     #   codecov
-s3transfer==0.3.4
+s3transfer==0.3.6
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -219,8 +223,10 @@ sqlparse==0.4.1
     #   django
 toml==0.10.2
     # via
+    #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
+    #   pep517
     #   pylint
     #   pytest
     #   tox
@@ -231,13 +237,13 @@ tox==3.23.0
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   tox-battery
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   botocore
     #   requests
-virtualenv==20.4.2
+virtualenv==20.4.3
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
