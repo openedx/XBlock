@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.17.32
+boto3==1.17.37
     # via fs-s3fs
-botocore==1.20.32
+botocore==1.20.37
     # via
     #   boto3
     #   s3transfer
@@ -33,7 +33,7 @@ jmespath==0.10.0
     #   botocore
 lazy==1.4
     # via -r requirements/django.in
-lxml==4.6.2
+lxml==4.6.3
     # via -r requirements/base.txt
 markupsafe==1.1.1
     # via -r requirements/base.txt
