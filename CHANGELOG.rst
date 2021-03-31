@@ -4,6 +4,11 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.4.1 - 2021-03-20
+------------------
+
+* Added XBlockParseException exception.
+
 1.3.1 - 2020-05-06
 ------------------
 
