@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.9.0
     # via sphinx
-boto3==1.17.37
+boto3==1.17.43
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.20.37
+botocore==1.20.43
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -33,13 +33,13 @@ django==2.2.19
     #   django-pyfs
 docutils==0.16
     # via sphinx
-edx-sphinx-theme==2.0.0
+edx-sphinx-theme==2.1.0
     # via -r requirements/doc.in
 fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-fs==2.4.12
+fs==2.4.13
     # via
     #   -r requirements/django.txt
     #   django-pyfs
