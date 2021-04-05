@@ -136,3 +136,9 @@ class DisallowedFileError(Exception):
 
 class FieldDataDeprecationWarning(DeprecationWarning):
     """Warning for use of deprecated _field_data accessor"""
+
+
+class XBlockParseException(Exception):
+    """
+    Raised if parsing the XBlock olx fails.
+    """
