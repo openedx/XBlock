@@ -8,7 +8,7 @@ click==7.1.2
     # via pip-tools
 pep517==0.10.0
     # via pip-tools
-pip-tools==6.0.1
+pip-tools==6.1.0
     # via -r requirements/pip-tools.in
 toml==0.10.2
     # via pep517

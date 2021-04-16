@@ -10,7 +10,7 @@ appdirs==1.4.4
     #   -r requirements/travis.txt
     #   fs
     #   virtualenv
-astroid==2.5.2
+astroid==2.5.3
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -19,11 +19,11 @@ attrs==20.3.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.48
+boto3==1.17.53
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.48
+botocore==1.20.53
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -80,7 +80,7 @@ fs==2.4.13
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.8.9
+hypothesis==6.9.2
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -146,7 +146,7 @@ pep517==0.10.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-pip-tools==6.0.1
+pip-tools==6.1.0
     # via -r requirements/pip-tools.txt
 pluggy==0.13.1
     # via
@@ -176,7 +176,7 @@ pyparsing==2.4.7
     #   packaging
 pytest-cov==2.11.1
     # via -r requirements/test.txt
-pytest-django==4.1.0
+pytest-django==4.2.0
     # via -r requirements/test.txt
 pytest==6.2.3
     # via
@@ -198,7 +198,7 @@ requests==2.25.1
     # via
     #   -r requirements/travis.txt
     #   codecov
-s3transfer==0.3.6
+s3transfer==0.3.7
     # via
     #   -r requirements/test.txt
     #   boto3
