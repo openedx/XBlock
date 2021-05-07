@@ -13,15 +13,15 @@ astroid==2.5.6
     # via
     #   -r requirements/test.in
     #   pylint
-attrs==20.3.0
+attrs==21.1.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.17.61
+boto3==1.17.68
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.20.61
+botocore==1.20.68
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -56,7 +56,7 @@ fs==2.4.13
     #   -r requirements/django.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.10.1
+hypothesis==6.12.0
     # via -r requirements/test.in
 inflect==5.3.0
     # via jinja2-pluralize
@@ -108,7 +108,7 @@ py==1.10.0
     #   tox
 pycodestyle==2.7.0
     # via -r requirements/test.in
-pygments==2.8.1
+pygments==2.9.0
     # via diff-cover
 pylint==2.8.2
     # via -r requirements/test.in
@@ -118,7 +118,7 @@ pytest-cov==2.11.1
     # via -r requirements/test.in
 pytest-django==4.2.0
     # via -r requirements/test.in
-pytest==6.2.3
+pytest==6.2.4
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -140,7 +140,7 @@ s3transfer==0.4.2
     #   boto3
 simplejson==3.17.2
     # via -r requirements/django.txt
-six==1.15.0
+six==1.16.0
     # via
     #   -r requirements/django.txt
     #   fs
@@ -159,13 +159,13 @@ toml==0.10.2
     #   pylint
     #   pytest
     #   tox
-tox==3.23.0
+tox==3.23.1
     # via -r requirements/test.in
 urllib3==1.26.4
     # via
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.4.4
+virtualenv==20.4.6
     # via tox
 web-fragments==1.0.0
     # via -r requirements/django.txt
