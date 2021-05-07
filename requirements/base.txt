@@ -22,7 +22,7 @@ pyyaml==5.4.1
     # via -r requirements/base.in
 simplejson==3.17.2
     # via -r requirements/base.in
-six==1.15.0
+six==1.16.0
     # via
     #   fs
     #   python-dateutil

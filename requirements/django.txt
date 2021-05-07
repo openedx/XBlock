@@ -8,15 +8,15 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.17.61
+boto3==1.17.68
     # via fs-s3fs
-botocore==1.20.61
+botocore==1.20.68
     # via
     #   boto3
     #   s3transfer
 django-pyfs==3.0
     # via -r requirements/django.in
-django==2.2.20
+django==2.2.22
     # via
     #   -r requirements/django.in
     #   django-pyfs
@@ -52,7 +52,7 @@ s3transfer==0.4.2
     # via boto3
 simplejson==3.17.2
     # via -r requirements/base.txt
-six==1.15.0
+six==1.16.0
     # via
     #   -r requirements/base.txt
     #   fs
