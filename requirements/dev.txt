@@ -14,16 +14,16 @@ astroid==2.5.6
     # via
     #   -r requirements/test.txt
     #   pylint
-attrs==21.1.0
+attrs==21.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.68
+boto3==1.17.77
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.68
+botocore==1.20.77
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -38,13 +38,13 @@ chardet==4.0.0
     #   -r requirements/travis.txt
     #   diff-cover
     #   requests
-click==7.1.2
+click==8.0.1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
 codecov==2.1.11
     # via -r requirements/travis.txt
-coverage==5.5
+coverage[toml]==5.5
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -52,7 +52,7 @@ coverage==5.5
     #   pytest-cov
 ddt==1.4.2
     # via -r requirements/test.txt
-diff-cover==5.0.1
+diff-cover==5.1.1
     # via -r requirements/test.txt
 distlib==0.3.1
     # via
@@ -61,7 +61,7 @@ distlib==0.3.1
     #   virtualenv
 django-pyfs==3.0
     # via -r requirements/test.txt
-django==2.2.22
+django==2.2.23
     # via
     #   -r requirements/test.txt
     #   django-pyfs
@@ -80,7 +80,7 @@ fs==2.4.13
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.12.0
+hypothesis==6.13.1
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -102,7 +102,7 @@ jinja2-pluralize==0.3.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-jinja2==2.11.3
+jinja2==3.0.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -120,7 +120,7 @@ lazy==1.4
     # via -r requirements/test.txt
 lxml==4.6.3
     # via -r requirements/test.txt
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
     #   -r requirements/test.txt
     #   jinja2
@@ -174,9 +174,9 @@ pyparsing==2.4.7
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   packaging
-pytest-cov==2.11.1
+pytest-cov==2.12.0
     # via -r requirements/test.txt
-pytest-django==4.2.0
+pytest-django==4.3.0
     # via -r requirements/test.txt
 pytest==6.2.4
     # via
@@ -213,7 +213,7 @@ six==1.16.0
     #   python-dateutil
     #   tox
     #   virtualenv
-sortedcontainers==2.3.0
+sortedcontainers==2.4.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
@@ -226,6 +226,7 @@ toml==0.10.2
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
+    #   coverage
     #   pep517
     #   pylint
     #   pytest
