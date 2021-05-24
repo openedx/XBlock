@@ -4,6 +4,11 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.4.2 - 2021-05-24
+------------------
+
+* Upgraded all Python dependencies.
+
 1.4.1 - 2021-03-20
 ------------------
 
