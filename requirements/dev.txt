@@ -19,11 +19,11 @@ attrs==21.2.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.77
+boto3==1.17.83
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.77
+botocore==1.20.83
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -80,7 +80,7 @@ fs==2.4.13
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.13.1
+hypothesis==6.13.7
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -238,13 +238,13 @@ tox==3.23.1
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   tox-battery
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   botocore
     #   requests
-virtualenv==20.4.6
+virtualenv==20.4.7
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
