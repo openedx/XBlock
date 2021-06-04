@@ -19,16 +19,16 @@ attrs==21.2.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.83
+boto3==1.17.87
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.83
+botocore==1.20.87
     # via
     #   -r requirements/test.txt
     #   boto3
     #   s3transfer
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   -r requirements/travis.txt
     #   requests
@@ -44,7 +44,7 @@ click==8.0.1
     #   pip-tools
 codecov==2.1.11
     # via -r requirements/travis.txt
-coverage[toml]==5.5
+coverage==5.5
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -52,16 +52,16 @@ coverage[toml]==5.5
     #   pytest-cov
 ddt==1.4.2
     # via -r requirements/test.txt
-diff-cover==5.1.1
+diff-cover==5.1.2
     # via -r requirements/test.txt
-distlib==0.3.1
+distlib==0.3.2
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   virtualenv
 django-pyfs==3.0
     # via -r requirements/test.txt
-django==2.2.23
+django==2.2.24
     # via
     #   -r requirements/test.txt
     #   django-pyfs
@@ -80,7 +80,7 @@ fs==2.4.13
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.13.7
+hypothesis==6.13.12
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -167,14 +167,14 @@ pygments==2.9.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.8.2
+pylint==2.8.3
     # via -r requirements/test.txt
 pyparsing==2.4.7
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   packaging
-pytest-cov==2.12.0
+pytest-cov==2.12.1
     # via -r requirements/test.txt
 pytest-django==4.3.0
     # via -r requirements/test.txt
@@ -226,10 +226,10 @@ toml==0.10.2
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
-    #   coverage
     #   pep517
     #   pylint
     #   pytest
+    #   pytest-cov
     #   tox
 tox-battery==0.6.1
     # via -r requirements/travis.txt
