@@ -63,6 +63,7 @@ django-pyfs==3.0
     # via -r requirements/test.txt
 django==2.2.24
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   django-pyfs
 filelock==3.0.12

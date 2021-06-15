@@ -18,6 +18,7 @@ django-pyfs==3.0
     # via -r requirements/django.in
 django==2.2.24
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.in
     #   django-pyfs
 fs-s3fs==1.1.1
