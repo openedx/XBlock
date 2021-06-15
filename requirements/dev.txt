@@ -19,11 +19,11 @@ attrs==21.2.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.17.87
+boto3==1.17.92
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.20.87
+botocore==1.20.92
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -80,7 +80,7 @@ fs==2.4.13
     #   -r requirements/test.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.13.12
+hypothesis==6.14.0
     # via -r requirements/test.txt
 idna==2.10
     # via
@@ -176,7 +176,7 @@ pyparsing==2.4.7
     #   packaging
 pytest-cov==2.12.1
     # via -r requirements/test.txt
-pytest-django==4.3.0
+pytest-django==4.4.0
     # via -r requirements/test.txt
 pytest==6.2.4
     # via

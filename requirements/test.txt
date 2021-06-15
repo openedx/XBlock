@@ -17,11 +17,11 @@ attrs==21.2.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.17.87
+boto3==1.17.92
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.20.87
+botocore==1.20.92
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -56,7 +56,7 @@ fs==2.4.13
     #   -r requirements/django.txt
     #   django-pyfs
     #   fs-s3fs
-hypothesis==6.13.12
+hypothesis==6.14.0
     # via -r requirements/test.in
 inflect==5.3.0
     # via jinja2-pluralize
@@ -116,7 +116,7 @@ pyparsing==2.4.7
     # via packaging
 pytest-cov==2.12.1
     # via -r requirements/test.in
-pytest-django==4.3.0
+pytest-django==4.4.0
     # via -r requirements/test.in
 pytest==6.2.4
     # via
