@@ -34,7 +34,7 @@ coverage==5.5
     #   pytest-cov
 ddt==1.4.2
     # via -r requirements/test.in
-diff-cover==5.1.2
+diff-cover==5.2.0
     # via -r requirements/test.in
 distlib==0.3.2
     # via virtualenv
@@ -63,7 +63,7 @@ inflect==5.3.0
     # via jinja2-pluralize
 iniconfig==1.1.1
     # via pytest
-isort==5.8.0
+isort==5.9.1
     # via pylint
 jinja2-pluralize==0.3.0
     # via diff-cover
@@ -94,10 +94,8 @@ packaging==20.9
     # via
     #   pytest
     #   tox
-path.py==12.5.0
-    # via -r requirements/test.in
 path==16.0.0
-    # via path.py
+    # via -r requirements/test.in
 pluggy==0.13.1
     # via
     #   diff-cover

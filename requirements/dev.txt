@@ -52,7 +52,7 @@ coverage==5.5
     #   pytest-cov
 ddt==1.4.2
     # via -r requirements/test.txt
-diff-cover==5.1.2
+diff-cover==5.2.0
     # via -r requirements/test.txt
 distlib==0.3.2
     # via
@@ -95,7 +95,7 @@ iniconfig==1.1.1
     # via
     #   -r requirements/test.txt
     #   pytest
-isort==5.8.0
+isort==5.9.1
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -137,12 +137,8 @@ packaging==20.9
     #   -r requirements/travis.txt
     #   pytest
     #   tox
-path.py==12.5.0
-    # via -r requirements/test.txt
 path==16.0.0
-    # via
-    #   -r requirements/test.txt
-    #   path.py
+    # via -r requirements/test.txt
 pep517==0.10.0
     # via
     #   -r requirements/pip-tools.txt
