@@ -4,6 +4,11 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.5.0 - 2021-07-27
+------------------
+
+* Added Django 3.0, 3.1 & 3.2 support
+
 1.4.2 - 2021-05-24
 ------------------
 
