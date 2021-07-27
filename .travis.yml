@@ -9,6 +9,9 @@ env:
   - TOX_ENV=docs
   - TOX_ENV=quality
   - TOX_ENV=django22
+  - TOX_ENV=django30
+  - TOX_ENV=django31
+  - TOX_ENV=django32
 
 script:
   - tox -e $TOX_ENV
