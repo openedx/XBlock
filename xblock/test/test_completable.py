@@ -9,8 +9,7 @@ from unittest import TestCase
 from unittest import mock
 
 import ddt
-from hypothesis import given, example
-import hypothesis.strategies as strategies
+from hypothesis import example, given, strategies
 
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
