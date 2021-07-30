@@ -890,9 +890,9 @@ class String(JSONField):
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
-    def from_string(self, value):
+    def from_string(self, serialized):
         """String gets serialized and deserialized without quote marks."""
-        return self.from_json(value)
+        return self.from_json(serialized)
 
     def to_string(self, value):
         """String gets serialized and deserialized without quote marks."""

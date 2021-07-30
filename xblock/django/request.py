@@ -1,7 +1,6 @@
 """Helpers for WebOb requests and responses."""
-from collections import MutableMapping  # pylint: disable=no-name-in-module
+from collections.abc import MutableMapping
 from itertools import chain, repeat
-import collections
 from lazy import lazy
 
 import webob
@@ -21,7 +20,7 @@ def webob_to_django_response(webob_response):
     return django_response
 
 
-class HeaderDict(MutableMapping, collections.Iterator):  # pylint: disable=useless-object-inheritance
+class HeaderDict(MutableMapping):
     """
     Provide a dictionary view of the HTTP headers in a
     Django request.META dictionary that translates the
