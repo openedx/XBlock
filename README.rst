@@ -35,7 +35,7 @@ to give us a virtual machine image which ran it.
 Installation
 ------------
 
-This code runs and is tested on Python 2.7 and 3.5.
+This code runs and is tested on Python 3.8.
 
 1.  Get a local copy of this repo.
 
