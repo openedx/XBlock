@@ -98,8 +98,8 @@ class DictKeyValueStore(KeyValueStore):
     def set(self, key, value):
         self.db_dict[key] = value
 
-    def set_many(self, other_dict):
-        self.db_dict.update(other_dict)
+    def set_many(self, update_dict):
+        self.db_dict.update(update_dict)
 
     def delete(self, key):
         del self.db_dict[key]

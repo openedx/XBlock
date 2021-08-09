@@ -343,9 +343,9 @@ def test_json_field_access():
 
     class Date(Field):
         """Date needs to convert between JSON-compatible persistence and a datetime object"""
-        def from_json(self, field):
+        def from_json(self, value):
             """Convert a string representation of a date to a datetime object"""
-            return datetime.strptime(field, "%m/%d/%Y")
+            return datetime.strptime(value, "%m/%d/%Y")
 
         def to_json(self, value):
             """Convert a datetime object to a string"""

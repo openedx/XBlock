@@ -669,9 +669,9 @@ def test_twofaced_field_access():
     # persists and saves correctly.
     class TwoFacedField(Field):
         """A field that emits different 'json' than it parses."""
-        def from_json(self, thestr):
+        def from_json(self, value):
             """Store an int, the length of the string parsed."""
-            return len(thestr)
+            return len(value)
 
         def to_json(self, value):
             """Emit some number of X's."""
