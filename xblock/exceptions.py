@@ -138,6 +138,10 @@ class FieldDataDeprecationWarning(DeprecationWarning):
     """Warning for use of deprecated _field_data accessor"""
 
 
+class UserIdDeprecationWarning(DeprecationWarning):
+    """Warning for use of deprecated user_id accessor"""
+
+
 class XBlockParseException(Exception):
     """
     Raised if parsing the XBlock olx fails.
