@@ -48,5 +48,5 @@ tox-battery==0.6.1
     # via -r requirements/travis.in
 urllib3==1.26.6
     # via requests
-virtualenv==20.7.0
+virtualenv==20.7.2
     # via tox
