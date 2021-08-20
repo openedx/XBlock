@@ -18,11 +18,11 @@ attrs==21.2.0
     #   pytest
 backports.entry-points-selectable==1.1.0
     # via virtualenv
-boto3==1.18.20
+boto3==1.18.25
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.21.20
+botocore==1.21.25
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -35,7 +35,7 @@ coverage==5.5
     #   pytest-cov
 ddt==1.4.2
     # via -r requirements/test.in
-diff-cover==6.3.0
+diff-cover==6.3.2
     # via -r requirements/test.in
 distlib==0.3.2
     # via virtualenv
@@ -58,7 +58,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-hypothesis==6.14.6
+hypothesis==6.14.8
     # via -r requirements/test.in
 inflect==5.3.0
     # via jinja2-pluralize
@@ -110,7 +110,7 @@ py==1.10.0
     #   tox
 pycodestyle==2.7.0
     # via -r requirements/test.in
-pygments==2.9.0
+pygments==2.10.0
     # via diff-cover
 pylint==2.9.6
     # via -r requirements/test.in
@@ -162,7 +162,7 @@ toml==0.10.2
     #   pytest
     #   pytest-cov
     #   tox
-tox==3.24.1
+tox==3.24.2
     # via -r requirements/test.in
 urllib3==1.26.6
     # via
