@@ -1,0 +1,37 @@
+name: Python CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches:
+    - '**'
+
+jobs:
+  run_tests:
+    name: tests
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.8']
+        toxenv: [docs, quality, django22, django30, django31, django32]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: pip install -r requirements/travis.txt
+
+    - name: Run Tests
+      run: tox -e ${{ matrix.toxenv }}
+
+    - name: Run Coverage
+      if: matrix.python-version == '3.8' && matrix.toxenv=='django22'
+      uses: codecov/codecov-action@v1
+      with:
+        flags: unittests
+        fail_ci_if_error: true
