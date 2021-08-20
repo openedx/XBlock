@@ -40,7 +40,7 @@ six==1.16.0
     #   virtualenv
 toml==0.10.2
     # via tox
-tox==3.24.1
+tox==3.24.2
     # via
     #   -r requirements/travis.in
     #   tox-battery
