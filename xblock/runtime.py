@@ -29,6 +29,7 @@ from xblock.exceptions import (
     NoSuchUsage,
     NoSuchDefinition,
     FieldDataDeprecationWarning,
+    UserIdDeprecationWarning,
 )
 
 log = logging.getLogger(__name__)
@@ -563,7 +564,7 @@ class Runtime(metaclass=ABCMeta):
         self.default_class = default_class
         self.select = select
 
-        self.user_id = None
+        self._deprecated_per_instance_user_id = None  # pylint: disable=invalid-name
         self.mixologist = Mixologist(mixins)
         self._view_name = None
 
@@ -592,6 +593,26 @@ class Runtime(metaclass=ABCMeta):
         """
         warnings.warn("Runtime.field_data is deprecated", FieldDataDeprecationWarning, stacklevel=2)
         self._deprecated_per_instance_field_data = field_data
+
+    @property
+    def user_id(self):
+        """
+        Access the current user ID.
+
+        Deprecated in favor of a 'user' service.
+        """
+        warnings.warn("Runtime.user_id is deprecated", UserIdDeprecationWarning, stacklevel=2)
+        return self._deprecated_per_instance_user_id
+
+    @user_id.setter
+    def user_id(self, user_id):
+        """
+        Set the current user ID.
+
+        Deprecated in favor of a 'user' service.
+        """
+        warnings.warn("Runtime.user_id is deprecated", UserIdDeprecationWarning, stacklevel=2)
+        self._deprecated_per_instance_user_id = user_id
 
     def load_block_type(self, block_type):
         """

@@ -4,6 +4,11 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.5.1 - 2021-08-26
+------------------
+
+* Deprecated the Runtime.user_id property in favor of the user service.
+
 1.5.0 - 2021-07-27
 ------------------
 
