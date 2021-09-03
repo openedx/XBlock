@@ -141,7 +141,7 @@ class ToyRuntime(Runtime):
 
 
 # Our global state (the "database").
-TOYRUNTIME_KVS = ToyRuntimeKeyValueStore(dict())
+TOYRUNTIME_KVS = ToyRuntimeKeyValueStore({})
 
 # Our global id manager
 ID_MANAGER = MemoryIdManager()
