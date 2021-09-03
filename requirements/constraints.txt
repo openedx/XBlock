@@ -10,3 +10,7 @@
 
 # Common constraints for edx repos
 -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+
+# diff-cover latest requires (pluggy>=0.13.1,<0.14.0) which conflicts with pytest which requires(pluggy>=0.12,<2.0.0)
+# Using the same version of diff-cover which is being used currently in edx-platform to avoid this conflict.
+diff-cover==4.0.0

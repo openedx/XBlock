@@ -20,7 +20,7 @@ pytz==2021.1
     #   fs
 pyyaml==5.4.1
     # via -r requirements/base.in
-simplejson==3.17.3
+simplejson==3.17.5
     # via -r requirements/base.in
 six==1.16.0
     # via

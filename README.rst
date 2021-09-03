@@ -86,7 +86,7 @@ by checking your code with these tools.
 .. _setup.cfg: https://github.com/edx/XBlock/blob/master/setup.cfg
 
 You can run these tests automatically before pushing code to github (and running
-the validation in Travis) by activating the `pre-push` script
+the validation in Github Actions) by activating the `pre-push` script
 
     cd .git/hooks
     ln -s ../../script/pre-push
@@ -175,7 +175,7 @@ To package a new release:
 
     git tag v1.2.17
 
-#. Push the tag and wait for Travis to upload to PyPI::
+#. Push the tag and wait for Github Action to upload to PyPI::
 
     git push --tags
 
@@ -188,7 +188,7 @@ at the `Open edX Getting Help`_ page.
 
 .. _Open edX Getting Help: https://openedx.org/getting-help
 
-.. |build-status| image:: https://travis-ci.com/edx/XBlock.svg?branch=master
-   :target: https://travis-ci.com/edx/XBlock
+.. |build-status| image:: https://github.com/edx/XBlock/workflows/Python%20CI/badge.svg?branch=master
+   :target: https://github.com/edx/XBlock/actions?query=workflow%3A%22Python+CI%22
 .. |coverage-status| image:: http://codecov.io/github/edx/XBlock/coverage.svg?branch=master
    :target: https://codecov.io/github/edx/XBlock?branch=master
