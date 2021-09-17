@@ -8,7 +8,7 @@ backports.entry-points-selectable==1.1.0
     # via virtualenv
 certifi==2021.5.30
     # via requests
-charset-normalizer==2.0.4
+charset-normalizer==2.0.5
     # via requests
 codecov==2.1.12
     # via -r requirements/travis.in
@@ -24,9 +24,9 @@ idna==3.2
     # via requests
 packaging==21.0
     # via tox
-platformdirs==2.2.0
+platformdirs==2.3.0
     # via virtualenv
-pluggy==0.13.1
+pluggy==1.0.0
     # via tox
 py==1.10.0
     # via tox
@@ -40,7 +40,7 @@ six==1.16.0
     #   virtualenv
 toml==0.10.2
     # via tox
-tox==3.24.2
+tox==3.24.4
     # via
     #   -r requirements/travis.in
     #   tox-battery
@@ -48,5 +48,5 @@ tox-battery==0.6.1
     # via -r requirements/travis.in
 urllib3==1.26.6
     # via requests
-virtualenv==20.7.2
+virtualenv==20.8.0
     # via tox

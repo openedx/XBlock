@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==2.6.6
+astroid==2.8.0
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -22,11 +22,11 @@ backports.entry-points-selectable==1.1.0
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   virtualenv
-boto3==1.18.25
+boto3==1.18.43
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.21.25
+botocore==1.21.43
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -39,7 +39,7 @@ chardet==4.0.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-charset-normalizer==2.0.4
+charset-normalizer==2.0.5
     # via
     #   -r requirements/travis.txt
     #   requests
@@ -57,7 +57,7 @@ coverage==5.5
     #   pytest-cov
 ddt==1.4.2
     # via -r requirements/test.txt
-diff-cover==6.3.2
+diff-cover==6.4.0
     # via -r requirements/test.txt
 distlib==0.3.2
     # via
@@ -86,7 +86,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-hypothesis==6.14.8
+hypothesis==6.21.5
     # via -r requirements/test.txt
 idna==3.2
     # via
@@ -150,12 +150,13 @@ pep517==0.11.0
     #   pip-tools
 pip-tools==6.2.0
     # via -r requirements/pip-tools.txt
-platformdirs==2.2.0
+platformdirs==2.3.0
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
+    #   pylint
     #   virtualenv
-pluggy==0.13.1
+pluggy==1.0.0
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
@@ -174,14 +175,14 @@ pygments==2.10.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.9.6
+pylint==2.11.1
     # via -r requirements/test.txt
 pyparsing==2.4.7
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   packaging
-pytest==6.2.4
+pytest==6.2.5
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -209,7 +210,7 @@ s3transfer==0.5.0
     # via
     #   -r requirements/test.txt
     #   boto3
-simplejson==3.17.3
+simplejson==3.17.5
     # via -r requirements/test.txt
 six==1.16.0
     # via
@@ -224,7 +225,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via
     #   -r requirements/test.txt
     #   django
@@ -240,20 +241,25 @@ tomli==1.2.1
     # via
     #   -r requirements/pip-tools.txt
     #   pep517
-tox==3.24.2
+tox==3.24.4
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/travis.txt
+typing-extensions==3.10.0.2
+    # via
+    #   -r requirements/test.txt
+    #   astroid
+    #   pylint
 urllib3==1.26.6
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
     #   botocore
     #   requests
-virtualenv==20.7.2
+virtualenv==20.8.0
     # via
     #   -r requirements/test.txt
     #   -r requirements/travis.txt
