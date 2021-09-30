@@ -29,7 +29,7 @@ test: ## run tests on every supported Python/Django combination
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	tox -e docs
-	$(BROWSER) doc/_build/html/index.html
+	$(BROWSER) docs/_build/html/index.html
 
 requirements: ## install development environment requirements
 	pip install -qr requirements/dev.txt --exists-action w
