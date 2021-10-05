@@ -112,6 +112,14 @@ nitpicky = True
 nitpick_ignore = [
     ('py:obj', 'str'),
     ('py:obj', 'string'),
+    ('py:class', 'class'),
+    # These are implicitly attempted based on namedtuples:
+    ('py:class', 'xblock.runtime.MemoryAsideDefinitionId'),
+    ('py:class', 'xblock.runtime.MemoryAsideUsageId'),
+    # Other random type-like things that Sphinx can't find:
+    ('py:class', 'aside'),
+    ('py:class', 'aside_fn'),
+    ('py:class', 'webob.Request'),
 ]
 
 # -- Options for HTML output ---------------------------------------------------
