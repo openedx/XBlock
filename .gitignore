@@ -12,7 +12,7 @@ htmlcov
 *~
 
 # Documentation
-doc/_build
+docs/_build
 .pip_cache
 nosetests.xml
 coverage.xml

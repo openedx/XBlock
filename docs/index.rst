@@ -20,6 +20,7 @@ in depth and guides developers through the process of creating an XBlock.
     fields
     runtime
     fragment
+    plugins
     exceptions
 
 .. _EdX XBlock Tutorial: http://edx.readthedocs.org/projects/xblock-tutorial/en/latest/index.html

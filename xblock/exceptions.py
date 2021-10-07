@@ -131,7 +131,7 @@ class JsonHandlerError(Exception):
 
 
 class DisallowedFileError(Exception):
-    """Raised by :meth:`open_local_resource` if the requested file is not allowed."""
+    """Raised by :meth:`.XBlock.open_local_resource` if the requested file is not allowed."""
 
 
 class FieldDataDeprecationWarning(DeprecationWarning):

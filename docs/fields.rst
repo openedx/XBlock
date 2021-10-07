@@ -6,5 +6,6 @@ Fields API
 
 .. automodule:: xblock.fields
     :members:
-.. autoclass:: xblock.reference.plugins.Filesystem
+
+.. autoclass:: xblock.field_data.FieldData
     :members:

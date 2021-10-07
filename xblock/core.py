@@ -236,12 +236,13 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         """
         A decorator to indicate a function is the aside view for the given view_name.
 
-        Aside views should have a signature like:
+        Aside views should have a signature like::
 
             @XBlockAside.aside_for('student_view')
             def student_aside(self, block, context=None):
                 ...
                 return Fragment(...)
+
         """
         # pylint: disable=protected-access
         def _decorator(func):  # pylint: disable=missing-docstring
@@ -283,7 +284,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         This function finds those declarations for a block.
 
         Arguments:
-            view_name (string): the name of the view requested.
+            view_name (str): the name of the view requested.
 
         Returns:
             either the function or None

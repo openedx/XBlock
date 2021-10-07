@@ -1048,8 +1048,8 @@ class Runtime(metaclass=ABCMeta):
 
         Args:
             block (XBlock): the block being rendered
-            frag (html): The result from rendering the block
-            aside_frag_fns list((aside, aside_fn)): The asides and closures for rendering to call
+            frag (str): The HTML result from rendering the block
+            aside_frag_fns (list((aside, aside_fn))): The asides and closures for rendering to call
         """
         result = Fragment(frag.content)
         result.add_fragment_resources(frag)
