@@ -565,7 +565,7 @@ class IndexInfoMixin:
             getattr(self.__class__, "display_name", None), "default", None
         )
 
-        _index_dictionary = dict()
+        _index_dictionary = {}
 
         if display_name is not None:
             _index_dictionary.update({
