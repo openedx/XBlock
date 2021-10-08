@@ -370,7 +370,7 @@ class MemoryIdManager(IdReader, IdGenerator):
 
     def _next_id(self, prefix):
         """Generate a new id."""
-        return "{}_{}".format(prefix, next(self._ids))
+        return f"{prefix}_{next(self._ids)}"
 
     def clear(self):
         """Remove all entries."""
@@ -1085,7 +1085,7 @@ class Runtime(metaclass=ABCMeta):
                 # Cache results of the handler call for later saving
                 results = fallback_handler(handler_name, request, suffix)
             else:
-                raise NoSuchHandlerError("Couldn't find handler {!r} for {!r}".format(handler_name, block))
+                raise NoSuchHandlerError(f"Couldn't find handler {handler_name!r} for {block!r}")
 
         # Write out dirty fields
         block.save()
@@ -1321,7 +1321,7 @@ class RegexLexer:
     def __init__(self, *toks):
         parts = []
         for name, regex in toks:
-            parts.append("(?P<{}>{})".format(name, regex))
+            parts.append(f"(?P<{name}>{regex})")
         self.regex = re.compile("|".join(parts))
 
     def lex(self, text):

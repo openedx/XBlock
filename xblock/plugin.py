@@ -24,7 +24,7 @@ class AmbiguousPluginError(Exception):
     def __init__(self, all_entry_points):
         classes = (entpt.load() for entpt in all_entry_points)
         desc = ", ".join("{0.__module__}.{0.__name__}".format(cls) for cls in classes)
-        msg = "Ambiguous entry points for {}: {}".format(all_entry_points[0].name, desc)
+        msg = f"Ambiguous entry points for {all_entry_points[0].name}: {desc}"
         super().__init__(msg)
 
 

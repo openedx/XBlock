@@ -100,7 +100,7 @@ class SharedBlockBase(Plugin):
 
         # Make sure the path starts with whatever public_dir is set to.
         if not uri.startswith(cls.public_dir + '/'):
-            raise DisallowedFileError("Only files from {!r}/ are allowed: {!r}".format(cls.public_dir, uri))
+            raise DisallowedFileError(f"Only files from {cls.public_dir!r}/ are allowed: {uri!r}")
 
         # Disalow paths that have a '/.' component, as `/./` is a no-op and `/../`
         # can be used to recurse back past the entry point of this XBlock.
