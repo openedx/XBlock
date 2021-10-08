@@ -1,4 +1,4 @@
-# Requirements for running tests in Travis
+# Requirements for running tests in CI
 
 -c constraints.txt
 

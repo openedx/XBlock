@@ -4,4 +4,4 @@
 
 -r pip-tools.txt                    # pip-tools and its dependencies, for managing requirements files
 -r test.txt                         # Dependencies for running the various test suites
--r travis.txt                       # tox and related dependencies
+-r ci.txt                       # tox and related dependencies
