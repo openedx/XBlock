@@ -85,12 +85,10 @@ by checking your code with these tools.
 .. _pylintrc: https://github.com/edx/XBlock/blob/master/pylintrc
 .. _setup.cfg: https://github.com/edx/XBlock/blob/master/setup.cfg
 
-You can run these tests automatically before pushing code to github (and running
-the validation in Github Actions) by activating the `pre-push` script
+You can run these checks before pushing code to github (and running
+the validation in Github Actions) using Tox::
 
-    cd .git/hooks
-    ln -s ../../script/pre-push
-    cd -
+    tox -e quality
 
 
 Using the XBlock-SDK
