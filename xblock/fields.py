@@ -996,7 +996,7 @@ class DateTime(JSONField):
         if value is None:
             return None
 
-        raise TypeError("Value stored must be a datetime or timedelta object, not {}".format(type(value)))
+        raise TypeError(f"Value stored must be a datetime or timedelta object, not {type(value)}")
 
     def to_string(self, value):
         """DateTime fields get serialized without quote marks."""
@@ -1123,7 +1123,7 @@ def scope_key(instance, xblock):
         elif char in substitution_list:
             return substitution_list[char]
         else:
-            return "_{}_".format(ord(char))
+            return f"_{ord(char)}_"
 
     for item in ['block', 'name', 'user']:
         if item in scope_key_dict:

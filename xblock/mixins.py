@@ -312,7 +312,7 @@ class ScopedStorageMixin(RuntimeServicesMixin, metaclass=NamedAttributesMetaclas
                 value = getattr(self, field.name)
             except Exception:  # pylint: disable=broad-except
                 # Ensure we return a string, even if unanticipated exceptions.
-                attrs.append(" {}=???".format(field.name))
+                attrs.append(f" {field.name}=???")
             else:
                 if isinstance(value, bytes):
                     value = value.decode('utf-8', errors='escape')
@@ -320,7 +320,7 @@ class ScopedStorageMixin(RuntimeServicesMixin, metaclass=NamedAttributesMetaclas
                     value = value.strip()
                     if len(value) > 40:
                         value = value[:37] + "..."
-                attrs.append(" {}={!r}".format(field.name, value))
+                attrs.append(f" {field.name}={value!r}")
         return "<{} @{:04X}{}>".format(
             self.__class__.__name__,
             id(self) % 0xFFFF,
