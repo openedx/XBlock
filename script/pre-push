@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# This pre-push hook verifies that there are no unexpected pylint/pep8 errors before pushing
-echo "Checking for quality violations..."
-make quality
