@@ -35,7 +35,6 @@ from xblock.test.tools import TestRuntime
 
 # Ignore statements that 'have no effect', since the effect is to read
 # from the descriptor
-# pylint: disable=W0104
 
 
 # Allow base classes to leave out class attributes and that they access
@@ -449,7 +448,6 @@ class UniqueIdTestCases(ImmutableTestCases):
 # pylint: enable=no-member
 
 
-# pylint: disable=C0111
 class TestImmutableWithStaticDefault(ImmutableTestCases, StaticDefaultTestCases):
     __test__ = False
 
@@ -459,6 +457,7 @@ class TestImmutableWithUniqueIdDefault(UniqueIdTestCases, StaticDefaultTestCases
 
 
 class TestImmutableWithComputedDefault(ImmutableTestCases, ComputedDefaultTestCases):
+    """TestImmutableWithComputedDefault"""
     __test__ = False
 
     @property
@@ -476,6 +475,7 @@ class TestMutableWithInitialValue(MutableTestCases, InitialValueProperties, Init
 
 
 class TestMutableWithComputedDefault(MutableTestCases, ComputedDefaultTestCases, DefaultValueMutationProperties):
+    """TestMutableWithComputedDefault"""
     __test__ = False
 
     @property
@@ -550,7 +550,7 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
                 TestImmutableWithUniqueIdDefault, TestImmutableWithInitialValueAndUniqueIdDefault
         ):
 
-            test_name = base_test_case.__name__ + "With" + operation_backend.__name__  # pylint: disable=invalid-name
+            test_name = base_test_case.__name__ + "With" + operation_backend.__name__
             test_classes = (operation_backend, base_test_case)
             if noop_prefix is not None:
                 test_name += "And" + noop_prefix.__name__
@@ -564,7 +564,6 @@ for operation_backend in (BlockFirstOperations, FieldFirstOperations):
 
 # If we don't delete the loop variables, then they leak into the global namespace
 # and cause the last class looped through to be tested twice. Surprise!
-# pylint: disable=undefined-loop-variable
 del operation_backend
 del noop_prefix
 del base_test_case

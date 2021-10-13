@@ -245,7 +245,7 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
 
         """
         # pylint: disable=protected-access
-        def _decorator(func):  # pylint: disable=missing-docstring
+        def _decorator(func):
             if not hasattr(func, '_aside_for'):
                 func._aside_for = []
 

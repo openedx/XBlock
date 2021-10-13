@@ -101,7 +101,7 @@ class ToyRuntime(Runtime):
         self.id_generator = ID_MANAGER
         self.user_id = user_id
 
-    def render_template(self, template_name, **kwargs):  # pylint: disable=unused-argument
+    def render_template(self, template_name, **kwargs):
         """Mock for rendering templates"""
         return template_name
 

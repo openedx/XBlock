@@ -28,12 +28,12 @@ class Abstract(metaclass=ABCMeta):
         raise NotImplementedError
 
 
-@unabc                      # pylint: disable=abstract-method
+@unabc
 class ForceConcrete(Abstract):  # pylint: disable=W0223
     """Ha-ha! Can't make me implement what I don't want to!"""
 
 
-@unabc("Sorry, no {}")      # pylint: disable=abstract-method
+@unabc("Sorry, no {}")
 class ForceConcreteMessage(Abstract):  # pylint: disable=W0223
     """I'll implement what I want to implement."""
 
@@ -43,21 +43,21 @@ class TestUnAbc(unittest.TestCase):
 
     def test_cant_abstract(self):
         with self.assertRaisesRegex(TypeError, r"Can't instantiate .*"):
-            Abstract()
+            Abstract()                  # pylint: disable=abstract-class-instantiated
 
     def test_concrete(self):
-        conc = ForceConcrete()
+        conc = ForceConcrete()          # pylint: disable=abstract-class-instantiated
         self.assertEqual(conc.concrete(10), 103)
 
     def test_concrete_absmeth(self):
-        conc = ForceConcrete()
+        conc = ForceConcrete()          # pylint: disable=abstract-class-instantiated
         with self.assertRaisesRegex(NotImplementedError, r"absmeth1 isn't implemented"):
             conc.absmeth1()
         with self.assertRaisesRegex(NotImplementedError, r"absmeth2 isn't implemented"):
             conc.absmeth2()
 
     def test_concrete_absmeth_message(self):
-        conc = ForceConcreteMessage()
+        conc = ForceConcreteMessage()   # pylint: disable=abstract-class-instantiated
         with self.assertRaisesRegex(NotImplementedError, r"Sorry, no absmeth1"):
             conc.absmeth1()
         with self.assertRaisesRegex(NotImplementedError, r"Sorry, no absmeth2"):

@@ -1,7 +1,7 @@
 """
 Tests for classes extending Field.
 """
-# pylint: disable=abstract-class-instantiated, protected-access
+# pylint: disable=protected-access
 from contextlib import contextmanager
 import datetime as dt
 import itertools
@@ -269,7 +269,6 @@ class XMLStringTest(FieldTest):
         b'<invalid_utf8_bytes char="\xe1"/>',
     )
     def test_bad_xml(self, input_text):
-        # pylint: disable=no-member
         xml_string = self.FIELD_TO_TEST(enforce_type=True)
         self.assertRaises(etree.XMLSyntaxError, xml_string.to_json, input_text)
         unchecked_xml_string = self.FIELD_TO_TEST(enforce_type=False)
