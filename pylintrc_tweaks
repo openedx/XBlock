@@ -1,0 +1,3 @@
+[MESSAGES CONTROL]
+disable+=
+    django-not-configured,

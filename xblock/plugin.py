@@ -68,7 +68,7 @@ class Plugin:
         attribute `plugin_name` on the loaded object
         """
         class_ = entry_point.load()
-        setattr(class_, 'plugin_name', entry_point.name)
+        class_.plugin_name = entry_point.name
         return class_
 
     @classmethod
@@ -167,9 +167,9 @@ class Plugin:
         )
         entry_point.name = identifier
 
-        def _decorator(func):                           # pylint: disable=C0111
+        def _decorator(func):
             @functools.wraps(func)
-            def _inner(*args, **kwargs):                # pylint: disable=C0111
+            def _inner(*args, **kwargs):
                 global PLUGIN_CACHE  # pylint: disable=global-statement
 
                 old = list(cls.extra_entry_points)

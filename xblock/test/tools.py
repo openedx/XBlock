@@ -52,7 +52,7 @@ def _unabc(cls, msg="{} isn't implemented"):
     """Helper method to implement `unabc`"""
     def make_dummy_method(ab_name):
         """A function to make the dummy method, to close over ab_name."""
-        def dummy_method(self, *args, **kwargs):  # pylint: disable=unused-argument
+        def dummy_method(self, *args, **kwargs):
             """The method provided for all missing abstract methods."""
             raise NotImplementedError(msg.format(ab_name))
         return dummy_method
@@ -112,7 +112,6 @@ class TestRuntime(Runtime):
     __test__ = False
 
     # unabc doesn't squash pylint errors
-    # pylint: disable=abstract-method
     def __init__(self, *args, **kwargs):
         memory_id_manager = MemoryIdManager()
         # Provide an IdReader if one isn't already passed to the runtime.
@@ -121,7 +120,7 @@ class TestRuntime(Runtime):
         kwargs.setdefault('id_generator', memory_id_manager)
         super().__init__(*args, **kwargs)
 
-    def handler_url(self, *args, **kwargs):  # pylint: disable=signature-differs
+    def handler_url(self, *args, **kwargs):
         raise NotImplementedError
 
     def local_resource_url(self, *args, **kwargs):

@@ -87,7 +87,7 @@ class FieldData(metaclass=ABCMeta):
         for key, value in update_dict.items():
             self.set(block, key, value)
 
-    def default(self, block, name):  # pylint: disable=unused-argument
+    def default(self, block, name):
         """
         Get the default value for this field which may depend on context or may just be the field's global
         default. The default behavior is to raise KeyError which will cause the caller to return the field's
@@ -105,7 +105,7 @@ class DictFieldData(FieldData):
     """
     A FieldData that uses a single supplied dictionary to store fields by name.
     """
-    def __init__(self, data):  # pylint: disable=super-init-not-called
+    def __init__(self, data):
         self._data = data
 
     def get(self, block, name):
@@ -124,13 +124,13 @@ class DictFieldData(FieldData):
         self._data.update(copy.deepcopy(update_dict))
 
 
-class SplitFieldData(FieldData):  # pylint: disable=super-init-not-called
+class SplitFieldData(FieldData):
     """
     A FieldData that uses divides particular scopes between
     several backing FieldData objects.
     """
 
-    def __init__(self, scope_mappings):  # pylint: disable=super-init-not-called
+    def __init__(self, scope_mappings):
         """
         `scope_mappings` defines :class:`~xblock.field_data.FieldData` objects to use
         for each scope. If a scope is not a key in `scope_mappings`, then using
@@ -184,7 +184,7 @@ class ReadOnlyFieldData(FieldData):
     A FieldData that wraps another FieldData an makes all calls to set and delete
     raise :class:`~xblock.exceptions.InvalidScopeError`s.
     """
-    def __init__(self, source):  # pylint: disable=super-init-not-called
+    def __init__(self, source):
         self._source = source
 
     def get(self, block, name):

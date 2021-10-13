@@ -12,22 +12,32 @@ astroid==2.8.2
     # via
     #   -r requirements/test.in
     #   pylint
+    #   pylint-celery
 attrs==21.2.0
     # via
     #   hypothesis
     #   pytest
 backports.entry-points-selectable==1.1.0
     # via virtualenv
-boto3==1.18.58
+boto3==1.18.61
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.21.58
+botocore==1.21.61
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
-coverage[toml]==6.0.1
+click==8.0.3
+    # via
+    #   click-log
+    #   code-annotations
+    #   edx-lint
+click-log==0.3.2
+    # via edx-lint
+code-annotations==1.2.0
+    # via edx-lint
+coverage[toml]==6.0.2
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -45,6 +55,8 @@ distlib==0.3.3
     #   django-pyfs
 django-pyfs==3.1.0
     # via -r requirements/django.txt
+edx-lint==5.2.0
+    # via -r requirements/test.in
 filelock==3.3.0
     # via
     #   tox
@@ -58,7 +70,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-hypothesis==6.23.1
+hypothesis==6.23.2
     # via -r requirements/test.in
 inflect==5.3.0
     # via jinja2-pluralize
@@ -68,6 +80,7 @@ isort==5.9.3
     # via pylint
 jinja2==3.0.2
     # via
+    #   code-annotations
     #   diff-cover
     #   jinja2-pluralize
 jinja2-pluralize==0.3.0
@@ -97,6 +110,8 @@ packaging==21.0
     #   tox
 path==16.2.0
     # via -r requirements/test.in
+pbr==5.6.0
+    # via stevedore
 platformdirs==2.4.0
     # via
     #   pylint
@@ -110,12 +125,25 @@ py==1.10.0
     # via
     #   pytest
     #   tox
-pycodestyle==2.7.0
+pycodestyle==2.8.0
     # via -r requirements/test.in
 pygments==2.10.0
     # via diff-cover
 pylint==2.11.1
-    # via -r requirements/test.in
+    # via
+    #   -r requirements/test.in
+    #   edx-lint
+    #   pylint-celery
+    #   pylint-django
+    #   pylint-plugin-utils
+pylint-celery==0.3
+    # via edx-lint
+pylint-django==2.4.4
+    # via edx-lint
+pylint-plugin-utils==0.6
+    # via
+    #   pylint-celery
+    #   pylint-django
 pyparsing==2.4.7
     # via packaging
 pytest==6.2.5
@@ -131,13 +159,17 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/django.txt
     #   botocore
+python-slugify==5.0.2
+    # via code-annotations
 pytz==2021.3
     # via
     #   -r requirements/django.txt
     #   django
     #   fs
 pyyaml==5.4.1
-    # via -r requirements/django.txt
+    # via
+    #   -r requirements/django.txt
+    #   code-annotations
 s3transfer==0.5.0
     # via
     #   -r requirements/django.txt
@@ -147,6 +179,7 @@ simplejson==3.17.5
 six==1.16.0
     # via
     #   -r requirements/django.txt
+    #   edx-lint
     #   fs
     #   fs-s3fs
     #   python-dateutil
@@ -158,6 +191,10 @@ sqlparse==0.4.2
     # via
     #   -r requirements/django.txt
     #   django
+stevedore==3.4.0
+    # via code-annotations
+text-unidecode==1.3
+    # via python-slugify
 toml==0.10.2
     # via
     #   pylint
