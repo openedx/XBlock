@@ -121,7 +121,7 @@ class RuntimeServicesMixin:
     @classmethod
     def needs(cls, *service_names):
         """A class decorator to indicate that an XBlock class needs particular services."""
-        def _decorator(cls_):                                # pylint: disable=missing-docstring
+        def _decorator(cls_):
             for service_name in service_names:
                 cls_._services_requested[service_name] = "need"  # pylint: disable=protected-access
             return cls_
@@ -130,7 +130,7 @@ class RuntimeServicesMixin:
     @classmethod
     def wants(cls, *service_names):
         """A class decorator to indicate that an XBlock class wants particular services."""
-        def _decorator(cls_):                                # pylint: disable=missing-docstring
+        def _decorator(cls_):
             for service_name in service_names:
                 cls_._services_requested[service_name] = "want"  # pylint: disable=protected-access
             return cls_
@@ -265,7 +265,7 @@ class ScopedStorageMixin(RuntimeServicesMixin, metaclass=NamedAttributesMetaclas
             self._field_data.set_many(self, fields_to_save_json)
         except KeyValueMultiSaveError as save_error:
             saved_fields = [field for field in fields
-                            if field.name in save_error.saved_field_names]  # pylint: disable=exception-escape
+                            if field.name in save_error.saved_field_names]
             for field in saved_fields:
                 # should only find one corresponding field
                 fields.remove(field)
@@ -499,7 +499,6 @@ class XmlSerializationMixin(ScopedStorageMixin):
 
     def xml_text_content(self):
         """What is the text content for this block's XML node?"""
-        # pylint: disable=E1101
         if 'content' in self.fields and self.content:
             return self.content
         else:

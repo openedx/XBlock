@@ -57,7 +57,6 @@ class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
         # `ModelMetaclassTester` and `ChildClass` both obtain the `fields` attribute
         # from the `ModelMetaclass`. Since this is not understood by static analysis,
         # silence this error for the duration of this test.
-        # pylint: disable=E1101
         self.assertIsNot(self.ScopedStorageMixinTester.fields, self.ChildClass.fields)
 
         self.assertHasAttr(self.ScopedStorageMixinTester, 'field_a')
@@ -78,7 +77,6 @@ class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
         # `MixinChildClass` and `MixinGrandchildClass` both obtain the `fields` attribute
         # from the `ScopedStorageMixin`. Since this is not understood by static analysis,
         # silence this error for the duration of this test.
-        # pylint: disable=E1101
 
         self.assertHasAttr(self.MixinChildClass, 'field_a')
         self.assertHasAttr(self.MixinChildClass, 'field_c')
@@ -235,7 +233,6 @@ class TestViewsMixin(TestCase):
 class TestXmlSerializationMixin(TestCase):
     """ Tests for XmlSerialization Mixin """
 
-    # pylint:disable=invalid-name
     class TestXBlock(XBlock):
         """ XBlock for XML export test """
         etree_node_tag = 'test_xblock'
@@ -248,7 +245,6 @@ class TestXmlSerializationMixin(TestCase):
         str_none_default = String(default=None)
         str_none_default_force_export = String(default=None, force_export=True)
 
-    # pylint:disable=invalid-name
     class TestXBlockAside(XBlockAside):
         """ XBlockAside for XML export test """
         etree_node_tag = 'test_xblock_aside'
@@ -266,6 +262,7 @@ class TestXmlSerializationMixin(TestCase):
         """
         Construct test XBlocks.
         """
+        super().setUp()
         self.test_xblock = self._make_block(self.TestXBlock)
         self.test_xblock_tag = self.TestXBlock.etree_node_tag
         self.test_xblock_datetime = self._make_block(self.TestXBlockWithDateTime)
@@ -476,7 +473,7 @@ class TestXmlSerializationMixin(TestCase):
         """
         node = etree.Element(self.test_xblock_datetime_tag)
 
-        self.test_xblock_datetime.datetime = value  # pylint: disable=attribute-defined-outside-init
+        self.test_xblock_datetime.datetime = value
 
         self.test_xblock_datetime.add_xml_to_node(node)
 

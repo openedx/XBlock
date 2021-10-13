@@ -51,6 +51,7 @@ class AsideRuntimeSetup(TestCase):
     A base class to setup the runtime
     """
     def setUp(self):
+        super().setUp()
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
         self.runtime = TestRuntime(services={'field-data': field_data})

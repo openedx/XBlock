@@ -355,9 +355,9 @@ def test_mixin_field_access():
     assert [1, 2, 3] == field_tester.field_x_with_default
 
     with pytest.raises(AttributeError):
-        getattr(field_tester, 'field_z')
+        field_tester.field_z        # pylint: disable=pointless-statement
     with pytest.raises(AttributeError):
-        delattr(field_tester, 'field_z')
+        del field_tester.field_z
 
     field_tester.field_z = 'foo'
     assert field_tester.field_z == 'foo'
@@ -607,6 +607,7 @@ class TestRuntimeGetBlock(TestCase):
     Test the get_block default method on Runtime.
     """
     def setUp(self):
+        super().setUp()
         patcher = patch.object(TestRuntime, 'construct_xblock')
         self.construct_block = patcher.start()
         self.addCleanup(patcher.stop)

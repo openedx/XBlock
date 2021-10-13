@@ -122,7 +122,7 @@ class JsonHandlerError(Exception):
         the Response.
         """
         return Response(
-            json.dumps({"error": self.message}),  # pylint: disable=exception-message-attribute
+            json.dumps({"error": self.message}),
             status_code=self.status_code,
             content_type="application/json",
             charset="utf-8",

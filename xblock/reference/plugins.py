@@ -19,9 +19,9 @@ except ImportError:
         '''
 
 try:
-    from djpyfs import djpyfs  # pylint: disable=import-error
+    from djpyfs import djpyfs
 except ImportError:
-    djpyfs = None  # pylint: disable=invalid-name
+    djpyfs = None
 except ImproperlyConfigured:
     print("Warning! Django is not correctly configured.")
     djpyfs = None  # pylint: disable=invalid-name
@@ -134,7 +134,6 @@ class Filesystem(Field):
         # is the value that will be returned. Otherwise, it will get
         # it from the fs service.
 
-        # pylint: disable=protected-access
         if xblock is None:
             return self
 

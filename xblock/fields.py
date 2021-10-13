@@ -500,7 +500,6 @@ class Field(Nameable):
         obtaining the value from the field-data service. Thus if a cached value
         exists, that is the value that will be returned.
         """
-        # pylint: disable=protected-access
         if xblock is None:
             return self
 
@@ -553,7 +552,6 @@ class Field(Nameable):
         Deletes `xblock` from the underlying data store.
         Deletes are not cached; they are performed immediately.
         """
-        # pylint: disable=protected-access
 
         # Try to perform the deletion on the field_data, and accept
         # that it's okay if the key is not present.  (It may never
@@ -976,10 +974,10 @@ class DateTime(JSONField):
             )
 
         if isinstance(value, datetime.datetime):
-            if value.tzinfo is not None:  # pylint: disable=maybe-no-member
-                return value.astimezone(pytz.utc)  # pylint: disable=maybe-no-member
+            if value.tzinfo is not None:
+                return value.astimezone(pytz.utc)
             else:
-                return value.replace(tzinfo=pytz.utc)  # pylint: disable=maybe-no-member
+                return value.replace(tzinfo=pytz.utc)
         else:
             return value
 
@@ -1087,7 +1085,7 @@ def scope_key(instance, xblock):
     """
     scope_key_dict = {}
     scope_key_dict['name'] = instance.name
-    if instance.scope.user == UserScope.NONE or instance.scope.user == UserScope.ALL:
+    if instance.scope.user in [UserScope.NONE, UserScope.ALL]:
         pass
     elif instance.scope.user == UserScope.ONE:
         scope_key_dict['user'] = str(xblock.scope_ids.user_id)

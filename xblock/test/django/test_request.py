@@ -6,9 +6,8 @@ responses.
 # Set up Django settings
 from unittest import TestCase
 
-# pylint: disable=wrong-import-position
 try:
-    from django.test.client import RequestFactory  # pylint: disable=import-error
+    from django.test.client import RequestFactory
     HAS_DJANGO = True
 except ImportError:
     HAS_DJANGO = False
@@ -27,6 +26,7 @@ class TestDjangoWebobRequest(TestCase):
     Tests of the django_to_webob_request function
     """
     def setUp(self):
+        super().setUp()
         self.req_factory = RequestFactory()
 
     def test_post_already_read(self):
@@ -35,7 +35,7 @@ class TestDjangoWebobRequest(TestCase):
         dj_req = self.req_factory.post('dummy_url', data={'foo': 'bar'})
 
         # Read from POST before constructing the webob request
-        self.assertEqual(dj_req.POST.getlist('foo'), ['bar'])  # pylint: disable=no-member
+        self.assertEqual(dj_req.POST.getlist('foo'), ['bar'])
 
         webob_req = django_to_webob_request(dj_req)
         self.assertEqual(webob_req.POST.getall('foo'), ['bar'])
