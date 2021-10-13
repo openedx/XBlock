@@ -404,7 +404,7 @@ def test_object_identity():
         """Toy class for ModelMetaclass and field access testing"""
         field_a = List(scope=Scope.settings)
 
-    def mock_default(block, name):  # pylint: disable=unused-argument
+    def mock_default(block, name):
         """
         Raising KeyError emulates no attribute found, which causes
         proper default value to be used after field is deleted.
@@ -501,26 +501,26 @@ def test_field_serialization():
 
 def test_class_tags():
     xblock = XBlock(None, None, None)
-    assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable, bad-option-value
+    assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable
 
     class Sub1Block(XBlock):
         """Toy XBlock"""
 
     sub1block = Sub1Block(None, None, None)
-    assert sub1block._class_tags == set()  # pylint: disable=comparison-with-callable, bad-option-value
+    assert sub1block._class_tags == set()  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
         """Toy XBlock"""
 
     sub2block = Sub2Block(None, None, None)
-    assert sub2block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable, bad-option-value
+    assert sub2block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     class Sub3Block(Sub2Block):
         """Toy XBlock"""
 
     sub3block = Sub3Block(None, None, None)
-    assert sub3block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable, bad-option-value
+    assert sub3block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("mixin")
     class MixinBlock(XBlock):
@@ -530,7 +530,7 @@ def test_class_tags():
         """Toy XBlock"""
 
     sub4block = Sub4Block(None, None, None)
-    assert sub4block._class_tags == {  # pylint: disable=comparison-with-callable, bad-option-value
+    assert sub4block._class_tags == {  # pylint: disable=comparison-with-callable
         "cat", "dog", "mixin"
     }
 
@@ -577,7 +577,7 @@ def setup_save_failure(set_many):
 def test_xblock_save_one():
     # Mimics a save failure when we only manage to save one of the values
 
-    def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
+    def fake_set_many(block, update_dict):
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that only one field was correctly saved."""
         raise KeyValueMultiSaveError([next(iter(update_dict))])
@@ -600,7 +600,7 @@ def test_xblock_save_one():
 def test_xblock_save_failure_none():
     # Mimics a save failure when we don't manage to save any of the values
 
-    def fake_set_many(block, update_dict):  # pylint: disable=unused-argument
+    def fake_set_many(block, update_dict):
         """Mock update method that throws a KeyValueMultiSaveError indicating
            that no fields were correctly saved."""
         raise KeyValueMultiSaveError([])
@@ -742,11 +742,10 @@ def test_handle_shortcut():
 
 
 def test_services_decorators():
-    # pylint: disable=E1101
     # A default XBlock has requested no services
     xblock = XBlock(None, None, None)
     assert XBlock._services_requested == {}
-    assert xblock._services_requested == {}  # pylint: disable=comparison-with-callable, bad-option-value
+    assert xblock._services_requested == {}  # pylint: disable=comparison-with-callable
 
     @XBlock.needs("n")
     @XBlock.wants("w")
@@ -754,10 +753,10 @@ def test_services_decorators():
         """XBlock using some services."""
 
     service_using_block = ServiceUsingBlock(None, scope_ids=None)
-    assert ServiceUsingBlock._services_requested == {  # pylint: disable=comparison-with-callable, bad-option-value
+    assert ServiceUsingBlock._services_requested == {
         'n': 'need', 'w': 'want'
     }
-    assert service_using_block._services_requested == {  # pylint: disable=comparison-with-callable, bad-option-value
+    assert service_using_block._services_requested == {  # pylint: disable=comparison-with-callable
         'n': 'need', 'w': 'want'
     }
 
@@ -879,10 +878,10 @@ def test_json_handler_error():
     test_request = Mock(method="POST", body=b"{}")
 
     @XBlock.json_handler
-    def test_func(self, request, suffix):   # pylint: disable=unused-argument
+    def test_func(self, request, suffix):
         raise JsonHandlerError(test_status_code, test_message)
 
-    response = test_func(Mock(), test_request, "dummy_suffix")  # pylint: disable=assignment-from-no-return
+    response = test_func(Mock(), test_request, "dummy_suffix")
     assert response.status_code == test_status_code
     assert json.loads(response.body.decode('utf-8')) == {"error": test_message}
     assert response.content_type == "application/json"

@@ -94,7 +94,7 @@ class CompletableXBlockMixinTest(TestCase):
         """
         block = self._make_block()
         self.assertEqual(XBlockCompletionMode.get_mode(block), XBlockCompletionMode.COMPLETABLE)
-        self.assertEqual(getattr(block, 'completion_mode'), XBlockCompletionMode.COMPLETABLE)
+        self.assertEqual(block.completion_mode, XBlockCompletionMode.COMPLETABLE)
 
     @given(strategies.floats())
     def test_emit_completion_illegal_custom_completion(self, any_completion):

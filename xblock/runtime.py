@@ -90,7 +90,7 @@ class DictKeyValueStore(KeyValueStore):
     A `KeyValueStore` that stores everything into a Python dictionary.
     """
 
-    def __init__(self, storage=None):  # pylint: disable=super-init-not-called
+    def __init__(self, storage=None):
         self.db_dict = storage if storage is not None else {}
 
     def get(self, key):
@@ -237,7 +237,7 @@ class KvsFieldData(FieldData):
 
 
 # The old name for KvsFieldData, to ease transition.
-DbModel = KvsFieldData  # pylint: disable=C0103
+DbModel = KvsFieldData
 
 
 class IdReader(metaclass=ABCMeta):
@@ -363,7 +363,7 @@ class MemoryIdManager(IdReader, IdGenerator):
     ASIDE_USAGE_ID = namedtuple('MemoryAsideUsageId', 'usage_id aside_type')
     ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')
 
-    def __init__(self):  # pylint: disable=super-init-not-called
+    def __init__(self):
         self._ids = itertools.count()
         self._usages = {}
         self._definitions = {}
@@ -626,7 +626,7 @@ class Runtime(metaclass=ABCMeta):
         """
         return XBlockAside.load_class(aside_type, select=self.select)
 
-    # pylint: disable=keyword-arg-before-vararg, bad-option-value
+    # pylint: disable=keyword-arg-before-vararg
     def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
         r"""
         Construct a new xblock of the type identified by block_type,
@@ -684,7 +684,7 @@ class Runtime(metaclass=ABCMeta):
 
     # Saving field data changes
 
-    def save_block(self, block):  # pylint: disable=unused-argument
+    def save_block(self, block):
         """
         Finalize/commit changes for the field data from the specified block.
         Called at the end of an XBlock's save() method. Runtimes may ignore this
@@ -882,7 +882,7 @@ class Runtime(metaclass=ABCMeta):
             results.append(result)
         return results
 
-    def wrap_xblock(self, block, view, frag, context):  # pylint: disable=W0613
+    def wrap_xblock(self, block, view, frag, context):
         """
         Creates a div which identifies the xblock and writes out the json_init_args into a script tag.
 
@@ -893,7 +893,7 @@ class Runtime(metaclass=ABCMeta):
         """
         if hasattr(self, 'wrap_child'):
             log.warning("wrap_child is deprecated in favor of wrap_xblock and wrap_aside %s", self.__class__)
-            return self.wrap_child(block, view, frag, context)  # pylint: disable=no-member
+            return self.wrap_child(block, view, frag, context)
 
         extra_data = {'name': block.name} if block.name else {}
         return self._wrap_ele(block, view, frag, extra_data)
@@ -1191,7 +1191,7 @@ class Runtime(metaclass=ABCMeta):
                 results = results.attr(toktext[1:])
                 state = FINAL
             elif tokname == "word":
-                # xxx (tag selection)  # pylint: disable=fixme
+                # xxx (tag selection)
                 if state != SEP:
                     raise BadPath()
                 results = results.children().tagged(toktext)
@@ -1365,7 +1365,6 @@ class NullI18nService:
         Note that under python 3, this uses `gettext()`, while under python 2,
         it uses `ugettext()`.  This should not be used with bytestrings.
         """
-        # pylint: disable=no-member
         return self._translations.gettext
 
     @property
@@ -1376,5 +1375,4 @@ class NullI18nService:
         Note that under python 3, this uses `ngettext()`, while under python 2,
         it uses `ungettext()`.  This should not be used with bytestrings.
         """
-        # pylint: disable=no-member
         return self._translations.ngettext

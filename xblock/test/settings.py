@@ -47,7 +47,7 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname().dirname()  # pylint: disable=invalid-name, no-value-for-parameter
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname().dirname()
 LOCALE_PATHS = [str(PROJECT_ROOT + '/xblock/test/locale')]
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
