@@ -19,11 +19,11 @@ attrs==21.2.0
     #   pytest
 backports.entry-points-selectable==1.1.0
     # via virtualenv
-boto3==1.18.61
+boto3==1.18.62
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.21.61
+botocore==1.21.62
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -166,7 +166,7 @@ pytz==2021.3
     #   -r requirements/django.txt
     #   django
     #   fs
-pyyaml==5.4.1
+pyyaml==6.0
     # via
     #   -r requirements/django.txt
     #   code-annotations

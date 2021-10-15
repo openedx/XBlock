@@ -18,7 +18,7 @@ pytz==2021.3
     # via
     #   -r requirements/base.in
     #   fs
-pyyaml==5.4.1
+pyyaml==6.0
     # via -r requirements/base.in
 simplejson==3.17.5
     # via -r requirements/base.in
