@@ -4,7 +4,10 @@
 Set up for XBlock
 """
 import codecs
+import os
 import os.path
+import re
+
 from setuptools import setup
 
 VERSION_FILE = os.path.join(os.path.dirname(__file__), 'xblock/VERSION.txt')

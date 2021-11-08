@@ -1,2 +1,3 @@
 include xblock/VERSION.txt
 recursive-include xblock *.mo *.po
+include requirements/constraints.txt
