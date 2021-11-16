@@ -4,12 +4,29 @@
 Set up for XBlock
 """
 import codecs
+import os
 import os.path
+import re
+
 from setuptools import setup
 
-VERSION_FILE = os.path.join(os.path.dirname(__file__), 'xblock/VERSION.txt')
-with codecs.open(VERSION_FILE, encoding='ascii') as f:
-    VERSION = f.read().strip()
+
+def get_version(*file_paths):
+    """
+    Extract the version string from the file at the given relative path fragments.
+    """
+    filename = os.path.join(os.path.dirname(__file__), *file_paths)
+    with open(filename, encoding='utf-8') as opened_file:
+        version_file = opened_file.read()
+        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                                  version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError('Unable to find version string.')
+
+
+VERSION = get_version("xblock", "__init__.py")
+
 
 setup(
     name='XBlock',
