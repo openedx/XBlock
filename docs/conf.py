@@ -10,7 +10,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import codecs
 import datetime
 import os
 import sys
@@ -18,12 +17,11 @@ import sys
 import edx_theme
 from unittest import mock
 
+
 MOCK_MODULES = [
     'webob',
     'lxml'
 ]
-
-VERSION_FILE = os.path.join(os.path.dirname(__file__), '..', 'xblock', 'VERSION.txt')
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock(class_that_is_extended=object)
@@ -33,7 +31,8 @@ for mod_name in MOCK_MODULES:
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
-
+sys.path.insert(0, os.path.abspath('..xblock',))
+from xblock import __version__
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -67,7 +66,7 @@ copyright = f'{datetime.datetime.now().year}, edX Inc.'
 # built documents.
 #
 # The short X.Y version.
-version = codecs.open(VERSION_FILE, encoding='ascii').read().strip()
+version = __version__
 # The full version, including alpha/beta/rc tags.
 #release = '0.3'
 

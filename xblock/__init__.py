@@ -27,7 +27,4 @@ class XBlockMixin(xblock.core.XBlockMixin):
 # without causing a circular import
 xblock.fields.XBlockMixin = XBlockMixin
 
-VERSION_FILE = os.path.join(os.path.dirname(__file__), 'VERSION.txt')
-
-with codecs.open(VERSION_FILE, encoding='ascii') as f:
-    __version__ = f.read().strip()
+__version__ = '1.5.1'
