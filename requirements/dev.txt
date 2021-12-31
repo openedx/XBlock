@@ -8,26 +8,21 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==2.8.2
+astroid==2.9.0
     # via
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-attrs==21.2.0
+attrs==21.4.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-backports.entry-points-selectable==1.1.0
-    # via
-    #   -r requirements/ci.txt
-    #   -r requirements/test.txt
-    #   virtualenv
-boto3==1.18.61
+boto3==1.20.26
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.21.61
+botocore==1.23.26
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -36,7 +31,7 @@ certifi==2021.10.8
     # via
     #   -r requirements/ci.txt
     #   requests
-charset-normalizer==2.0.7
+charset-normalizer==2.0.9
     # via
     #   -r requirements/ci.txt
     #   requests
@@ -58,7 +53,7 @@ code-annotations==1.2.0
     #   edx-lint
 codecov==2.1.12
     # via -r requirements/ci.txt
-coverage[toml]==6.0.2
+coverage[toml]==6.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -70,27 +65,27 @@ diff-cover==4.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/test.txt
-distlib==0.3.3
+distlib==0.3.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   virtualenv
-django==2.2.24
+django==2.2.25
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   django-pyfs
 django-pyfs==3.1.0
     # via -r requirements/test.txt
-edx-lint==5.2.0
+edx-lint==5.2.1
     # via -r requirements/test.txt
-filelock==3.3.0
+filelock==3.4.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
     #   virtualenv
-fs==2.4.13
+fs==2.4.14
     # via
     #   -r requirements/test.txt
     #   django-pyfs
@@ -99,7 +94,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-hypothesis==6.23.2
+hypothesis==6.34.0
     # via -r requirements/test.txt
 idna==3.3
     # via
@@ -113,11 +108,11 @@ iniconfig==1.1.1
     # via
     #   -r requirements/test.txt
     #   pytest
-isort==5.9.3
+isort==5.10.1
     # via
     #   -r requirements/test.txt
     #   pylint
-jinja2==3.0.2
+jinja2==3.0.3
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -134,11 +129,11 @@ jmespath==0.10.0
     #   botocore
 lazy==1.4
     # via -r requirements/test.txt
-lazy-object-proxy==1.6.0
+lazy-object-proxy==1.7.1
     # via
     #   -r requirements/test.txt
     #   astroid
-lxml==4.6.3
+lxml==4.7.1
     # via -r requirements/test.txt
 markupsafe==2.0.1
     # via
@@ -150,7 +145,7 @@ mccabe==0.6.1
     #   pylint
 mock==4.0.3
     # via -r requirements/test.txt
-packaging==21.0
+packaging==21.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -158,17 +153,17 @@ packaging==21.0
     #   tox
 path==16.2.0
     # via -r requirements/test.txt
-pbr==5.6.0
+pbr==5.8.0
     # via
     #   -r requirements/test.txt
     #   stevedore
-pep517==0.11.0
+pep517==0.12.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
 pip-tools==6.4.0
     # via -r requirements/pip-tools.txt
-platformdirs==2.4.0
+platformdirs==2.4.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -181,7 +176,7 @@ pluggy==1.0.0
     #   diff-cover
     #   pytest
     #   tox
-py==1.10.0
+py==1.11.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -189,11 +184,11 @@ py==1.10.0
     #   tox
 pycodestyle==2.8.0
     # via -r requirements/test.txt
-pygments==2.10.0
+pygments==2.11.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.11.1
+pylint==2.12.2
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -208,12 +203,12 @@ pylint-django==2.4.4
     # via
     #   -r requirements/test.txt
     #   edx-lint
-pylint-plugin-utils==0.6
+pylint-plugin-utils==0.7
     # via
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pyparsing==2.4.7
+pyparsing==3.0.6
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -225,7 +220,7 @@ pytest==6.2.5
     #   pytest-django
 pytest-cov==3.0.0
     # via -r requirements/test.txt
-pytest-django==4.4.0
+pytest-django==4.5.2
     # via -r requirements/test.txt
 python-dateutil==2.8.2
     # via
@@ -240,7 +235,7 @@ pytz==2021.3
     #   -r requirements/test.txt
     #   django
     #   fs
-pyyaml==5.4.1
+pyyaml==6.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -252,7 +247,7 @@ s3transfer==0.5.0
     # via
     #   -r requirements/test.txt
     #   boto3
-simplejson==3.17.5
+simplejson==3.17.6
     # via -r requirements/test.txt
 six==1.16.0
     # via
@@ -272,7 +267,7 @@ sqlparse==0.4.2
     # via
     #   -r requirements/test.txt
     #   django
-stevedore==3.4.0
+stevedore==3.5.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -287,20 +282,20 @@ toml==0.10.2
     #   pylint
     #   pytest
     #   tox
-tomli==1.2.1
+tomli==2.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   coverage
     #   pep517
-tox==3.24.4
+tox==3.24.5
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/ci.txt
-typing-extensions==3.10.0.2
+typing-extensions==4.0.1
     # via
     #   -r requirements/test.txt
     #   astroid
@@ -311,20 +306,20 @@ urllib3==1.26.7
     #   -r requirements/test.txt
     #   botocore
     #   requests
-virtualenv==20.8.1
+virtualenv==20.11.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-web-fragments==1.1.0
+web-fragments==2.0.0
     # via -r requirements/test.txt
 webob==1.8.7
     # via -r requirements/test.txt
-wheel==0.37.0
+wheel==0.37.1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-wrapt==1.12.1
+wrapt==1.13.3
     # via
     #   -r requirements/test.txt
     #   astroid
