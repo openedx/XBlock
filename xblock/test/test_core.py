@@ -744,8 +744,8 @@ def test_handle_shortcut():
 def test_services_decorators():
     # A default XBlock has requested no services
     xblock = XBlock(None, None, None)
-    assert XBlock._services_requested == {}
-    assert xblock._services_requested == {}  # pylint: disable=comparison-with-callable
+    assert not XBlock._services_requested
+    assert not xblock._services_requested
 
     @XBlock.needs("n")
     @XBlock.wants("w")
