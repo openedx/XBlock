@@ -1,6 +1,6 @@
-Part of `edX code`__.
+Part of the `Open edX Platform`__.
 
-__ http://code.edx.org/
+__ http://openedx.org/
 
 XBlock Courseware Components |build-status| |coverage-status|
 =============================================================
