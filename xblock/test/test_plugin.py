@@ -65,7 +65,7 @@ def test_nosuch_plugin():
 @patch.object(XBlock, '_load_class_entry_point', Mock(side_effect=Exception))
 def test_broken_plugin():
     plugins = XBlock.load_classes()
-    assert list(plugins) == []
+    assert not list(plugins)
 
 
 def _num_plugins_cached():
