@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.9.1
     # via sphinx
-boto3==1.20.35
+boto3==1.20.40
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.23.35
+botocore==1.23.40
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -30,7 +30,7 @@ django==2.2.26
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
     #   django-pyfs
-django-pyfs==3.1.0
+django-pyfs==3.2.0
     # via -r requirements/django.txt
 docutils==0.17.1
     # via sphinx
@@ -48,6 +48,8 @@ fs-s3fs==1.1.1
 idna==3.3
     # via requests
 imagesize==1.3.0
+    # via sphinx
+importlib-metadata==4.10.1
     # via sphinx
 jinja2==3.0.3
     # via sphinx
@@ -101,7 +103,7 @@ six==1.16.0
     #   python-dateutil
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==4.3.2
+sphinx==4.4.0
     # via
     #   -r requirements/doc.in
     #   edx-sphinx-theme
@@ -130,6 +132,8 @@ web-fragments==2.0.0
     # via -r requirements/django.txt
 webob==1.8.7
     # via -r requirements/django.txt
+zipp==3.7.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

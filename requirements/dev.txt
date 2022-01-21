@@ -18,11 +18,11 @@ attrs==21.4.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.20.35
+boto3==1.20.40
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.23.35
+botocore==1.23.40
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -75,7 +75,7 @@ django==2.2.26
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   django-pyfs
-django-pyfs==3.1.0
+django-pyfs==3.2.0
     # via -r requirements/test.txt
 edx-lint==5.2.1
     # via -r requirements/test.txt
@@ -94,7 +94,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-hypothesis==6.35.0
+hypothesis==6.36.0
     # via -r requirements/test.txt
 idna==3.3
     # via
