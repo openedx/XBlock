@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.20.35
+boto3==1.20.40
     # via fs-s3fs
-botocore==1.23.35
+botocore==1.23.40
     # via
     #   boto3
     #   s3transfer
@@ -19,7 +19,7 @@ django==2.2.26
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.in
     #   django-pyfs
-django-pyfs==3.1.0
+django-pyfs==3.2.0
     # via -r requirements/django.in
 fs==2.4.14
     # via
