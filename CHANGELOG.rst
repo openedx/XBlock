@@ -4,6 +4,11 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.6.1 - 2022-01-28
+------------------
+
+* Fix Release Issue with PyPi release workflow
+
 1.6.0 - 2022-01-25
 ------------------
 
