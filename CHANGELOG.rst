@@ -4,6 +4,13 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+1.6.0 - 2022-01-25
+------------------
+
+* Dropped Django22, 30 and 31 support
+* Added Django40 Support in CI
+
+
 1.5.1 - 2021-08-26
 ------------------
 

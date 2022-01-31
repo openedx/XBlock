@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8']
-        toxenv: [quality, django22, django30, django31, django32]
+        toxenv: [quality, django32, django40]
 
     steps:
     - uses: actions/checkout@v2
