@@ -1,0 +1,12 @@
+# Run the workflow that adds DEPR labeled issues
+# to the org-wide DEPR project board
+
+name: Add newly created DEPR issues to the DEPR project board
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  routeissue:
+    uses: openedx/.github/.github/workflows/add-depr-ticket-to-depr-board.yml@master
