@@ -6,11 +6,11 @@
 #
 certifi==2021.10.8
     # via requests
-charset-normalizer==2.0.10
+charset-normalizer==2.0.11
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
-coverage==6.3
+coverage==6.3.1
     # via codecov
 distlib==0.3.4
     # via virtualenv
@@ -22,7 +22,7 @@ idna==3.3
     # via requests
 packaging==21.3
     # via tox
-platformdirs==2.4.1
+platformdirs==2.5.0
     # via virtualenv
 pluggy==1.0.0
     # via tox
@@ -46,5 +46,5 @@ tox-battery==0.6.1
     # via -r requirements/ci.in
 urllib3==1.26.8
     # via requests
-virtualenv==20.13.0
+virtualenv==20.13.1
     # via tox
