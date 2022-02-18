@@ -6,7 +6,7 @@
 #
 certifi==2021.10.8
     # via requests
-charset-normalizer==2.0.11
+charset-normalizer==2.0.12
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
@@ -14,7 +14,7 @@ coverage==6.3.1
     # via codecov
 distlib==0.3.4
     # via virtualenv
-filelock==3.4.2
+filelock==3.6.0
     # via
     #   tox
     #   virtualenv

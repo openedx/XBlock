@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via fs
 fs==2.4.15
     # via -r requirements/base.in
-lxml==4.7.1
+lxml==4.8.0
     # via -r requirements/base.in
 markupsafe==2.0.1
     # via -r requirements/base.in
