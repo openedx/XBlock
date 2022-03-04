@@ -18,11 +18,11 @@ attrs==21.4.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.21.7
+boto3==1.21.12
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.24.7
+botocore==1.24.12
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -94,7 +94,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-hypothesis==6.37.2
+hypothesis==6.39.1
     # via -r requirements/test.txt
 idna==3.3
     # via
@@ -151,7 +151,7 @@ packaging==21.3
     #   -r requirements/test.txt
     #   pytest
     #   tox
-path==16.3.0
+path==16.4.0
     # via -r requirements/test.txt
 pbr==5.8.1
     # via
@@ -226,7 +226,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/test.txt
     #   botocore
-python-slugify==6.1.0
+python-slugify==6.1.1
     # via
     #   -r requirements/test.txt
     #   code-annotations
