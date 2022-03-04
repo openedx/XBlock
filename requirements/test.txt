@@ -17,11 +17,11 @@ attrs==21.4.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.21.7
+boto3==1.21.12
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.24.7
+botocore==1.24.12
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -68,7 +68,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-hypothesis==6.37.2
+hypothesis==6.39.1
     # via -r requirements/test.in
 inflect==5.4.0
     # via jinja2-pluralize
@@ -106,7 +106,7 @@ packaging==21.3
     # via
     #   pytest
     #   tox
-path==16.3.0
+path==16.4.0
     # via -r requirements/test.in
 pbr==5.8.1
     # via stevedore
@@ -157,7 +157,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/django.txt
     #   botocore
-python-slugify==6.1.0
+python-slugify==6.1.1
     # via code-annotations
 pytz==2021.3
     # via
