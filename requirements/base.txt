@@ -10,7 +10,7 @@ fs==2.4.15
     # via -r requirements/base.in
 lxml==4.8.0
     # via -r requirements/base.in
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via -r requirements/base.in
 python-dateutil==2.8.2
     # via -r requirements/base.in
