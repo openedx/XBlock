@@ -17,11 +17,11 @@ attrs==21.4.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.21.17
+boto3==1.21.21
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.24.17
+botocore==1.24.21
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -31,7 +31,7 @@ click==8.0.4
     #   click-log
     #   code-annotations
     #   edx-lint
-click-log==0.3.2
+click-log==0.4.0
     # via edx-lint
 code-annotations==1.3.0
     # via edx-lint
@@ -68,7 +68,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-hypothesis==6.39.3
+hypothesis==6.39.4
     # via -r requirements/test.in
 inflect==5.4.0
     # via jinja2-pluralize
@@ -83,7 +83,7 @@ jinja2==3.0.3
     #   jinja2-pluralize
 jinja2-pluralize==0.3.0
     # via diff-cover
-jmespath==0.10.0
+jmespath==1.0.0
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -94,7 +94,7 @@ lazy-object-proxy==1.7.1
     # via astroid
 lxml==4.8.0
     # via -r requirements/django.txt
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via
     #   -r requirements/django.txt
     #   jinja2
@@ -144,7 +144,7 @@ pylint-plugin-utils==0.7
     #   pylint-django
 pyparsing==3.0.7
     # via packaging
-pytest==7.0.1
+pytest==7.1.1
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -207,7 +207,7 @@ typing-extensions==4.1.1
     # via
     #   astroid
     #   pylint
-urllib3==1.26.8
+urllib3==1.26.9
     # via
     #   -r requirements/django.txt
     #   botocore

@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.9.1
     # via sphinx
-boto3==1.21.17
+boto3==1.21.21
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.24.17
+botocore==1.24.21
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -49,11 +49,11 @@ idna==3.3
     # via requests
 imagesize==1.3.0
     # via sphinx
-importlib-metadata==4.11.2
+importlib-metadata==4.11.3
     # via sphinx
 jinja2==3.0.3
     # via sphinx
-jmespath==0.10.0
+jmespath==1.0.0
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -62,7 +62,7 @@ lazy==1.4
     # via -r requirements/django.txt
 lxml==4.8.0
     # via -r requirements/django.txt
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via
     #   -r requirements/django.txt
     #   jinja2
@@ -123,7 +123,7 @@ sqlparse==0.4.2
     # via
     #   -r requirements/django.txt
     #   django
-urllib3==1.26.8
+urllib3==1.26.9
     # via
     #   -r requirements/django.txt
     #   botocore

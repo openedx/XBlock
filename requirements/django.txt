@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.21.17
+boto3==1.21.21
     # via fs-s3fs
-botocore==1.24.17
+botocore==1.24.21
     # via
     #   boto3
     #   s3transfer
@@ -28,7 +28,7 @@ fs==2.4.15
     #   fs-s3fs
 fs-s3fs==1.1.1
     # via django-pyfs
-jmespath==0.10.0
+jmespath==1.0.0
     # via
     #   boto3
     #   botocore
@@ -36,7 +36,7 @@ lazy==1.4
     # via -r requirements/django.in
 lxml==4.8.0
     # via -r requirements/base.txt
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via -r requirements/base.txt
 python-dateutil==2.8.2
     # via
@@ -61,7 +61,7 @@ six==1.16.0
     #   python-dateutil
 sqlparse==0.4.2
     # via django
-urllib3==1.26.8
+urllib3==1.26.9
     # via botocore
 web-fragments==2.0.0
     # via -r requirements/base.txt
