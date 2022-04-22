@@ -22,7 +22,7 @@ idna==3.3
     # via requests
 packaging==21.3
     # via tox
-platformdirs==2.5.1
+platformdirs==2.5.2
     # via virtualenv
 pluggy==1.0.0
     # via tox

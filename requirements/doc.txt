@@ -10,13 +10,13 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-babel==2.9.1
+babel==2.10.1
     # via sphinx
-boto3==1.21.41
+boto3==1.21.45
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.24.41
+botocore==1.24.45
     # via
     #   -r requirements/django.txt
     #   boto3
