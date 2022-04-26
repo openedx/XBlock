@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-astroid==2.11.2
+astroid==2.11.3
     # via
     #   -r requirements/test.in
     #   pylint
@@ -17,11 +17,11 @@ attrs==21.4.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.21.41
+boto3==1.21.45
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.24.41
+botocore==1.24.45
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -70,7 +70,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-hypothesis==6.43.1
+hypothesis==6.44.0
     # via -r requirements/test.in
 inflect==5.5.2
     # via jinja2-pluralize
@@ -112,7 +112,7 @@ path==16.4.0
     # via -r requirements/test.in
 pbr==5.8.1
     # via stevedore
-platformdirs==2.5.1
+platformdirs==2.5.2
     # via
     #   pylint
     #   virtualenv
@@ -129,7 +129,7 @@ pycodestyle==2.8.0
     # via -r requirements/test.in
 pygments==2.11.2
     # via diff-cover
-pylint==2.13.5
+pylint==2.13.7
     # via
     #   -r requirements/test.in
     #   edx-lint
@@ -204,7 +204,7 @@ tomli==2.0.1
     #   pytest
 tox==3.25.0
     # via -r requirements/test.in
-typing-extensions==4.1.1
+typing-extensions==4.2.0
     # via
     #   astroid
     #   pylint
