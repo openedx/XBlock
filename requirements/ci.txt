@@ -10,7 +10,7 @@ charset-normalizer==2.0.12
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
-coverage==6.3.2
+coverage==6.3.3
     # via codecov
 distlib==0.3.4
     # via virtualenv
@@ -28,7 +28,7 @@ pluggy==1.0.0
     # via tox
 py==1.11.0
     # via tox
-pyparsing==3.0.8
+pyparsing==3.0.9
     # via packaging
 requests==2.27.1
     # via codecov
