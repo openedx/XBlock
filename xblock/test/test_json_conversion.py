@@ -67,7 +67,7 @@ class TestJsonConversion:
         assert isinstance(self.block.field_b, set)
 
     def test_set(self):
-        self.block.field_b = {5, 6, 5}
+        self.block.field_b = {5, 6, 5}  # pylint: disable=duplicate-value
         self.block.save()
         assert isinstance(self.block.field_b, set)
         assert {'$type': 'set', '$vals': [5, 6]} == \

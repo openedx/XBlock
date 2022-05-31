@@ -4,17 +4,17 @@
 #
 #    make upgrade
 #
-certifi==2021.10.8
+certifi==2022.5.18.1
     # via requests
 charset-normalizer==2.0.12
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
-coverage==6.3.2
+coverage==6.4.1
     # via codecov
 distlib==0.3.4
     # via virtualenv
-filelock==3.6.0
+filelock==3.7.1
     # via
     #   tox
     #   virtualenv
@@ -28,9 +28,9 @@ pluggy==1.0.0
     # via tox
 py==1.11.0
     # via tox
-pyparsing==3.0.8
+pyparsing==3.0.9
     # via packaging
-requests==2.27.1
+requests==2.28.0
     # via codecov
 six==1.16.0
     # via

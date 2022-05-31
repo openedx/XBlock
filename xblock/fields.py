@@ -650,7 +650,7 @@ class Field(Nameable):
         """
         Retrieve the value for this field from the specified xblock
         """
-        return self.__get__(xblock, xblock.__class__)
+        return self.__get__(xblock, xblock.__class__)  # pylint: disable=unnecessary-dunder-call
 
     def read_json(self, xblock):
         """
@@ -663,13 +663,13 @@ class Field(Nameable):
         """
         Set the value for this field to value on the supplied xblock
         """
-        self.__set__(xblock, value)
+        self.__set__(xblock, value)  # pylint: disable=unnecessary-dunder-call
 
     def delete_from(self, xblock):
         """
         Delete the value for this field from the supplied xblock
         """
-        self.__delete__(xblock)
+        self.__delete__(xblock)   # pylint: disable=unnecessary-dunder-call
 
     def is_set_on(self, xblock):
         """
