@@ -437,7 +437,7 @@ class SetTest(FieldTest):
         self.assertJSONOrSetEquals({'foo', 'bar'}, {'foo', 'bar'})
         self.assertJSONOrSetEquals({'bar', 'foo'}, {'foo', 'bar'})
         self.assertJSONOrSetEquals({1, 3.14}, {1, 3.14})
-        self.assertJSONOrSetEquals({1, 3.14}, {1, 3.14, 1})
+        self.assertJSONOrSetEquals({1, 3.14}, {1, 3.14, 1})  # pylint: disable=duplicate-value
 
     def test_hashable_converts(self):
         self.assertJSONOrSetEquals({1, 3.4}, [1, 3.4])
