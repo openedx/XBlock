@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.10.3
     # via sphinx
-boto3==1.24.25
+boto3==1.24.46
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.27.25
+botocore==1.27.46
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -32,7 +32,7 @@ django==2.2.28
     #   django-pyfs
 django-pyfs==3.2.0
     # via -r requirements/django.txt
-docutils==0.18.1
+docutils==0.19
     # via sphinx
 edx-sphinx-theme==3.0.0
     # via -r requirements/doc.in
@@ -102,7 +102,7 @@ six==1.16.0
     #   python-dateutil
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==5.0.2
+sphinx==5.1.1
     # via
     #   -r requirements/doc.in
     #   edx-sphinx-theme
@@ -122,7 +122,7 @@ sqlparse==0.4.2
     # via
     #   -r requirements/django.txt
     #   django
-urllib3==1.26.10
+urllib3==1.26.11
     # via
     #   -r requirements/django.txt
     #   botocore
@@ -131,7 +131,7 @@ web-fragments==2.0.0
     # via -r requirements/django.txt
 webob==1.8.7
     # via -r requirements/django.txt
-zipp==3.8.0
+zipp==3.8.1
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

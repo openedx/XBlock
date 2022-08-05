@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.24.25
+boto3==1.24.46
     # via fs-s3fs
-botocore==1.27.25
+botocore==1.27.46
     # via
     #   boto3
     #   s3transfer
@@ -60,7 +60,7 @@ six==1.16.0
     #   python-dateutil
 sqlparse==0.4.2
     # via django
-urllib3==1.26.10
+urllib3==1.26.11
     # via botocore
 web-fragments==2.0.0
     # via -r requirements/base.txt
