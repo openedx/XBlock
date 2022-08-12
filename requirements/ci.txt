@@ -10,11 +10,11 @@ charset-normalizer==2.1.0
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
-coverage==6.4.2
+coverage==6.4.3
     # via codecov
 distlib==0.3.5
     # via virtualenv
-filelock==3.7.1
+filelock==3.8.0
     # via
     #   tox
     #   virtualenv
