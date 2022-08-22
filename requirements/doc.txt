@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.10.3
     # via sphinx
-boto3==1.24.50
+boto3==1.24.55
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.27.50
+botocore==1.27.55
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -70,7 +70,7 @@ mock==4.0.3
     # via -r requirements/doc.in
 packaging==21.3
     # via sphinx
-pygments==2.12.0
+pygments==2.13.0
     # via sphinx
 pyparsing==3.0.9
     # via packaging
@@ -78,7 +78,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/django.txt
     #   botocore
-pytz==2022.2
+pytz==2022.2.1
     # via
     #   -r requirements/django.txt
     #   babel
