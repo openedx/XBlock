@@ -18,11 +18,11 @@ attrs==22.1.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.24.55
+boto3==1.24.60
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.27.55
+botocore==1.27.60
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -35,7 +35,7 @@ certifi==2022.6.15
     # via
     #   -r requirements/ci.txt
     #   requests
-charset-normalizer==2.1.0
+charset-normalizer==2.1.1
     # via
     #   -r requirements/ci.txt
     #   requests
@@ -106,7 +106,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-hypothesis==6.54.3
+hypothesis==6.54.4
     # via -r requirements/test.txt
 idna==3.3
     # via
@@ -323,7 +323,7 @@ typing-extensions==4.3.0
     #   astroid
     #   pydantic
     #   pylint
-urllib3==1.26.11
+urllib3==1.26.12
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
