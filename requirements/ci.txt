@@ -6,7 +6,7 @@
 #
 certifi==2022.6.15
     # via requests
-charset-normalizer==2.1.0
+charset-normalizer==2.1.1
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
@@ -42,7 +42,7 @@ tox==3.25.1
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/ci.in
-urllib3==1.26.11
+urllib3==1.26.12
     # via requests
 virtualenv==20.16.3
     # via tox
