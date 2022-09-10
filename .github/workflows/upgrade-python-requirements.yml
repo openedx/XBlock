@@ -39,7 +39,7 @@ jobs:
 
       - name: setup testeng-ci
         run: |
-          git clone https://github.com/edx/testeng-ci.git
+          git clone https://github.com/openedx/testeng-ci.git
           cd $GITHUB_WORKSPACE/testeng-ci
           pip install -r requirements/base.txt
       - name: create pull request
