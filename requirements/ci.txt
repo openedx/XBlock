@@ -34,9 +34,9 @@ requests==2.28.1
     # via codecov
 six==1.16.0
     # via tox
-toml==0.10.2
+tomli==2.0.1
     # via tox
-tox==3.25.1
+tox==3.26.0
     # via
     #   -r requirements/ci.in
     #   tox-battery
@@ -44,5 +44,5 @@ tox-battery==0.6.1
     # via -r requirements/ci.in
 urllib3==1.26.12
     # via requests
-virtualenv==20.16.4
+virtualenv==20.16.5
     # via tox
