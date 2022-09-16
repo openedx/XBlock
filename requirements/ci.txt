@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-certifi==2022.6.15
+certifi==2022.9.14
     # via requests
 charset-normalizer==2.1.1
     # via requests
@@ -18,7 +18,7 @@ filelock==3.8.0
     # via
     #   tox
     #   virtualenv
-idna==3.3
+idna==3.4
     # via requests
 packaging==21.3
     # via tox
