@@ -12,16 +12,16 @@ appdirs==1.4.4
     #   fs
 babel==2.10.3
     # via sphinx
-boto3==1.24.69
+boto3==1.24.74
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.27.69
+botocore==1.27.74
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
-certifi==2022.6.15
+certifi==2022.9.14
     # via requests
 charset-normalizer==2.1.1
     # via requests
@@ -45,7 +45,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-idna==3.3
+idna==3.4
     # via requests
 imagesize==1.4.1
     # via sphinx

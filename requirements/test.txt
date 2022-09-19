@@ -17,11 +17,11 @@ attrs==22.1.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.24.69
+boto3==1.24.74
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.27.69
+botocore==1.27.74
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -55,7 +55,7 @@ distlib==0.3.6
     #   django-pyfs
 django-pyfs==3.2.0
     # via -r requirements/django.txt
-edx-lint==5.2.5
+edx-lint==5.3.0
     # via -r requirements/test.in
 exceptiongroup==1.0.0rc9
     # via hypothesis
