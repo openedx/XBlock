@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-astroid==2.12.9
+astroid==2.12.10
     # via
     #   -r requirements/test.in
     #   pylint
@@ -17,11 +17,11 @@ attrs==22.1.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.24.74
+boto3==1.24.79
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.27.74
+botocore==1.27.79
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -72,7 +72,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   django-pyfs
-hypothesis==6.54.5
+hypothesis==6.54.6
     # via -r requirements/test.in
 inflect==6.0.0
     # via jinja2-pluralize
@@ -92,7 +92,7 @@ jmespath==1.0.1
     #   -r requirements/django.txt
     #   boto3
     #   botocore
-lazy==1.4
+lazy==1.5
     # via -r requirements/django.txt
 lazy-object-proxy==1.7.1
     # via astroid
@@ -133,7 +133,7 @@ pydantic==1.10.2
     # via inflect
 pygments==2.13.0
     # via diff-cover
-pylint==2.15.2
+pylint==2.15.3
     # via
     #   -r requirements/test.in
     #   edx-lint
