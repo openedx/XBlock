@@ -12,16 +12,16 @@ appdirs==1.4.4
     #   fs
 babel==2.10.3
     # via sphinx
-boto3==1.24.74
+boto3==1.24.83
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.27.74
+botocore==1.27.83
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
-certifi==2022.9.14
+certifi==2022.9.24
     # via requests
 charset-normalizer==2.1.1
     # via requests
@@ -58,7 +58,7 @@ jmespath==1.0.1
     #   -r requirements/django.txt
     #   boto3
     #   botocore
-lazy==1.4
+lazy==1.5
     # via -r requirements/django.txt
 lxml==4.9.1
     # via -r requirements/django.txt
@@ -102,7 +102,7 @@ six==1.16.0
     #   python-dateutil
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==5.1.1
+sphinx==5.2.2
     # via
     #   -r requirements/doc.in
     #   edx-sphinx-theme
@@ -118,7 +118,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sqlparse==0.4.2
+sqlparse==0.4.3
     # via
     #   -r requirements/django.txt
     #   django
