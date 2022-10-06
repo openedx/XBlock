@@ -49,8 +49,8 @@ def public(type=None, **kwargs):  # pylint: disable=unused-argument, redefined-b
       Takes two students and returns a number. Specific instances may
       look at e.g. difference in some measure of aptitude, geographic
       distance, culture, or language. See stevedor, as well as queries
-      in https://github.com/edx/insights to understand how this will
-      be used.
+      in https://github.com/edx-unsupported/insights to understand how
+      this will be used.
     """
 
     def wrapper(function):
@@ -193,7 +193,7 @@ class FSService(Service):
             return djpyfs.get_filesystem(scope_key(instance, xblock))
         else:
             # The reference implementation relies on djpyfs
-            # https://github.com/edx/django-pyfs
+            # https://github.com/openedx/django-pyfs
             # For Django runtimes, you may use this reference
             # implementation. Otherwise, you will need to
             # patch pyfilesystem yourself to implement get_url.

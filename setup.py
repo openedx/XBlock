@@ -55,7 +55,7 @@ setup(
     },
     author='edX',
     author_email='oscm@edx.org',
-    url='https://github.com/edx/XBlock',
+    url='https://github.com/openedx/XBlock',
     license='Apache 2.0',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
