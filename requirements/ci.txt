@@ -4,13 +4,13 @@
 #
 #    make upgrade
 #
-certifi==2022.9.14
+certifi==2022.9.24
     # via requests
 charset-normalizer==2.1.1
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
-coverage==6.4.4
+coverage==6.5.0
     # via codecov
 distlib==0.3.6
     # via virtualenv
