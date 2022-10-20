@@ -113,7 +113,7 @@ class Plugin:
                 else:
                     """
                     To void import Course failed because of xblock plugin missing , replace the missing plugin by the build-in htmlXblock
-                    This ensures import course sucessfully, when import done, author could verify&&edit the missing part concent. 
+                    This ensures import course sucessfully, when import done, author could verify&&edit the missing part content. 
                     """
                     log_prefix = 'Course import'
                     log.warning(f'{log_prefix} warning , {identifier} missing replaced by htmlXblock')
