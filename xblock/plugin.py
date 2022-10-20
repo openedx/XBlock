@@ -110,7 +110,18 @@ class Plugin:
             except PluginMissingError:
                 if default is not None:
                     return default
-                raise
+                else:
+                    """
+                    To void import Course failed because of xblock plugin missing , replace the missing plugin by the build-in htmlXblock
+                    This ensures import course sucessfully, when import done, author could verify&&edit the missing part concent. 
+                    """
+                    log_prefix = 'Course import'
+                    log.warning(f'{log_prefix} warning , {identifier} missing replaced by htmlXblock')
+                    identifier = 'html'
+                    all_entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
+                    selected_entry_point = select(identifier, all_entry_points)
+                #raise    
+            
 
             PLUGIN_CACHE[key] = cls._load_class_entry_point(selected_entry_point)
 
