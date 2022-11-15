@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==2.12.5
+astroid==2.12.10
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -18,11 +18,11 @@ attrs==22.1.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.24.65
+boto3==1.24.83
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.27.65
+botocore==1.27.83
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -31,7 +31,7 @@ build==0.8.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-certifi==2022.6.15
+certifi==2022.9.24
     # via
     #   -r requirements/ci.txt
     #   requests
@@ -57,7 +57,7 @@ code-annotations==1.3.0
     #   edx-lint
 codecov==2.1.12
     # via -r requirements/ci.txt
-coverage[toml]==6.4.4
+coverage[toml]==6.5.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -85,7 +85,7 @@ django==2.2.28
     #   django-pyfs
 django-pyfs==3.2.0
     # via -r requirements/test.txt
-edx-lint==5.2.4
+edx-lint==5.3.0
     # via -r requirements/test.txt
 exceptiongroup==1.0.0rc9
     # via
@@ -106,9 +106,9 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-hypothesis==6.54.4
+hypothesis==6.55.0
     # via -r requirements/test.txt
-idna==3.3
+idna==3.4
     # via
     #   -r requirements/ci.txt
     #   requests
@@ -139,7 +139,7 @@ jmespath==1.0.1
     #   -r requirements/test.txt
     #   boto3
     #   botocore
-lazy==1.4
+lazy==1.5
     # via -r requirements/test.txt
 lazy-object-proxy==1.7.1
     # via
@@ -165,7 +165,7 @@ packaging==21.3
     #   build
     #   pytest
     #   tox
-path==16.4.0
+path==16.5.0
     # via -r requirements/test.txt
 pbr==5.10.0
     # via
@@ -198,7 +198,7 @@ py==1.11.0
     #   tox
 pycodestyle==2.9.1
     # via -r requirements/test.txt
-pydantic==1.10.1
+pydantic==1.10.2
     # via
     #   -r requirements/test.txt
     #   inflect
@@ -206,7 +206,7 @@ pygments==2.13.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.15.0
+pylint==2.15.3
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -232,12 +232,12 @@ pyparsing==3.0.9
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   packaging
-pytest==7.1.2
+pytest==7.1.3
     # via
     #   -r requirements/test.txt
     #   pytest-cov
     #   pytest-django
-pytest-cov==3.0.0
+pytest-cov==4.0.0
     # via -r requirements/test.txt
 pytest-django==4.5.2
     # via -r requirements/test.txt
@@ -280,7 +280,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-sqlparse==0.4.2
+sqlparse==0.4.3
     # via
     #   -r requirements/test.txt
     #   django
@@ -292,13 +292,9 @@ text-unidecode==1.3
     # via
     #   -r requirements/test.txt
     #   python-slugify
-toml==0.10.2
-    # via
-    #   -r requirements/ci.txt
-    #   -r requirements/test.txt
-    #   tox
 tomli==2.0.1
     # via
+    #   -r requirements/ci.txt
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   build
@@ -306,11 +302,12 @@ tomli==2.0.1
     #   pep517
     #   pylint
     #   pytest
-tomlkit==0.11.4
+    #   tox
+tomlkit==0.11.5
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==3.25.1
+tox==3.26.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -329,7 +326,7 @@ urllib3==1.26.12
     #   -r requirements/test.txt
     #   botocore
     #   requests
-virtualenv==20.16.4
+virtualenv==20.16.5
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt

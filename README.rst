@@ -82,8 +82,8 @@ we ignore by viewing the contents of `pylintrc`_ and `setup.cfg`_. Before making
 request, you should ensure that your branch does not add any new quality violations
 by checking your code with these tools.
 
-.. _pylintrc: https://github.com/edx/XBlock/blob/master/pylintrc
-.. _setup.cfg: https://github.com/edx/XBlock/blob/master/setup.cfg
+.. _pylintrc: https://github.com/openedx/XBlock/blob/master/pylintrc
+.. _setup.cfg: https://github.com/openedx/XBlock/blob/master/setup.cfg
 
 You can run these checks before pushing code to github (and running
 the validation in Github Actions) using Tox::
@@ -98,7 +98,7 @@ The XBlock-SDK exists in a separate repository. The SDK contains useful tools fo
 developing your own XBlocks, such as a template XBlock generator, sample XBlocks
 that demonstrate XBlock functionality.
 
-You can find it in its own repository: https://github.com/edx/xblock-sdk
+You can find it in its own repository: https://github.com/openedx/xblock-sdk
 
 
 Documentation
@@ -131,7 +131,7 @@ Making an XBlock can be as simple as creating a Python class with a few
 specific methods.
 
 Instructions for constructing a new XBlock along with examples can be found in
-the XBlock SDK: https://github.com/edx/xblock-sdk
+the XBlock SDK: https://github.com/openedx/xblock-sdk
 
 
 License
@@ -150,7 +150,7 @@ Contributions are very welcome. The easiest way is to fork this repo, and then
 make a pull request from your fork. The first time you make a pull request, you
 may be asked to sign a Contributor Agreement.
 
-Please refer to our `contributor guidelines <https://github.com/edx/edx-platform/
+Please refer to our `contributor guidelines <https://github.com/openedx/edx-platform/
 blob/master/CONTRIBUTING.rst>`_ in the main edx-platform repo for
 important additional information.
 
@@ -186,7 +186,7 @@ at the `Open edX Getting Help`_ page.
 
 .. _Open edX Getting Help: https://openedx.org/getting-help
 
-.. |build-status| image:: https://github.com/edx/XBlock/workflows/Python%20CI/badge.svg?branch=master
-   :target: https://github.com/edx/XBlock/actions?query=workflow%3A%22Python+CI%22
+.. |build-status| image:: https://github.com/openedx/XBlock/workflows/Python%20CI/badge.svg?branch=master
+   :target: https://github.com/openedx/XBlock/actions?query=workflow%3A%22Python+CI%22
 .. |coverage-status| image:: http://codecov.io/github/edx/XBlock/coverage.svg?branch=master
    :target: https://codecov.io/github/edx/XBlock?branch=master
