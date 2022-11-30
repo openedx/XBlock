@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==2.12.10
+astroid==2.12.13
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -18,16 +18,16 @@ attrs==22.1.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.24.83
+boto3==1.26.19
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.27.83
+botocore==1.29.19
     # via
     #   -r requirements/test.txt
     #   boto3
     #   s3transfer
-build==0.8.0
+build==0.9.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
@@ -69,7 +69,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/test.txt
-dill==0.3.5.1
+dill==0.3.6
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -87,10 +87,11 @@ django-pyfs==3.2.0
     # via -r requirements/test.txt
 edx-lint==5.3.0
     # via -r requirements/test.txt
-exceptiongroup==1.0.0rc9
+exceptiongroup==1.0.4
     # via
     #   -r requirements/test.txt
     #   hypothesis
+    #   pytest
 filelock==3.8.0
     # via
     #   -r requirements/ci.txt
@@ -106,13 +107,13 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   django-pyfs
-hypothesis==6.55.0
+hypothesis==6.58.1
     # via -r requirements/test.txt
 idna==3.4
     # via
     #   -r requirements/ci.txt
     #   requests
-inflect==6.0.0
+inflect==6.0.2
     # via
     #   -r requirements/test.txt
     #   jinja2-pluralize
@@ -141,7 +142,7 @@ jmespath==1.0.1
     #   botocore
 lazy==1.5
     # via -r requirements/test.txt
-lazy-object-proxy==1.7.1
+lazy-object-proxy==1.8.0
     # via
     #   -r requirements/test.txt
     #   astroid
@@ -167,7 +168,7 @@ packaging==21.3
     #   tox
 path==16.5.0
     # via -r requirements/test.txt
-pbr==5.10.0
+pbr==5.11.0
     # via
     #   -r requirements/test.txt
     #   stevedore
@@ -175,9 +176,9 @@ pep517==0.13.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pip-tools==6.8.0
+pip-tools==6.10.0
     # via -r requirements/pip-tools.txt
-platformdirs==2.5.2
+platformdirs==2.5.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -194,9 +195,8 @@ py==1.11.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
-    #   pytest
     #   tox
-pycodestyle==2.9.1
+pycodestyle==2.10.0
     # via -r requirements/test.txt
 pydantic==1.10.2
     # via
@@ -206,7 +206,7 @@ pygments==2.13.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.15.3
+pylint==2.15.7
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -232,7 +232,7 @@ pyparsing==3.0.9
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   packaging
-pytest==7.1.3
+pytest==7.2.0
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -245,11 +245,11 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/test.txt
     #   botocore
-python-slugify==6.1.2
+python-slugify==7.0.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
-pytz==2022.2.1
+pytz==2022.6
     # via
     #   -r requirements/test.txt
     #   django
@@ -265,7 +265,7 @@ s3transfer==0.6.0
     # via
     #   -r requirements/test.txt
     #   boto3
-simplejson==3.17.6
+simplejson==3.18.0
     # via -r requirements/test.txt
 six==1.16.0
     # via
@@ -284,7 +284,7 @@ sqlparse==0.4.3
     # via
     #   -r requirements/test.txt
     #   django
-stevedore==4.0.0
+stevedore==4.1.1
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -303,30 +303,30 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
-tomlkit==0.11.5
+tomlkit==0.11.6
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==3.26.0
+tox==3.27.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/ci.txt
-typing-extensions==4.3.0
+typing-extensions==4.4.0
     # via
     #   -r requirements/test.txt
     #   astroid
     #   pydantic
     #   pylint
-urllib3==1.26.12
+urllib3==1.26.13
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   botocore
     #   requests
-virtualenv==20.16.5
+virtualenv==20.17.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -335,7 +335,7 @@ web-fragments==2.0.0
     # via -r requirements/test.txt
 webob==1.8.7
     # via -r requirements/test.txt
-wheel==0.37.1
+wheel==0.38.4
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
