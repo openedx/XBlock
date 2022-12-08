@@ -80,12 +80,15 @@ and pep8 violations at all times.
 
 To run these tools on a single file:
 
+..  code-block:: bash
     $ pylint path/to/file.py
 
     $ pep8 path/to/file.py
 
+
 To run these tools on the whole project:
 
+..  code-block:: bash
     $ pylint .
 
     $ pep8 .
