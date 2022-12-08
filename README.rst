@@ -57,7 +57,7 @@ This code runs and is tested on Python 3.8.
 3.  Install the requirements and register the XBlock entry points with (you may
     need to sudo this if you don't use virtualenv):
 
-        $ make requirements
+    ``$ make requirements``
 
 
 Testing
