@@ -101,10 +101,14 @@ by checking your code with these tools.
 .. _setup.cfg: https://github.com/openedx/XBlock/blob/master/setup.cfg
 
 You can run these checks before pushing code to github (and running
-the validation in Github Actions) using Tox::
+the validation in Github Actions) using ``make quality`` as descibed above.
 
-    tox -e quality
+To run these tools on a single file:
 
+..  code-block:: bash
+
+    $ pylint path/to/file.py
+    $ pep8 path/to/file.py
 
 Using the XBlock-SDK
 ====================
