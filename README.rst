@@ -88,8 +88,8 @@ To run these tools on a single file:
 To run these tools on the whole project:
 
 ..  code-block:: bash
-    $ pylint .
 
+    $ pylint .
     $ pep8 .
 
 We do not abide by all pylint and pep8 violations. You can check out which violations
