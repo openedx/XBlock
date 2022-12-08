@@ -15,8 +15,8 @@ XBlock
 .. |Status| image:: https://img.shields.io/badge/status-maintained-31c653
 
 
-XBlock Courseware Components |build-status| |coverage-status|
-=============================================================
+XBlock Courseware Components
+****************************
 
 XBlock is the Open edX component architecture for building courseware.
 
@@ -24,7 +24,7 @@ This repo contains the core code for implementing XBlocks.
 
 
 Background
-----------
+==========
 
 Open edX courseware is built out of components that are combined hierarchically.
 These include components like the video player, `LON-CAPA`_ problems, as well
@@ -46,7 +46,7 @@ to give us a virtual machine image which ran it.
 
 
 Installation
-------------
+============
 
 This code runs and is tested on Python 3.8.
 
@@ -61,7 +61,7 @@ This code runs and is tested on Python 3.8.
 
 
 Testing
---------
+=======
 
 To run the test suite:
 
@@ -72,7 +72,7 @@ reports.
 
 
 Style Testing
--------------
+=============
 
 We use two tools - ``pylint`` and ``pep8`` - to manage the code quality and style
 of all Python files in this repo. Our goal is to maintain zero reported pylint
@@ -105,7 +105,7 @@ the validation in Github Actions) using Tox::
 
 
 Using the XBlock-SDK
--------------------
+====================
 
 The XBlock-SDK exists in a separate repository. The SDK contains useful tools for
 developing your own XBlocks, such as a template XBlock generator, sample XBlocks
@@ -115,14 +115,14 @@ You can find it in its own repository: https://github.com/openedx/xblock-sdk
 
 
 Documentation
--------------
+=============
 
 The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org .
 
 
 
 Reading the code
-----------------
+================
 
 There are distinct layers to this code.  In the docstrings, we've tried to make
 clear which layer the code lives in, though sometimes the lines are blurred:
@@ -138,7 +138,7 @@ clear which layer the code lives in, though sometimes the lines are blurred:
 
 
 Making your own XBlock
-----------------------
+======================
 
 Making an XBlock can be as simple as creating a Python class with a few
 specific methods.
@@ -148,7 +148,7 @@ the XBlock SDK: https://github.com/openedx/xblock-sdk
 
 
 License
--------
+=======
 
 The code in this repository is licensed the Apache 2.0 license unless otherwise
 noted.
@@ -157,7 +157,7 @@ Please see ``LICENSE.txt`` for details.
 
 
 How to Contribute
------------------
+=================
 
 Contributions are very welcome. The easiest way is to fork this repo, and then
 make a pull request from your fork. The first time you make a pull request, you
@@ -169,12 +169,12 @@ important additional information.
 
 
 Reporting Security Issues
--------------------------
+=========================
 
 Please do not report security issues in public. Please email security@edx.org
 
 Packaging
----------
+=========
 
 To package a new release:
 
@@ -192,7 +192,7 @@ To package a new release:
 
 
 Getting Help
-------------
+============
 
 If you need help, you can find online resources, including discussions,
 at the `Open edX Getting Help`_ page.
