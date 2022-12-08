@@ -65,7 +65,7 @@ Testing
 
 To run the test suite:
 
-    $ tox
+    $ make test
 
 This will run the XBlock core and runtime unit tests, and print coverage
 reports.
