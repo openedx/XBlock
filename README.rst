@@ -15,16 +15,22 @@ XBlock
 .. |Status| image:: https://img.shields.io/badge/status-maintained-31c653
 
 
-XBlock Courseware Components
-****************************
+Purpose
+*******
 
-XBlock is the Open edX component architecture for building courseware.
+XBlock is the Open edX component architecture for building custom
+learning interactives.
 
-This repo contains the core code for implementing XBlocks.
+This repo contains the core APIs for implementing XBlocks.
+
+Xblocks are installed into your instance of the Open edX platform as
+python dependencies and are privileged components that have access to
+Open edX APIs and Django APIs and services.  XBlocks can, for example,
+contain database migrations and access the platform's database.
 
 
 Background
-==========
+**********
 
 Open edX courseware is built out of components that are combined hierarchically.
 These include components like the video player, `LON-CAPA`_ problems, as well
@@ -46,7 +52,7 @@ to give us a virtual machine image which ran it.
 
 
 Installation
-============
+************
 
 This code runs and is tested on Python 3.8.
 
@@ -61,7 +67,7 @@ This code runs and is tested on Python 3.8.
 
 
 Testing
-=======
+*******
 
 To run the test suite:
 
@@ -71,26 +77,18 @@ This will run the XBlock core and runtime unit tests, and print coverage
 reports.
 
 
-Style Testing
-=============
+Code Quality Testing
+====================
 
 We use two tools - ``pylint`` and ``pep8`` - to manage the code quality and style
 of all Python files in this repo. Our goal is to maintain zero reported pylint
 and pep8 violations at all times.
 
-To run these tools on a single file:
-
-..  code-block:: bash
-
-    $ pylint path/to/file.py
-    $ pep8 path/to/file.py
-
 To run these tools on the whole project:
 
 ..  code-block:: bash
 
-    $ pylint .
-    $ pep8 .
+    $ make quality
 
 We do not abide by all pylint and pep8 violations. You can check out which violations
 we ignore by viewing the contents of `pylintrc`_ and `setup.cfg`_. Before making a pull
@@ -110,8 +108,9 @@ To run these tools on a single file:
     $ pylint path/to/file.py
     $ pep8 path/to/file.py
 
+
 Using the XBlock-SDK
-====================
+********************
 
 The XBlock-SDK exists in a separate repository. The SDK contains useful tools for
 developing your own XBlocks, such as a template XBlock generator, sample XBlocks
@@ -121,14 +120,13 @@ You can find it in its own repository: https://github.com/openedx/xblock-sdk
 
 
 Documentation
-=============
+*************
 
 The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org .
 
 
-
 Reading the code
-================
+****************
 
 There are distinct layers to this code.  In the docstrings, we've tried to make
 clear which layer the code lives in, though sometimes the lines are blurred:
@@ -144,7 +142,7 @@ clear which layer the code lives in, though sometimes the lines are blurred:
 
 
 Making your own XBlock
-======================
+**********************
 
 Making an XBlock can be as simple as creating a Python class with a few
 specific methods.
@@ -154,7 +152,7 @@ the XBlock SDK: https://github.com/openedx/xblock-sdk
 
 
 License
-=======
+*******
 
 The code in this repository is licensed the Apache 2.0 license unless otherwise
 noted.
@@ -162,25 +160,8 @@ noted.
 Please see ``LICENSE.txt`` for details.
 
 
-How to Contribute
-=================
-
-Contributions are very welcome. The easiest way is to fork this repo, and then
-make a pull request from your fork. The first time you make a pull request, you
-may be asked to sign a Contributor Agreement.
-
-Please refer to our `contributor guidelines <https://github.com/openedx/edx-platform/
-blob/master/CONTRIBUTING.rst>`_ in the main edx-platform repo for
-important additional information.
-
-
-Reporting Security Issues
-=========================
-
-Please do not report security issues in public. Please email security@edx.org
-
 Packaging
-=========
+*********
 
 To package a new release:
 
@@ -198,14 +179,56 @@ To package a new release:
 
 
 Getting Help
-============
+************
 
-If you need help, you can find online resources, including discussions,
-at the `Open edX Getting Help`_ page.
+If you're having trouble, we have discussion forums at
+https://discuss.openedx.org where you can connect with others in the
+community.
 
-.. _Open edX Getting Help: https://openedx.org/getting-help
+Our real-time conversations are on Slack. You can request a `Slack
+invitation`_, then join our `community Slack workspace`_.
 
-.. |build-status| image:: https://github.com/openedx/XBlock/workflows/Python%20CI/badge.svg?branch=master
-   :target: https://github.com/openedx/XBlock/actions?query=workflow%3A%22Python+CI%22
-.. |coverage-status| image:: http://codecov.io/github/edx/XBlock/coverage.svg?branch=master
-   :target: https://codecov.io/github/edx/XBlock?branch=master
+For anything non-trivial, the best path is to open an issue in this
+repository with as many details about the issue you are facing as you
+can provide.
+
+https://github.com/openedx/XBlock/issues
+
+For more information about these options, see the `Getting Help`_ page.
+
+.. _Slack invitation: https://openedx.org/slack
+.. _community Slack workspace: https://openedx.slack.com/
+.. _Getting Help: https://openedx.org/getting-help
+
+
+How to Contribute
+*****************
+
+Details about how to become a contributor to the Open edX project may
+be found in the wiki at `How to contribute`_
+
+.. _How to contribute: https://openedx.org/r/how-to-contribute
+
+
+The Open edX Code of Conduct
+============================
+
+All community members should familarize themselves with the `Open edX Code of Conduct`_.
+
+.. _Open edX Code of Conduct: https://openedx.org/code-of-conduct/
+
+
+People
+******
+
+The assigned maintainers for this component and other project details
+may be found in `Backstage`_ or groked from inspecting catalog-info.yaml.
+
+.. _Backstage: https://open-edx-backstage.herokuapp.com/catalog/default/component/DoneXBlock
+
+
+Reporting Security Issues
+*************************
+
+Please do not report security issues in public. Please email security@edx.org.
+
