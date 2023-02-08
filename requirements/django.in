@@ -6,5 +6,5 @@
 -r base.txt                         # Core XBlock dependencies
 
 Django>=2.2,<3.0
-django-pyfs>=1.0.5
+openedx-django-pyfs>=1.0.5
 lazy
