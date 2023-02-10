@@ -1,5 +1,5 @@
 # Do things in edx-platform
-.PHONY: clean docs help package quality requirements test upgrade
+.PHONY: clean docs help package quality requirements test upgrade validate
 
 .DEFAULT_GOAL := help
 
@@ -22,6 +22,8 @@ help: ## display this help message
 quality: ## check coding style with pycodestyle and pylint
 	pycodestyle
 	pylint xblock
+
+validate: test
 
 test: ## run tests on every supported Python/Django combination
 	tox
