@@ -9,16 +9,16 @@ on:
       branch:
         description: "Target branch against which to create requirements PR"
         required: true
-        default: '$default-branch'
+        default: 'master'
 
 jobs:
   call-upgrade-python-requirements-workflow:
     uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@master
     with:
-      branch: ${{ github.event.inputs.branch || '$default-branch' }}
+      branch: ${{ github.event.inputs.branch || 'master' }}
       # optional parameters below; fill in if you'd like github or email notifications
       # user_reviewers: ""
-      # team_reviewers: ""
+      team_reviewers: "tcril-engineering"
       # email_address: ""
       # send_success_notification: false
     secrets:
