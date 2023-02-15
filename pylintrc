@@ -70,6 +70,7 @@
 ignore = 
 persistent = yes
 load-plugins = edx_lint.pylint,pylint_django,pylint_celery
+extension-pkg-whitelist = lxml
 
 [MESSAGES CONTROL]
 enable = 
@@ -384,4 +385,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 77a30f2e836b30cb6ff9fc9c92efa0aac6fe25bd
+# 4ffcd1a49c7a1312d20c4b5f8ed46fcbe7ea9fa4
