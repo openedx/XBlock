@@ -22,7 +22,7 @@ idna==3.4
     # via requests
 packaging==23.0
     # via tox
-platformdirs==2.6.2
+platformdirs==3.0.0
     # via virtualenv
 pluggy==1.0.0
     # via tox
@@ -43,5 +43,5 @@ tox-battery==0.6.1
     # via -r requirements/ci.in
 urllib3==1.26.14
     # via requests
-virtualenv==20.17.1
+virtualenv==20.19.0
     # via tox

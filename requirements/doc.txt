@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.11.0
     # via sphinx
-boto3==1.26.58
+boto3==1.26.71
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.58
+botocore==1.29.71
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -89,7 +89,7 @@ s3transfer==0.6.0
     # via
     #   -r requirements/django.txt
     #   boto3
-simplejson==3.18.1
+simplejson==3.18.3
     # via -r requirements/django.txt
 six==1.16.0
     # via
@@ -109,7 +109,7 @@ sphinxcontrib-applehelp==1.0.4
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==2.0.0
+sphinxcontrib-htmlhelp==2.0.1
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
@@ -130,7 +130,7 @@ web-fragments==2.0.0
     # via -r requirements/django.txt
 webob==1.8.7
     # via -r requirements/django.txt
-zipp==3.11.0
+zipp==3.13.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
