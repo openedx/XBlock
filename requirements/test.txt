@@ -17,11 +17,11 @@ attrs==22.2.0
     # via
     #   hypothesis
     #   pytest
-boto3==1.26.71
+boto3==1.26.73
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.71
+botocore==1.29.73
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -129,7 +129,7 @@ py==1.11.0
     # via tox
 pycodestyle==2.10.0
     # via -r requirements/test.in
-pydantic==1.10.4
+pydantic==1.10.5
     # via inflect
 pygments==2.14.0
     # via diff-cover
