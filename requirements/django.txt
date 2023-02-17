@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.26.71
+boto3==1.26.73
     # via fs-s3fs
-botocore==1.29.71
+botocore==1.29.73
     # via
     #   boto3
     #   s3transfer
