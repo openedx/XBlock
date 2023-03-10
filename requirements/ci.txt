@@ -6,7 +6,7 @@
 #
 certifi==2022.12.7
     # via requests
-charset-normalizer==3.0.1
+charset-normalizer==3.1.0
     # via requests
 codecov==2.1.12
     # via -r requirements/ci.in
@@ -22,7 +22,7 @@ idna==3.4
     # via requests
 packaging==23.0
     # via tox
-platformdirs==3.0.0
+platformdirs==3.1.0
     # via virtualenv
 pluggy==1.0.0
     # via tox
