@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==2.14.2
+astroid==2.15.0
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -18,11 +18,11 @@ attrs==22.2.0
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-boto3==1.26.83
+boto3==1.26.88
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.83
+botocore==1.29.88
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -35,7 +35,7 @@ certifi==2022.12.7
     # via
     #   -r requirements/ci.txt
     #   requests
-charset-normalizer==3.0.1
+charset-normalizer==3.1.0
     # via
     #   -r requirements/ci.txt
     #   requests
@@ -174,7 +174,7 @@ pbr==5.11.1
     #   stevedore
 pip-tools==6.12.3
     # via -r requirements/pip-tools.txt
-platformdirs==3.0.0
+platformdirs==3.1.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -194,7 +194,7 @@ py==1.11.0
     #   tox
 pycodestyle==2.10.0
     # via -r requirements/test.txt
-pydantic==1.10.5
+pydantic==1.10.6
     # via
     #   -r requirements/test.txt
     #   inflect
@@ -202,7 +202,7 @@ pygments==2.14.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.16.2
+pylint==2.17.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -226,7 +226,7 @@ pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pytest==7.2.1
+pytest==7.2.2
     # via
     #   -r requirements/test.txt
     #   pytest-cov
