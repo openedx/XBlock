@@ -14,7 +14,7 @@ coverage==7.2.2
     # via codecov
 distlib==0.3.6
     # via virtualenv
-filelock==3.10.0
+filelock==3.10.3
     # via
     #   tox
     #   virtualenv
