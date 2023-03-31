@@ -14,7 +14,7 @@ markupsafe==2.1.2
     # via -r requirements/base.in
 python-dateutil==2.8.2
     # via -r requirements/base.in
-pytz==2022.7.1
+pytz==2023.3
     # via -r requirements/base.in
 pyyaml==6.0
     # via -r requirements/base.in
