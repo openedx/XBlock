@@ -17,12 +17,11 @@ attrs==22.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-    #   pytest
-boto3==1.26.108
+boto3==1.26.113
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.108
+botocore==1.29.113
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -31,14 +30,6 @@ build==0.10.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-certifi==2022.12.7
-    # via
-    #   -r requirements/ci.txt
-    #   requests
-charset-normalizer==3.1.0
-    # via
-    #   -r requirements/ci.txt
-    #   requests
 click==8.1.3
     # via
     #   -r requirements/pip-tools.txt
@@ -55,13 +46,10 @@ code-annotations==1.3.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
-codecov==2.1.12
-    # via -r requirements/ci.txt
 coverage[toml]==7.2.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
-    #   codecov
     #   pytest-cov
 ddt==1.6.0
     # via -r requirements/test.txt
@@ -105,12 +93,8 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.70.2
+hypothesis==6.71.0
     # via -r requirements/test.txt
-idna==3.4
-    # via
-    #   -r requirements/ci.txt
-    #   requests
 inflect==6.0.4
     # via
     #   -r requirements/test.txt
@@ -158,7 +142,7 @@ mock==5.0.1
     # via -r requirements/test.txt
 openedx-django-pyfs==3.2.1
     # via -r requirements/test.txt
-packaging==23.0
+packaging==23.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/pip-tools.txt
@@ -172,7 +156,7 @@ pbr==5.11.1
     # via
     #   -r requirements/test.txt
     #   stevedore
-pip-tools==6.12.3
+pip-tools==6.13.0
     # via -r requirements/pip-tools.txt
 platformdirs==3.2.0
     # via
@@ -198,7 +182,7 @@ pydantic==1.10.7
     # via
     #   -r requirements/test.txt
     #   inflect
-pygments==2.14.0
+pygments==2.15.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -226,7 +210,7 @@ pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pytest==7.2.2
+pytest==7.3.0
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -251,10 +235,6 @@ pyyaml==6.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
-requests==2.28.2
-    # via
-    #   -r requirements/ci.txt
-    #   codecov
 s3transfer==0.6.0
     # via
     #   -r requirements/test.txt
@@ -317,10 +297,8 @@ typing-extensions==4.5.0
     #   pylint
 urllib3==1.26.15
     # via
-    #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   botocore
-    #   requests
 virtualenv==20.21.0
     # via
     #   -r requirements/ci.txt

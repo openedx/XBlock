@@ -14,14 +14,12 @@ astroid==2.15.2
     #   pylint
     #   pylint-celery
 attrs==22.2.0
-    # via
-    #   hypothesis
-    #   pytest
-boto3==1.26.108
+    # via hypothesis
+boto3==1.26.113
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.108
+botocore==1.29.113
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -72,7 +70,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.70.2
+hypothesis==6.71.0
     # via -r requirements/test.in
 inflect==6.0.4
     # via jinja2-pluralize
@@ -108,7 +106,7 @@ mock==5.0.1
     # via -r requirements/test.in
 openedx-django-pyfs==3.2.1
     # via -r requirements/django.txt
-packaging==23.0
+packaging==23.1
     # via
     #   pytest
     #   tox
@@ -131,7 +129,7 @@ pycodestyle==2.10.0
     # via -r requirements/test.in
 pydantic==1.10.7
     # via inflect
-pygments==2.14.0
+pygments==2.15.0
     # via diff-cover
 pylint==2.17.2
     # via
@@ -148,7 +146,7 @@ pylint-plugin-utils==0.7
     # via
     #   pylint-celery
     #   pylint-django
-pytest==7.2.2
+pytest==7.3.0
     # via
     #   -r requirements/test.in
     #   pytest-cov
