@@ -2,6 +2,6 @@
 
 -c constraints.txt
 
-codecov                             # Code coverage reporting
+coverage                            # Code coverage reporting
 tox                                 # Virtualenv management for tests
 tox-battery                         # Makes tox aware of requirements file changes
