@@ -12,11 +12,11 @@ appdirs==1.4.4
     #   fs
 babel==2.12.1
     # via sphinx
-boto3==1.26.108
+boto3==1.26.113
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.108
+botocore==1.29.113
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -47,7 +47,7 @@ idna==3.4
     # via requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==6.1.0
+importlib-metadata==6.3.0
     # via sphinx
 jinja2==3.1.2
     # via sphinx
@@ -68,9 +68,9 @@ mock==5.0.1
     # via -r requirements/doc.in
 openedx-django-pyfs==3.2.1
     # via -r requirements/django.txt
-packaging==23.0
+packaging==23.1
     # via sphinx
-pygments==2.14.0
+pygments==2.15.0
     # via sphinx
 python-dateutil==2.8.2
     # via
