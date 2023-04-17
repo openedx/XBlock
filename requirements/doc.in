@@ -5,6 +5,6 @@
 
 -r django.txt                       # Package dependencies, including optional Django support
 
-edx-sphinx-theme
+sphinx-book-theme
 mock
 sphinx
