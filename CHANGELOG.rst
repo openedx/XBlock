@@ -4,6 +4,13 @@ Change history for XBlock
 
 These are notable changes in XBlock.
 
+Unreleased
+----------
+
+* Switch from ``edx-sphinx-theme`` to ``sphinx-book-theme`` since the former is
+  deprecated.  See https://github.com/openedx/edx-sphinx-theme/issues/184 for
+  more details.
+
 1.6.1 - 2022-01-28
 ------------------
 
