@@ -8,20 +8,20 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==2.15.2
+astroid==2.15.3
     # via
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-attrs==22.2.0
+attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.113
+boto3==1.26.117
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.113
+botocore==1.29.117
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -78,7 +78,7 @@ exceptiongroup==1.1.1
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-filelock==3.11.0
+filelock==3.12.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -93,7 +93,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.71.0
+hypothesis==6.72.1
     # via -r requirements/test.txt
 inflect==6.0.4
     # via
@@ -138,7 +138,7 @@ mccabe==0.7.0
     # via
     #   -r requirements/test.txt
     #   pylint
-mock==5.0.1
+mock==5.0.2
     # via -r requirements/test.txt
 openedx-django-pyfs==3.2.1
     # via -r requirements/test.txt
@@ -182,7 +182,7 @@ pydantic==1.10.7
     # via
     #   -r requirements/test.txt
     #   inflect
-pygments==2.15.0
+pygments==2.15.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -210,7 +210,7 @@ pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pytest==7.3.0
+pytest==7.3.1
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -254,7 +254,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-sqlparse==0.4.3
+sqlparse==0.4.4
     # via
     #   -r requirements/test.txt
     #   django
@@ -299,7 +299,7 @@ urllib3==1.26.15
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.21.0
+virtualenv==20.22.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt

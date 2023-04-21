@@ -18,11 +18,11 @@ babel==2.12.1
     #   sphinx
 beautifulsoup4==4.12.2
     # via pydata-sphinx-theme
-boto3==1.26.113
+boto3==1.26.117
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.113
+botocore==1.29.117
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -53,7 +53,7 @@ idna==3.4
     # via requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==6.3.0
+importlib-metadata==6.5.0
     # via sphinx
 jinja2==3.1.2
     # via sphinx
@@ -70,7 +70,7 @@ markupsafe==2.1.2
     # via
     #   -r requirements/django.txt
     #   jinja2
-mock==5.0.1
+mock==5.0.2
     # via -r requirements/doc.in
 openedx-django-pyfs==3.2.1
     # via -r requirements/django.txt
@@ -80,7 +80,7 @@ packaging==23.1
     #   sphinx
 pydata-sphinx-theme==0.13.3
     # via sphinx-book-theme
-pygments==2.15.0
+pygments==2.15.1
     # via
     #   accessible-pygments
     #   pydata-sphinx-theme
@@ -134,7 +134,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sqlparse==0.4.3
+sqlparse==0.4.4
     # via
     #   -r requirements/django.txt
     #   django
