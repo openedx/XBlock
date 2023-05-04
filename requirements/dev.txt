@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==2.15.3
+astroid==2.15.4
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -17,11 +17,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.117
+boto3==1.26.122
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.117
+botocore==1.29.122
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -93,7 +93,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.72.1
+hypothesis==6.74.1
     # via -r requirements/test.txt
 inflect==6.0.4
     # via
@@ -158,7 +158,7 @@ pbr==5.11.1
     #   stevedore
 pip-tools==6.13.0
     # via -r requirements/pip-tools.txt
-platformdirs==3.2.0
+platformdirs==3.5.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -186,7 +186,7 @@ pygments==2.15.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.17.2
+pylint==2.17.3
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -277,7 +277,7 @@ tomli==2.0.1
     #   pyproject-hooks
     #   pytest
     #   tox
-tomlkit==0.11.7
+tomlkit==0.11.8
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -299,7 +299,7 @@ urllib3==1.26.15
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.22.0
+virtualenv==20.23.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
