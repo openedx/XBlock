@@ -15,11 +15,11 @@ astroid==2.15.4
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.26.122
+boto3==1.26.127
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.122
+botocore==1.29.127
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -33,7 +33,7 @@ click-log==0.4.0
     # via edx-lint
 code-annotations==1.3.0
     # via edx-lint
-coverage[toml]==7.2.3
+coverage[toml]==7.2.5
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -70,7 +70,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.74.1
+hypothesis==6.75.2
     # via -r requirements/test.in
 inflect==6.0.4
     # via jinja2-pluralize
@@ -169,7 +169,7 @@ pyyaml==6.0
     # via
     #   -r requirements/django.txt
     #   code-annotations
-s3transfer==0.6.0
+s3transfer==0.6.1
     # via
     #   -r requirements/django.txt
     #   boto3
