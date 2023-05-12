@@ -17,11 +17,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.127
+boto3==1.26.133
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.127
+botocore==1.29.133
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -158,7 +158,7 @@ pbr==5.11.1
     #   stevedore
 pip-tools==6.13.0
     # via -r requirements/pip-tools.txt
-platformdirs==3.5.0
+platformdirs==3.5.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -186,7 +186,7 @@ pygments==2.15.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.17.3
+pylint==2.17.4
     # via
     #   -r requirements/test.txt
     #   edx-lint

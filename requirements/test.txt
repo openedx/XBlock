@@ -15,11 +15,11 @@ astroid==2.15.4
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.26.127
+boto3==1.26.133
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.127
+botocore==1.29.133
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -114,7 +114,7 @@ path==16.6.0
     # via -r requirements/test.in
 pbr==5.11.1
     # via stevedore
-platformdirs==3.5.0
+platformdirs==3.5.1
     # via
     #   pylint
     #   virtualenv
@@ -131,7 +131,7 @@ pydantic==1.10.7
     # via inflect
 pygments==2.15.1
     # via diff-cover
-pylint==2.17.3
+pylint==2.17.4
     # via
     #   -r requirements/test.in
     #   edx-lint
