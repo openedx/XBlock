@@ -30,9 +30,9 @@ spec:
   # Don't forget the "user:" or "group:" prefix. Groups must be GitHub team
   # names in the openedx GitHub organization: https://github.com/orgs/openedx/teams
   #
-  # If you need a new team created, create an issue with tCRIL engineering:
-  # https://github.com/openedx/tcril-engineering/issues/new/choose
-  owner: group:tcril-engineering
+  # If you need a new team created, create an issue with Axim engineering:
+  # https://github.com/openedx/axim-engineering/issues/new/choose
+  owner: group:axim-engineering
 
   # (Required) Acceptable Type Values: service, website, library
   type: 'library'
