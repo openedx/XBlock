@@ -17,11 +17,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.136
+boto3==1.26.141
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.136
+botocore==1.29.141
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -46,7 +46,7 @@ code-annotations==1.3.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
-coverage[toml]==7.2.5
+coverage[toml]==7.2.6
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -178,7 +178,7 @@ py==1.11.0
     #   tox
 pycodestyle==2.10.0
     # via -r requirements/test.txt
-pydantic==1.10.7
+pydantic==1.10.8
     # via
     #   -r requirements/test.txt
     #   inflect
@@ -201,7 +201,7 @@ pylint-django==2.5.3
     # via
     #   -r requirements/test.txt
     #   edx-lint
-pylint-plugin-utils==0.8.1
+pylint-plugin-utils==0.8.2
     # via
     #   -r requirements/test.txt
     #   pylint-celery
@@ -215,7 +215,7 @@ pytest==7.3.1
     #   -r requirements/test.txt
     #   pytest-cov
     #   pytest-django
-pytest-cov==4.0.0
+pytest-cov==4.1.0
     # via -r requirements/test.txt
 pytest-django==4.5.2
     # via -r requirements/test.txt
@@ -289,13 +289,13 @@ tox==3.28.0
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/ci.txt
-typing-extensions==4.5.0
+typing-extensions==4.6.2
     # via
     #   -r requirements/test.txt
     #   astroid
     #   pydantic
     #   pylint
-urllib3==1.26.15
+urllib3==1.26.16
     # via
     #   -r requirements/test.txt
     #   botocore
