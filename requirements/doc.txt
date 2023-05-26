@@ -18,11 +18,11 @@ babel==2.12.1
     #   sphinx
 beautifulsoup4==4.12.2
     # via pydata-sphinx-theme
-boto3==1.26.136
+boto3==1.26.141
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.136
+botocore==1.29.141
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -96,7 +96,7 @@ pytz==2023.3
     #   django
 pyyaml==6.0
     # via -r requirements/django.txt
-requests==2.30.0
+requests==2.31.0
     # via sphinx
 s3transfer==0.6.1
     # via
@@ -138,9 +138,9 @@ sqlparse==0.4.4
     # via
     #   -r requirements/django.txt
     #   django
-typing-extensions==4.5.0
+typing-extensions==4.6.2
     # via pydata-sphinx-theme
-urllib3==1.26.15
+urllib3==1.26.16
     # via
     #   -r requirements/django.txt
     #   botocore
