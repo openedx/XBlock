@@ -17,11 +17,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.141
+boto3==1.26.142
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.141
+botocore==1.29.142
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -93,7 +93,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.75.3
+hypothesis==6.75.6
     # via -r requirements/test.txt
 inflect==6.0.4
     # via
@@ -140,7 +140,7 @@ mccabe==0.7.0
     #   pylint
 mock==5.0.2
     # via -r requirements/test.txt
-openedx-django-pyfs==3.2.1
+openedx-django-pyfs @ git+https://github.com/openedx/django-pyfs.git@4179ff06128098bc11ca70e666ccd6adde3652b2
     # via -r requirements/test.txt
 packaging==23.1
     # via

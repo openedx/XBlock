@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.26.141
+boto3==1.26.142
     # via fs-s3fs
-botocore==1.29.141
+botocore==1.29.142
     # via
     #   boto3
     #   s3transfer
@@ -36,7 +36,7 @@ lxml==4.9.2
     # via -r requirements/base.txt
 markupsafe==2.1.2
     # via -r requirements/base.txt
-openedx-django-pyfs==3.2.1
+openedx-django-pyfs @ git+https://github.com/openedx/django-pyfs.git@4179ff06128098bc11ca70e666ccd6adde3652b2
     # via -r requirements/django.in
 python-dateutil==2.8.2
     # via

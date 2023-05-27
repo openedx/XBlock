@@ -18,11 +18,11 @@ babel==2.12.1
     #   sphinx
 beautifulsoup4==4.12.2
     # via pydata-sphinx-theme
-boto3==1.26.141
+boto3==1.26.142
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.141
+botocore==1.29.142
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -72,7 +72,7 @@ markupsafe==2.1.2
     #   jinja2
 mock==5.0.2
     # via -r requirements/doc.in
-openedx-django-pyfs==3.2.1
+openedx-django-pyfs @ git+https://github.com/openedx/django-pyfs.git@4179ff06128098bc11ca70e666ccd6adde3652b2
     # via -r requirements/django.txt
 packaging==23.1
     # via
