@@ -15,11 +15,11 @@ astroid==2.15.5
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.26.141
+boto3==1.26.145
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.141
+botocore==1.29.145
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -33,7 +33,7 @@ click-log==0.4.0
     # via edx-lint
 code-annotations==1.3.0
     # via edx-lint
-coverage[toml]==7.2.6
+coverage[toml]==7.2.7
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -70,7 +70,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.75.3
+hypothesis==6.75.9
     # via -r requirements/test.in
 inflect==6.0.4
     # via jinja2-pluralize
@@ -205,7 +205,7 @@ tox==3.28.0
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.in
-typing-extensions==4.6.2
+typing-extensions==4.6.3
     # via
     #   astroid
     #   pydantic
