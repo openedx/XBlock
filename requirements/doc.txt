@@ -18,11 +18,11 @@ babel==2.12.1
     #   sphinx
 beautifulsoup4==4.12.2
     # via pydata-sphinx-theme
-boto3==1.26.141
+boto3==1.26.145
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.141
+botocore==1.29.145
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -138,7 +138,7 @@ sqlparse==0.4.4
     # via
     #   -r requirements/django.txt
     #   django
-typing-extensions==4.6.2
+typing-extensions==4.6.3
     # via pydata-sphinx-theme
 urllib3==1.26.16
     # via

@@ -17,11 +17,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.141
+boto3==1.26.145
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.141
+botocore==1.29.145
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -46,7 +46,7 @@ code-annotations==1.3.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
-coverage[toml]==7.2.6
+coverage[toml]==7.2.7
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -93,7 +93,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.75.3
+hypothesis==6.75.9
     # via -r requirements/test.txt
 inflect==6.0.4
     # via
@@ -289,7 +289,7 @@ tox==3.28.0
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/ci.txt
-typing-extensions==4.6.2
+typing-extensions==4.6.3
     # via
     #   -r requirements/test.txt
     #   astroid
