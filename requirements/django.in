@@ -6,5 +6,5 @@
 -r base.txt                         # Core XBlock dependencies
 
 Django>=2.2,<3.0
-git+https://github.com/openedx/django-pyfs.git@4179ff06128098bc11ca70e666ccd6adde3652b2#egg=openedx-django-pyfs
+openedx-django-pyfs>=1.0.5
 lazy
