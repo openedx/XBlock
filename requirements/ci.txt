@@ -14,9 +14,9 @@ filelock==3.12.2
     #   virtualenv
 packaging==23.1
     # via tox
-platformdirs==3.5.3
+platformdirs==3.8.0
     # via virtualenv
-pluggy==1.0.0
+pluggy==1.2.0
     # via tox
 py==1.11.0
     # via tox

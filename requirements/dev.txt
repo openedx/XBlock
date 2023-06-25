@@ -17,11 +17,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.155
+boto3==1.26.160
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.155
+botocore==1.29.160
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -93,7 +93,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.79.0
+hypothesis==6.79.2
     # via -r requirements/test.txt
 inflect==6.0.4
     # via
@@ -158,13 +158,13 @@ pbr==5.11.1
     #   stevedore
 pip-tools==6.13.0
     # via -r requirements/pip-tools.txt
-platformdirs==3.5.3
+platformdirs==3.8.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   pylint
     #   virtualenv
-pluggy==1.0.0
+pluggy==1.2.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -210,7 +210,7 @@ pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pytest==7.3.2
+pytest==7.4.0
     # via
     #   -r requirements/test.txt
     #   pytest-cov
