@@ -15,11 +15,11 @@ astroid==2.15.5
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.26.155
+boto3==1.26.160
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.155
+botocore==1.29.160
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -70,7 +70,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.79.0
+hypothesis==6.79.2
     # via -r requirements/test.in
 inflect==6.0.4
     # via jinja2-pluralize
@@ -114,11 +114,11 @@ path==16.6.0
     # via -r requirements/test.in
 pbr==5.11.1
     # via stevedore
-platformdirs==3.5.3
+platformdirs==3.8.0
     # via
     #   pylint
     #   virtualenv
-pluggy==1.0.0
+pluggy==1.2.0
     # via
     #   diff-cover
     #   pytest
@@ -146,7 +146,7 @@ pylint-plugin-utils==0.8.2
     # via
     #   pylint-celery
     #   pylint-django
-pytest==7.3.2
+pytest==7.4.0
     # via
     #   -r requirements/test.in
     #   pytest-cov
