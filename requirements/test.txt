@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+annotated-types==0.5.0
+    # via pydantic
 appdirs==1.4.4
     # via
     #   -r requirements/django.txt
@@ -15,11 +17,11 @@ astroid==2.15.5
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.26.160
+boto3==1.26.165
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.160
+botocore==1.29.165
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -70,7 +72,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.79.2
+hypothesis==6.80.0
     # via -r requirements/test.in
 inflect==6.0.4
     # via jinja2-pluralize
@@ -127,8 +129,10 @@ py==1.11.0
     # via tox
 pycodestyle==2.10.0
     # via -r requirements/test.in
-pydantic==1.10.9
+pydantic==2.0
     # via inflect
+pydantic-core==2.0.1
+    # via pydantic
 pygments==2.15.1
     # via diff-cover
 pylint==2.17.4
@@ -205,10 +209,12 @@ tox==3.28.0
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.in
-typing-extensions==4.6.3
+typing-extensions==4.7.0
     # via
+    #   annotated-types
     #   astroid
     #   pydantic
+    #   pydantic-core
     #   pylint
 urllib3==1.26.16
     # via

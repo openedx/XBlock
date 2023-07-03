@@ -4,6 +4,10 @@
 #
 #    make upgrade
 #
+annotated-types==0.5.0
+    # via
+    #   -r requirements/test.txt
+    #   pydantic
 appdirs==1.4.4
     # via
     #   -r requirements/test.txt
@@ -17,11 +21,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.26.160
+boto3==1.26.165
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.29.160
+botocore==1.29.165
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -93,7 +97,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.79.2
+hypothesis==6.80.0
     # via -r requirements/test.txt
 inflect==6.0.4
     # via
@@ -156,7 +160,7 @@ pbr==5.11.1
     # via
     #   -r requirements/test.txt
     #   stevedore
-pip-tools==6.13.0
+pip-tools==6.14.0
     # via -r requirements/pip-tools.txt
 platformdirs==3.8.0
     # via
@@ -178,10 +182,14 @@ py==1.11.0
     #   tox
 pycodestyle==2.10.0
     # via -r requirements/test.txt
-pydantic==1.10.9
+pydantic==2.0
     # via
     #   -r requirements/test.txt
     #   inflect
+pydantic-core==2.0.1
+    # via
+    #   -r requirements/test.txt
+    #   pydantic
 pygments==2.15.1
     # via
     #   -r requirements/test.txt
@@ -273,6 +281,7 @@ tomli==2.0.1
     #   -r requirements/test.txt
     #   build
     #   coverage
+    #   pip-tools
     #   pylint
     #   pyproject-hooks
     #   pytest
@@ -289,11 +298,13 @@ tox==3.28.0
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/ci.txt
-typing-extensions==4.6.3
+typing-extensions==4.7.0
     # via
     #   -r requirements/test.txt
+    #   annotated-types
     #   astroid
     #   pydantic
+    #   pydantic-core
     #   pylint
 urllib3==1.26.16
     # via
