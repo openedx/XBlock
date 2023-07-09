@@ -10,23 +10,23 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-astroid==2.15.5
+astroid==2.15.6
     # via
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.26.165
+boto3==1.28.1
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.29.165
+botocore==1.31.1
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
-click==8.1.3
+click==8.1.4
     # via
     #   click-log
     #   code-annotations
@@ -55,7 +55,7 @@ distlib==0.3.6
     #   openedx-django-pyfs
 edx-lint==5.3.4
     # via -r requirements/test.in
-exceptiongroup==1.1.1
+exceptiongroup==1.1.2
     # via
     #   hypothesis
     #   pytest
@@ -72,9 +72,9 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.80.0
+hypothesis==6.80.1
     # via -r requirements/test.in
-inflect==6.0.4
+inflect==7.0.0
     # via jinja2-pluralize
 iniconfig==2.0.0
     # via pytest
@@ -96,7 +96,7 @@ lazy==1.5
     # via -r requirements/django.txt
 lazy-object-proxy==1.9.0
     # via astroid
-lxml==4.9.2
+lxml==4.9.3
     # via -r requirements/django.txt
 markupsafe==2.1.3
     # via
@@ -112,11 +112,11 @@ packaging==23.1
     # via
     #   pytest
     #   tox
-path==16.6.0
+path==16.7.1
     # via -r requirements/test.in
 pbr==5.11.1
     # via stevedore
-platformdirs==3.8.0
+platformdirs==3.8.1
     # via
     #   pylint
     #   virtualenv
@@ -129,9 +129,9 @@ py==1.11.0
     # via tox
 pycodestyle==2.10.0
     # via -r requirements/test.in
-pydantic==2.0
+pydantic==2.0.2
     # via inflect
-pydantic-core==2.0.1
+pydantic-core==2.1.2
     # via pydantic
 pygments==2.15.1
     # via diff-cover
@@ -209,10 +209,11 @@ tox==3.28.0
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.in
-typing-extensions==4.7.0
+typing-extensions==4.7.1
     # via
     #   annotated-types
     #   astroid
+    #   inflect
     #   pydantic
     #   pydantic-core
     #   pylint
