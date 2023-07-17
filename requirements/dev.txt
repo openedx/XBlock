@@ -21,11 +21,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.28.1
+boto3==1.28.3
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.31.1
+botocore==1.31.3
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -34,7 +34,7 @@ build==0.10.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-click==8.1.4
+click==8.1.5
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
@@ -97,7 +97,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.80.1
+hypothesis==6.81.2
     # via -r requirements/test.txt
 inflect==7.0.0
     # via
@@ -142,9 +142,9 @@ mccabe==0.7.0
     # via
     #   -r requirements/test.txt
     #   pylint
-mock==5.0.2
+mock==5.1.0
     # via -r requirements/test.txt
-openedx-django-pyfs==3.3.0
+openedx-django-pyfs==3.4.0
     # via -r requirements/test.txt
 packaging==23.1
     # via
@@ -160,9 +160,9 @@ pbr==5.11.1
     # via
     #   -r requirements/test.txt
     #   stevedore
-pip-tools==6.14.0
+pip-tools==7.0.0
     # via -r requirements/pip-tools.txt
-platformdirs==3.8.1
+platformdirs==3.9.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -182,11 +182,11 @@ py==1.11.0
     #   tox
 pycodestyle==2.10.0
     # via -r requirements/test.txt
-pydantic==2.0.2
+pydantic==2.0.3
     # via
     #   -r requirements/test.txt
     #   inflect
-pydantic-core==2.1.2
+pydantic-core==2.3.0
     # via
     #   -r requirements/test.txt
     #   pydantic
@@ -311,7 +311,7 @@ urllib3==1.26.16
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.23.1
+virtualenv==20.24.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
