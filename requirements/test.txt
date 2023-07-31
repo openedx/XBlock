@@ -17,11 +17,11 @@ astroid==2.15.6
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.28.9
+boto3==1.28.15
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.31.9
+botocore==1.31.15
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -116,7 +116,7 @@ path==16.7.1
     # via -r requirements/test.in
 pbr==5.11.1
     # via stevedore
-platformdirs==3.9.1
+platformdirs==3.10.0
     # via
     #   pylint
     #   virtualenv
@@ -127,15 +127,15 @@ pluggy==1.2.0
     #   tox
 py==1.11.0
     # via tox
-pycodestyle==2.10.0
+pycodestyle==2.11.0
     # via -r requirements/test.in
-pydantic==2.0.3
+pydantic==2.1.1
     # via inflect
-pydantic-core==2.3.0
+pydantic-core==2.4.0
     # via pydantic
 pygments==2.15.1
     # via diff-cover
-pylint==2.17.4
+pylint==2.17.5
     # via
     #   -r requirements/test.in
     #   edx-lint
@@ -203,7 +203,7 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
-tomlkit==0.11.8
+tomlkit==0.12.1
     # via pylint
 tox==3.28.0
     # via
@@ -221,7 +221,7 @@ urllib3==1.26.16
     # via
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.24.1
+virtualenv==20.24.2
     # via tox
 web-fragments==2.0.0
     # via -r requirements/django.txt
