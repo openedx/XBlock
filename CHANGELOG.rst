@@ -7,9 +7,14 @@ These are notable changes in XBlock.
 Unreleased
 ----------
 
+
+1.7.0 - 2023-08-03
+------------------
+
 * Switch from ``edx-sphinx-theme`` to ``sphinx-book-theme`` since the former is
   deprecated.  See https://github.com/openedx/edx-sphinx-theme/issues/184 for
   more details.
+* Added support for Django 4.2
 
 1.6.1 - 2022-01-28
 ------------------
