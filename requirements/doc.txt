@@ -18,11 +18,11 @@ babel==2.12.1
     #   sphinx
 beautifulsoup4==4.12.2
     # via pydata-sphinx-theme
-boto3==1.28.15
+boto3==1.28.20
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.31.15
+botocore==1.31.20
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -144,7 +144,7 @@ urllib3==1.26.16
     #   -r requirements/django.txt
     #   botocore
     #   requests
-web-fragments==2.0.0
+web-fragments==2.1.0
     # via -r requirements/django.txt
 webob==1.8.7
     # via -r requirements/django.txt
