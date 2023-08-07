@@ -72,7 +72,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.82.1
+hypothesis==6.82.2
     # via -r requirements/test.in
 inflect==7.0.0
     # via jinja2-pluralize
@@ -133,7 +133,7 @@ pydantic==2.1.1
     # via inflect
 pydantic-core==2.4.0
     # via pydantic
-pygments==2.15.1
+pygments==2.16.1
     # via diff-cover
 pylint==2.17.5
     # via

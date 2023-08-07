@@ -97,7 +97,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.82.1
+hypothesis==6.82.2
     # via -r requirements/test.txt
 inflect==7.0.0
     # via
@@ -190,7 +190,7 @@ pydantic-core==2.4.0
     # via
     #   -r requirements/test.txt
     #   pydantic
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
