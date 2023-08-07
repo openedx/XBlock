@@ -21,11 +21,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.28.15
+boto3==1.28.20
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.31.15
+botocore==1.31.20
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -97,7 +97,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.82.0
+hypothesis==6.82.1
     # via -r requirements/test.txt
 inflect==7.0.0
     # via
@@ -160,7 +160,7 @@ pbr==5.11.1
     # via
     #   -r requirements/test.txt
     #   stevedore
-pip-tools==7.1.0
+pip-tools==7.2.0
     # via -r requirements/pip-tools.txt
 platformdirs==3.10.0
     # via
@@ -316,11 +316,11 @@ virtualenv==20.24.2
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-web-fragments==2.0.0
+web-fragments==2.1.0
     # via -r requirements/test.txt
 webob==1.8.7
     # via -r requirements/test.txt
-wheel==0.41.0
+wheel==0.41.1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
