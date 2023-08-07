@@ -18,7 +18,7 @@ jobs:
       branch: ${{ github.event.inputs.branch || 'master' }}
       # optional parameters below; fill in if you'd like github or email notifications
       # user_reviewers: ""
-      team_reviewers: "tcril-engineering"
+      team_reviewers: "axim-engineering"
       # email_address: ""
       # send_success_notification: false
     secrets:
