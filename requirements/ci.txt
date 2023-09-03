@@ -8,7 +8,7 @@ coverage==7.3.0
     # via -r requirements/ci.in
 distlib==0.3.7
     # via virtualenv
-filelock==3.12.2
+filelock==3.12.3
     # via
     #   tox
     #   virtualenv
@@ -31,5 +31,7 @@ tox==3.28.0
     #   tox-battery
 tox-battery==0.6.2
     # via -r requirements/ci.in
-virtualenv==20.24.3
+typing-extensions==4.7.1
+    # via filelock
+virtualenv==20.24.4
     # via tox
