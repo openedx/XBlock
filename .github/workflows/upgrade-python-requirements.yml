@@ -18,9 +18,9 @@ jobs:
       branch: ${{ github.event.inputs.branch || 'master' }}
       # optional parameters below; fill in if you'd like github or email notifications
       # user_reviewers: ""
-      team_reviewers: "axim-engineering"
-      # email_address: ""
-      # send_success_notification: false
+      team_reviewers: "axim-aximprovements"
+      email_address: "aximimprovements@axim.org"
+      send_success_notification: false
     secrets:
       requirements_bot_github_token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
       requirements_bot_github_email: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
