@@ -21,16 +21,16 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.28.40
+boto3==1.28.44
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.31.40
+botocore==1.31.44
     # via
     #   -r requirements/test.txt
     #   boto3
     #   s3transfer
-build==1.0.0
+build==1.0.3
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
@@ -50,7 +50,7 @@ code-annotations==1.5.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
-coverage[toml]==7.3.0
+coverage[toml]==7.3.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -97,7 +97,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.84.0
+hypothesis==6.84.2
     # via -r requirements/test.txt
 importlib-metadata==6.8.0
     # via
@@ -222,7 +222,7 @@ pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pytest==7.4.1
+pytest==7.4.2
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -317,7 +317,7 @@ urllib3==1.26.16
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.24.4
+virtualenv==20.24.5
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
