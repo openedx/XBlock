@@ -8,6 +8,11 @@ Unreleased
 ----------
 
 
+1.8.0 - 2023-09-25
+------------------
+* Added `xblock-utils <https://github.com/openedx/xblock-utils>`_ repository code into this repository along with docs.
+  Docs moved into the docs/ directory.
+
 1.7.0 - 2023-08-03
 ------------------
 

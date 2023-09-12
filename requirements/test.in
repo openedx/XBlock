@@ -18,3 +18,4 @@ pytest
 pytest-cov
 pytest-django
 tox
+xblock-sdk

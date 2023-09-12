@@ -1,0 +1,6 @@
+<example>
+    <title>This is a simple xml template.</title>
+    <arguments>
+        <url_name>{{url_name}}</url_name>
+    </arguments>
+</example>

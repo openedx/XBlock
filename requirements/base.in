@@ -3,6 +3,7 @@
 
 fs
 lxml
+mako
 markupsafe
 python-dateutil
 pytz

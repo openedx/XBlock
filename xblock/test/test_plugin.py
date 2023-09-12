@@ -75,13 +75,13 @@ def _num_plugins_cached():
     return len(plugin.PLUGIN_CACHE)
 
 
-@XBlock.register_temp_plugin(AmbiguousBlock1, "thumbs")
+@XBlock.register_temp_plugin(AmbiguousBlock1, "ambiguous_block_1")
 def test_plugin_caching():
     plugin.PLUGIN_CACHE = {}
     assert _num_plugins_cached() == 0
 
-    XBlock.load_class("thumbs")
+    XBlock.load_class("ambiguous_block_1")
     assert _num_plugins_cached() == 1
 
-    XBlock.load_class("thumbs")
+    XBlock.load_class("ambiguous_block_1")
     assert _num_plugins_cached() == 1
