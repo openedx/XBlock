@@ -17,11 +17,11 @@ astroid==2.15.6
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.28.44
+boto3==1.28.49
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.31.44
+botocore==1.31.49
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -59,7 +59,7 @@ exceptiongroup==1.1.3
     # via
     #   hypothesis
     #   pytest
-filelock==3.12.3
+filelock==3.12.4
     # via
     #   tox
     #   virtualenv
@@ -72,7 +72,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.84.2
+hypothesis==6.85.1
     # via -r requirements/test.in
 inflect==7.0.0
     # via jinja2-pluralize
@@ -92,7 +92,7 @@ jmespath==1.0.1
     #   -r requirements/django.txt
     #   boto3
     #   botocore
-lazy==1.5
+lazy==1.6
     # via -r requirements/django.txt
 lazy-object-proxy==1.9.0
     # via astroid
@@ -213,7 +213,6 @@ typing-extensions==4.7.1
     # via
     #   annotated-types
     #   astroid
-    #   filelock
     #   inflect
     #   pydantic
     #   pydantic-core
