@@ -21,11 +21,11 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.28.44
+boto3==1.28.49
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.31.44
+botocore==1.31.49
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -82,7 +82,7 @@ exceptiongroup==1.1.3
     #   -r requirements/test.txt
     #   hypothesis
     #   pytest
-filelock==3.12.3
+filelock==3.12.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -97,7 +97,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.84.2
+hypothesis==6.85.1
     # via -r requirements/test.txt
 importlib-metadata==6.8.0
     # via
@@ -130,7 +130,7 @@ jmespath==1.0.1
     #   -r requirements/test.txt
     #   boto3
     #   botocore
-lazy==1.5
+lazy==1.6
     # via -r requirements/test.txt
 lazy-object-proxy==1.9.0
     # via
@@ -304,11 +304,9 @@ tox-battery==0.6.2
     # via -r requirements/ci.txt
 typing-extensions==4.7.1
     # via
-    #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   annotated-types
     #   astroid
-    #   filelock
     #   inflect
     #   pydantic
     #   pydantic-core

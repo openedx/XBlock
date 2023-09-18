@@ -18,11 +18,11 @@ babel==2.12.1
     #   sphinx
 beautifulsoup4==4.12.2
     # via pydata-sphinx-theme
-boto3==1.28.44
+boto3==1.28.49
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.31.44
+botocore==1.31.49
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -62,7 +62,7 @@ jmespath==1.0.1
     #   -r requirements/django.txt
     #   boto3
     #   botocore
-lazy==1.5
+lazy==1.6
     # via -r requirements/django.txt
 lxml==4.9.3
     # via -r requirements/django.txt
@@ -78,7 +78,7 @@ packaging==23.1
     # via
     #   pydata-sphinx-theme
     #   sphinx
-pydata-sphinx-theme==0.13.3
+pydata-sphinx-theme==0.14.0
     # via sphinx-book-theme
 pygments==2.16.1
     # via
