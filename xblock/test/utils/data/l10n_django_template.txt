@@ -1,0 +1,3 @@
+{% load l10n %}
+{{ 1000|localize }}
+{{ 1000|unlocalize }}

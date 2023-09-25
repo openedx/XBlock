@@ -36,10 +36,16 @@ setup(
         'xblock',
         'xblock.django',
         'xblock.reference',
+        'xblock.utils',
         'xblock.test',
         'xblock.test.django',
+        'xblock.test.utils',
     ],
     include_package_data=True,
+    package_data={
+        'xblock.utils': ['public/*', 'templates/*', 'templatetags/*'],
+        'xblock.test.utils': ['data/*'],
+    },
     install_requires=[
         'fs',
         'lxml',
