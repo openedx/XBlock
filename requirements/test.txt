@@ -10,6 +10,8 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
+arrow==1.2.3
+    # via cookiecutter
 astroid==2.15.7
     # via
     #   -r requirements/test.in
@@ -17,6 +19,8 @@ astroid==2.15.7
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
+binaryornot==0.4.4
+    # via cookiecutter
 boto3==1.28.53
     # via
     #   -r requirements/django.txt
@@ -26,15 +30,24 @@ botocore==1.31.53
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
+certifi==2023.7.22
+    # via requests
+chardet==5.2.0
+    # via binaryornot
+charset-normalizer==3.2.0
+    # via requests
 click==8.1.7
     # via
     #   click-log
     #   code-annotations
+    #   cookiecutter
     #   edx-lint
 click-log==0.4.0
     # via edx-lint
 code-annotations==1.5.0
     # via edx-lint
+cookiecutter==2.3.1
+    # via xblock-sdk
 coverage[toml]==7.3.1
     # via
     #   -r requirements/test.in
@@ -53,6 +66,7 @@ distlib==0.3.7
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
     #   openedx-django-pyfs
+    #   xblock-sdk
 edx-lint==5.3.4
     # via -r requirements/test.in
 exceptiongroup==1.1.3
@@ -68,12 +82,16 @@ fs==2.4.16
     #   -r requirements/django.txt
     #   fs-s3fs
     #   openedx-django-pyfs
+    #   xblock
 fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.86.2
+    #   xblock-sdk
+hypothesis==6.87.0
     # via -r requirements/test.in
+idna==3.4
+    # via requests
 inflect==7.0.0
     # via jinja2-pluralize
 iniconfig==2.0.0
@@ -83,6 +101,7 @@ isort==5.12.0
 jinja2==3.1.2
     # via
     #   code-annotations
+    #   cookiecutter
     #   diff-cover
     #   jinja2-pluralize
 jinja2-pluralize==0.3.0
@@ -97,13 +116,24 @@ lazy==1.6
 lazy-object-proxy==1.9.0
     # via astroid
 lxml==4.9.3
+    # via
+    #   -r requirements/django.txt
+    #   xblock
+    #   xblock-sdk
+mako==1.2.4
     # via -r requirements/django.txt
+markdown-it-py==3.0.0
+    # via rich
 markupsafe==2.1.3
     # via
     #   -r requirements/django.txt
     #   jinja2
+    #   mako
+    #   xblock
 mccabe==0.7.0
     # via pylint
+mdurl==0.1.2
+    # via markdown-it-py
 mock==5.1.0
     # via -r requirements/test.in
 openedx-django-pyfs==3.4.0
@@ -129,13 +159,15 @@ py==1.11.0
     # via tox
 pycodestyle==2.11.0
     # via -r requirements/test.in
-pydantic==2.3.0
+pydantic==2.4.0
     # via inflect
-pydantic-core==2.6.3
+pydantic-core==2.10.0
     # via pydantic
 pygments==2.16.1
-    # via diff-cover
-pylint==2.17.5
+    # via
+    #   diff-cover
+    #   rich
+pylint==2.17.6
     # via
     #   -r requirements/test.in
     #   edx-lint
@@ -150,6 +182,8 @@ pylint-plugin-utils==0.8.2
     # via
     #   pylint-celery
     #   pylint-django
+pypng==0.20220715.0
+    # via xblock-sdk
 pytest==7.4.2
     # via
     #   -r requirements/test.in
@@ -162,23 +196,38 @@ pytest-django==4.5.2
 python-dateutil==2.8.2
     # via
     #   -r requirements/django.txt
+    #   arrow
     #   botocore
+    #   xblock
 python-slugify==8.0.1
-    # via code-annotations
+    # via
+    #   code-annotations
+    #   cookiecutter
 pytz==2023.3.post1
     # via
     #   -r requirements/django.txt
     #   django
+    #   xblock
 pyyaml==6.0.1
     # via
     #   -r requirements/django.txt
     #   code-annotations
+    #   cookiecutter
+    #   xblock
+requests==2.31.0
+    # via
+    #   cookiecutter
+    #   xblock-sdk
+rich==13.5.3
+    # via cookiecutter
 s3transfer==0.6.2
     # via
     #   -r requirements/django.txt
     #   boto3
 simplejson==3.19.1
-    # via -r requirements/django.txt
+    # via
+    #   -r requirements/django.txt
+    #   xblock-sdk
 six==1.16.0
     # via
     #   -r requirements/django.txt
@@ -217,18 +266,30 @@ typing-extensions==4.8.0
     #   pydantic
     #   pydantic-core
     #   pylint
+    #   rich
 urllib3==1.26.16
     # via
     #   -r requirements/django.txt
     #   botocore
+    #   requests
 virtualenv==20.24.5
     # via tox
 web-fragments==2.1.0
-    # via -r requirements/django.txt
+    # via
+    #   -r requirements/django.txt
+    #   xblock
+    #   xblock-sdk
 webob==1.8.7
-    # via -r requirements/django.txt
+    # via
+    #   -r requirements/django.txt
+    #   xblock
+    #   xblock-sdk
 wrapt==1.15.0
     # via astroid
+xblock==1.7.0
+    # via xblock-sdk
+xblock-sdk==0.7.0
+    # via -r requirements/test.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
