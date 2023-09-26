@@ -12,6 +12,10 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
+arrow==1.2.3
+    # via
+    #   -r requirements/test.txt
+    #   cookiecutter
 astroid==2.15.7
     # via
     #   -r requirements/test.txt
@@ -21,6 +25,10 @@ attrs==23.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
+binaryornot==0.4.4
+    # via
+    #   -r requirements/test.txt
+    #   cookiecutter
 boto3==1.28.53
     # via
     #   -r requirements/test.txt
@@ -34,12 +42,25 @@ build==1.0.3
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
+certifi==2023.7.22
+    # via
+    #   -r requirements/test.txt
+    #   requests
+chardet==5.2.0
+    # via
+    #   -r requirements/test.txt
+    #   binaryornot
+charset-normalizer==3.2.0
+    # via
+    #   -r requirements/test.txt
+    #   requests
 click==8.1.7
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
     #   click-log
     #   code-annotations
+    #   cookiecutter
     #   edx-lint
     #   pip-tools
 click-log==0.4.0
@@ -50,6 +71,10 @@ code-annotations==1.5.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
+cookiecutter==2.3.1
+    # via
+    #   -r requirements/test.txt
+    #   xblock-sdk
 coverage[toml]==7.3.1
     # via
     #   -r requirements/ci.txt
@@ -75,6 +100,7 @@ django==2.2.28
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   openedx-django-pyfs
+    #   xblock-sdk
 edx-lint==5.3.4
     # via -r requirements/test.txt
 exceptiongroup==1.1.3
@@ -93,12 +119,18 @@ fs==2.4.16
     #   -r requirements/test.txt
     #   fs-s3fs
     #   openedx-django-pyfs
+    #   xblock
 fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.86.2
+    #   xblock-sdk
+hypothesis==6.87.0
     # via -r requirements/test.txt
+idna==3.4
+    # via
+    #   -r requirements/test.txt
+    #   requests
 importlib-metadata==6.8.0
     # via
     #   -r requirements/pip-tools.txt
@@ -119,6 +151,7 @@ jinja2==3.1.2
     # via
     #   -r requirements/test.txt
     #   code-annotations
+    #   cookiecutter
     #   diff-cover
     #   jinja2-pluralize
 jinja2-pluralize==0.3.0
@@ -137,15 +170,30 @@ lazy-object-proxy==1.9.0
     #   -r requirements/test.txt
     #   astroid
 lxml==4.9.3
+    # via
+    #   -r requirements/test.txt
+    #   xblock
+    #   xblock-sdk
+mako==1.2.4
     # via -r requirements/test.txt
+markdown-it-py==3.0.0
+    # via
+    #   -r requirements/test.txt
+    #   rich
 markupsafe==2.1.3
     # via
     #   -r requirements/test.txt
     #   jinja2
+    #   mako
+    #   xblock
 mccabe==0.7.0
     # via
     #   -r requirements/test.txt
     #   pylint
+mdurl==0.1.2
+    # via
+    #   -r requirements/test.txt
+    #   markdown-it-py
 mock==5.1.0
     # via -r requirements/test.txt
 openedx-django-pyfs==3.4.0
@@ -186,11 +234,11 @@ py==1.11.0
     #   tox
 pycodestyle==2.11.0
     # via -r requirements/test.txt
-pydantic==2.3.0
+pydantic==2.4.0
     # via
     #   -r requirements/test.txt
     #   inflect
-pydantic-core==2.6.3
+pydantic-core==2.10.0
     # via
     #   -r requirements/test.txt
     #   pydantic
@@ -198,7 +246,8 @@ pygments==2.16.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==2.17.5
+    #   rich
+pylint==2.17.6
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -218,6 +267,10 @@ pylint-plugin-utils==0.8.2
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
+pypng==0.20220715.0
+    # via
+    #   -r requirements/test.txt
+    #   xblock-sdk
 pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
@@ -234,25 +287,42 @@ pytest-django==4.5.2
 python-dateutil==2.8.2
     # via
     #   -r requirements/test.txt
+    #   arrow
     #   botocore
+    #   xblock
 python-slugify==8.0.1
     # via
     #   -r requirements/test.txt
     #   code-annotations
+    #   cookiecutter
 pytz==2023.3.post1
     # via
     #   -r requirements/test.txt
     #   django
+    #   xblock
 pyyaml==6.0.1
     # via
     #   -r requirements/test.txt
     #   code-annotations
+    #   cookiecutter
+    #   xblock
+requests==2.31.0
+    # via
+    #   -r requirements/test.txt
+    #   cookiecutter
+    #   xblock-sdk
+rich==13.5.3
+    # via
+    #   -r requirements/test.txt
+    #   cookiecutter
 s3transfer==0.6.2
     # via
     #   -r requirements/test.txt
     #   boto3
 simplejson==3.19.1
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   xblock-sdk
 six==1.16.0
     # via
     #   -r requirements/ci.txt
@@ -311,19 +381,27 @@ typing-extensions==4.8.0
     #   pydantic
     #   pydantic-core
     #   pylint
+    #   rich
 urllib3==1.26.16
     # via
     #   -r requirements/test.txt
     #   botocore
+    #   requests
 virtualenv==20.24.5
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
 web-fragments==2.1.0
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   xblock
+    #   xblock-sdk
 webob==1.8.7
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   xblock
+    #   xblock-sdk
 wheel==0.41.2
     # via
     #   -r requirements/pip-tools.txt
@@ -332,6 +410,12 @@ wrapt==1.15.0
     # via
     #   -r requirements/test.txt
     #   astroid
+xblock==1.7.0
+    # via
+    #   -r requirements/test.txt
+    #   xblock-sdk
+xblock-sdk==0.7.0
+    # via -r requirements/test.txt
 zipp==3.17.0
     # via
     #   -r requirements/pip-tools.txt

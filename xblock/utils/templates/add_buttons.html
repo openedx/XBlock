@@ -1,0 +1,22 @@
+{% load i18n %}
+
+<div class="add-xblock-component new-component-item adding">
+  <div class="new-component">
+    <h5>{% trans "Add New Component" %}</h5>
+    <ul class="new-component-type">
+      {% for block_spec in child_blocks %}
+        <li>
+          <a href="#" class="single-template add-xblock-component-button"
+             data-category="{{ block_spec.category }}" data-single-instance="{{ block_spec.single_instance|lower }}"
+             {% if block_spec.disabled %}
+              disabled="disabled" title="{{ block_spec.disabled_reason }}"
+             {% endif %}
+             {% if block_spec.boilerplate %} data-boilerplate="{{ block_spec.boilerplate }}"  {% endif %}
+              >
+            {{ block_spec.label }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

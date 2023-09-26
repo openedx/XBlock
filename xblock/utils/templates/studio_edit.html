@@ -1,0 +1,113 @@
+{% load i18n %}
+<div class="editor-with-buttons">
+  <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
+    <ul class="list-input settings-list">
+      {% for field in fields %}
+        <li
+          class="field comp-setting-entry metadata_entry {% if field.is_set %}is-set{% endif %}"
+          data-field-name="{{field.name}}"
+          data-default="{% if field.type == 'boolean' %}{{ field.default|yesno:'1,0' }}{% else %}{{ field.default|default_if_none:"" }}{% endif %}"
+          data-cast="{{field.type}}"
+        >
+          <div class="wrapper-comp-setting{% if field.type == "set" %} metadata-list-enum {%endif%}">
+            <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
+
+            {% if field.type == "boolean" %}
+              <select
+                class="field-data-control"
+                id="xb-field-edit-{{field.name}}"
+              >
+                <option value="1" {% if field.value %}selected{% endif %}>
+                  True {% if field.default %}&nbsp;&nbsp;&nbsp;&nbsp;(Default){% endif %}
+                </option>
+                <option value="0" {% if not field.value %}selected{% endif %}>
+                  False {% if not field.default %}&nbsp;&nbsp;&nbsp;&nbsp;(Default){% endif %}
+                </option>
+              </select>
+            {% elif field.has_values %}
+              <select
+                class="field-data-control"
+                id="xb-field-edit-{{field.name}}"
+              >
+                {% for option in field.values %}
+                  <option value="{{option.value}}" {% if field.value == option.value %}selected{% endif %}>
+                    {{option.display_name}} {% if option.value == field.default %}&nbsp;&nbsp;&nbsp;&nbsp;(Default){% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            {% elif field.type == "string" or field.type == "datepicker" %}
+              <input
+                type="text"
+                class="field-data-control"
+                id="xb-field-edit-{{field.name}}"
+                value="{{field.value|default_if_none:""}}"
+              >
+            {% elif field.type == "integer" or field.type == "float" %}
+              <input
+                type="number"
+                class="field-data-control"
+                id="xb-field-edit-{{field.name}}"
+                {% if field.step %} step="{{field.step}}" {% elif field.type == "integer" %} step=1 {% endif %}
+                {% if field.max %} max="{{field.max}}" {% endif %}
+                {% if field.min %} min="{{field.min}}" {% endif %}
+                value="{{field.value|default_if_none:""}}"
+              >
+            {% elif field.type == "text" or field.type == "html" %}
+              <textarea class="field-data-control" data-field-name="{{field.name}}" id="xb-field-edit-{{field.name}}" rows=10 cols=70>{{field.value}}</textarea>
+            {% elif field.type == 'set' and field.has_list_values %}
+              {% comment %}
+                TODO: If len(list_values) is high, show an alternate editor 
+                with a select box and a growing list of selected choices
+              {% endcomment %}
+              <div class="wrapper-list-settings">
+                <ul class="list-settings list-set">
+                  {% for choice in field.list_values %}
+                    <li class="list-settings-item">
+                      <input
+                        id="xb-field-edit-{{field.name}}-{{forloop.counter}}"
+                        type="checkbox"
+                        value="{{choice.value}}"
+                        style="width:auto;min-width:auto;height:auto;float:left;margin-top:3px;"
+                        {% if choice.value in field.value %}checked="checked"{% endif %}
+                      >
+                      <label for="xb-field-edit-{{field.name}}-{{forloop.counter}}" style="display:block;margin-left:1.1em;">
+                        {{choice.display_name}}
+                      </label>
+                    </li>
+                  {% empty %}
+                    <li>{% trans "None Available" %}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% elif field.type == 'generic' or field.type == 'list' or field.type == 'set' %}
+              {# Show a textarea so we can edit it as a JSON string #}
+              <textarea class="field-data-control" data-field-name="{{field.name}}" id="xb-field-edit-{{field.name}}" rows=5 cols=70>{{field.value}}</textarea>
+            {% else %}
+              Unsupported field type. This setting cannot be edited.
+            {% endif %}
+
+            {% if field.allow_reset %}
+              <button class="action setting-clear {% if field.is_set %}active{%else%}inactive{% endif %}" type="button" name="setting-clear" value="{% trans "Clear" %}" data-tooltip="{% trans "Clear" %}">
+                <i class="icon fa fa-undo"></i><span class="sr">{% trans "Clear Value" %}</span>
+              </button>
+            {% endif %}
+          </div>
+          {% if field.help %}
+            <span class="tip setting-help"> {{ field.help|safe }} </span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="xblock-actions">
+    <ul>
+      <li class="action-item">
+        <a href="#" class="button action-primary save-button">{% trans "Save" %}</a>
+      </li>
+
+      <li class="action-item">
+        <a href="#" class="button cancel-button">{% trans "Cancel" %}</a>
+      </li>
+    </ul>
+  </div>
+</div>

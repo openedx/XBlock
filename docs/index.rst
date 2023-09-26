@@ -22,5 +22,6 @@ in depth and guides developers through the process of creating an XBlock.
     fragment
     plugins
     exceptions
+    xblock-utils/index
 
 .. _EdX XBlock Tutorial: http://edx.readthedocs.org/projects/xblock-tutorial/en/latest/index.html

@@ -1,0 +1,8 @@
+{% load i18n %}
+{% trans "Translate 1" %}
+{% trans "Translate 2" as var %}
+{{ var }}
+{% blocktrans %}
+Multi-line translation
+with variable: {{name}}
+{% endblocktrans %}
