@@ -49,10 +49,12 @@ setup(
     install_requires=[
         'fs',
         'lxml',
+        'mako',
         'markupsafe',
         'python-dateutil',
         'pytz',
         'pyyaml',
+        'simplejson',
         'webob',
         'web-fragments',
     ],
