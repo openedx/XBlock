@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-annotated-types==0.5.0
+annotated-types==0.6.0
     # via
     #   -r requirements/test.txt
     #   pydantic
@@ -29,11 +29,11 @@ binaryornot==0.4.4
     # via
     #   -r requirements/test.txt
     #   cookiecutter
-boto3==1.28.57
+boto3==1.28.62
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.31.57
+botocore==1.31.62
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -75,7 +75,7 @@ cookiecutter==2.4.0
     # via
     #   -r requirements/test.txt
     #   xblock-sdk
-coverage[toml]==7.3.1
+coverage[toml]==7.3.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -125,7 +125,7 @@ fs-s3fs==1.1.1
     #   -r requirements/test.txt
     #   openedx-django-pyfs
     #   xblock-sdk
-hypothesis==6.87.0
+hypothesis==6.87.3
     # via -r requirements/test.txt
 idna==3.4
     # via
@@ -175,7 +175,9 @@ lxml==4.9.3
     #   xblock
     #   xblock-sdk
 mako==1.2.4
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   xblock
 markdown-it-py==3.0.0
     # via
     #   -r requirements/test.txt
@@ -198,7 +200,7 @@ mock==5.1.0
     # via -r requirements/test.txt
 openedx-django-pyfs==3.4.0
     # via -r requirements/test.txt
-packaging==23.1
+packaging==23.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/pip-tools.txt
@@ -214,7 +216,7 @@ pbr==5.11.1
     #   stevedore
 pip-tools==7.3.0
     # via -r requirements/pip-tools.txt
-platformdirs==3.10.0
+platformdirs==3.11.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -319,9 +321,10 @@ s3transfer==0.7.0
     # via
     #   -r requirements/test.txt
     #   boto3
-simplejson==3.19.1
+simplejson==3.19.2
     # via
     #   -r requirements/test.txt
+    #   xblock
     #   xblock-sdk
 six==1.16.0
     # via
@@ -386,7 +389,7 @@ typing-extensions==4.8.0
     #   pydantic-core
     #   pylint
     #   rich
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -r requirements/test.txt
     #   botocore
@@ -414,7 +417,7 @@ wrapt==1.15.0
     # via
     #   -r requirements/test.txt
     #   astroid
-xblock==1.8.0
+xblock==1.8.1
     # via
     #   -r requirements/test.txt
     #   xblock-sdk
