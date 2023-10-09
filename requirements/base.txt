@@ -22,7 +22,7 @@ pytz==2023.3.post1
     # via -r requirements/base.in
 pyyaml==6.0.1
     # via -r requirements/base.in
-simplejson==3.19.1
+simplejson==3.19.2
     # via -r requirements/base.in
 six==1.16.0
     # via
