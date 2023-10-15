@@ -21,11 +21,11 @@ attrs==23.1.0
     # via hypothesis
 binaryornot==0.4.4
     # via cookiecutter
-boto3==1.28.62
+boto3==1.28.63
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.31.62
+botocore==1.31.63
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -88,7 +88,7 @@ fs-s3fs==1.1.1
     #   -r requirements/django.txt
     #   openedx-django-pyfs
     #   xblock-sdk
-hypothesis==6.87.3
+hypothesis==6.87.4
     # via -r requirements/test.in
 idna==3.4
     # via requests
@@ -159,7 +159,7 @@ pluggy==1.3.0
     #   tox
 py==1.11.0
     # via tox
-pycodestyle==2.11.0
+pycodestyle==2.11.1
     # via -r requirements/test.in
 pydantic==2.4.2
     # via inflect
