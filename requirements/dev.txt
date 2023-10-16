@@ -29,11 +29,11 @@ binaryornot==0.4.4
     # via
     #   -r requirements/test.txt
     #   cookiecutter
-boto3==1.28.62
+boto3==1.28.63
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.31.62
+botocore==1.31.63
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -125,7 +125,7 @@ fs-s3fs==1.1.1
     #   -r requirements/test.txt
     #   openedx-django-pyfs
     #   xblock-sdk
-hypothesis==6.87.3
+hypothesis==6.87.4
     # via -r requirements/test.txt
 idna==3.4
     # via
@@ -234,7 +234,7 @@ py==1.11.0
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-pycodestyle==2.11.0
+pycodestyle==2.11.1
     # via -r requirements/test.txt
 pydantic==2.4.2
     # via
