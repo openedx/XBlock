@@ -15,8 +15,13 @@ formats:
   - pdf
   - epub
 
+# Set the version of python needed to build these docs.
+build:
+  os: "ubuntu-22.04"
+  tools:
+    python: "3.8"
+
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: "3.8"
   install:
   - requirements: requirements/doc.txt
