@@ -29,11 +29,11 @@ binaryornot==0.4.4
     # via
     #   -r requirements/test.txt
     #   cookiecutter
-boto3==1.28.63
+boto3==1.28.68
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.31.63
+botocore==1.31.68
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -79,6 +79,7 @@ coverage[toml]==7.3.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
+    #   coverage
     #   pytest-cov
 ddt==1.6.0
     # via -r requirements/test.txt
@@ -125,7 +126,7 @@ fs-s3fs==1.1.1
     #   -r requirements/test.txt
     #   openedx-django-pyfs
     #   xblock-sdk
-hypothesis==6.87.4
+hypothesis==6.88.1
     # via -r requirements/test.txt
 idna==3.4
     # via
@@ -372,9 +373,6 @@ tox==3.28.0
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
-    #   tox-battery
-tox-battery==0.6.2
-    # via -r requirements/ci.txt
 types-python-dateutil==2.8.19.14
     # via
     #   -r requirements/test.txt
@@ -389,7 +387,7 @@ typing-extensions==4.8.0
     #   pydantic-core
     #   pylint
     #   rich
-urllib3==1.26.17
+urllib3==1.26.18
     # via
     #   -r requirements/test.txt
     #   botocore
