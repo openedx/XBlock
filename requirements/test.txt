@@ -21,11 +21,11 @@ attrs==23.1.0
     # via hypothesis
 binaryornot==0.4.4
     # via cookiecutter
-boto3==1.28.63
+boto3==1.28.68
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.31.63
+botocore==1.31.68
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -88,7 +88,7 @@ fs-s3fs==1.1.1
     #   -r requirements/django.txt
     #   openedx-django-pyfs
     #   xblock-sdk
-hypothesis==6.87.4
+hypothesis==6.88.1
     # via -r requirements/test.in
 idna==3.4
     # via requests
@@ -272,7 +272,7 @@ typing-extensions==4.8.0
     #   pydantic-core
     #   pylint
     #   rich
-urllib3==1.26.17
+urllib3==1.26.18
     # via
     #   -r requirements/django.txt
     #   botocore
