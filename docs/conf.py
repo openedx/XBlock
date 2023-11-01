@@ -140,6 +140,7 @@ html_theme_options = {
  "use_repository_button": True,
  "use_issues_button": True,
  "use_edit_page_button": True,
+ "navigation_with_keys": False,
  # Please don't change unless you know what you're doing.
  "extra_footer": """
         <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
