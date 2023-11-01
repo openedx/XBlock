@@ -1,0 +1,6 @@
+.. code-block:: html
+
+    <p>
+      <span class='upvote'><span class='count'>{self.upvotes}</span>&uarr;</span>
+      <span class='downvote'><span class='count'>{self.downvotes}</span>&darr;</span>
+    </p>

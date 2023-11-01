@@ -1,14 +1,14 @@
-.. _EdX XBlock API Guide:
+.. _Open edX XBlock API Guide:
 
-#####################
-EdX XBlock API Guide
-#####################
+#########################
+Open edX XBlock API Guide
+#########################
 
 
 This document provides reference information on the XBlock API. You use this
 API to build XBlocks.
 
-EdX also provides the `EdX XBlock Tutorial`_, which describes XBlock concepts
+This document also contains the Open edX XBlock Tutorial, which describes XBlock concepts
 in depth and guides developers through the process of creating an XBlock.
 
 .. toctree::
@@ -22,6 +22,5 @@ in depth and guides developers through the process of creating an XBlock.
     fragment
     plugins
     exceptions
+    xblock-tutorial/index
     xblock-utils/index
-
-.. _EdX XBlock Tutorial: http://edx.readthedocs.org/projects/xblock-tutorial/en/latest/index.html

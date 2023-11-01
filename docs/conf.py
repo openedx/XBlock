@@ -264,6 +264,12 @@ html_favicon = "https://logos.openedx.org/open-edx-favicon.ico"
 
 exclude_patterns = ['api/*', 'links.rst']
 
+# Intersphinx Extension Configuration
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
+    "docs-openedx-org": (
+        f"https://docs.openedx.org/en/latest",
+        None,
+    ),
 }
