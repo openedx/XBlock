@@ -21,19 +21,23 @@ attrs==23.1.0
     # via hypothesis
 binaryornot==0.4.4
     # via cookiecutter
-boto3==1.28.78
+boto3==1.28.84
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.31.78
+botocore==1.31.84
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
+cachetools==5.3.2
+    # via tox
 certifi==2023.7.22
     # via requests
 chardet==5.2.0
-    # via binaryornot
+    # via
+    #   binaryornot
+    #   tox
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
@@ -46,13 +50,15 @@ click-log==0.4.0
     # via edx-lint
 code-annotations==1.5.0
     # via edx-lint
+colorama==0.4.6
+    # via tox
 cookiecutter==2.4.0
     # via xblock-sdk
 coverage[toml]==7.3.2
     # via
     #   -r requirements/test.in
     #   pytest-cov
-ddt==1.6.0
+ddt==1.7.0
     # via -r requirements/test.in
 diff-cover==4.0.0
     # via
@@ -88,7 +94,7 @@ fs-s3fs==1.1.1
     #   -r requirements/django.txt
     #   openedx-django-pyfs
     #   xblock-sdk
-hypothesis==6.88.1
+hypothesis==6.88.3
     # via -r requirements/test.in
 idna==3.4
     # via requests
@@ -118,7 +124,7 @@ lxml==4.9.3
     #   -r requirements/django.txt
     #   xblock
     #   xblock-sdk
-mako==1.2.4
+mako==1.3.0
     # via
     #   -r requirements/django.txt
     #   xblock
@@ -140,23 +146,23 @@ openedx-django-pyfs==3.4.0
     # via -r requirements/django.txt
 packaging==23.2
     # via
+    #   pyproject-api
     #   pytest
     #   tox
 path==16.7.1
     # via -r requirements/test.in
-pbr==5.11.1
+pbr==6.0.0
     # via stevedore
 platformdirs==3.11.0
     # via
     #   pylint
+    #   tox
     #   virtualenv
 pluggy==1.3.0
     # via
     #   diff-cover
     #   pytest
     #   tox
-py==1.11.0
-    # via tox
 pycodestyle==2.11.1
     # via -r requirements/test.in
 pydantic==2.4.2
@@ -184,6 +190,8 @@ pylint-plugin-utils==0.8.2
     #   pylint-django
 pypng==0.20220715.0
     # via xblock-sdk
+pyproject-api==1.6.1
+    # via tox
 pytest==7.4.3
     # via
     #   -r requirements/test.in
@@ -191,7 +199,7 @@ pytest==7.4.3
     #   pytest-django
 pytest-cov==4.1.0
     # via -r requirements/test.in
-pytest-django==4.6.0
+pytest-django==4.7.0
     # via -r requirements/test.in
 python-dateutil==2.8.2
     # via
@@ -236,7 +244,6 @@ six==1.16.0
     #   fs
     #   fs-s3fs
     #   python-dateutil
-    #   tox
 sortedcontainers==2.4.0
     # via hypothesis
 sqlparse==0.4.4
@@ -251,14 +258,13 @@ tomli==2.0.1
     # via
     #   coverage
     #   pylint
+    #   pyproject-api
     #   pytest
     #   tox
 tomlkit==0.12.2
     # via pylint
-tox==3.28.0
-    # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
-    #   -r requirements/test.in
+tox==4.11.3
+    # via -r requirements/test.in
 types-python-dateutil==2.8.19.14
     # via arrow
 typing-extensions==4.8.0
