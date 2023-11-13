@@ -1,0 +1,9 @@
+.. code-block:: css
+
+    .upvote, .downvote {
+      cursor: pointer;
+      border: 1px solid #888;
+      padding: 0 .5em;
+    }
+    .upvote { color: green; }
+    .downvote { color: red; }

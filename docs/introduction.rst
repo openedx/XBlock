@@ -1,8 +1,16 @@
-.. _Introduction to XBlocks:
-
-#############################
+#######################
 Introduction to XBlocks
-#############################
+#######################
+
+This section introduces XBlocks.
+
+.. contents::
+ :local:
+ :depth: 1
+
+********
+Overview
+********
 
 As a developer, you build XBlocks that course teams use to create independent
 course components that work seamlessly with other components in an online
@@ -14,17 +22,18 @@ can build XBlocks to represent larger structures such as lessons, sections, and
 entire courses.
 
 A primary advantage to XBlocks is that they are sharable. The code you write
-can be deployed in any instance of the edX Platform or other XBlock runtime
+can be deployed in any instance of the Open edX Platform or other XBlock runtime
 application, then used by any course team using that system.
 
-By combining XBlocks from a wide variety of sources, from text and video, to
-multiple choice and numerical questions, to sophisticated collaborative and
-interactive learning laboratories, course teams can create rich and engaging
-courseware.
+In educational applications, XBlocks can be used to represent individual
+problems, web-formatted text and videos, interactive simulations and labs, or
+collaborative learning experiences. Furthermore, XBlocks are composable,
+allowing an XBlock developer to control the display of other XBlocks to compose
+lessons, sections, and entire courses.
 
-*****************************************
+****************************************
 XBlock Independence and Interoperability
-*****************************************
+****************************************
 
 You must design your XBlock to meet two goals.
 
@@ -34,9 +43,9 @@ You must design your XBlock to meet two goals.
 * The XBlock must work together with other XBlocks. Course teams must be
   able to combine different XBlocks in flexible ways.
 
-*****************************************
+************************************
 XBlocks Compared to Web Applications
-*****************************************
+************************************
 
 XBlocks are like miniature web applications: they maintain state in a storage
 layer, render themselves through views, and process user actions through
