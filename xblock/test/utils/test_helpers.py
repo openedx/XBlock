@@ -4,9 +4,8 @@ Tests for helpers.py
 
 import unittest
 
-from workbench.runtime import WorkbenchRuntime
-
 from xblock.core import XBlock
+from xblock.test.toy_runtime import ToyRuntime
 from xblock.utils.helpers import child_isinstance
 
 
@@ -45,7 +44,7 @@ class TestChildIsInstance(unittest.TestCase):
         """
         Check that child_isinstance() works on direct children
         """
-        runtime = WorkbenchRuntime()
+        runtime = ToyRuntime()
         root_id = runtime.parse_xml_string('<block> <block><cat/><gr/></block> <cat/> <gr/> </block>')
         root = runtime.get_block(root_id)
         self.assertFalse(child_isinstance(root, root.children[0], DogXBlock))
@@ -67,7 +66,7 @@ class TestChildIsInstance(unittest.TestCase):
         """
         Check that child_isinstance() works on deeper descendants
         """
-        runtime = WorkbenchRuntime()
+        runtime = ToyRuntime()
         root_id = runtime.parse_xml_string('<block> <block><cat/><gr/></block> <cat/> <gr/> </block>')
         root = runtime.get_block(root_id)
         block = root.runtime.get_block(root.children[0])

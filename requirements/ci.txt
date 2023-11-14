@@ -24,6 +24,7 @@ packaging==23.2
     #   tox
 platformdirs==3.11.0
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   tox
     #   virtualenv
 pluggy==1.3.0
