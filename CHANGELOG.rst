@@ -7,6 +7,14 @@ These are notable changes in XBlock.
 Unreleased
 ----------
 
+1.10.0 - 2024-01-12
+-------------------
+
+* Add two new properties to ``XBlock`` objects: ``.usage_key`` and ``.context_key``.
+  These simply expose the values of ``.scope_ids.usage_id`` and ``.scope_ids.usage_id.context_key``,
+  providing a convenient replacement to the deprecated, edx-platform-specific block properties ``.location``
+  and ``.course_id``, respectively.
+
 1.9.1 - 2023-12-22
 ------------------
 

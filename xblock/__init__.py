@@ -27,4 +27,4 @@ class XBlockMixin(xblock.core.XBlockMixin):
 # without causing a circular import
 xblock.fields.XBlockMixin = XBlockMixin
 
-__version__ = '1.9.1'
+__version__ = '1.10.0'
