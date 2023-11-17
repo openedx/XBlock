@@ -55,6 +55,7 @@ class SharedBlockBase(Plugin):
 
     resources_dir = ''
     public_dir = 'public'
+    i18n_js_namespace = None
 
     @classmethod
     def get_resources_dir(cls):
@@ -69,6 +70,17 @@ class SharedBlockBase(Plugin):
         Gets the public directory for this XBlock.
         """
         return cls.public_dir
+
+    @classmethod
+    def get_i18n_js_namespace(cls):
+        """
+        Gets the JavaScript translations namespace for this XBlock.
+
+        Returns:
+            str: The JavaScript namespace for this XBlock.
+            None: If this doesn't have JavaScript translations configured.
+        """
+        return cls.i18n_js_namespace
 
     @classmethod
     def open_local_resource(cls, uri):

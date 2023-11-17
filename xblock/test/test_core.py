@@ -196,6 +196,39 @@ def test_set_field_access():
     assert {1} == field_tester._field_data.get(field_tester, 'field_d')
 
 
+def test_shared_block_base_defaults():
+    """
+    Test default values and static methods provided by the SharedBlockBase class.
+    """
+    class DefaultsTester(XBlock):
+        pass
+
+    defaults_tester = DefaultsTester(
+        TestRuntime(services={'field-data': DictFieldData({})}),
+        scope_ids=Mock(spec=ScopeIds)
+    )
+
+    # Testing the default static method return values of SharedBlockBase
+    assert defaults_tester.get_resources_dir() == ''
+    assert defaults_tester.get_public_dir() == 'public'
+    assert defaults_tester.get_i18n_js_namespace() is None
+
+    class CustomizedValuesTester(XBlock):
+        resources_dir = 'custom_resource_dir'
+        public_dir = 'another_public_dir'
+        i18n_js_namespace = 'CustomizedValuesTesterI18N'
+
+    customized_values_tester = CustomizedValuesTester(
+        TestRuntime(services={'field-data': DictFieldData({})}),
+        scope_ids=Mock(spec=ScopeIds),
+    )
+
+    # Testing the customized static method return values of SharedBlockBase
+    assert customized_values_tester.get_resources_dir() == 'custom_resource_dir'
+    assert customized_values_tester.get_public_dir() == 'another_public_dir'
+    assert customized_values_tester.get_i18n_js_namespace() == 'CustomizedValuesTesterI18N'
+
+
 def test_mutable_none_values():
     # Check that fields with values intentionally set to None
     # save properly.

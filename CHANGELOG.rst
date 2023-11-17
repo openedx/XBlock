@@ -7,6 +7,25 @@ These are notable changes in XBlock.
 Unreleased
 ----------
 
+1.9.0 - 2023-11-20
+------------------
+
+* Support for `OEP-58 JavaScript translations <https://docs.openedx.org/en/latest/developers/concepts/oep58.html>`_:
+
+  * Introduced abstract JavaScript translations support by adding the ``i18n_js_namespace`` property and
+    ``get_i18n_js_namespace`` method to the ``SharedBlockBase``. This allows XBlocks to define a JavaScript namespace
+    so the XBlock i18n runtime service can manage and load JavaScript translations for XBlocks.
+
+  * Added the stub ``get_javascript_i18n_catalog_url`` method to the ``NullI18nService`` class to be implemented
+    by runtime services.
+
+  * See the `edx-platform atlas translations proposal <https://github.com/openedx/edx-platform/blob/master/docs/decisions/0019-oep-58-atlas-translations-design.rst>`_
+
+1.8.1 - 2023-10-07
+------------------
+
+* Python Requirements Update
+* Update setup.py, adds required packages
 
 1.8.0 - 2023-09-25
 ------------------
