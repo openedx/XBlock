@@ -16,3 +16,4 @@ To continue, see the following sections.
    prereqs
    setup_sdk
    create_first_xblock
+   browsers
