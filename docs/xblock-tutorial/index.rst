@@ -1,14 +1,13 @@
 .. _Open edX XBlock Tutorial:
 
-#########################
+########################
 Open edX XBlock Tutorial
-#########################
+########################
 
 .. toctree::
-    :numbered:
     :maxdepth: 2
 
-    front_matter/index
+    introduction
     overview/index
     getting_started/index
     anatomy/index
