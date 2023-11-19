@@ -1,19 +1,19 @@
 .. _XBlock Examples:
 
-#############################
+###############
 XBlock Examples
-#############################
+###############
 
 This section shows example XBlocks. These examples are meant to demonstrate
-simple XBlocks and are not meant to show the range of capabilities.
+simple XBlocks and are not meant to showcase the range of capabilities.
 
 .. contents::
  :local:
  :depth: 1
 
-*********************************
-Google Drive and Calendar XBlock
-*********************************
+******************************
+Google Drive & Calendar XBlock
+******************************
 
 Course teams can use the `Google Drive and Calendar XBlock`_ to embed Google
 documents and calendars in their courseware.
@@ -25,11 +25,11 @@ it is structured and developed.
 Instructions are provided so that you can install the XBlock on your Open
 edX system. For more information, see :ref:`XBlocks and the edX Platform`.
 
-================================
+===============================
 Adding the XBlock to Courseware
-================================
+===============================
 
-When the Google Drive and Calendar XBlock is installed on the edX Platform,
+When the Google Drive and Calendar XBlock is installed on an Open edX instance,
 course teams can add Google documents and calendars to courseware.
 
 For example, in Studio, course teams can add and configure a Google calendar
@@ -50,9 +50,8 @@ Course teams or developers can also add a Google calendar using OLX (open learni
     display_name="Class Schedule"
   />
 
-For more information, see `Google calendar tool`_ and
-`Google Drive file tool`_ in *Building and Running an Open
-edX Course*.
+For more information, see `Google calendar tool`_ and `Google Drive file tool`_
+in *Building and Running an Open edX Course*.
 
 ==================
 Viewing the XBlock
@@ -62,12 +61,12 @@ When course teams use the Google Drive and Calendar XBlock, learners can view
 the referenced Google documents and calendars directly in their the courseware.
 
 .. image:: ../Images/google-spreadsheet.png
-  :alt:  The Google Calendar in the LMS.
+  :alt:  A Google spreadsheet rendered in the LMS.
   :width: 600
 
-*********************************
+**************************
 Examples in the XBlock SDK
-*********************************
+**************************
 
 The `XBlock SDK`_ that you use in this tutorial also contains several example
 XBlocks.

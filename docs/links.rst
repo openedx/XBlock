@@ -45,6 +45,8 @@
 
 .. _View Counter XBlock: https://github.com/openedx/xblock-sdk/blob/master/sample_xblocks/basic/view_counter.py
 
+.. _Google Drive and Calendar XBlock: https://github.com/openedx/xblock-google-drive
+
 .. _requirements/edx/github.txt: https://github.com/openedx/edx-platform/blob/master/requirements/edx/github.txt
 
 .. _thumbs.html: https://github.com/openedx/xblock-sdk/blob/master/sample_xblocks/thumbs/static/html/thumbs.html

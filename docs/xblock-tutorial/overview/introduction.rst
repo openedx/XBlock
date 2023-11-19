@@ -36,7 +36,7 @@ XBlocks for Developers
 **********************
 
 Developers can select from functionality developed by the Open edX community by
-installing an XBlock on their instance of Open edX. Developers can integrate
+installing an XBlock on their Open edX instance. Developers can integrate
 new or propriety functionality for use in XBlock runtimes by developing a new
 XBlock using the supported XBlock API.
 
