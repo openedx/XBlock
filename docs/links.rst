@@ -31,6 +31,8 @@
 
 .. _VirtualEnvWrapper: http://virtualenvwrapper.readthedocs.io/en/latest
 
+.. _managing different Python versions with virtualenv: https://saturncloud.io/blog/how-to-use-different-python-versions-with-virtualenv/
+
 .. _XBlock SDK: https://github.com/openedx/xblock-sdk
 
 .. _PyEnv: https://github.com/yyuu/pyenv

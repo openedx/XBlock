@@ -1,8 +1,8 @@
 .. _Set Up the XBlock Software Development Kit:
 
-###########################################
+##########################################
 Set Up the XBlock Software Development Kit
-###########################################
+##########################################
 
 Before you continue, make sure that you are familiar with the subjects in the
 :ref:`Install XBlock Prerequisites` section.
@@ -14,9 +14,9 @@ SDK`_ in a virtual environment. To do this, complete the following steps.
  :local:
  :depth: 1
 
-********************************************
+**********************************
 Create a Directory for XBlock Work
-********************************************
+**********************************
 
 It is recommended that you create a directory in which to store all your XBlock
 work, including a virtual environment, the XBlock SDK, and the XBlocks you
@@ -38,11 +38,14 @@ develop.
 
 .. _Create and Activate the Virtual Environment:
 
-********************************************
+*******************************************
 Create and Activate the Virtual Environment
-********************************************
+*******************************************
 
-You must have a virtual environment tool installed on your computer. For more information, see :ref:`Install XBlock Prerequisites`.
+You must have a virtual environment tool installed on your computer. For more
+information, see :ref:`Install XBlock Prerequisites`. If you have multiple
+Python versions on your machine, see `managing different Python versions with
+virtualenv`_.
 
 Then create the virtual environment in your ``xblock_development`` directory.
 
@@ -51,23 +54,26 @@ Then create the virtual environment in your ``xblock_development`` directory.
 
    .. code-block:: bash
 
-      $ virtualenv venv
+      $ virtualenv xblock-env
 
 #. Run the following command to activate the virtual environment.
 
    .. code-block:: bash
 
-      $ source venv/bin/activate
+      $ source xblock-env/bin/activate
 
    When the virtual environment is activated, the command prompt shows the name
    of the virtual directory in parentheses.
 
    .. code-block:: none
 
-      (venv) $
+      (xblock-env) $
 
 .. include:: ../reusable/clone_sdk.rst
 
-When the requirements are installed, you are in the ``xblock_development`` directory, which contains the ``venv`` and ``xblock-sdk`` subdirectories. You can now :ref:`create your first XBlock <Create Your First XBlock>`.
+When the requirements are installed, you are in the ``xblock_development``
+directory, which contains the ``var``, ``xblock-env``, and ``xblock-sdk``
+subdirectories. You can now :ref:`create your first XBlock <Create Your First
+XBlock>`.
 
 .. include:: ../../links.rst
