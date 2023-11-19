@@ -1,8 +1,8 @@
 .. _Create Your First XBlock:
 
-#########################
+########################
 Create Your First XBlock
-#########################
+########################
 
 Before you continue, make sure that you have :ref:`set up the XBlock SDK <Set
 Up the XBlock Software Development Kit>`. You then create the XBlock and deploy
@@ -20,9 +20,9 @@ it in the XBlock SDK.
 
 .. include:: ../reusable/run_server.rst
 
-******************
+**********
 Next Steps
-******************
+**********
 
 You have now completed the Getting Started section of the XBlock tutorial. In
 the next sections, you will learn :ref:`how to use the XBlock SDK <Using the

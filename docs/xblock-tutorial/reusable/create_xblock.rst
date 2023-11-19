@@ -1,18 +1,19 @@
-******************
+****************
 Create an XBlock
-******************
+****************
 
 You use the XBlock SDK to create skeleton files for an XBlock. To do this,
 follow these steps at a command prompt.
 
-#. Change to the ``xblock_development`` directory, which contains the ``venv`` and ``xblock-sdk`` subdirectories.
+#. Change to the ``xblock_development`` directory, which contains the
+   ``var``, ``xblock-env``, and ``xblock-sdk`` subdirectories.
 
 #. Run the following command to create the skeleton
    files for the XBlock.
 
    .. code-block:: none
 
-      (venv) $ xblock-sdk/bin/workbench-make-xblock
+      (xblock-env) $ xblock-sdk/bin/workbench-make-xblock
 
    Instructions in the command window instruct you to determine a short name
    and a class name. Follow the guidelines in the command window to determine
