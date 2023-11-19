@@ -11,16 +11,24 @@
 
         # Load the HTML fragment from within the package and fill in the template
 
-        html_str = pkg_resources.resource_string(__name__, "static/html/thumbs.html")
-        frag = Fragment(unicode(html_str).format(self=self))
+        html_str = pkg_resources.resource_string(
+            __name__,
+            "static/html/thumbs.html".decode('utf-8')
+        )
+        frag = Fragment(str(html_str).format(block=self))
 
         # Load the CSS and JavaScript fragments from within the package
-        css_str = pkg_resources.resource_string(__name__, "static/css/thumbs.css")
-        frag.add_css(unicode(css_str))
+        css_str = pkg_resources.resource_string(
+            __name__,
+            "static/css/thumbs.css".decode('utf-8')
+        )
+        frag.add_css(str(css_str))
 
-        js_str = pkg_resources.resource_string(__name__,
-                                               "static/js/src/thumbs.js")
-        frag.add_javascript(unicode(js_str))
+        js_str = pkg_resources.resource_string(
+            __name__,
+            "static/js/src/thumbs.js".decode('utf-8')
+        )
+        frag.add_javascript(str(js_str))
 
         frag.initialize_js('ThumbsBlock')
         return frag
