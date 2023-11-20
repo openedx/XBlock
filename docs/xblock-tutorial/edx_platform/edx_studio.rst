@@ -1,10 +1,10 @@
-.. _EdX Studio as an XBlock Runtime:
+.. _Open edX Studio as an XBlock Runtime:
 
-###############################
-EdX Studio as an XBlock Runtime
-###############################
+####################################
+Open edX Studio as an XBlock Runtime
+####################################
 
-EdX Studio is the application in the edX Platform that instructors use to build
+Open edX Studio is the application in the Open edX Platform that instructors use to build
 courseware.
 
 Because instructors use Studio to add and configure XBlocks, Studio is
@@ -31,7 +31,7 @@ Studio requires XBlocks to have the following properties.
   ``student_view``, but may contain inline editing capabilities. 
 
   If you do not define an ``author_view``, the preview mode uses the
-  ``student_view``. For more information, see :ref:`EdX Learning Management
+  ``student_view``. For more information, see :ref:`Open edX Learning Management
   System as an XBlock Runtime`.
 
 * A class property named ``non_editable_metadata_fields``. This variable
