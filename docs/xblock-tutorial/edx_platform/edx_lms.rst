@@ -1,10 +1,10 @@
-.. _EdX Learning Management System as an XBlock Runtime:
+.. _Open edX Learning Management System as an XBlock Runtime:
 
-####################################################
-EdX Learning Management System as an XBlock Runtime
-####################################################
+########################################################
+Open edX Learning Management System as an XBlock Runtime
+########################################################
 
-The edX Learning Management System (LMS) is the application in the edX Platform
+The Open edX Learning Management System (LMS) is the application in the Open edX Platform
 that learners use to view and interact with courseware.
 
 Because it presents XBlocks to learners and records their interactions, the LMS
@@ -28,7 +28,7 @@ The LMS requires XBlocks to have the following properties.
 
   In addition, the ``student_view`` method is used to render the XBlock in the
   Studio preview mode, unless the XBlock also has an ``author_view`` method.
-  For more information, see :ref:`EdX Studio as an XBlock Runtime`.
+  For more information, see :ref:`Open edX Studio as an XBlock Runtime`.
 
 * A class property named ``has_score`` with a value of ``True`` if the XBlock
   is to be graded.

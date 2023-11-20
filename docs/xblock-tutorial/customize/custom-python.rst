@@ -1,8 +1,8 @@
 .. _Customize myxblock.py:
 
-#######################
+#####################
 Customize myxblock.py
-#######################
+#####################
 
 This section describes how to modify the Python file of the XBlock you created,
 ``myxblock.py``, to provide the functionality in the Thumbs XBlock example in
@@ -16,9 +16,9 @@ scenarios.
  :local:
  :depth: 1 
 
-*******************************
+******************************
 The Default XBlock Python File
-*******************************
+******************************
 
 When you :ref:`create a new XBlock <Create Your First XBlock>`, the default
 Python file is created automatically, with skeletal functionality defined. In
@@ -27,18 +27,18 @@ the ``xblock_development/myxblock/myxblock/`` directory, see the file
 
 .. include:: ../reusable/code_myxblock_python.rst
 
-********************
+************
 Add Comments
-********************
+************
 
 As a best practice and because XBlocks can be shared, you should add comments
 to the ``myxblock.py`` file. Replace the "TO DO" indicators with a description
 of what the XBlock does and any details future developers or users would want
 to know.
 
-********************
+*****************
 Add XBlock Fields
-********************
+*****************
 
 You determine the data your XBlock stores through :ref:`fields <XBlock
 Fields>`. Fields store user and XBlock state as JSON data.
@@ -60,9 +60,9 @@ Review the :ref:`XBlock Fields` section, then add the required fields to
 ``myxblock.py``. You can remove the ``count`` field, which was defined
 automatically when you created the XBlock.
 
-=======================================
+======================================
 Check Fields Against the Thumbs XBlock
-=======================================
+======================================
 
 After you have defined the fields, check your work against the fields in the
 Thumbs XBlock, in the file ``xblock_development/xblock-sdk/sample_xblocks/thumbs/thumbs.py``.
@@ -81,17 +81,17 @@ Note the following details.
 * ``voted`` has the scope ``Scope.user_state``. This indicates that the data in
   this field applies to the XBlock and to the specific user. 
 
-**************************
+***********************
 Define the Student View
-**************************
+***********************
 
 The XBlock Python file must contain one or more :ref:`view methods<View
 Methods>`. 
 
-To run the XBlock in the edX Platform Learning Management System, there must be
+To run the XBlock in the Open edX Platform Learning Management System, there must be
 a method named ``student_view``. If you intend the XBlock to run in a different
 :ref:`runtime application <XBlock Runtimes>`, you might need to define a
-different name. For more information, see :ref:`EdX Learning Management
+different name. For more information, see :ref:`Open edX Learning Management
 System as an XBlock Runtime`.
 
 In ``myxblock.py``, examine the ``student_view`` method that was defined
@@ -111,7 +111,7 @@ Note the following details about student view.
      frag = Fragment(unicode(html_str).format(self=self))
 
 *  The JavaScript and CSS files are added to the fragment with the
-   ``add_javascript()`` and ``add_css`` methods.
+   ``add_javascript()`` and ``add_css()`` methods.
 
 * The JavaScript in the fragment must be initialized using the name of the
   XBlock class. The name also maps to the function that initializes the XBlock
@@ -127,9 +127,9 @@ Check the student view in ``myxblock.py`` against the student view in
 CSS, and JavaScript files added to the fragment. As the file names are correct
 for MyXBlock, you do not need to edit the student view at all.
 
-**************************
+***********************
 Define the Vote Handler
-**************************
+***********************
 
 :ref:`Handlers <Handler Methods>` process input events from the XBlock
 JavaScript code. You use handlers to add interactivity to your block. In
@@ -150,9 +150,9 @@ You can use any name for the vote handler, and you will use the same name in
 the JavaScript code to connect browser events to the vote handler running in
 the server. To match the Thumbs XBlock, use the name ``vote``.
 
-============================================
+===========================================
 Check the Handler Against the Thumbs XBlock
-============================================
+===========================================
 
 After you have defined the vote handler, check your work against the handler
 in the Thumbs XBlock.
@@ -162,11 +162,11 @@ in the Thumbs XBlock.
 If necessary, make corrections to the handler in your XBlock so that it matches
 the handler in the Thumbs XBlock.
   
-**********************************
+*********
 Next Step
-**********************************
+*********
 
-After you complete your customizations to the Python file, you continue on and
+After you complete your customizations to the Python file, you can continue on and
 :ref:`customize the XBlock HTML file<Customize myxblock.html>`.
 
 .. include:: ../../links.rst
