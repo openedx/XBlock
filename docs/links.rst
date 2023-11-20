@@ -66,3 +66,5 @@
 .. _Installing, Configuring, and Running the Open edX Platform: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/index.html
 
 .. _Developing Course Components: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/developing_course/course_components.html
+
+.. _HTML unicode characters: https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references

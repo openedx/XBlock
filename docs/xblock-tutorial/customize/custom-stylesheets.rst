@@ -1,8 +1,8 @@
 .. _Customize myxblock.css:
 
-#######################
+######################
 Customize myxblock.css
-#######################
+######################
 
 This section describes how to modify the static CSS file of the XBlock you
 created, ``myxblock.css``, to provide the functionality in the Thumbs XBlock
@@ -16,9 +16,9 @@ application.
  :local:
  :depth: 1 
 
-*******************************
+***************************
 The Default XBlock CSS File
-*******************************
+***************************
 
 When you :ref:`create a new XBlock <Create Your First XBlock>`, the default
 static CSS file is created automatically, with skeletal functionality defined.
@@ -30,9 +30,9 @@ file ``myxblock.css``.
 The file contains CSS code to format the ``count`` field that was added by
 default to the XBlock. Delete this code.
 
-********************
+************
 Add CSS Code
-********************
+************
 
 You must add CSS code to format the XBlock content. Follow the guidelines
 below.
@@ -48,9 +48,9 @@ below.
   
 * The color for ``.upvote`` is green and for ``downvote`` is red.
 
-****************************************
+***********************************
 Check CSS Against the Thumbs XBlock
-****************************************
+***********************************
 
 After you have defined the CSS code, check your work against the CSS in the
 Thumbs XBlock, in the file ``xblock_development/xblock-sdk/sample_xblocks/thumbs/static/css/thumbs.css``.
@@ -62,5 +62,12 @@ matches the code in the Thumbs XBlock.
 
 The styles in ``thumbs.css`` are referenced in the :ref:`XBlock HTML file <The
 XBlock HTML File>`.
+
+*********
+Congrats!
+*********
+
+You've completed customizing MyXBlock to have up and down voting functionality.
+Read on for more about XBlocks - and have fun making your next XBlock!
 
 .. include:: ../../links.rst
