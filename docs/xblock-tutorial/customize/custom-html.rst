@@ -17,9 +17,9 @@ method <View Methods>`.
  :local:
  :depth: 1 
 
-*******************************
+****************************
 The Default XBlock HTML File
-*******************************
+****************************
 
 When you :ref:`create a new XBlock <Create Your First XBlock>`, the default
 static HTML file is created automatically, with skeletal functionality defined.
@@ -31,9 +31,9 @@ file ``myxblock.html``.
 The file contains HTML to display the ``count`` field that was added by
 default to the XBlock. Delete the HTML between the ``div`` elements.
 
-********************
+****************
 Add HTML Content
-********************
+****************
 
 You can create HTML as needed to display the state of your XBlock. The Thumbs
 XBlock displays the up and down votes. Create a single paragraph and follow the
@@ -50,13 +50,13 @@ guidelines below.
   reference the ``upvotes`` and ``downvotes`` fields you defined in the
   :ref:`Python file <Customize myxblock.py>` for the XBlock.
 
-* For the value of each of the outer ``span`` elements, use the entities
-  ``&uarr;`` and ``&darr`` to show thumbs up and thumbs down symbols next to
-  the number of votes.
+* For the value of each of the outer ``span`` elements, use the `HTML unicode
+  characters`_ ``&uarr;`` and ``&darr`` to show thumbs up and thumbs down
+  symbols next to the number of votes.
 
-****************************************
+************************************
 Check HTML Against the Thumbs XBlock
-****************************************
+************************************
 
 After you have defined the HTML, check your work against the HTML in the
 Thumbs XBlock, in the file ``xblock_development/xblock-sdk/sample_xblocks/thumbs/static/html/thumbs.html``.
@@ -66,11 +66,11 @@ Thumbs XBlock, in the file ``xblock_development/xblock-sdk/sample_xblocks/thumbs
 If necessary, make corrections to the HTML in your XBlock so that it
 matches the HTML in the Thumbs XBlock.
 
-**********************************
+*********
 Next Step
-**********************************
+*********
 
-After you complete your customizations to the HTML file, you continue on and
+After you complete your customizations to the HTML file, you can continue on and
 :ref:`customize the XBlock JavaScript file<Customize myxblock.js>`.
 
 .. include:: ../../links.rst
