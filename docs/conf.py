@@ -13,9 +13,9 @@
 import datetime
 import os
 import sys
-
 from unittest import mock
 
+import django
 
 MOCK_MODULES = [
     'webob',
@@ -32,7 +32,18 @@ for mod_name in MOCK_MODULES:
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('..xblock',))
 from xblock import __version__
+
 # -- General configuration -----------------------------------------------------
+
+# Use a settings module that allows all LMS and Studio code to be imported
+# without errors.  If running sphinx-apidoc, we already set a different
+# settings module to use in the on_init() hook of the parent process
+if 'DJANGO_SETTINGS_MODULE' not in os.environ:
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'docs.docs_settings'
+
+django.setup()
+
+
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
