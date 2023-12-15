@@ -1357,6 +1357,16 @@ class NullI18nService:
         timestring = dtime.strftime(format)
         return timestring
 
+    def get_javascript_i18n_catalog_url(self):
+        """
+        Return the URL to the JavaScript i18n catalog file.
+
+        This method returns None in NullI18nService. When implemented in
+        a runtime, it should return the URL to the JavaScript i18n catalog so
+        it can be loaded in frontends.
+        """
+        return None
+
     @property
     def ugettext(self):
         """
