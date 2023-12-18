@@ -5,8 +5,8 @@ XBlock Runtimes
 ###############
 
 An XBlock runtime is the application that hosts XBlock. For example, the XBlock
-SDK, the :ref:`edX LMS <EdX Learning Management System as an XBlock Runtime>`,
-and :ref:`edX Studio <EdX Studio as an XBlock Runtime>` are all XBlock runtime
+SDK, the :ref:`Open edX LMS <Open edX Learning Management System as an XBlock Runtime>`,
+and :ref:`Open edX Studio <Open edX Studio as an XBlock Runtime>` are all XBlock runtime
 applications. You can also render an individual XBlock in HTML with the XBlock
 URL.
 
