@@ -1,8 +1,8 @@
 .. _The XBlock Python File:
 
-#######################
+######################
 The XBlock Python File
-#######################
+######################
 
 This section of the tutorial walks through the Python file, `thumbs.py`_, for
 the Thumbs XBlock example in the XBlock SDK.
@@ -18,9 +18,9 @@ scenarios.
  :local:
  :depth: 1 
 
-********************
+*******************
 Thumb XBlock Fields
-********************
+*******************
 
 The ``thumbs.py`` file defines the following fields for the XBlock in the
 ``ThumbsBlockBase`` class.
@@ -42,9 +42,9 @@ Note the following details about the fields in the Thumbs XBlock.
 
 For more information, see :ref:`XBlock Fields`.  
 
-**************************
+*************************
 Thumb XBlock Student View
-**************************
+*************************
 
 The ``thumbs.py`` file defines the student view for the XBlock in the
 ``ThumbsBlockBase`` class. 
@@ -60,14 +60,18 @@ Note the following details about student view.
 
   .. code-block:: python
 
-     html_str = pkg_resources.resource_string(__name__, "static/html/thumbs.html")
-     frag = Fragment(unicode(html_str).format(self=self))
+     html_str = pkg_resources.resource_string(
+          __name__,
+          "static/html/thumbs.html".decode('utf-8')
+      )
+     frag = Fragment(str(html_str).format(block=self))
 
 *  The JavaScript and CSS file contents are added to the fragment with the
-   ``add_javascript()`` and ``add_css`` methods.
+   ``add_javascript()`` and ``add_css()`` methods.
 
 * The JavaScript in the fragment must be initialized using the name of the
-  XBlock class. The name also maps to the function that initializes the XBlock in the :ref:`JavaScript file <The XBlock JavaScript File>`.
+  XBlock class. The name also maps to the function that initializes the XBlock
+  in the :ref:`JavaScript file <The XBlock JavaScript File>`.
 
   .. code-block:: python
 
@@ -75,9 +79,9 @@ Note the following details about student view.
 
 For more information, see :ref:`View Methods`.
 
-**************************
+*************************
 Thumb XBlock Vote Handler
-**************************
+*************************
 
 The ``thumbs.py`` file defines a handler that adds a user's vote to the XBlock.
 

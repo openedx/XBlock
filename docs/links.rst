@@ -31,6 +31,8 @@
 
 .. _VirtualEnvWrapper: http://virtualenvwrapper.readthedocs.io/en/latest
 
+.. _managing different Python versions with virtualenv: https://saturncloud.io/blog/how-to-use-different-python-versions-with-virtualenv/
+
 .. _XBlock SDK: https://github.com/openedx/xblock-sdk
 
 .. _PyEnv: https://github.com/yyuu/pyenv
@@ -44,6 +46,8 @@
 .. _Structure XBlocks: https://github.com/openedx/xblock-sdk/blob/master/sample_xblocks/basic/structure.py
 
 .. _View Counter XBlock: https://github.com/openedx/xblock-sdk/blob/master/sample_xblocks/basic/view_counter.py
+
+.. _Google Drive and Calendar XBlock: https://github.com/openedx/xblock-google-drive
 
 .. _requirements/edx/github.txt: https://github.com/openedx/edx-platform/blob/master/requirements/edx/github.txt
 
@@ -62,3 +66,5 @@
 .. _Installing, Configuring, and Running the Open edX Platform: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/index.html
 
 .. _Developing Course Components: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/developing_course/course_components.html
+
+.. _HTML unicode characters: https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references

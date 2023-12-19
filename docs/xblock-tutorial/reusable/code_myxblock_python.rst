@@ -4,9 +4,9 @@
 
     import pkg_resources
 
+    from web_fragments.fragment import Fragment
     from xblock.core import XBlock
-    from xblock.fields import Scope, Integer
-    from xblock.fragment import Fragment
+    from xblock.fields import Integer, Scope
 
 
     class MyXBlock(XBlock):
@@ -61,11 +61,14 @@
             """A canned scenario for display in the workbench."""
             return [
                 ("MyXBlock",
-                 """<vertical_demo>
+                """<myxblock/>
+                """),
+                ("Multiple MyXBlock",
+                """<vertical_demo>
                     <myxblock/>
                     <myxblock/>
                     <myxblock/>
                     </vertical_demo>
-                 """),
+                """),
             ]
 

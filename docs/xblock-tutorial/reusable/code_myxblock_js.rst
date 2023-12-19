@@ -1,5 +1,6 @@
 .. code-block:: javascript
 
+    /* Javascript for MyXBlock. */
     function MyXBlock(runtime, element) {
 
         function updateCount(result) {

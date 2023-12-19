@@ -10,13 +10,5 @@ database.
 
    .. code-block:: none
 
-      (venv) $ python xblock-sdk/manage.py migrate
+      (xblock-env) $ python xblock-sdk/manage.py migrate
 
-#. You are prompted to indicate whether or not to create a Django superuser.
-
-   .. code-block:: none
-
-      You just installed Django's auth system, which means you don't have any
-      superusers defined. Would you like to create one now? (yes/no):
-
-#. Enter ``no``.

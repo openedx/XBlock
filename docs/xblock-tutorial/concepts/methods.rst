@@ -10,7 +10,7 @@ XBlock.
 .. contents::
  :local:
  :depth: 1
-   
+
 .. _View Methods:
 
 ************
@@ -22,15 +22,15 @@ the XBlock.
 
 An XBlock can have multiple view methods. For example, an XBlock might have a
 student view for rendering the XBlock for learners, and an editing view for
-rendering the XBlock to course staff. 
+rendering the XBlock to course staff.
 
-.. note:: 
-  The XBlock view names are specified by runtime applications; you cannot use 
-  arbitrary view names. 
+.. note::
+  The XBlock view names are specified by runtime applications; you cannot use
+  arbitrary view names.
 
-For information about the view requirements in the edX Platform, see :ref:`edX
-LMS <EdX Learning Management System as an XBlock Runtime>` and
-:ref:`edX Studio <EdX Studio as an XBlock Runtime>`.
+For information about the view requirements in the edX Platform, see :ref:`Open edX
+LMS <Open edX Learning Management System as an XBlock Runtime>` and
+:ref:`Open edX Studio <Open edX Studio as an XBlock Runtime>`.
 
 Typically, you define a view to produce a fragment that is used to render the
 XBlock as part of a web page. Fragments are aggregated hierarchically. You can
@@ -104,12 +104,12 @@ Default Methods in a New XBlock
 When you create a new XBlock, two methods are added automatically.
 
 * The view method ``student_view``.
-  
+
   You can modify the contents of this view, but to use your XBlock with the edX
   Platform, you must keep the method name ``student_view``.
 
-* The handler method ``increment_count``. 
-  
+* The handler method ``increment_count``.
+
   This method is for demonstration purposes and you can remove it.
 
 

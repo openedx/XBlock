@@ -260,9 +260,9 @@ You can customize the OLX representation of the XBlock by using the
 Field Requirements in the edX Platform
 **************************************
 
-For information about field requirements in the edX Platform, see :ref:`edX LMS
-<EdX Learning Management System as an XBlock Runtime>` and
-:ref:`edX Studio <EdX Studio as an XBlock Runtime>`.
+For information about field requirements in the edX Platform, see :ref:`Open edX LMS
+<Open edX Learning Management System as an XBlock Runtime>` and
+:ref:`Open edX Studio <Open edX Studio as an XBlock Runtime>`.
 
 ******************************
 Default Fields in a New XBlock
