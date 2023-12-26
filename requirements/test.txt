@@ -10,32 +10,26 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-astroid==3.0.1
+astroid==3.0.2
     # via
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
 attrs==23.1.0
     # via hypothesis
-boto3==1.33.11
+boto3==1.34.7
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.33.11
+botocore==1.34.7
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
 cachetools==5.3.2
     # via tox
-cerberus==1.3.5
-    # via plette
-certifi==2023.11.17
-    # via requests
 chardet==5.2.0
     # via tox
-charset-normalizer==3.3.2
-    # via requests
 click==8.1.7
     # via
     #   click-log
@@ -47,7 +41,7 @@ code-annotations==1.5.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.3.2
+coverage[toml]==7.3.4
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -59,16 +53,12 @@ diff-cover==4.0.0
     #   -r requirements/test.in
 dill==0.3.7
     # via pylint
-distlib==0.3.7
-    # via
-    #   requirementslib
-    #   virtualenv
+distlib==0.3.8
+    # via virtualenv
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-docopt==0.6.2
-    # via pipreqs
 edx-lint==5.3.6
     # via -r requirements/test.in
 exceptiongroup==1.2.0
@@ -88,15 +78,13 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.91.2
+hypothesis==6.92.1
     # via -r requirements/test.in
-idna==3.6
-    # via requests
 inflect==7.0.0
     # via jinja2-pluralize
 iniconfig==2.0.0
     # via pytest
-isort==5.13.0
+isort==5.13.2
     # via pylint
 jinja2==3.1.2
     # via
@@ -112,7 +100,7 @@ jmespath==1.0.1
     #   botocore
 lazy==1.6
     # via -r requirements/django.txt
-lxml==4.9.3
+lxml==4.9.4
     # via -r requirements/django.txt
 mako==1.3.0
     # via -r requirements/django.txt
@@ -125,7 +113,7 @@ mccabe==0.7.0
     # via pylint
 mock==5.1.0
     # via -r requirements/test.in
-openedx-django-pyfs==3.4.0
+openedx-django-pyfs==3.4.1
     # via -r requirements/django.txt
 packaging==23.2
     # via
@@ -136,20 +124,11 @@ path==16.9.0
     # via -r requirements/test.in
 pbr==6.0.0
     # via stevedore
-pep517==0.13.1
-    # via requirementslib
-pip-api==0.0.30
-    # via isort
-pipreqs==0.4.13
-    # via isort
 platformdirs==4.1.0
     # via
     #   pylint
-    #   requirementslib
     #   tox
     #   virtualenv
-plette[validation]==0.4.4
-    # via requirementslib
 pluggy==1.3.0
     # via
     #   diff-cover
@@ -157,15 +136,13 @@ pluggy==1.3.0
     #   tox
 pycodestyle==2.11.1
     # via -r requirements/test.in
-pydantic==2.5.2
-    # via
-    #   inflect
-    #   requirementslib
-pydantic-core==2.14.5
+pydantic==2.5.3
+    # via inflect
+pydantic-core==2.14.6
     # via pydantic
 pygments==2.17.2
     # via diff-cover
-pylint==3.0.2
+pylint==3.0.3
     # via
     #   -r requirements/test.in
     #   edx-lint
@@ -205,13 +182,7 @@ pyyaml==6.0.1
     # via
     #   -r requirements/django.txt
     #   code-annotations
-requests==2.31.0
-    # via
-    #   requirementslib
-    #   yarg
-requirementslib==3.0.0
-    # via isort
-s3transfer==0.8.2
+s3transfer==0.10.0
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -237,19 +208,15 @@ text-unidecode==1.3
 tomli==2.0.1
     # via
     #   coverage
-    #   pep517
     #   pylint
     #   pyproject-api
     #   pytest
     #   tox
 tomlkit==0.12.3
-    # via
-    #   plette
-    #   pylint
-    #   requirementslib
+    # via pylint
 tox==4.11.4
     # via -r requirements/test.in
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via
     #   annotated-types
     #   astroid
@@ -261,16 +228,12 @@ urllib3==1.26.18
     # via
     #   -r requirements/django.txt
     #   botocore
-    #   requests
 virtualenv==20.25.0
     # via tox
 web-fragments==2.1.0
     # via -r requirements/django.txt
 webob==1.8.7
     # via -r requirements/django.txt
-yarg==0.1.9
-    # via pipreqs
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip
 # setuptools
