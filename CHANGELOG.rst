@@ -7,6 +7,12 @@ These are notable changes in XBlock.
 Unreleased
 ----------
 
+1.9.1 - 2023-12-22
+------------------
+
+* Fix: add ``get_javascript_i18n_catalog_url`` missing ``xblock`` parameter to match the Open edX LMS
+  XBlockI18nService.
+
 1.9.0 - 2023-11-20
 ------------------
 

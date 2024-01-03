@@ -1357,9 +1357,12 @@ class NullI18nService:
         timestring = dtime.strftime(format)
         return timestring
 
-    def get_javascript_i18n_catalog_url(self):
+    def get_javascript_i18n_catalog_url(self, block):  # pylint: disable=unused-argument
         """
         Return the URL to the JavaScript i18n catalog file.
+
+        Args:
+            block (XBlock): The block that is requesting the URL.
 
         This method returns None in NullI18nService. When implemented in
         a runtime, it should return the URL to the JavaScript i18n catalog so

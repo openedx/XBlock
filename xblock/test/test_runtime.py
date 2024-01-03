@@ -524,7 +524,7 @@ class XBlockWithServices(XBlock):
         assert_equals_unicode("10:30:17 PM", i18n.strftime(when, "TIME"))
 
         # Runtimes are expected to implement this method though.
-        assert i18n.get_javascript_i18n_catalog_url() is None, 'NullI18nService does not implement this method.'
+        assert i18n.get_javascript_i18n_catalog_url(object()) is None, 'NullI18nService does not implement this method.'
 
         # secret_service is available.
         assert self.runtime.service(self, "secret_service") == 17
