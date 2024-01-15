@@ -17,15 +17,15 @@ astroid==3.0.2
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-attrs==23.1.0
+attrs==23.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.34.11
+boto3==1.34.18
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.34.11
+botocore==1.34.18
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -71,7 +71,7 @@ coverage[toml]==7.4.0
     #   -r requirements/test.txt
     #   coverage
     #   pytest-cov
-ddt==1.7.0
+ddt==1.7.1
     # via -r requirements/test.txt
 diff-cover==4.0.0
     # via
@@ -113,7 +113,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.92.2
+hypothesis==6.93.0
     # via -r requirements/test.txt
 importlib-metadata==7.0.1
     # via
@@ -131,7 +131,7 @@ isort==5.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-jinja2==3.1.2
+jinja2==3.1.3
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -148,7 +148,7 @@ jmespath==1.0.1
     #   botocore
 lazy==1.6
     # via -r requirements/test.txt
-lxml==5.0.0
+lxml==5.1.0
     # via -r requirements/test.txt
 mako==1.3.0
     # via -r requirements/test.txt
@@ -239,7 +239,7 @@ pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pytest==7.4.3
+pytest==7.4.4
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -310,7 +310,7 @@ tomlkit==0.12.3
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.11.4
+tox==4.12.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
