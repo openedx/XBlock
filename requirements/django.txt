@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.34.18
+boto3==1.34.23
     # via fs-s3fs
-botocore==1.34.18
+botocore==1.34.23
     # via
     #   boto3
     #   s3transfer
@@ -36,7 +36,7 @@ lxml==5.1.0
     # via -r requirements/base.txt
 mako==1.3.0
     # via -r requirements/base.txt
-markupsafe==2.1.3
+markupsafe==2.1.4
     # via
     #   -r requirements/base.txt
     #   mako
