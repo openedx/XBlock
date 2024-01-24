@@ -205,6 +205,32 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         # Provide backwards compatibility for external access through _field_data
         super().__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
 
+    @property
+    def usage_key(self):
+        """
+        A key identifying this particular usage of the XBlock, unique across all learning contexts in the system.
+
+        Equivalent to to `.scope_ids.usage_id`.
+        """
+        return self.scope_ids.usage_id
+
+    @property
+    def context_key(self):
+        """
+        A key identifying the learning context (course, library, etc.) that contains this XBlock usage.
+
+        Equivalent to `.scope_ids.usage_id.context_key`.
+
+        Returns:
+        * `LearningContextKey`, if `.scope_ids.usage_id` is a `UsageKey` instance.
+        * `None`, otherwise.
+
+        After https://github.com/openedx/XBlock/issues/708 is complete, we can assume that
+        `.scope_ids.usage_id` is always a `UsageKey`, and that this method will
+        always return a `LearningContextKey`.
+        """
+        return getattr(self.scope_ids.usage_id, "context_key", None)
+
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""
         return self.runtime.render(self, view, context)

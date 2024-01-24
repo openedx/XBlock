@@ -1,6 +1,7 @@
 # Core requirements for using this package
 -c constraints.txt
 
+edx-opaque-keys
 fs
 lxml
 mako

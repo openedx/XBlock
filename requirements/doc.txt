@@ -18,11 +18,11 @@ babel==2.14.0
     #   sphinx
 beautifulsoup4==4.12.3
     # via pydata-sphinx-theme
-boto3==1.34.23
+boto3==1.34.26
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.23
+botocore==1.34.26
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -40,6 +40,8 @@ docutils==0.19
     # via
     #   pydata-sphinx-theme
     #   sphinx
+edx-opaque-keys==2.5.1
+    # via -r requirements/django.txt
 fs==2.4.16
     # via
     #   -r requirements/django.txt
@@ -66,7 +68,7 @@ lazy==1.6
     # via -r requirements/django.txt
 lxml==5.1.0
     # via -r requirements/django.txt
-mako==1.3.0
+mako==1.3.1
     # via -r requirements/django.txt
 markupsafe==2.1.4
     # via
@@ -81,6 +83,10 @@ packaging==23.2
     # via
     #   pydata-sphinx-theme
     #   sphinx
+pbr==6.0.0
+    # via
+    #   -r requirements/django.txt
+    #   stevedore
 pydata-sphinx-theme==0.14.4
     # via sphinx-book-theme
 pygments==2.17.2
@@ -88,6 +94,10 @@ pygments==2.17.2
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
+pymongo==3.13.0
+    # via
+    #   -r requirements/django.txt
+    #   edx-opaque-keys
 python-dateutil==2.8.2
     # via
     #   -r requirements/django.txt
@@ -140,8 +150,15 @@ sqlparse==0.4.4
     # via
     #   -r requirements/django.txt
     #   django
+stevedore==5.1.0
+    # via
+    #   -r requirements/django.txt
+    #   edx-opaque-keys
 typing-extensions==4.9.0
-    # via pydata-sphinx-theme
+    # via
+    #   -r requirements/django.txt
+    #   edx-opaque-keys
+    #   pydata-sphinx-theme
 urllib3==1.26.18
     # via
     #   -r requirements/django.txt

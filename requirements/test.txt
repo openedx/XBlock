@@ -17,11 +17,11 @@ astroid==3.0.2
     #   pylint-celery
 attrs==23.2.0
     # via hypothesis
-boto3==1.34.23
+boto3==1.34.26
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.23
+botocore==1.34.26
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -61,6 +61,8 @@ distlib==0.3.8
     #   openedx-django-pyfs
 edx-lint==5.3.6
     # via -r requirements/test.in
+edx-opaque-keys==2.5.1
+    # via -r requirements/django.txt
 exceptiongroup==1.2.0
     # via
     #   hypothesis
@@ -78,7 +80,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.96.1
+hypothesis==6.96.4
     # via -r requirements/test.in
 inflect==7.0.0
     # via jinja2-pluralize
@@ -102,7 +104,7 @@ lazy==1.6
     # via -r requirements/django.txt
 lxml==5.1.0
     # via -r requirements/django.txt
-mako==1.3.0
+mako==1.3.1
     # via -r requirements/django.txt
 markupsafe==2.1.4
     # via
@@ -123,7 +125,9 @@ packaging==23.2
 path==16.9.0
     # via -r requirements/test.in
 pbr==6.0.0
-    # via stevedore
+    # via
+    #   -r requirements/django.txt
+    #   stevedore
 platformdirs==4.1.0
     # via
     #   pylint
@@ -157,6 +161,10 @@ pylint-plugin-utils==0.8.2
     # via
     #   pylint-celery
     #   pylint-django
+pymongo==3.13.0
+    # via
+    #   -r requirements/django.txt
+    #   edx-opaque-keys
 pyproject-api==1.6.1
     # via tox
 pytest==7.4.4
@@ -202,7 +210,10 @@ sqlparse==0.4.4
     #   -r requirements/django.txt
     #   django
 stevedore==5.1.0
-    # via code-annotations
+    # via
+    #   -r requirements/django.txt
+    #   code-annotations
+    #   edx-opaque-keys
 text-unidecode==1.3
     # via python-slugify
 tomli==2.0.1
@@ -218,8 +229,10 @@ tox==4.12.1
     # via -r requirements/test.in
 typing-extensions==4.9.0
     # via
+    #   -r requirements/django.txt
     #   annotated-types
     #   astroid
+    #   edx-opaque-keys
     #   inflect
     #   pydantic
     #   pydantic-core
