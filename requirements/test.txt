@@ -17,11 +17,11 @@ astroid==3.0.2
     #   pylint-celery
 attrs==23.2.0
     # via hypothesis
-boto3==1.34.26
+boto3==1.34.29
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.26
+botocore==1.34.29
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -41,7 +41,7 @@ code-annotations==1.5.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.4.0
+coverage[toml]==7.4.1
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -51,7 +51,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/test.in
-dill==0.3.7
+dill==0.3.8
     # via pylint
 distlib==0.3.8
     # via virtualenv
@@ -80,7 +80,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.96.4
+hypothesis==6.97.1
     # via -r requirements/test.in
 inflect==7.0.0
     # via jinja2-pluralize
@@ -104,7 +104,7 @@ lazy==1.6
     # via -r requirements/django.txt
 lxml==5.1.0
     # via -r requirements/django.txt
-mako==1.3.1
+mako==1.3.0
     # via -r requirements/django.txt
 markupsafe==2.1.4
     # via
@@ -133,7 +133,7 @@ platformdirs==4.1.0
     #   pylint
     #   tox
     #   virtualenv
-pluggy==1.3.0
+pluggy==1.4.0
     # via
     #   diff-cover
     #   pytest
@@ -167,7 +167,7 @@ pymongo==3.13.0
     #   edx-opaque-keys
 pyproject-api==1.6.1
     # via tox
-pytest==7.4.4
+pytest==8.0.0
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -180,7 +180,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/django.txt
     #   botocore
-python-slugify==8.0.1
+python-slugify==8.0.2
     # via code-annotations
 pytz==2023.3.post1
     # via

@@ -21,11 +21,11 @@ attrs==23.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.34.26
+boto3==1.34.29
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.34.26
+botocore==1.34.29
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -65,7 +65,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.4.0
+coverage[toml]==7.4.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -77,7 +77,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/test.txt
-dill==0.3.7
+dill==0.3.8
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -115,7 +115,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.96.4
+hypothesis==6.97.1
     # via -r requirements/test.txt
 importlib-metadata==7.0.1
     # via
@@ -152,7 +152,7 @@ lazy==1.6
     # via -r requirements/test.txt
 lxml==5.1.0
     # via -r requirements/test.txt
-mako==1.3.1
+mako==1.3.0
     # via -r requirements/test.txt
 markupsafe==2.1.4
     # via
@@ -191,7 +191,7 @@ platformdirs==4.1.0
     #   pylint
     #   tox
     #   virtualenv
-pluggy==1.3.0
+pluggy==1.4.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -245,7 +245,7 @@ pyproject-hooks==1.0.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
-pytest==7.4.4
+pytest==8.0.0
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -258,7 +258,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/test.txt
     #   botocore
-python-slugify==8.0.1
+python-slugify==8.0.2
     # via
     #   -r requirements/test.txt
     #   code-annotations
