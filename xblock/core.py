@@ -11,6 +11,7 @@ import os
 import warnings
 import typing as t
 from collections import defaultdict
+from xml.etree import ElementTree as ET
 
 import pkg_resources
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
@@ -18,7 +19,8 @@ from web_fragments.fragment import Fragment
 
 import xblock.exceptions
 from xblock.exceptions import DisallowedFileError
-from xblock.fields import String, List, Scope
+from xblock.fields import String, List, Scope, ScopeIds
+from xblock.field_data import FieldData
 from xblock.internal import class_lazy
 import xblock.mixins
 from xblock.mixins import (
@@ -32,6 +34,10 @@ from xblock.mixins import (
 )
 from xblock.plugin import Plugin
 from xblock.validation import Validation
+
+
+if t.TYPE_CHECKING:
+    from xblock.runtime import Runtime
 
 # exposing XML_NAMESPACES as a member of core, in order to avoid importing mixins where
 # XML_NAMESPACES are needed (e.g. runtime.py).
@@ -87,7 +93,7 @@ class SharedBlockBase(Plugin):
         return cls.i18n_js_namespace
 
     @classmethod
-    def open_local_resource(cls, uri: str) -> t.BinaryIO:
+    def open_local_resource(cls, uri: str) -> t.IO[bytes]:
         """
         Open a local resource.
 
@@ -143,11 +149,11 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
     tags = List(help="Tags for this block", scope=Scope.settings)
 
     @class_lazy
-    def _class_tags(cls: type[XBlock]) -> set[str]:  # pylint: disable=no-self-argument
+    def _class_tags(cls: type[XBlock]) -> set[str]:  # type: ignore[misc]
         """
         Collect the tags from all base classes.
         """
-        class_tags = set()
+        class_tags: set[str] = set()
 
         for base in cls.mro()[1:]:  # pylint: disable=no-member
             class_tags.update(getattr(base, '_class_tags', set()))
@@ -165,7 +171,9 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         return dec
 
     @classmethod
-    def load_tagged_classes(cls, tag, fail_silently=True) -> t.Iterable[type[XBlock]]:
+    def load_tagged_classes(
+        cls, tag: str, fail_silently: bool = True
+    ) -> t.Iterable[tuple[str, type[XBlock]]]:
         """
         Produce a sequence of all XBlock classes tagged with `tag`.
 
@@ -178,18 +186,17 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         (e.g. on startup or first page load), and in what
         contexts. Hence, the flag.
         """
-        # Allow this method to access the `_class_tags`
-        # pylint: disable=W0212
         for name, class_ in cls.load_classes(fail_silently):
-            if tag in class_._class_tags:
-                yield name, class_
+            xblock_class: type[XBlock] = class_  # type: ignore
+            if tag in xblock_class._class_tags:  # pylint: disable=protected-access
+                yield name, xblock_class
 
     # pylint: disable=keyword-arg-before-vararg
     def __init__(
         self,
         runtime: Runtime,
         field_data: FieldData | None = None,
-        scope_ids: ScopeIds = UNSET,
+        scope_ids: ScopeIds | object = UNSET,
         *args,
         **kwargs
     ):
@@ -264,7 +271,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         runtime_ugettext = runtime_service.ugettext
         return runtime_ugettext(text)
 
-    def add_xml_to_node(self, node: etree.Element) -> None:
+    def add_xml_to_node(self, node: ET.Element) -> None:
         """
         For exporting, set data on etree.Element `node`.
         """
@@ -273,18 +280,19 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         self.add_children_to_node(node)
 
 
-XBlockAsideView: t.TypeAlias = t.Callable[[XBlockAside, XBlock, dict | None], Fragment]
+# An XBlockAside's view method takes itself, an XBlock, and optional context dict,
+# and returns a Fragment.
+AsideView = t.Callable[["XBlockAside", XBlock, t.Optional[dict]], Fragment]
 
 
 class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixin, HandlersMixin, SharedBlockBase):
     """
     This mixin allows Xblock-like class to declare that it provides aside functionality.
     """
-
     entry_point: str = "xblock_asides.v1"
 
     @classmethod
-    def aside_for(cls, view_name: str) -> t.Callable[[XBlockAsideView], XBlockAsideView]:
+    def aside_for(cls, view_name: str) -> t.Callable[[AsideView], AsideView]:
         """
         A decorator to indicate a function is the aside view for the given view_name.
 
@@ -297,11 +305,11 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
 
         """
         # pylint: disable=protected-access
-        def _decorator(func: XBlockAsideView) -> XBlockAsideView:
+        def _decorator(func: AsideView) -> AsideView:
             if not hasattr(func, '_aside_for'):
-                func._aside_for = []
+                func._aside_for = []  # type: ignore
 
-            func._aside_for.append(view_name)  # pylint: disable=protected-access
+            func._aside_for.append(view_name)  # type: ignore
             return func
         return _decorator
 
@@ -321,14 +329,14 @@ class XBlockAside(XmlSerializationMixin, ScopedStorageMixin, RuntimeServicesMixi
         """
         # The method declares what views it decorates. We rely on `dir`
         # to handle subclasses and overrides.
-        combined_asides = defaultdict(None)
+        combined_asides: dict[str, str | None] = defaultdict(None)
         for _view_name, view_func in inspect.getmembers(cls, lambda attr: hasattr(attr, '_aside_for')):
             aside_for = getattr(view_func, '_aside_for', [])
             for view in aside_for:
                 combined_asides[view] = view_func.__name__
         return combined_asides
 
-    def aside_view_declaration(self, view_name: str) -> XBlockAsideView | None:
+    def aside_view_declaration(self, view_name: str) -> AsideView | None:
         """
         Find and return a function object if one is an aside_view for the given view_name
 

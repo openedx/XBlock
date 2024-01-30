@@ -2,6 +2,8 @@
 This module defines all of the Mixins that provide components of XBlock-family
 functionality, such as ScopeStorage, RuntimeServices, and Handlers.
 """
+from __future__ import annotations
+
 from collections import OrderedDict
 import copy
 import functools
@@ -14,7 +16,8 @@ from lxml import etree
 from webob import Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
-from xblock.fields import Field, Reference, Scope, ReferenceList
+from xblock.fields import Field, Reference, Scope, ScopeIds, ReferenceList
+from xblock.field_data import FieldData
 from xblock.internal import class_lazy, NamedAttributesMetaclass
 
 
@@ -188,7 +191,7 @@ class ScopedStorageMixin(RuntimeServicesMixin, metaclass=NamedAttributesMetaclas
 
         return fields
 
-    def __init__(self, scope_ids, field_data=None, **kwargs):
+    def __init__(self, scope_ids: ScopeIds, field_data: FieldData | None = None, **kwargs):
         """
         Arguments:
             field_data (:class:`.FieldData`): Interface used by the XBlock

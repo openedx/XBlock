@@ -57,14 +57,7 @@ class Sentinel:
     """
     Class for implementing sentinel objects (only equal to themselves).
     """
-    name: str = ""  # Name is 'optional' for ease of making sub-class instances.
-
-    def __post_init__(self):
-        """
-        Ensure `self.name` is set, either by constructor or subclass.
-        """
-        if not self.name:
-            raise ValueError("Coding error: sentinel must have a name!")
+    name: str
 
     def __repr__(self) -> str:
         return self.name
@@ -120,6 +113,11 @@ class BlockScope(Enum):
         """
         return list(cls)
 
+    @property
+    def attr_name(self) -> str:
+        return self.name.lower().replace('.', '_')
+
+
 
 class UserScope(Enum):
     """
@@ -153,6 +151,10 @@ class UserScope(Enum):
         Why do we need this? I believe it is not used anywhere.
         """
         return list(cls)
+
+    @property
+    def attr_name(self) -> str:
+        return self.name.lower().replace('.', '_')
 
 
 class ScopeBase(t.NamedTuple):
@@ -224,9 +226,12 @@ class Scope(ScopeBase):
             if cls(user, block) not in named_scopes
         ]
 
-    def __new__(cls, user: UserScope, block, name: str | None = None) -> Scope:
+    def __new__(cls, user: UserScope, block, name: str | None = None) -> Scope:  # type: ignore
         """Create a new Scope, with an optional name."""
-        return cls(user, block, name or f'{user}_{block}')
+        # TODO: This is a pretty wacky way to set a default value for `name`.
+        #       We should try to refactor this so that Scope is just, like,
+        #       a dataclass with a __post_init__ hook that sets the default `name`.
+        return ScopeBase.__new__(cls, user, block, name or f'{user}_{block}')
 
     children: t.ClassVar = Sentinel('Scope.children')
     parent: t.ClassVar = Sentinel('Scope.parent')
@@ -262,7 +267,7 @@ class Unset(Sentinel):
     """
     Indicates that default value has not been provided.
     """
-    name = "fields.UNSET"
+    name: str = "fields.UNSET"
 
 
 @dataclass(frozen=True)
@@ -272,7 +277,7 @@ class UniqueId(Sentinel):
     definition to signal that the field should default to a unique string value
     calculated at runtime.
     """
-    name = "fields.UNIQUE_ID"
+    name: str = "fields.UNIQUE_ID"
 
 
 @dataclass(frozen=True)
@@ -281,7 +286,7 @@ class NoCacheValue(Sentinel):
     Placeholder ('nil') value to indicate when nothing has been stored
     in the cache ("None" may be a valid value in the cache, so we cannot use it).
     """
-    name = "fields.NO_CACHE_VALUE"
+    name: str = "fields.NO_CACHE_VALUE"
 
 
 @dataclass(frozen=True)
@@ -290,7 +295,7 @@ class ExplicitlySet(Sentinel):
     Placeholder value that indicates that a value is explicitly dirty,
     because it was explicitly set.
     """
-    name = "fields.EXPLICITLY_SET"
+    name: str = "fields.EXPLICITLY_SET"
 
 
 # For backwards API compatibility, define an instance of each Field-related sentinel.
