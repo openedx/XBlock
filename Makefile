@@ -21,6 +21,7 @@ help: ## display this help message
 
 quality: ## check coding style with pycodestyle and pylint
 	pycodestyle
+	mypy
 	pylint xblock
 
 validate: test
