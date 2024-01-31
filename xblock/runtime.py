@@ -14,11 +14,13 @@ import json
 import logging
 import re
 import threading
+import typing as t
 import warnings
 
 from lxml import etree
 import markupsafe
 
+from opaque_keys.edx.keys import DefinitionKey, UsageKey
 from web_fragments.fragment import Fragment
 
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
@@ -40,40 +42,47 @@ log = logging.getLogger(__name__)
 class KeyValueStore(metaclass=ABCMeta):
     """The abstract interface for Key Value Stores."""
 
-    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
+    class Key(t.NamedTuple):
         """
         Keys are structured to retain information about the scope of the data.
         Stores can use this information however they like to store and retrieve
         data.
         """
+        scope: Scope
+        user_id: int | str | None
+        block_scope_id: UsageKey | DefinitionKey | str | None
+        field_name: str
+        block_family: str
 
-        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1'):
+        def __new__(  # type: ignore
+            cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1'
+        ):
             return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family)
 
     @abstractmethod
-    def get(self, key):
+    def get(self, key: Key) -> t.Any:
         """Reads the value of the given `key` from storage."""
 
     @abstractmethod
-    def set(self, key, value):
+    def set(self, key: Key, value: t.Any) -> None:
         """Sets `key` equal to `value` in storage."""
 
     @abstractmethod
-    def delete(self, key):
+    def delete(self, key: Key) -> None:
         """Deletes `key` from storage."""
 
     @abstractmethod
-    def has(self, key):
+    def has(self, key: Key) -> bool:
         """Returns whether or not `key` is present in storage."""
 
-    def default(self, key):
+    def default(self, key: Key):
         """
         Returns the context relevant default of the given `key`
         or raise KeyError which will result in the field's global default.
         """
         raise KeyError(repr(key))
 
-    def set_many(self, update_dict):
+    def set_many(self, update_dict: dict[Key, t.Any]) -> None:
         """
         For each (`key, value`) in `update_dict`, set `key` to `value` in storage.
 
@@ -92,8 +101,8 @@ class DictKeyValueStore(KeyValueStore):
     A `KeyValueStore` that stores everything into a Python dictionary.
     """
 
-    def __init__(self, storage=None):
-        self.db_dict = storage if storage is not None else {}
+    def __init__(self, storage: dict[KeyValueStore.Key, t.Any] | None = None):
+        self.db_dict: dict[KeyValueStore.Key, t.Any] = storage if storage is not None else {}
 
     def get(self, key):
         return self.db_dict[key]
@@ -117,14 +126,14 @@ class KvsFieldData(FieldData):
     that uses the correct scoped keys for the underlying KeyValueStore
     """
 
-    def __init__(self, kvs, **kwargs):
+    def __init__(self, kvs: KeyValueStore, **kwargs):
         super().__init__(**kwargs)
         self._kvs = kvs
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{0.__class__.__name__}({0._kvs!r})".format(self)
 
-    def _getfield(self, block, name):
+    def _getfield(self, block: XBlock, name: str) -> Field:
         """
         Return the field with the given `name` from `block`.
         If no field with `name` exists in any namespace, raises a KeyError.
@@ -145,7 +154,7 @@ class KvsFieldData(FieldData):
         # really doesn't name a field
         raise KeyError(name)
 
-    def _key(self, block, name):
+    def _key(self, block: XBlock, name: str) -> KeyValueStore.Key:
         """
         Resolves `name` to a key, in the following form:
 
@@ -158,6 +167,7 @@ class KvsFieldData(FieldData):
         )
         """
         field = self._getfield(block, name)
+        block_id: UsageKey | DefinitionKey | str | None   # Type depends on field scope.
         if field.scope in (Scope.children, Scope.parent):
             block_id = block.scope_ids.usage_id
             user_id = None
@@ -187,7 +197,7 @@ class KvsFieldData(FieldData):
         )
         return key
 
-    def get(self, block, name):
+    def get(self, block: XBlock, name: str) -> t.Any:
         """
         Retrieve the value for the field named `name`.
 
@@ -196,19 +206,19 @@ class KvsFieldData(FieldData):
         """
         return self._kvs.get(self._key(block, name))
 
-    def set(self, block, name, value):
+    def set(self, block: XBlock, name: str, value: t.Any) -> None:
         """
         Set the value of the field named `name`
         """
         self._kvs.set(self._key(block, name), value)
 
-    def delete(self, block, name):
+    def delete(self, block: XBlock, name: str) -> None:
         """
         Reset the value of the field named `name` to the default
         """
         self._kvs.delete(self._key(block, name))
 
-    def has(self, block, name):
+    def has(self, block: XBlock, name: str) -> bool:
         """
         Return whether or not the field named `name` has a non-default value
         """
@@ -217,7 +227,7 @@ class KvsFieldData(FieldData):
         except KeyError:
             return False
 
-    def set_many(self, block, update_dict):
+    def set_many(self, block, update_dict: dict[str, t.Any]):
         """Update the underlying model with the correct values."""
         updated_dict = {}
 
@@ -227,7 +237,7 @@ class KvsFieldData(FieldData):
 
         self._kvs.set_many(updated_dict)
 
-    def default(self, block, name):
+    def default(self, block: XBlock, name: str) -> t.Any:
         """
         Ask the kvs for the default (default implementation which other classes may override).
 
