@@ -8,7 +8,6 @@ for each scope.
 from __future__ import annotations
 
 import copy
-import datetime
 import hashlib
 import itertools
 import json
@@ -17,6 +16,7 @@ import traceback
 import typing as t
 import warnings
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from enum import Enum
 
 import dateutil.parser
@@ -28,7 +28,7 @@ from opaque_keys.edx.keys import DefinitionKey, UsageKey
 from xblock.internal import Nameable
 
 if t.TYPE_CHECKING:
-    from .core import XBlock
+    from xblock.core import XBlock
 
 
 # __all__ controls what classes end up in the docs, and in what order.
@@ -312,8 +312,9 @@ EXPLICITLY_SET = ExplicitlySet()
 # because they define the structure of XBlock trees.
 NO_GENERATED_DEFAULTS = ('parent', 'children')
 
-
-FieldValue = t.TypeVar("FieldValue")
+# Type parameters of Fields. These only matter for static type analysis (mypy).
+FieldValue = t.TypeVar("FieldValue")  # What does the field hold?
+InnerFieldValue = t.TypeVar("InnerFieldValue")  # For Dict/List/Set fields: What do they contain?
 
 
 class Field(Nameable, t.Generic[FieldValue]):
@@ -656,7 +657,7 @@ class Field(Nameable, t.Generic[FieldValue]):
             )
             self.warned = True
 
-    def to_json(self, value: FieldValue | None) -> FieldValue | None:
+    def to_json(self, value: FieldValue | None) -> t.Any:
         """
         Return value in the form of nested lists and dictionaries (suitable
         for passing to json.dumps).
@@ -667,7 +668,7 @@ class Field(Nameable, t.Generic[FieldValue]):
         self._warn_deprecated_outside_JSONField()
         return value
 
-    def from_json(self, value: FieldValue | None) -> FieldValue | None:
+    def from_json(self, value) -> FieldValue | None:
         """
         Return value as a native full featured python type (the inverse of to_json)
 
@@ -675,7 +676,7 @@ class Field(Nameable, t.Generic[FieldValue]):
         object
         """
         self._warn_deprecated_outside_JSONField()
-        return value
+        return value  # type: ignore
 
     def to_string(self, value: FieldValue | None) -> str:
         """
@@ -746,14 +747,14 @@ class Field(Nameable, t.Generic[FieldValue]):
         return hash(self.name)
 
 
-class JSONField(Field):
+class JSONField(Field, t.Generic[FieldValue]):
     """
     Field type which has a convenient JSON representation.
     """
     # for now; we'll bubble functions down when we finish deprecation in Field
 
 
-class Integer(JSONField):
+class Integer(JSONField[int]):
     """
     A field that contains an integer.
 
@@ -767,7 +768,7 @@ class Integer(JSONField):
     """
     MUTABLE = False
 
-    def from_json(self, value):
+    def from_json(self, value) -> int | None:
         if value is None or value == '':
             return None
         return int(value)
@@ -775,7 +776,7 @@ class Integer(JSONField):
     enforce_type = from_json
 
 
-class Float(JSONField):
+class Float(JSONField[float]):
     """
     A field that contains a float.
 
@@ -786,7 +787,7 @@ class Float(JSONField):
     """
     MUTABLE = False
 
-    def from_json(self, value):
+    def from_json(self, value) -> float | None:
         if value is None or value == '':
             return None
         return float(value)
@@ -794,7 +795,7 @@ class Float(JSONField):
     enforce_type = from_json
 
 
-class Boolean(JSONField):
+class Boolean(JSONField[bool]):
     """
     A field class for representing a boolean.
 
@@ -823,7 +824,7 @@ class Boolean(JSONField):
                          values=({'display_name': "True", "value": True},
                                  {'display_name': "False", "value": False}), **kwargs)
 
-    def from_json(self, value):
+    def from_json(self, value) -> bool | None:
         if isinstance(value, bytes):
             value = value.decode('ascii', errors='replace')
         if isinstance(value, str):
@@ -834,7 +835,7 @@ class Boolean(JSONField):
     enforce_type = from_json
 
 
-class Dict(JSONField):
+class Dict(JSONField[t.Dict[str, InnerFieldValue]], t.Generic[InnerFieldValue]):
     """
     A field class for representing a Python dict.
 
@@ -843,7 +844,7 @@ class Dict(JSONField):
     """
     _default = {}
 
-    def from_json(self, value):
+    def from_json(self, value) -> dict[str, InnerFieldValue] | None:
         if value is None or isinstance(value, dict):
             return value
         else:
@@ -851,7 +852,7 @@ class Dict(JSONField):
 
     enforce_type = from_json
 
-    def to_string(self, value):
+    def to_string(self, value) -> str:
         """
         In python3, json.dumps() cannot sort keys of different types,
         so preconvert None to 'null'.
@@ -864,7 +865,7 @@ class Dict(JSONField):
         return super().to_string(value)
 
 
-class List(JSONField):
+class List(JSONField[t.List[InnerFieldValue]], t.Generic[InnerFieldValue]):
     """
     A field class for representing a list.
 
@@ -873,7 +874,7 @@ class List(JSONField):
     """
     _default = []
 
-    def from_json(self, value):
+    def from_json(self, value) -> list[InnerFieldValue] | None:
         if value is None or isinstance(value, list):
             return value
         else:
@@ -882,7 +883,7 @@ class List(JSONField):
     enforce_type = from_json
 
 
-class Set(JSONField):
+class Set(JSONField[t.List[InnerFieldValue]], t.Generic[InnerFieldValue]):
     """
     A field class for representing a set.
 
@@ -901,7 +902,7 @@ class Set(JSONField):
 
         self._default = set(self._default)
 
-    def from_json(self, value):
+    def from_json(self, value) -> set[InnerFieldValue] | None:
         if value is None or isinstance(value, set):
             return value
         else:
@@ -910,7 +911,7 @@ class Set(JSONField):
     enforce_type = from_json
 
 
-class String(JSONField):
+class String(JSONField[str]):
     """
     A field class for representing a string.
 
@@ -920,7 +921,7 @@ class String(JSONField):
     MUTABLE = False
     BAD_REGEX = re.compile('[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]', flags=re.UNICODE)
 
-    def _sanitize(self, value):
+    def _sanitize(self, value) -> str | None:
         """
         Remove the control characters that are not allowed in XML:
         https://www.w3.org/TR/xml/#charsets
@@ -940,7 +941,7 @@ class String(JSONField):
         else:
             return value
 
-    def from_json(self, value):
+    def from_json(self, value) -> str | None:
         if value is None:
             return None
         elif isinstance(value, (bytes, str)):
@@ -952,20 +953,23 @@ class String(JSONField):
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
-    def from_string(self, serialized):
+    def from_string(self, serialized) -> str | None:
         """String gets serialized and deserialized without quote marks."""
         return self.from_json(serialized)
 
-    def to_string(self, value):
+    def to_string(self, value) -> str:
         """String gets serialized and deserialized without quote marks."""
         if isinstance(value, bytes):
             value = value.decode('utf-8')
         return self.to_json(value)
 
-    @property
-    def none_to_xml(self):
-        """Returns True to use a XML node for the field and represent None as an attribute."""
-        return True
+    def enforce_type(self, value: t.Any) -> str | None:
+        """
+        (no-op override just to make mypy happy about XMLString.enforce_type)
+        """
+        return super().enforce_type(value)  
+
+    none_to_xml = True  # Use an XML node for the field, and represent None as an attribute.
 
     enforce_type = from_json
 
@@ -979,7 +983,7 @@ class XMLString(String):
     an lxml.etree.XMLSyntaxError will be raised.
     """
 
-    def to_json(self, value):
+    def to_json(self, value) -> t.Any:
         """
         Serialize the data, ensuring that it is valid XML (or None).
 
@@ -990,13 +994,13 @@ class XMLString(String):
             value = self.enforce_type(value)
         return super().to_json(value)
 
-    def enforce_type(self, value):
+    def enforce_type(self, value: t.Any) -> str | None:
         if value is not None:
             etree.XML(value)
-        return value
+        return value  # type: ignore
 
 
-class DateTime(JSONField):
+class DateTime(JSONField[t.Union[datetime, timedelta]]):
     """
     A field for representing a datetime.
 
@@ -1006,7 +1010,7 @@ class DateTime(JSONField):
 
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
-    def from_json(self, value):
+    def from_json(self, value) -> datetime | timedelta | None:
         """
         Parse the date from an ISO-formatted date string, or None.
         """
@@ -1028,16 +1032,16 @@ class DateTime(JSONField):
 
         # Interpret raw numbers as a relative dates
         if isinstance(value, (int, float)):
-            value = datetime.timedelta(seconds=value)
+            value = timedelta(seconds=value)
 
-        if not isinstance(value, (datetime.datetime, datetime.timedelta)):
+        if not isinstance(value, (datetime, timedelta)):
             raise TypeError(
                 "Value should be loaded from a string, a datetime object, a timedelta object, or None, not {}".format(
                     type(value)
                 )
             )
 
-        if isinstance(value, datetime.datetime):
+        if isinstance(value, datetime):
             if value.tzinfo is not None:
                 return value.astimezone(pytz.utc)
             else:
@@ -1045,14 +1049,14 @@ class DateTime(JSONField):
         else:
             return value
 
-    def to_json(self, value):
+    def to_json(self, value) -> t.Any:
         """
         Serialize the date as an ISO-formatted date string, or None.
         """
-        if isinstance(value, datetime.datetime):
+        if isinstance(value, datetime):
             return value.strftime(self.DATETIME_FORMAT)
 
-        if isinstance(value, datetime.timedelta):
+        if isinstance(value, timedelta):
             return value.total_seconds()
 
         if value is None:
@@ -1060,14 +1064,14 @@ class DateTime(JSONField):
 
         raise TypeError(f"Value stored must be a datetime or timedelta object, not {type(value)}")
 
-    def to_string(self, value):
+    def to_string(self, value) -> str:
         """DateTime fields get serialized without quote marks."""
         return self.to_json(value)
 
     enforce_type = from_json
 
 
-class Any(JSONField):
+class Any(JSONField[t.Any]):
     """
     A field class for representing any piece of data; type is not enforced.
 
@@ -1077,7 +1081,7 @@ class Any(JSONField):
     """
 
 
-class Reference(JSONField):
+class Reference(JSONField[UsageKey]):
     """
     An xblock reference. That is, a pointer to another xblock.
 
@@ -1086,7 +1090,7 @@ class Reference(JSONField):
     """
 
 
-class ReferenceList(List):
+class ReferenceList(List[UsageKey]):
     """
     An list of xblock references. That is, pointers to xblocks.
 
@@ -1097,7 +1101,19 @@ class ReferenceList(List):
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
 
 
-class ReferenceValueDict(Dict):
+class ReferenceListNotNone(ReferenceList):
+    """
+    An list of xblock references. Should not equal None.
+
+    Functionally, this is exactly equivalent to ReferenceList.
+    To the type-checker, this adds that guarantee that accessing the field will always return
+    a list of UsageKeys, rather than None OR a list of UsageKeys.
+    """
+    def __get__(self, xblock: XBlock, xblock_class: type[XBlock]) -> list[UsageKey]:
+        return super().__get__(xblock, xblock_class)  # type: ignore
+
+
+class ReferenceValueDict(Dict[UsageKey]):
     """
     A dictionary where the values are xblock references. That is, pointers to xblocks.
 
@@ -1108,8 +1124,9 @@ class ReferenceValueDict(Dict):
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
 
 
-def scope_key(instance, xblock):
-    """Generate a unique key for a scope that can be used as a
+def scope_key(instance: Field, xblock: XBlock) -> str:
+    """
+    Generate a unique key for a scope that can be used as a
     filename, in a URL, or in a KVS.
 
     Our goal is to have a pretty, human-readable 1:1 encoding.
@@ -1174,11 +1191,10 @@ def scope_key(instance, xblock):
 
     key_list = []
 
-    def encode(char):
+    def encode(char: str) -> str:
         """
         Replace all non-alphanumeric characters with -n- where n
         is their Unicode codepoint.
-        TODO: Test for UTF8 which is not ASCII
         """
         if char.isalnum():
             return char

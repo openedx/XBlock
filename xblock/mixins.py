@@ -11,14 +11,21 @@ import inspect
 import logging
 import warnings
 import json
+import typing as t
 
+from opaque_keys.edx.keys import UsageKey
 from lxml import etree
-from webob import Response
+from webob import Request, Response
 
 from xblock.exceptions import JsonHandlerError, KeyValueMultiSaveError, XBlockSaveError, FieldDataDeprecationWarning
-from xblock.fields import Field, Reference, Scope, ScopeIds, ReferenceList
+from xblock.fields import Field, Reference, Scope, ScopeIds, ReferenceListNotNone
 from xblock.field_data import FieldData
 from xblock.internal import class_lazy, NamedAttributesMetaclass
+
+
+if t.TYPE_CHECKING:
+    from xblock.core import XBlock
+    from xblock.runtime import Runtime
 
 
 # OrderedDict is used so that namespace attributes are put in predictable order
@@ -35,7 +42,7 @@ class HandlersMixin:
     """
 
     @classmethod
-    def json_handler(cls, func):
+    def json_handler(cls, func: t.Callable[[XBlock, t.Any, str], t.Any]) -> t.Callable[[XBlock, Request, str], Response]:
         """
         Wrap a handler to consume and produce JSON.
 
@@ -54,7 +61,7 @@ class HandlersMixin:
         """
         @cls.handler
         @functools.wraps(func)
-        def wrapper(self, request, suffix=''):
+        def wrapper(self, request: Request, suffix: str = '') -> Response:
             """The wrapper function `json_handler` returns."""
             if request.method != "POST":
                 return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
@@ -73,18 +80,19 @@ class HandlersMixin:
         return wrapper
 
     @classmethod
-    def handler(cls, func):
+    def handler(cls, func: t.Callable) -> t.Callable:
         """
         A decorator to indicate a function is usable as a handler.
 
         The wrapped function must return a `webob.Response` object.
         """
-        func._is_xblock_handler = True      # pylint: disable=protected-access
+        func._is_xblock_handler = True  # type: ignore
         return func
 
-    def handle(self, handler_name, request, suffix=''):
+    def handle(self, handler_name: str, request: Request, suffix: str = '') -> Response:
         """Handle `request` with this block's runtime."""
-        return self.runtime.handle(self, handler_name, request, suffix)
+        runtime: Runtime = self.runtime  # type: ignore
+        return runtime.handle(self, handler_name, request, suffix)
 
 
 class RuntimeServicesMixin:
@@ -215,9 +223,9 @@ class ScopedStorageMixin(RuntimeServicesMixin, metaclass=NamedAttributesMetaclas
         else:
             self._deprecated_per_instance_field_data = None  # pylint: disable=invalid-name
 
-        self._field_data_cache = {}
-        self._dirty_fields = {}
-        self.scope_ids = scope_ids
+        self._field_data_cache: dict[str, t.Any] = {}
+        self._dirty_fields: dict[Field, t.Any] = {}
+        self.scope_ids: ScopeIds = scope_ids
 
         super().__init__(**kwargs)
 
@@ -331,15 +339,19 @@ class ScopedStorageMixin(RuntimeServicesMixin, metaclass=NamedAttributesMetaclas
         )
 
 
-class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
+class ChildrenModelMetaclass(NamedAttributesMetaclass):
     """
     A metaclass that transforms the attribute `has_children = True` into a List
     field with a children scope.
-
     """
-    def __new__(mcs, name, bases, attrs):
+    def __new__(
+        mcs: type[ChildrenModelMetaclass],
+        name: str,
+        bases: tuple[type, ...],
+        attrs: dict[str, t.Any],
+    ):
         if (attrs.get('has_children', False) or any(getattr(base, 'has_children', False) for base in bases)):
-            attrs['children'] = ReferenceList(
+            attrs['children'] = ReferenceListNotNone(
                 help='The ids of the children of this XBlock',
                 scope=Scope.children)
         else:
@@ -351,17 +363,23 @@ class ChildrenModelMetaclass(ScopedStorageMixin.__class__):
 class HierarchyMixin(ScopedStorageMixin, metaclass=ChildrenModelMetaclass):
     """
     This adds Fields for parents and children.
+
+    TODO: Why in the world is this separate from XBlock??
+          It depends on a bunch of XBlock attributes (runtime, has_childen, children...)
+          so it's not really useful outside of XBlock. As a future refactoring, consider
+          smashing this into the XBlock class and removing all the '_as_xblock' stuff below.
     """
 
     parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
+    children: ReferenceListNotNone
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # A cache of the parent block, retrieved from .parent
-        self._parent_block = None
-        self._parent_block_id = None
-        self._child_cache = {}
+        self._parent_block: XBlock | None = None
+        self._parent_block_id: UsageKey | None = None
+        self._child_cache: dict[UsageKey, XBlock] = {}
 
-        for_parent = kwargs.pop('for_parent', None)
+        for_parent: XBlock | None = kwargs.pop('for_parent', None)  # type: ignore
 
         if for_parent is not None:
             self._parent_block = for_parent
@@ -369,57 +387,67 @@ class HierarchyMixin(ScopedStorageMixin, metaclass=ChildrenModelMetaclass):
 
         super().__init__(**kwargs)
 
-    def get_parent(self):
+    @property
+    def _as_xblock(self) -> XBlock:
+        """
+        The same as 'self', but type-checks as an XBlock.
+
+        This is a dumb mypy hack that would be great to remove. See TODO comment in class docstring.
+        """
+        return self  # type: ignore
+
+    def get_parent(self) -> XBlock | None:
         """Return the parent block of this block, or None if there isn't one."""
         if not self.has_cached_parent:
-            if self.parent is not None:
-                self._parent_block = self.runtime.get_block(self.parent)
+            if self._as_xblock.parent is not None:
+                self._parent_block = self._as_xblock.runtime.get_block(self._as_xblock.parent)
             else:
                 self._parent_block = None
-            self._parent_block_id = self.parent
+            self._parent_block_id = self._as_xblock.parent
         return self._parent_block
 
     @property
-    def has_cached_parent(self):
+    def has_cached_parent(self) -> bool:
         """Return whether this block has a cached parent block."""
-        return self.parent is not None and self._parent_block_id == self.parent
+        return self._as_xblock.parent is not None and self._parent_block_id == self._as_xblock.parent
 
-    def get_child(self, usage_id):
+    def get_child(self, usage_id: UsageKey) -> XBlock:
         """Return the child identified by ``usage_id``."""
         if usage_id in self._child_cache:
             return self._child_cache[usage_id]
 
-        child_block = self.runtime.get_block(usage_id, for_parent=self)
+        runtime: Runtime = self.runtime  # type: ignore
+        child_block = runtime.get_block(usage_id, for_parent=self)
         self._child_cache[usage_id] = child_block
         return child_block
 
-    def get_children(self, usage_id_filter=None):
+    def get_children(self, usage_id_filter: t.Callable[[UsageKey], bool] | None = None) -> list[XBlock]:
         """
         Return instantiated XBlocks for each of this blocks ``children``.
         """
-        if not self.has_children:
+        if not self._as_xblock.has_children:
             return []
 
         return [
             self.get_child(usage_id)
-            for usage_id in self.children
+            for usage_id in self._as_xblock.children
             if usage_id_filter is None or usage_id_filter(usage_id)
         ]
 
-    def clear_child_cache(self):
+    def clear_child_cache(self) -> None:
         """
         Reset the cache of children stored on this XBlock.
         """
         self._child_cache.clear()
 
-    def add_children_to_node(self, node):
+    def add_children_to_node(self, node: etree._Element) -> None:
         """
         Add children to etree.Element `node`.
         """
-        if self.has_children:
-            for child_id in self.children:
-                child = self.runtime.get_block(child_id)
-                self.runtime.add_block_as_child_node(child, node)
+        if self._as_xblock.has_children:
+            for child_id in self._as_xblock.children:
+                child = self._as_xblock.runtime.get_block(child_id)
+                self._as_xblock.runtime.add_block_as_child_node(child, node)
 
 
 class XmlSerializationMixin(ScopedStorageMixin):

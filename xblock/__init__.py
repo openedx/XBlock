@@ -25,6 +25,6 @@ class XBlockMixin(xblock.core.XBlockMixin):
 
 # For backwards compatibility, provide the XBlockMixin in xblock.fields
 # without causing a circular import
-xblock.fields.XBlockMixin = XBlockMixin
+xblock.fields.XBlockMixin = XBlockMixin  # type: ignore[attr-defined]
 
 __version__ = '1.10.0'

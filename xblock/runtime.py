@@ -1,6 +1,8 @@
 """
 Machinery to make the common case easy when building new runtimes
 """
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 import functools
@@ -360,8 +362,8 @@ class IdGenerator(metaclass=ABCMeta):
 class MemoryIdManager(IdReader, IdGenerator):
     """A simple dict-based implementation of IdReader and IdGenerator."""
 
-    ASIDE_USAGE_ID = namedtuple('MemoryAsideUsageId', 'usage_id aside_type')
-    ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')
+    ASIDE_USAGE_ID = namedtuple('MemoryAsideUsageId', 'usage_id aside_type')  # type: ignore[name-match]
+    ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')  # type: ignore[name-match]
 
     def __init__(self):
         self._ids = itertools.count()
@@ -1246,7 +1248,7 @@ class ObjectAggregator:
 
 
 # Cache of Mixologist generated classes
-_CLASS_CACHE = {}
+_CLASS_CACHE: dict[tuple[type, tuple[type, ...]], type]  = {}
 _CLASS_CACHE_LOCK = threading.RLock()
 
 

@@ -11,9 +11,9 @@ import os
 import warnings
 import typing as t
 from collections import defaultdict
-from xml.etree import ElementTree as ET
 
 import pkg_resources
+from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from web_fragments.fragment import Fragment
 
@@ -146,7 +146,9 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
     entry_point: str = 'xblock.v1'
 
     name = String(help="Short name for the block", scope=Scope.settings)
-    tags = List(help="Tags for this block", scope=Scope.settings)
+    tags: List[str] = List(help="Tags for this block", scope=Scope.settings)
+
+    has_children: bool
 
     @class_lazy
     def _class_tags(cls: type[XBlock]) -> set[str]:  # type: ignore[misc]
@@ -219,6 +221,8 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         """
         if scope_ids is UNSET:
             raise TypeError('scope_ids are required')
+        else:
+            assert isinstance(scope_ids, ScopeIds)
 
         # Provide backwards compatibility for external access through _field_data
         super().__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
@@ -271,7 +275,7 @@ class XBlock(XmlSerializationMixin, HierarchyMixin, ScopedStorageMixin, RuntimeS
         runtime_ugettext = runtime_service.ugettext
         return runtime_ugettext(text)
 
-    def add_xml_to_node(self, node: ET.Element) -> None:
+    def add_xml_to_node(self, node: etree._Element) -> None:
         """
         For exporting, set data on etree.Element `node`.
         """
