@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.34.29
+boto3==1.34.31
     # via fs-s3fs
-botocore==1.34.29
+botocore==1.34.31
     # via
     #   boto3
     #   s3transfer
@@ -36,7 +36,7 @@ lazy==1.6
     # via -r requirements/django.in
 lxml==5.1.0
     # via -r requirements/base.txt
-mako==1.3.0
+mako==1.3.2
     # via -r requirements/base.txt
 markupsafe==2.1.4
     # via
@@ -56,7 +56,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/base.txt
     #   botocore
-pytz==2023.3.post1
+pytz==2023.4
     # via
     #   -r requirements/base.txt
     #   django

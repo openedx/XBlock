@@ -1,8 +1,11 @@
 """
 Internal machinery used to make building XBlock family base classes easier.
 """
+from __future__ import annotations
+
 import functools
 import inspect
+import typing as t
 
 
 class LazyClassProperty:
@@ -13,9 +16,9 @@ class LazyClassProperty:
     executing the decorated method once, and then storing the result
     in the class __dict__.
     """
-    def __init__(self, constructor):
-        self.__constructor = constructor
-        self.__cache = {}
+    def __init__(self, constructor: t.Callable):
+        self.__constructor: t.Callable = constructor
+        self.__cache: dict[object, object] = {}
         functools.wraps(self.__constructor)(self)
 
     def __get__(self, instance, owner):
@@ -35,7 +38,12 @@ class NamedAttributesMetaclass(type):
     A metaclass which adds the __name__ attribute to all Nameable attributes
     which are attributes of the instantiated class, or of its baseclasses.
     """
-    def __new__(mcs, name, bases, attrs):
+    def __new__(
+        mcs: type[NamedAttributesMetaclass],
+        name: str,
+        bases: tuple[type, ...],
+        attrs: dict[str, t.Any],
+    ):
         # Iterate over the attrs before they're bound to the class
         # so that we don't accidentally trigger any __get__ methods
         for attr_name, attr in attrs.items():
@@ -58,10 +66,10 @@ class Nameable:
     :class:`.NamedAttributesMetaclass`, will be assigned a `__name__`
     attribute based on what class attribute they are bound to.
     """
-    __name__ = None
+    __name__: str | None = None
 
     @staticmethod
-    def needs_name(obj):
+    def needs_name(obj: object) -> bool:
         """
         Return True if `obj` is a :class:`.Nameable` object that
         hasn't yet been assigned a name.

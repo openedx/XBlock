@@ -5,22 +5,31 @@ The hosting runtime application decides what actual storage mechanism to use
 for each scope.
 
 """
-from collections import namedtuple
+from __future__ import annotations
+
 import copy
-import datetime
 import hashlib
 import itertools
 import json
 import re
 import traceback
+import typing as t
 import warnings
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from enum import Enum
 
 import dateutil.parser
-from lxml import etree
 import pytz
 import yaml
+from lxml import etree
+from opaque_keys.edx.keys import DefinitionKey, UsageKey
 
 from xblock.internal import Nameable
+
+if t.TYPE_CHECKING:
+    from xblock.core import XBlock
+
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
@@ -43,40 +52,36 @@ class ModifyingEnforceTypeWarning(DeprecationWarning):
     """
 
 
+@dataclass(frozen=True)
 class Sentinel:
     """
     Class for implementing sentinel objects (only equal to themselves).
     """
+    name: str
 
-    def __init__(self, name):
-        """
-        `name` is the name used to identify the sentinel (which will
-            be displayed as the __repr__) of the sentinel.
-        """
-        self.name = name
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.name
 
     @property
-    def attr_name(self):
+    def attr_name(self) -> str:
         """ TODO: Look into namespace collisions. block.name_space == block_name.space
         """
         return self.name.lower().replace('.', '_')
 
-    def __eq__(self, other):
-        """ Equality is based on being of the same class, and having same name
+    def __eq__(self, other: object) -> bool:
         """
-        return isinstance(other, Sentinel) and self.name == other.name
+        Equality is based on being of the same class, and having same name
+        """
+        return isinstance(other, self.__class__) and self.name == other.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Use a hash of the name of the sentinel
         """
         return hash(self.name)
 
 
-class BlockScope:
+class BlockScope(Enum):
     """
     Enumeration of block scopes.
 
@@ -96,23 +101,25 @@ class BlockScope:
         information that is purely about the student.
 
     """
-    USAGE = Sentinel('BlockScope.USAGE')
-    DEFINITION = Sentinel('BlockScope.DEFINITION')
-    TYPE = Sentinel('BlockScope.TYPE')
-    ALL = Sentinel('BlockScope.ALL')
+    USAGE = 'BlockScope.USAGE'
+    DEFINITION = 'BlockScope.DEFINITION'
+    TYPE = 'BlockScope.TYPE'
+    ALL = 'BlockScope.ALL'
 
     @classmethod
-    def scopes(cls):
+    def scopes(cls) -> list[BlockScope]:
         """
         Return a list of valid/understood class scopes.
         """
-        # Why do we need this? This should either
-        # * Be bubbled to the places where it is used (AcidXBlock).
-        # * Be automatic. Look for all members of a type.
-        return [cls.USAGE, cls.DEFINITION, cls.TYPE, cls.ALL]
+        return list(cls)
+
+    @property
+    def attr_name(self) -> str:
+        return self.name.lower().replace('.', '_')
 
 
-class UserScope:
+
+class UserScope(Enum):
     """
     Enumeration of user scopes.
 
@@ -133,22 +140,27 @@ class UserScope:
         submitted by all students.
 
     """
-    NONE = Sentinel('UserScope.NONE')
-    ONE = Sentinel('UserScope.ONE')
-    ALL = Sentinel('UserScope.ALL')
+    NONE = 'UserScope.NONE'
+    ONE = 'UserScope.ONE'
+    ALL = 'UserScope.ALL'
 
     @classmethod
-    def scopes(cls):
+    def scopes(cls) -> list[UserScope]:
         """
         Return a list of valid/understood class scopes.
         Why do we need this? I believe it is not used anywhere.
         """
-        return [cls.NONE, cls.ONE, cls.ALL]
+        return list(cls)
+
+    @property
+    def attr_name(self) -> str:
+        return self.name.lower().replace('.', '_')
 
 
-UNSET = Sentinel("fields.UNSET")
-
-ScopeBase = namedtuple('ScopeBase', 'user block name')
+class ScopeBase(t.NamedTuple):
+    user: UserScope
+    block: BlockScope
+    name: str
 
 
 class Scope(ScopeBase):
@@ -184,15 +196,15 @@ class Scope(ScopeBase):
     the points scored by all users attempting a problem.
 
     """
-    content = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, 'content')
-    settings = ScopeBase(UserScope.NONE, BlockScope.USAGE, 'settings')
-    user_state = ScopeBase(UserScope.ONE, BlockScope.USAGE, 'user_state')
-    preferences = ScopeBase(UserScope.ONE, BlockScope.TYPE, 'preferences')
-    user_info = ScopeBase(UserScope.ONE, BlockScope.ALL, 'user_info')
-    user_state_summary = ScopeBase(UserScope.ALL, BlockScope.USAGE, 'user_state_summary')
+    content: t.ClassVar = ScopeBase(UserScope.NONE, BlockScope.DEFINITION, 'content')
+    settings: t.ClassVar = ScopeBase(UserScope.NONE, BlockScope.USAGE, 'settings')
+    user_state: t.ClassVar = ScopeBase(UserScope.ONE, BlockScope.USAGE, 'user_state')
+    preferences: t.ClassVar = ScopeBase(UserScope.ONE, BlockScope.TYPE, 'preferences')
+    user_info: t.ClassVar = ScopeBase(UserScope.ONE, BlockScope.ALL, 'user_info')
+    user_state_summary: t.ClassVar = ScopeBase(UserScope.ALL, BlockScope.USAGE, 'user_state_summary')
 
     @classmethod
-    def named_scopes(cls):
+    def named_scopes(cls) -> list[ScopeBase]:
         """Return all named Scopes."""
         return [
             cls.content,
@@ -204,7 +216,7 @@ class Scope(ScopeBase):
         ]
 
     @classmethod
-    def scopes(cls):
+    def scopes(cls) -> list[ScopeBase]:
         """Return all possible Scopes."""
         named_scopes = cls.named_scopes()
         return named_scopes + [
@@ -214,56 +226,98 @@ class Scope(ScopeBase):
             if cls(user, block) not in named_scopes
         ]
 
-    def __new__(cls, user, block, name=None):
+    def __new__(cls, user: UserScope, block, name: str | None = None) -> Scope:  # type: ignore
         """Create a new Scope, with an optional name."""
+        # TODO: This is a pretty wacky way to set a default value for `name`.
+        #       We should try to refactor this so that Scope is just, like,
+        #       a dataclass with a __post_init__ hook that sets the default `name`.
+        return ScopeBase.__new__(cls, user, block, name or f'{user}_{block}')
 
-        if name is None:
-            name = f'{user}_{block}'
+    children: t.ClassVar = Sentinel('Scope.children')
+    parent: t.ClassVar = Sentinel('Scope.parent')
 
-        return ScopeBase.__new__(cls, user, block, name)
-
-    children = Sentinel('Scope.children')
-    parent = Sentinel('Scope.parent')
-
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, Scope) and self.user == other.user and self.block == other.block
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(('xblock.fields.Scope', self.user, self.block))
 
 
-class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
+class ScopeIds(t.NamedTuple):
     """
     A simple wrapper to collect all of the ids needed to correctly identify an XBlock
     (or other classes deriving from ScopedStorageMixin) to a FieldData.
     These identifiers match up with BlockScope and UserScope attributes, so that,
     for instance, the `def_id` identifies scopes that use BlockScope.DEFINITION.
     """
-    __slots__ = ()
+    user_id: int | str | None
+    block_type: str
+    def_id: DefinitionKey
+    usage_id: UsageKey
 
 
-# Define special reference that can be used as a field's default in field
-# definition to signal that the field should default to a unique string value
-# calculated at runtime.
-UNIQUE_ID = Sentinel("fields.UNIQUE_ID")
+ScopeIds.__slots__ = ()  # type: ignore
 
-# define a placeholder ('nil') value to indicate when nothing has been stored
-# in the cache ("None" may be a valid value in the cache, so we cannot use it).
-NO_CACHE_VALUE = Sentinel("fields.NO_CACHE_VALUE")
 
-# define a placeholder value that indicates that a value is explicitly dirty,
-# because it was explicitly set
-EXPLICITLY_SET = Sentinel("fields.EXPLICITLY_SET")
+@dataclass(frozen=True)
+class Unset(Sentinel):
+    """
+    Indicates that default value has not been provided.
+    """
+    name: str = "fields.UNSET"
+
+
+@dataclass(frozen=True)
+class UniqueId(Sentinel):
+    """
+    A special reference that can be used as a field's default in field
+    definition to signal that the field should default to a unique string value
+    calculated at runtime.
+    """
+    name: str = "fields.UNIQUE_ID"
+
+
+@dataclass(frozen=True)
+class NoCacheValue(Sentinel):
+    """
+    Placeholder ('nil') value to indicate when nothing has been stored
+    in the cache ("None" may be a valid value in the cache, so we cannot use it).
+    """
+    name: str = "fields.NO_CACHE_VALUE"
+
+
+@dataclass(frozen=True)
+class ExplicitlySet(Sentinel):
+    """
+    Placeholder value that indicates that a value is explicitly dirty,
+    because it was explicitly set.
+    """
+    name: str = "fields.EXPLICITLY_SET"
+
+
+# For backwards API compatibility, define an instance of each Field-related sentinel.
+# Because our sentinels are now frozen dataclasses (i.e., value objects), these could be
+# be removed in favor of just constructing the class. For example, every use of
+# `UNIQUE_ID` could be replaced with `UniqueId()`.
+UNSET = Unset()
+UNIQUE_ID = UniqueId()
+NO_CACHE_VALUE = NoCacheValue()
+EXPLICITLY_SET = ExplicitlySet()
+
 
 # Fields that cannot have runtime-generated defaults. These are special,
 # because they define the structure of XBlock trees.
 NO_GENERATED_DEFAULTS = ('parent', 'children')
 
+# Type parameters of Fields. These only matter for static type analysis (mypy).
+FieldValue = t.TypeVar("FieldValue")  # What does the field hold?
+InnerFieldValue = t.TypeVar("InnerFieldValue")  # For Dict/List/Set fields: What do they contain?
 
-class Field(Nameable):
+
+class Field(Nameable, t.Generic[FieldValue]):
     """
     A field class that can be used as a class attribute to define what data the
     class will want to refer to.
@@ -307,21 +361,30 @@ class Field(Nameable):
             runtime_options.
 
     """
-    MUTABLE = True
-    _default = None
-    # Indicates if a field's None value should be sent to the XML representation.
-    none_to_xml = False
+    MUTABLE: bool = True
+    _default: FieldValue | None | UniqueId = None
 
-    # We're OK redefining built-in `help`
-    def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
-                 display_name=None, values=None, enforce_type=False,
-                 xml_node=False, force_export=False, **kwargs):
+    # Indicates if a field's None value should be sent to the XML representation.
+    none_to_xml: bool = False
+
+    def __init__(
+        self,
+        help: str | None = None,  # pylint:disable=redefined-builtin
+        default: FieldValue | None | UniqueId | Unset = Unset(),
+        scope: ScopeBase = Scope.content,  
+        display_name: str | None = None,
+        values: list[object] | None = None,
+        enforce_type: bool = False,
+        xml_node: bool = False,
+        force_export: bool = False,
+        **kwargs
+    ):
         self.warned = False
         self.help = help
         self._enable_enforce_type = enforce_type
-        if default is not UNSET:
-            if default is UNIQUE_ID:
-                self._default = UNIQUE_ID
+        if not isinstance(default, Unset):
+            if isinstance(default, UniqueId):
+                self._default = UniqueId()
             else:
                 self._default = self._check_or_enforce_type(default)
         self.scope = scope
@@ -332,7 +395,7 @@ class Field(Nameable):
         self.force_export = force_export
 
     @property
-    def default(self):
+    def default(self) -> FieldValue | None | UniqueId:
         """Returns the static value that this defaults to."""
         if self.MUTABLE:
             return copy.deepcopy(self._default)
@@ -340,13 +403,13 @@ class Field(Nameable):
             return self._default
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Returns the name of this field."""
         # This is set by ModelMetaclass
         return self.__name__ or 'unknown'
 
     @property
-    def values(self):
+    def values(self) -> t.Any:
         """
         Returns the valid values for this class. This is useful
         for representing possible values in a UI.
@@ -379,7 +442,7 @@ class Field(Nameable):
             return self._values
 
     @property
-    def display_name(self):
+    def display_name(self) -> str:
         """
         Returns the display name for this class, suitable for use in a GUI.
 
@@ -387,27 +450,27 @@ class Field(Nameable):
         """
         return self._display_name if self._display_name is not None else self.name
 
-    def _get_cached_value(self, xblock):
+    def _get_cached_value(self, xblock) -> FieldValue | None | NoCacheValue:
         """
         Return a value from the xblock's cache, or a marker value if either the cache
         doesn't exist or the value is not found in the cache.
         """
-        return getattr(xblock, '_field_data_cache', {}).get(self.name, NO_CACHE_VALUE)
+        return getattr(xblock, '_field_data_cache', {}).get(self.name, NoCacheValue())
 
-    def _set_cached_value(self, xblock, value):
+    def _set_cached_value(self, xblock: XBlock, value: FieldValue | None):
         """Store a value in the xblock's cache, creating the cache if necessary."""
         # pylint: disable=protected-access
         if not hasattr(xblock, '_field_data_cache'):
             xblock._field_data_cache = {}
         xblock._field_data_cache[self.name] = value
 
-    def _del_cached_value(self, xblock):
+    def _del_cached_value(self, xblock: XBlock):
         """Remove a value from the xblock's cache, if the cache exists."""
         # pylint: disable=protected-access
         if hasattr(xblock, '_field_data_cache') and self.name in xblock._field_data_cache:
             del xblock._field_data_cache[self.name]
 
-    def _mark_dirty(self, xblock, value):
+    def _mark_dirty(self, xblock: XBlock, value: FieldValue | None | ExplicitlySet):
         """Set this field to dirty on the xblock."""
         # pylint: disable=protected-access
 
@@ -416,7 +479,7 @@ class Field(Nameable):
         if self not in xblock._dirty_fields:
             xblock._dirty_fields[self] = copy.deepcopy(value)
 
-    def _is_dirty(self, xblock):
+    def _is_dirty(self, xblock: XBlock) -> bool:
         """
         Return whether this field should be saved when xblock.save() is called
         """
@@ -425,15 +488,15 @@ class Field(Nameable):
             return False
 
         baseline = xblock._dirty_fields[self]
-        return baseline is EXPLICITLY_SET or xblock._field_data_cache[self.name] != baseline
+        return isinstance(baseline, ExplicitlySet) or xblock._field_data_cache[self.name] != baseline
 
-    def _is_lazy(self, value):
+    def _is_lazy(self, value: FieldValue | None) -> bool:
         """
         Detect if a value is being evaluated lazily by Django.
         """
         return 'django.utils.functional.' in str(type(value))
 
-    def _check_or_enforce_type(self, value):
+    def _check_or_enforce_type(self, value: t.Any) -> FieldValue | None:
         """
         Depending on whether enforce_type is enabled call self.enforce_type and
         return the result or call it and trigger a silent warning if the result
@@ -462,9 +525,9 @@ class Field(Nameable):
                     value, new_value)
                 warnings.warn(message, ModifyingEnforceTypeWarning, stacklevel=3)
 
-        return value
+        return value  # type: ignore
 
-    def _calculate_unique_id(self, xblock):
+    def _calculate_unique_id(self, xblock: XBlock) -> str:
         """
         Provide a default value for fields with `default=UNIQUE_ID`.
 
@@ -474,7 +537,7 @@ class Field(Nameable):
         key = scope_key(self, xblock)
         return hashlib.sha1(key.encode('utf-8')).hexdigest()
 
-    def _get_default_value_to_cache(self, xblock):
+    def _get_default_value_to_cache(self, xblock: XBlock) -> FieldValue | None:
         """
         Perform special logic to provide a field's default value for caching.
         """
@@ -482,39 +545,42 @@ class Field(Nameable):
             # pylint: disable=protected-access
             return self.from_json(xblock._field_data.default(xblock, self.name))
         except KeyError:
-            if self._default is UNIQUE_ID:
+            if isinstance(self.default, UniqueId):
                 return self._check_or_enforce_type(self._calculate_unique_id(xblock))
             else:
                 return self.default
 
-    def _sanitize(self, value):
+    def _sanitize(self, value: FieldValue | None) -> FieldValue | None:
         """
         Allow the individual fields to sanitize the value being set -or- "get".
         For example, a String field wants to remove control characters.
         """
         return value
 
-    def __get__(self, xblock, xblock_class):
+    def __get__(self, xblock: XBlock, xblock_class: type[XBlock]) -> FieldValue | None:
         """
         Gets the value of this xblock. Prioritizes the cached value over
         obtaining the value from the field-data service. Thus if a cached value
         exists, that is the value that will be returned.
         """
         if xblock is None:
-            return self
+            return self   # TODO: wtf?
 
         field_data = xblock._field_data
 
-        value = self._get_cached_value(xblock)
-        if value is NO_CACHE_VALUE:
+        cache_value = self._get_cached_value(xblock)
+        value: FieldValue | None
+        if isinstance(cache_value, NoCacheValue):
             if field_data.has(xblock, self.name):
                 value = self.from_json(field_data.get(xblock, self.name))
             elif self.name not in NO_GENERATED_DEFAULTS:
                 # Cache default value
                 value = self._get_default_value_to_cache(xblock)
-            else:
-                value = self.default
+            else:  # TODO: why aren't we handling UniqueId here???
+                value = self.default  # type: ignore
             self._set_cached_value(xblock, value)
+        else:
+            value = cache_value
 
         # If this is a mutable type, mark it as dirty, since mutations can occur without an
         # explicit call to __set__ (but they do require a call to __get__)
@@ -523,7 +589,7 @@ class Field(Nameable):
 
         return self._sanitize(value)
 
-    def __set__(self, xblock, value):
+    def __set__(self, xblock: XBlock, value: FieldValue | None) -> None:
         """
         Sets the `xblock` to the given `value`.
         Setting a value does not update the underlying data store; the
@@ -535,7 +601,7 @@ class Field(Nameable):
         """
         value = self._check_or_enforce_type(value)
         value = self._sanitize(value)
-        cached_value = self._get_cached_value(xblock)
+        cached_value = self._get_cached_value(xblock)  # TODO: why aren't we handling NoCacheValue??
         try:
             value_has_changed = cached_value != value
         except Exception:  # pylint: disable=broad-except
@@ -544,10 +610,10 @@ class Field(Nameable):
             value_has_changed = True
         if value_has_changed:
             # Mark the field as dirty and update the cache
-            self._mark_dirty(xblock, EXPLICITLY_SET)
+            self._mark_dirty(xblock, ExplicitlySet())
             self._set_cached_value(xblock, value)
 
-    def __delete__(self, xblock):
+    def __delete__(self, xblock: XBlock):
         """
         Deletes `xblock` from the underlying data store.
         Deletes are not cached; they are performed immediately.
@@ -591,7 +657,7 @@ class Field(Nameable):
             )
             self.warned = True
 
-    def to_json(self, value):
+    def to_json(self, value: FieldValue | None) -> t.Any:
         """
         Return value in the form of nested lists and dictionaries (suitable
         for passing to json.dumps).
@@ -602,7 +668,7 @@ class Field(Nameable):
         self._warn_deprecated_outside_JSONField()
         return value
 
-    def from_json(self, value):
+    def from_json(self, value) -> FieldValue | None:
         """
         Return value as a native full featured python type (the inverse of to_json)
 
@@ -610,22 +676,21 @@ class Field(Nameable):
         object
         """
         self._warn_deprecated_outside_JSONField()
-        return value
+        return value  # type: ignore
 
-    def to_string(self, value):
+    def to_string(self, value: FieldValue | None) -> str:
         """
         Return a JSON serialized string representation of the value.
         """
         self._warn_deprecated_outside_JSONField()
-        value = json.dumps(
+        return json.dumps(
             self.to_json(value),
             indent=2,
             sort_keys=True,
             separators=(',', ': '),
         )
-        return value
 
-    def from_string(self, serialized):
+    def from_string(self, serialized: str) -> FieldValue | None:
         """
         Returns a native value from a YAML serialized string representation.
         Since YAML is a superset of JSON, this is the inverse of to_string.)
@@ -634,7 +699,7 @@ class Field(Nameable):
         value = yaml.safe_load(serialized)
         return self.enforce_type(value)
 
-    def enforce_type(self, value):
+    def enforce_type(self, value: t.Any) -> FieldValue | None:
         """
         Coerce the type of the value, if necessary
 
@@ -644,52 +709,52 @@ class Field(Nameable):
         This must not have side effects, since it will be executed to trigger
         a DeprecationWarning even if enforce_type is disabled
         """
-        return value
+        return value  # type: ignore
 
-    def read_from(self, xblock):
+    def read_from(self, xblock: XBlock) -> FieldValue | None:
         """
         Retrieve the value for this field from the specified xblock
         """
         return self.__get__(xblock, xblock.__class__)  # pylint: disable=unnecessary-dunder-call
 
-    def read_json(self, xblock):
+    def read_json(self, xblock: XBlock) -> FieldValue | None:
         """
         Retrieve the serialized value for this field from the specified xblock
         """
         self._warn_deprecated_outside_JSONField()
         return self.to_json(self.read_from(xblock))
 
-    def write_to(self, xblock, value):
+    def write_to(self, xblock: XBlock, value: FieldValue | None) -> None:
         """
         Set the value for this field to value on the supplied xblock
         """
         self.__set__(xblock, value)  # pylint: disable=unnecessary-dunder-call
 
-    def delete_from(self, xblock):
+    def delete_from(self, xblock: XBlock) -> None:
         """
         Delete the value for this field from the supplied xblock
         """
         self.__delete__(xblock)   # pylint: disable=unnecessary-dunder-call
 
-    def is_set_on(self, xblock):
+    def is_set_on(self, xblock: XBlock) -> bool:
         """
         Return whether this field has a non-default value on the supplied xblock
         """
         # pylint: disable=protected-access
         return self._is_dirty(xblock) or xblock._field_data.has(xblock, self.name)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
 
-class JSONField(Field):
+class JSONField(Field, t.Generic[FieldValue]):
     """
     Field type which has a convenient JSON representation.
     """
     # for now; we'll bubble functions down when we finish deprecation in Field
 
 
-class Integer(JSONField):
+class Integer(JSONField[int]):
     """
     A field that contains an integer.
 
@@ -703,7 +768,7 @@ class Integer(JSONField):
     """
     MUTABLE = False
 
-    def from_json(self, value):
+    def from_json(self, value) -> int | None:
         if value is None or value == '':
             return None
         return int(value)
@@ -711,7 +776,7 @@ class Integer(JSONField):
     enforce_type = from_json
 
 
-class Float(JSONField):
+class Float(JSONField[float]):
     """
     A field that contains a float.
 
@@ -722,7 +787,7 @@ class Float(JSONField):
     """
     MUTABLE = False
 
-    def from_json(self, value):
+    def from_json(self, value) -> float | None:
         if value is None or value == '':
             return None
         return float(value)
@@ -730,7 +795,7 @@ class Float(JSONField):
     enforce_type = from_json
 
 
-class Boolean(JSONField):
+class Boolean(JSONField[bool]):
     """
     A field class for representing a boolean.
 
@@ -759,7 +824,7 @@ class Boolean(JSONField):
                          values=({'display_name': "True", "value": True},
                                  {'display_name': "False", "value": False}), **kwargs)
 
-    def from_json(self, value):
+    def from_json(self, value) -> bool | None:
         if isinstance(value, bytes):
             value = value.decode('ascii', errors='replace')
         if isinstance(value, str):
@@ -770,7 +835,7 @@ class Boolean(JSONField):
     enforce_type = from_json
 
 
-class Dict(JSONField):
+class Dict(JSONField[t.Dict[str, InnerFieldValue]], t.Generic[InnerFieldValue]):
     """
     A field class for representing a Python dict.
 
@@ -779,7 +844,7 @@ class Dict(JSONField):
     """
     _default = {}
 
-    def from_json(self, value):
+    def from_json(self, value) -> dict[str, InnerFieldValue] | None:
         if value is None or isinstance(value, dict):
             return value
         else:
@@ -787,7 +852,7 @@ class Dict(JSONField):
 
     enforce_type = from_json
 
-    def to_string(self, value):
+    def to_string(self, value) -> str:
         """
         In python3, json.dumps() cannot sort keys of different types,
         so preconvert None to 'null'.
@@ -800,7 +865,7 @@ class Dict(JSONField):
         return super().to_string(value)
 
 
-class List(JSONField):
+class List(JSONField[t.List[InnerFieldValue]], t.Generic[InnerFieldValue]):
     """
     A field class for representing a list.
 
@@ -809,7 +874,7 @@ class List(JSONField):
     """
     _default = []
 
-    def from_json(self, value):
+    def from_json(self, value) -> list[InnerFieldValue] | None:
         if value is None or isinstance(value, list):
             return value
         else:
@@ -818,7 +883,7 @@ class List(JSONField):
     enforce_type = from_json
 
 
-class Set(JSONField):
+class Set(JSONField[t.List[InnerFieldValue]], t.Generic[InnerFieldValue]):
     """
     A field class for representing a set.
 
@@ -837,7 +902,7 @@ class Set(JSONField):
 
         self._default = set(self._default)
 
-    def from_json(self, value):
+    def from_json(self, value) -> set[InnerFieldValue] | None:
         if value is None or isinstance(value, set):
             return value
         else:
@@ -846,7 +911,7 @@ class Set(JSONField):
     enforce_type = from_json
 
 
-class String(JSONField):
+class String(JSONField[str]):
     """
     A field class for representing a string.
 
@@ -856,7 +921,7 @@ class String(JSONField):
     MUTABLE = False
     BAD_REGEX = re.compile('[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]', flags=re.UNICODE)
 
-    def _sanitize(self, value):
+    def _sanitize(self, value) -> str | None:
         """
         Remove the control characters that are not allowed in XML:
         https://www.w3.org/TR/xml/#charsets
@@ -876,7 +941,7 @@ class String(JSONField):
         else:
             return value
 
-    def from_json(self, value):
+    def from_json(self, value) -> str | None:
         if value is None:
             return None
         elif isinstance(value, (bytes, str)):
@@ -888,20 +953,23 @@ class String(JSONField):
         else:
             raise TypeError('Value stored in a String must be None or a string, found %s' % type(value))
 
-    def from_string(self, serialized):
+    def from_string(self, serialized) -> str | None:
         """String gets serialized and deserialized without quote marks."""
         return self.from_json(serialized)
 
-    def to_string(self, value):
+    def to_string(self, value) -> str:
         """String gets serialized and deserialized without quote marks."""
         if isinstance(value, bytes):
             value = value.decode('utf-8')
         return self.to_json(value)
 
-    @property
-    def none_to_xml(self):
-        """Returns True to use a XML node for the field and represent None as an attribute."""
-        return True
+    def enforce_type(self, value: t.Any) -> str | None:
+        """
+        (no-op override just to make mypy happy about XMLString.enforce_type)
+        """
+        return super().enforce_type(value)  
+
+    none_to_xml = True  # Use an XML node for the field, and represent None as an attribute.
 
     enforce_type = from_json
 
@@ -915,7 +983,7 @@ class XMLString(String):
     an lxml.etree.XMLSyntaxError will be raised.
     """
 
-    def to_json(self, value):
+    def to_json(self, value) -> t.Any:
         """
         Serialize the data, ensuring that it is valid XML (or None).
 
@@ -926,13 +994,13 @@ class XMLString(String):
             value = self.enforce_type(value)
         return super().to_json(value)
 
-    def enforce_type(self, value):
+    def enforce_type(self, value: t.Any) -> str | None:
         if value is not None:
             etree.XML(value)
-        return value
+        return value  # type: ignore
 
 
-class DateTime(JSONField):
+class DateTime(JSONField[t.Union[datetime, timedelta]]):
     """
     A field for representing a datetime.
 
@@ -942,7 +1010,7 @@ class DateTime(JSONField):
 
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
-    def from_json(self, value):
+    def from_json(self, value) -> datetime | timedelta | None:
         """
         Parse the date from an ISO-formatted date string, or None.
         """
@@ -964,16 +1032,16 @@ class DateTime(JSONField):
 
         # Interpret raw numbers as a relative dates
         if isinstance(value, (int, float)):
-            value = datetime.timedelta(seconds=value)
+            value = timedelta(seconds=value)
 
-        if not isinstance(value, (datetime.datetime, datetime.timedelta)):
+        if not isinstance(value, (datetime, timedelta)):
             raise TypeError(
                 "Value should be loaded from a string, a datetime object, a timedelta object, or None, not {}".format(
                     type(value)
                 )
             )
 
-        if isinstance(value, datetime.datetime):
+        if isinstance(value, datetime):
             if value.tzinfo is not None:
                 return value.astimezone(pytz.utc)
             else:
@@ -981,14 +1049,14 @@ class DateTime(JSONField):
         else:
             return value
 
-    def to_json(self, value):
+    def to_json(self, value) -> t.Any:
         """
         Serialize the date as an ISO-formatted date string, or None.
         """
-        if isinstance(value, datetime.datetime):
+        if isinstance(value, datetime):
             return value.strftime(self.DATETIME_FORMAT)
 
-        if isinstance(value, datetime.timedelta):
+        if isinstance(value, timedelta):
             return value.total_seconds()
 
         if value is None:
@@ -996,14 +1064,14 @@ class DateTime(JSONField):
 
         raise TypeError(f"Value stored must be a datetime or timedelta object, not {type(value)}")
 
-    def to_string(self, value):
+    def to_string(self, value) -> str:
         """DateTime fields get serialized without quote marks."""
         return self.to_json(value)
 
     enforce_type = from_json
 
 
-class Any(JSONField):
+class Any(JSONField[t.Any]):
     """
     A field class for representing any piece of data; type is not enforced.
 
@@ -1013,7 +1081,7 @@ class Any(JSONField):
     """
 
 
-class Reference(JSONField):
+class Reference(JSONField[UsageKey]):
     """
     An xblock reference. That is, a pointer to another xblock.
 
@@ -1022,7 +1090,7 @@ class Reference(JSONField):
     """
 
 
-class ReferenceList(List):
+class ReferenceList(List[UsageKey]):
     """
     An list of xblock references. That is, pointers to xblocks.
 
@@ -1033,7 +1101,19 @@ class ReferenceList(List):
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
 
 
-class ReferenceValueDict(Dict):
+class ReferenceListNotNone(ReferenceList):
+    """
+    An list of xblock references. Should not equal None.
+
+    Functionally, this is exactly equivalent to ReferenceList.
+    To the type-checker, this adds that guarantee that accessing the field will always return
+    a list of UsageKeys, rather than None OR a list of UsageKeys.
+    """
+    def __get__(self, xblock: XBlock, xblock_class: type[XBlock]) -> list[UsageKey]:
+        return super().__get__(xblock, xblock_class)  # type: ignore
+
+
+class ReferenceValueDict(Dict[UsageKey]):
     """
     A dictionary where the values are xblock references. That is, pointers to xblocks.
 
@@ -1044,8 +1124,9 @@ class ReferenceValueDict(Dict):
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
 
 
-def scope_key(instance, xblock):
-    """Generate a unique key for a scope that can be used as a
+def scope_key(instance: Field, xblock: XBlock) -> str:
+    """
+    Generate a unique key for a scope that can be used as a
     filename, in a URL, or in a KVS.
 
     Our goal is to have a pretty, human-readable 1:1 encoding.
@@ -1110,11 +1191,10 @@ def scope_key(instance, xblock):
 
     key_list = []
 
-    def encode(char):
+    def encode(char: str) -> str:
         """
         Replace all non-alphanumeric characters with -n- where n
         is their Unicode codepoint.
-        TODO: Test for UTF8 which is not ASCII
         """
         if char.isalnum():
             return char
