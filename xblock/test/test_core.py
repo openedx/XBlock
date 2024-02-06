@@ -958,11 +958,6 @@ class OpenLocalResourceTest(unittest.TestCase):
         """Just something to load resources from."""
         resources_dir = None
 
-    def stub_resource_stream(self, module, name):
-        """Act like pkg_resources.resource_stream, for testing."""
-        assert module == "xblock.test.test_core"
-        return "!" + name + "!"
-
     @ddt.data(
         "public/hey.js",
         "public/sub/hey.js",
@@ -973,7 +968,8 @@ class OpenLocalResourceTest(unittest.TestCase):
     )
     def test_open_good_local_resource(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)
-        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+        with patch('importlib_resources.files') as mock_files:
+            mock_files.return_value.joinpath.return_value.open.return_value = "!" + uri + "!"
             assert loadable.open_local_resource(uri) == "!" + uri + "!"
             assert loadable.open_local_resource(uri.encode('utf-8')) == "!" + uri + "!"
 
@@ -987,7 +983,8 @@ class OpenLocalResourceTest(unittest.TestCase):
     )
     def test_open_good_local_resource_binary(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)
-        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+        with patch('importlib_resources.files') as mock_files:
+            mock_files.return_value.joinpath.return_value.open.return_value = "!" + uri.decode('utf-8') + "!"
             assert loadable.open_local_resource(uri) == "!" + uri.decode('utf-8') + "!"
 
     @ddt.data(
@@ -1001,7 +998,8 @@ class OpenLocalResourceTest(unittest.TestCase):
     )
     def test_open_bad_local_resource(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)
-        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+        with patch('importlib_resources.files') as mock_files:
+            mock_files.return_value.joinpath.return_value.open.return_value = "!" + uri + "!"
             msg_pattern = ".*: %s" % re.escape(repr(uri))
             with pytest.raises(DisallowedFileError, match=msg_pattern):
                 loadable.open_local_resource(uri)
@@ -1017,7 +1015,8 @@ class OpenLocalResourceTest(unittest.TestCase):
     )
     def test_open_bad_local_resource_binary(self, uri):
         loadable = self.LoadableXBlock(None, scope_ids=None)
-        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+        with patch('importlib_resources.files') as mock_files:
+            mock_files.return_value.joinpath.return_value.open.return_value = "!" + str(uri) + "!"
             msg = ".*: %s" % re.escape(repr(uri.decode('utf-8')))
             with pytest.raises(DisallowedFileError, match=msg):
                 loadable.open_local_resource(uri)
@@ -1040,7 +1039,8 @@ class OpenLocalResourceTest(unittest.TestCase):
     def test_open_local_resource_with_no_resources_dir(self, uri):
         unloadable = self.UnloadableXBlock(None, scope_ids=None)
 
-        with patch('pkg_resources.resource_stream', self.stub_resource_stream):
+        with patch('importlib_resources.files') as mock_files:
+            mock_files.return_value.joinpath.return_value.open.return_value = "!" + uri + "!"
             msg = "not configured to serve local resources"
             with pytest.raises(DisallowedFileError, match=msg):
                 unloadable.open_local_resource(uri)

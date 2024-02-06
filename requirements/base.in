@@ -3,6 +3,7 @@
 
 edx-opaque-keys
 fs
+importlib-resources
 lxml
 mako
 markupsafe

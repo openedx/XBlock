@@ -6,8 +6,8 @@ import os
 import sys
 import warnings
 
-import pkg_resources
-from django.template import Context, Template, Engine
+import importlib_resources
+from django.template import Context, Engine, Template
 from django.template.backends.django import get_installed_libraries
 from mako.lookup import TemplateLookup as MakoTemplateLookup
 from mako.template import Template as MakoTemplate
@@ -22,8 +22,7 @@ class ResourceLoader:
         """
         Gets the content of a resource
         """
-        resource_content = pkg_resources.resource_string(self.module_name, resource_path)
-        return resource_content.decode('utf-8')
+        return importlib_resources.files(self.module_name).joinpath(resource_path).read_text()
 
     def render_django_template(self, template_path, context=None, i18n_service=None):
         """
@@ -57,7 +56,8 @@ class ResourceLoader:
         )
         context = context or {}
         template_str = self.load_unicode(template_path)
-        lookup = MakoTemplateLookup(directories=[pkg_resources.resource_filename(self.module_name, '')])
+        directory = str(importlib_resources.as_file(importlib_resources.files(self.module_name) / ''))
+        lookup = MakoTemplateLookup(directories=[directory])
         template = MakoTemplate(template_str, lookup=lookup)
         return template.render(**context)
 
