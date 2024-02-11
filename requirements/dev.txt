@@ -12,7 +12,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-astroid==3.0.2
+astroid==3.0.3
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -21,11 +21,11 @@ attrs==23.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.34.34
+boto3==1.34.39
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.34.34
+botocore==1.34.39
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -115,7 +115,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.97.5
+hypothesis==6.98.3
     # via -r requirements/test.txt
 importlib-metadata==7.0.1
     # via
@@ -176,7 +176,7 @@ packaging==23.2
     #   pyproject-api
     #   pytest
     #   tox
-path==16.9.0
+path==16.10.0
     # via -r requirements/test.txt
 pbr==6.0.0
     # via
@@ -200,11 +200,11 @@ pluggy==1.4.0
     #   tox
 pycodestyle==2.11.1
     # via -r requirements/test.txt
-pydantic==2.6.0
+pydantic==2.6.1
     # via
     #   -r requirements/test.txt
     #   inflect
-pydantic-core==2.16.1
+pydantic-core==2.16.2
     # via
     #   -r requirements/test.txt
     #   pydantic
@@ -258,7 +258,7 @@ python-dateutil==2.8.2
     # via
     #   -r requirements/test.txt
     #   botocore
-python-slugify==8.0.3
+python-slugify==8.0.4
     # via
     #   -r requirements/test.txt
     #   code-annotations
