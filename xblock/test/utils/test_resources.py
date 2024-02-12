@@ -5,9 +5,9 @@ Tests for resources.py
 
 import gettext
 import unittest
-from unittest.mock import patch, DEFAULT
+from unittest.mock import DEFAULT, patch
 
-from pkg_resources import resource_filename
+import importlib_resources
 
 from xblock.utils.resources import ResourceLoader
 
@@ -136,7 +136,7 @@ class MockI18nService:
     def __init__(self):
 
         locale_dir = 'data/translations'
-        locale_path = resource_filename(__name__, locale_dir)
+        locale_path = str(importlib_resources.files(__name__) / locale_dir)
         domain = 'text'
         self.mock_translator = gettext.translation(
             domain,

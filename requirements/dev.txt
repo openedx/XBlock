@@ -115,12 +115,14 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.98.3
+hypothesis==6.98.4
     # via -r requirements/test.txt
 importlib-metadata==7.0.1
     # via
     #   -r requirements/pip-tools.txt
     #   build
+importlib-resources==6.1.1
+    # via -r requirements/test.txt
 inflect==7.0.0
     # via
     #   -r requirements/test.txt
@@ -150,8 +152,10 @@ jmespath==1.0.1
     #   botocore
 lazy==1.6
     # via -r requirements/test.txt
-lxml==5.1.0
-    # via -r requirements/test.txt
+lxml==4.9.4
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/test.txt
 mako==1.3.2
     # via -r requirements/test.txt
 markupsafe==2.1.5
@@ -351,7 +355,9 @@ wheel==0.42.0
 zipp==3.17.0
     # via
     #   -r requirements/pip-tools.txt
+    #   -r requirements/test.txt
     #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

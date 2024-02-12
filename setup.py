@@ -48,6 +48,7 @@ setup(
     },
     install_requires=[
         'fs',
+        'importlib-resources',
         'lxml',
         'mako',
         'markupsafe',

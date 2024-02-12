@@ -10,7 +10,7 @@ import inspect
 import os
 import warnings
 
-import pkg_resources
+import importlib_resources
 
 import xblock.exceptions
 from xblock.exceptions import DisallowedFileError
@@ -119,7 +119,9 @@ class SharedBlockBase(Plugin):
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
 
-        return pkg_resources.resource_stream(cls.__module__, os.path.join(cls.resources_dir, uri))
+        return importlib_resources.files(cls.__module__).joinpath(
+            os.path.join(cls.resources_dir, uri)
+        ).open('rb')
 
 
 # -- Base Block
