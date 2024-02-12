@@ -28,14 +28,18 @@ fs==2.4.16
     #   openedx-django-pyfs
 fs-s3fs==1.1.1
     # via openedx-django-pyfs
+importlib-resources==6.1.1
+    # via -r requirements/base.txt
 jmespath==1.0.1
     # via
     #   boto3
     #   botocore
 lazy==1.6
     # via -r requirements/django.in
-lxml==5.1.0
-    # via -r requirements/base.txt
+lxml==4.9.4
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/base.txt
 mako==1.3.2
     # via -r requirements/base.txt
 markupsafe==2.1.5
@@ -88,6 +92,10 @@ web-fragments==2.1.0
     # via -r requirements/base.txt
 webob==1.8.7
     # via -r requirements/base.txt
+zipp==3.17.0
+    # via
+    #   -r requirements/base.txt
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
