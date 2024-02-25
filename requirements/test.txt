@@ -17,11 +17,11 @@ astroid==3.0.3
     #   pylint-celery
 attrs==23.2.0
     # via hypothesis
-boto3==1.34.44
+boto3==1.34.49
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.44
+botocore==1.34.49
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -41,7 +41,7 @@ code-annotations==1.6.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.4.1
+coverage[toml]==7.4.3
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -80,7 +80,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.98.6
+hypothesis==6.98.11
     # via -r requirements/test.in
 inflect==7.0.0
     # via jinja2-pluralize
@@ -140,13 +140,13 @@ pluggy==1.4.0
     #   tox
 pycodestyle==2.11.1
     # via -r requirements/test.in
-pydantic==2.6.1
+pydantic==2.6.2
     # via inflect
-pydantic-core==2.16.2
+pydantic-core==2.16.3
     # via pydantic
 pygments==2.17.2
     # via diff-cover
-pylint==3.0.3
+pylint==3.0.4
     # via
     #   -r requirements/test.in
     #   edx-lint
@@ -167,7 +167,7 @@ pymongo==3.13.0
     #   edx-opaque-keys
 pyproject-api==1.6.1
     # via tox
-pytest==8.0.1
+pytest==8.0.2
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -209,7 +209,7 @@ sqlparse==0.4.4
     # via
     #   -r requirements/django.txt
     #   django
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/django.txt
     #   code-annotations
@@ -241,7 +241,7 @@ urllib3==1.26.18
     # via
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.25.0
+virtualenv==20.25.1
     # via tox
 web-fragments==2.1.0
     # via -r requirements/django.txt

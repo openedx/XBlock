@@ -21,11 +21,11 @@ attrs==23.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.34.44
+boto3==1.34.49
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.34.44
+botocore==1.34.49
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -65,7 +65,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.4.1
+coverage[toml]==7.4.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -114,7 +114,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.98.6
+hypothesis==6.98.11
     # via -r requirements/test.txt
 importlib-metadata==7.0.1
     # via
@@ -199,11 +199,11 @@ pluggy==1.4.0
     #   tox
 pycodestyle==2.11.1
     # via -r requirements/test.txt
-pydantic==2.6.1
+pydantic==2.6.2
     # via
     #   -r requirements/test.txt
     #   inflect
-pydantic-core==2.16.2
+pydantic-core==2.16.3
     # via
     #   -r requirements/test.txt
     #   pydantic
@@ -211,7 +211,7 @@ pygments==2.17.2
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==3.0.3
+pylint==3.0.4
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -245,7 +245,7 @@ pyproject-hooks==1.0.0
     #   -r requirements/pip-tools.txt
     #   build
     #   pip-tools
-pytest==8.0.1
+pytest==8.0.2
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -291,7 +291,7 @@ sqlparse==0.4.4
     # via
     #   -r requirements/test.txt
     #   django
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -335,7 +335,7 @@ urllib3==1.26.18
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.25.0
+virtualenv==20.25.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
