@@ -13,13 +13,12 @@ in depth and guides developers through the process of creating an XBlock.
 
 .. toctree::
     :titlesonly:
-    
+
     changelog
     introduction
     xblock
     fields
     runtime
-    fragment
     plugins
     exceptions
     xblock-tutorial/index
