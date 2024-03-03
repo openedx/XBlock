@@ -22,7 +22,7 @@ pbr==6.0.0
     # via stevedore
 pymongo==3.13.0
     # via edx-opaque-keys
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
     # via -r requirements/base.in
 pytz==2024.1
     # via -r requirements/base.in
@@ -36,7 +36,7 @@ six==1.16.0
     #   python-dateutil
 stevedore==5.2.0
     # via edx-opaque-keys
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via edx-opaque-keys
 web-fragments==2.1.0
     # via -r requirements/base.in

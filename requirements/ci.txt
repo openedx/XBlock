@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-cachetools==5.3.2
+cachetools==5.3.3
     # via tox
 chardet==5.2.0
     # via tox
