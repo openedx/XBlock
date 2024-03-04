@@ -425,7 +425,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
     """
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
+    def parse_xml(cls, node, runtime, keys):
         """
         Use `node` to construct a new block.
 
@@ -436,10 +436,6 @@ class XmlSerializationMixin(ScopedStorageMixin):
 
             keys (:class:`.ScopeIds`): The keys identifying where this block
                 will store its data.
-
-            id_generator (:class:`.IdGenerator`): An object that will allow the
-                runtime to generate correct definition and usage ids for
-                children of this block.
 
         """
         block = runtime.construct_xblock_from_class(cls, keys)
@@ -456,7 +452,7 @@ class XmlSerializationMixin(ScopedStorageMixin):
             if namespace == XML_NAMESPACES["option"]:
                 cls._set_field_if_present(block, tag, child.text, child.attrib)
             else:
-                block.runtime.add_node_as_child(block, child, id_generator)
+                block.runtime.add_node_as_child(block, child)
 
         # Attributes become fields.
         for name, value in list(node.items()):  # lxml has no iteritems

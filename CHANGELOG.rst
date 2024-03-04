@@ -7,6 +7,17 @@ These are notable changes in XBlock.
 Unreleased
 ----------
 
+2.0.0 - 2024-02-26
+------------------
+
+* Removed deprecations
+* xblock.fragment (removed completely)
+* xblock.runtime.Runtime._aside_from_xml (just the id_generator argument)
+* xblock.runtime.Runtime._usage_id_from_node (just the id_generator argument)
+* xblock.runtime.Runtime.add_node_as_child (just the id_generator argument)
+* xblock.runtime.Runtime.parse_xml_string (just the id_generator argument)
+* xblock.runtime.Runtime.parse_xml_file (just the id_generator argument)
+
 1.10.0 - 2024-01-12
 -------------------
 
