@@ -835,7 +835,7 @@ def test_cached_parent():
     block.parent = "some_parent_id"
     parent = block.get_parent()
     assert parent is not None
-    assert runtime.get_block.called_with("some_parent_id")
+    assert runtime.get_block.called
 
     # Get the parent again.  It will be the same parent, and we didn't call the
     # runtime.

@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ['3.8']
-        toxenv: [quality, django32, django42]
+        python-version: ['3.8', '3.12']
+        toxenv: [quality, django42]
 
     steps:
     - uses: actions/checkout@v3

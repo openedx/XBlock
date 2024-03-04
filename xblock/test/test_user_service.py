@@ -29,10 +29,10 @@ def test_dummy_user_service_current_user():
     assert current_user == user
     assert current_user.full_name == "tester"
     # assert that emails is an Iterable but not a string
-    assert isinstance(current_user.emails, collections.Iterable)
+    assert isinstance(current_user.emails, collections.abc.Iterable)
     assert not isinstance(current_user.emails, (str, bytes))
     # assert that opt_attrs is a Mapping
-    assert isinstance(current_user.opt_attrs, collections.Mapping)
+    assert isinstance(current_user.opt_attrs, collections.abc.Mapping)
 
 
 def test_dummy_user_service_exception():
