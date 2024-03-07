@@ -14,8 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8']
-        toxenv: [quality, django32, django42]
+        python-version: ['3.8', '3.12']
+        toxenv: [quality, django42]
 
     steps:
     - uses: actions/checkout@v3
