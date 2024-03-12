@@ -10,8 +10,10 @@ edx-opaque-keys==2.5.1
     # via -r requirements/base.in
 fs==2.4.16
     # via -r requirements/base.in
-lxml==5.1.0
-    # via -r requirements/base.in
+lxml==4.9.4
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/base.in
 mako==1.3.2
     # via -r requirements/base.in
 markupsafe==2.1.5
