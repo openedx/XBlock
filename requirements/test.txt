@@ -10,6 +10,10 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
+asgiref==3.7.2
+    # via
+    #   -r requirements/django.txt
+    #   django
 astroid==3.1.0
     # via
     #   -r requirements/test.in
@@ -17,11 +21,15 @@ astroid==3.1.0
     #   pylint-celery
 attrs==23.2.0
     # via hypothesis
-boto3==1.34.59
+backports-zoneinfo==0.2.1 ; python_version < "3.9"
+    # via
+    #   -r requirements/django.txt
+    #   django
+boto3==1.34.62
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.59
+botocore==1.34.62
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -37,7 +45,7 @@ click==8.1.7
     #   edx-lint
 click-log==0.4.0
     # via edx-lint
-code-annotations==1.6.0
+code-annotations==1.7.0
     # via edx-lint
 colorama==0.4.6
     # via tox
@@ -80,7 +88,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.99.0
+hypothesis==6.99.6
     # via -r requirements/test.in
 inflect==7.0.0
     # via jinja2-pluralize
@@ -119,7 +127,7 @@ mock==5.1.0
     # via -r requirements/test.in
 openedx-django-pyfs==3.5.0
     # via -r requirements/django.txt
-packaging==23.2
+packaging==24.0
     # via
     #   pyproject-api
     #   pytest
@@ -142,7 +150,7 @@ pluggy==1.4.0
     #   tox
 pycodestyle==2.11.1
     # via -r requirements/test.in
-pydantic==2.6.3
+pydantic==2.6.4
     # via inflect
 pydantic-core==2.16.3
     # via pydantic
@@ -185,9 +193,7 @@ python-dateutil==2.9.0.post0
 python-slugify==8.0.4
     # via code-annotations
 pytz==2024.1
-    # via
-    #   -r requirements/django.txt
-    #   django
+    # via -r requirements/django.txt
 pyyaml==6.0.1
     # via
     #   -r requirements/django.txt
@@ -233,6 +239,7 @@ typing-extensions==4.10.0
     # via
     #   -r requirements/django.txt
     #   annotated-types
+    #   asgiref
     #   astroid
     #   edx-opaque-keys
     #   inflect
