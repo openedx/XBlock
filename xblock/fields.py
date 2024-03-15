@@ -307,7 +307,6 @@ class Field(Nameable):
             runtime_options.
 
     """
-    MUTABLE = True
     _default = None
     # Indicates if a field's None value should be sent to the XML representation.
     none_to_xml = False
@@ -334,10 +333,7 @@ class Field(Nameable):
     @property
     def default(self):
         """Returns the static value that this defaults to."""
-        if self.MUTABLE:
-            return copy.deepcopy(self._default)
-        else:
-            return self._default
+        return copy.deepcopy(self._default)
 
     @property
     def name(self):
@@ -516,10 +512,7 @@ class Field(Nameable):
                 value = self.default
             self._set_cached_value(xblock, value)
 
-        # If this is a mutable type, mark it as dirty, since mutations can occur without an
-        # explicit call to __set__ (but they do require a call to __get__)
-        if self.MUTABLE:
-            self._mark_dirty(xblock, value)
+        self._mark_dirty(xblock, value)
 
         return self._sanitize(value)
 
@@ -701,7 +694,6 @@ class Integer(JSONField):
     containing a floating point number ('3.48') will throw an error.
 
     """
-    MUTABLE = False
 
     def from_json(self, value):
         if value is None or value == '':
@@ -720,7 +712,6 @@ class Float(JSONField):
     something for which float(value) does not throw an error.
 
     """
-    MUTABLE = False
 
     def from_json(self, value):
         if value is None or value == '':
@@ -750,7 +741,6 @@ class Boolean(JSONField):
         None - > False
 
     """
-    MUTABLE = False
 
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None,
@@ -853,7 +843,6 @@ class String(JSONField):
     The value, as loaded or enforced, can either be None or a basestring instance.
 
     """
-    MUTABLE = False
     BAD_REGEX = re.compile('[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]', flags=re.UNICODE)
 
     def _sanitize(self, value):

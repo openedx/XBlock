@@ -122,7 +122,6 @@ class Filesystem(Field):
     src=...> will typically be faster through this than serving that
     up through XBlocks views.
     """
-    MUTABLE = False
 
     def __get__(self, xblock, xblock_class):
         """
