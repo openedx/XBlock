@@ -344,7 +344,7 @@ class ExportTest(XmlTest, unittest.TestCase):
     def test_unknown_field_as_attribute_raises_warning(self, parameter_name):
         with mock.patch('logging.warning') as patched_warn:
             block = self.parse_xml_to_block(f"<leaf {parameter_name}='something irrelevant'></leaf>")
-            patched_warn.assert_called_once_with("XBlock %s does not contain field %s", type(block), parameter_name)
+            patched_warn.assert_called_once_with("%s does not contain field %s", type(block), parameter_name)
 
     @XBlock.register_temp_plugin(LeafWithOption)
     @ddt.data(
@@ -361,7 +361,7 @@ class ExportTest(XmlTest, unittest.TestCase):
         """) % (get_namespace_attrs(), parameter_name, parameter_name)
         with mock.patch('logging.warning') as patched_warn:
             block = self.parse_xml_to_block(xml)
-            patched_warn.assert_called_once_with("XBlock %s does not contain field %s", type(block), parameter_name)
+            patched_warn.assert_called_once_with("%s does not contain field %s", type(block), parameter_name)
 
 
 class TestRoundTrip(XmlTest, unittest.TestCase):

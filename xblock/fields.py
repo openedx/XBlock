@@ -20,14 +20,12 @@ from lxml import etree
 import pytz
 import yaml
 
-from xblock.internal import Nameable
 
 # __all__ controls what classes end up in the docs, and in what order.
 __all__ = [
     'BlockScope', 'UserScope', 'Scope', 'ScopeIds',
     'Field',
     'Boolean', 'Dict', 'Float', 'Integer', 'List', 'Set', 'String', 'XMLString',
-    'XBlockMixin',
 ]
 
 
@@ -263,7 +261,7 @@ EXPLICITLY_SET = Sentinel("fields.EXPLICITLY_SET")
 NO_GENERATED_DEFAULTS = ('parent', 'children')
 
 
-class Field(Nameable):
+class Field:
     """
     A field class that can be used as a class attribute to define what data the
     class will want to refer to.
@@ -312,6 +310,8 @@ class Field(Nameable):
     # Indicates if a field's None value should be sent to the XML representation.
     none_to_xml = False
 
+    __name__ = None
+
     # We're OK redefining built-in `help`
     def __init__(self, help=None, default=UNSET, scope=Scope.content,  # pylint:disable=redefined-builtin
                  display_name=None, values=None, enforce_type=False,
@@ -338,6 +338,13 @@ class Field(Nameable):
             return copy.deepcopy(self._default)
         else:
             return self._default
+
+    @staticmethod
+    def needs_name(field):
+        """
+        Returns whether the given ) is yet to be named.
+        """
+        return not field.__name__
 
     @property
     def name(self):

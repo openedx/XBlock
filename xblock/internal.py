@@ -2,7 +2,6 @@
 Internal machinery used to make building XBlock family base classes easier.
 """
 import functools
-import inspect
 
 
 class LazyClassProperty:
@@ -28,42 +27,3 @@ class LazyClassProperty:
 
 
 class_lazy = LazyClassProperty  # pylint: disable=invalid-name
-
-
-class NamedAttributesMetaclass(type):
-    """
-    A metaclass which adds the __name__ attribute to all Nameable attributes
-    which are attributes of the instantiated class, or of its baseclasses.
-    """
-    def __new__(mcs, name, bases, attrs):
-        # Iterate over the attrs before they're bound to the class
-        # so that we don't accidentally trigger any __get__ methods
-        for attr_name, attr in attrs.items():
-            if Nameable.needs_name(attr):
-                attr.__name__ = attr_name
-
-        # Iterate over all of the base classes, so that we can add
-        # names to any mixins that don't include this metaclass, but that
-        # do include Nameable attributes
-        for base in bases:
-            for attr_name, attr in inspect.getmembers(base, Nameable.needs_name):
-                attr.__name__ = attr_name
-
-        return super().__new__(mcs, name, bases, attrs)
-
-
-class Nameable:
-    """
-    A base class for class attributes which, when used in concert with
-    :class:`.NamedAttributesMetaclass`, will be assigned a `__name__`
-    attribute based on what class attribute they are bound to.
-    """
-    __name__ = None
-
-    @staticmethod
-    def needs_name(obj):
-        """
-        Return True if `obj` is a :class:`.Nameable` object that
-        hasn't yet been assigned a name.
-        """
-        return isinstance(obj, Nameable) and obj.__name__ is None

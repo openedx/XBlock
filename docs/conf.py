@@ -128,6 +128,7 @@ nitpick_ignore = [
     ('py:class', 'aside'),
     ('py:class', 'aside_fn'),
     ('py:class', 'webob.Request'),
+    ('py:class', 'webob.Response'),
 ]
 
 suppress_warnings = [

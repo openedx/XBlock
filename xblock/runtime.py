@@ -541,9 +541,9 @@ class Runtime(metaclass=ABCMeta):
             default_class (class): The default class to use if a class can't be found for a
                 particular `block_type` when loading an :class:`.XBlock`.
 
-            select: A function to select from one or more :class:`.XBlock` subtypes found
-                when calling :meth:`.XBlock.load_class` to resolve a `block_type`.
-                This is the same `select` as used by :meth:`.Plugin.load_class`.
+            select: A function to select from one or more XBlock-like subtypes found
+                when calling :meth:`.XBlock.load_class` or :meth:`.XBlockAside.load_class`
+                to resolve a `block_type`.
 
         """
         self.id_reader = id_reader

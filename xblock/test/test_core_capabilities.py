@@ -1,5 +1,12 @@
 """
-Tests of the XBlock-family functionality mixins
+Tests for various capabilities of Blocklikes.
+
+This is separate from test_core because these capabilities were originally
+provided by a varity of mixins to XBlock and XBlockAside. Those mixins were
+mostly collapsed into Blocklike because they were hard to reason about and
+unfriendly to type annotation. However, it led to pretty good organization
+for testing various block capabilities, so we've left the tests separated
+like this.
 """
 from datetime import datetime
 from unittest import TestCase
@@ -9,10 +16,9 @@ import ddt
 import pytz
 from lxml import etree
 
-from xblock.core import XBlock, XBlockAside
+from xblock.core import Blocklike, XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
 from xblock.field_data import DictFieldData
-from xblock.mixins import ScopedStorageMixin, HierarchyMixin, IndexInfoMixin, ViewsMixin, XML_NAMESPACES
 from xblock.runtime import Runtime
 from xblock.test.tools import TestRuntime
 
@@ -30,40 +36,40 @@ class AttrAssertionMixin(TestCase):
         self.assertFalse(hasattr(obj, attr), f"{obj!r} has attribute {attr!r}")
 
 
-class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
-    "Tests of the ScopedStorageMixin."
+class TestScopedStorage(AttrAssertionMixin, TestCase):
+    """Tests of the scoped storage capaility of Blocklikes."""
 
-    class ScopedStorageMixinTester(ScopedStorageMixin):
-        """Toy class for ScopedStorageMixin testing"""
+    # pylint doesn't understand that @class_lazy fields is a dict.
+    # pylint: disable=unsubscriptable-object
+
+    class ScopedStorageTester(Blocklike):
+        """Toy class for scoped storage testing"""
 
         field_a = Integer(scope=Scope.settings)
         field_b = Integer(scope=Scope.content)
 
-    class ChildClass(ScopedStorageMixinTester):
-        """Toy class for ModelMetaclass testing"""
+    class ChildClass(ScopedStorageTester):
+        """Toy class for scoped storage testing"""
 
     class FieldsMixin:
         """Toy mixin for field testing"""
         field_c = Integer(scope=Scope.settings)
 
-    class MixinChildClass(FieldsMixin, ScopedStorageMixinTester):
-        """Toy class for ScopedStorageMixin testing with mixed-in fields"""
+    class MixinChildClass(FieldsMixin, ScopedStorageTester):
+        """Toy class for scoped storage testing with mixed-in fields"""
 
     class MixinGrandchildClass(MixinChildClass):
-        """Toy class for ScopedStorageMixin testing with inherited mixed-in fields"""
+        """Toy class for scoped storage testing with inherited mixed-in fields"""
 
-    def test_scoped_storage_mixin(self):
+    def test_scoped_storage(self):
 
-        # `ModelMetaclassTester` and `ChildClass` both obtain the `fields` attribute
-        # from the `ModelMetaclass`. Since this is not understood by static analysis,
-        # silence this error for the duration of this test.
-        self.assertIsNot(self.ScopedStorageMixinTester.fields, self.ChildClass.fields)
+        self.assertIsNot(self.ScopedStorageTester.fields, self.ChildClass.fields)
 
-        self.assertHasAttr(self.ScopedStorageMixinTester, 'field_a')
-        self.assertHasAttr(self.ScopedStorageMixinTester, 'field_b')
+        self.assertHasAttr(self.ScopedStorageTester, 'field_a')
+        self.assertHasAttr(self.ScopedStorageTester, 'field_b')
 
-        self.assertIs(self.ScopedStorageMixinTester.field_a, self.ScopedStorageMixinTester.fields['field_a'])
-        self.assertIs(self.ScopedStorageMixinTester.field_b, self.ScopedStorageMixinTester.fields['field_b'])
+        self.assertIs(self.ScopedStorageTester.field_a, self.ScopedStorageTester.fields['field_a'])
+        self.assertIs(self.ScopedStorageTester.field_b, self.ScopedStorageTester.fields['field_b'])
 
         self.assertHasAttr(self.ChildClass, 'field_a')
         self.assertHasAttr(self.ChildClass, 'field_b')
@@ -73,10 +79,6 @@ class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
 
     def test_with_mixins(self):
         # Testing model metaclass with mixins
-
-        # `MixinChildClass` and `MixinGrandchildClass` both obtain the `fields` attribute
-        # from the `ScopedStorageMixin`. Since this is not understood by static analysis,
-        # silence this error for the duration of this test.
 
         self.assertHasAttr(self.MixinChildClass, 'field_a')
         self.assertHasAttr(self.MixinChildClass, 'field_c')
@@ -90,7 +92,7 @@ class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
 
     def test_save_calls_runtime_save_block(self):
         """
-        Make sure that when block.save() is called, ScopedStorageMixin will let
+        Make sure that when block.save() is called, it lets
         the runtime know that the entire block should be saved.
         """
         class SaveTestBlock(XBlock):
@@ -106,25 +108,20 @@ class TestScopedStorageMixin(AttrAssertionMixin, TestCase):
         runtime.save_block.assert_called_once_with(block)
 
 
-class TestHierarchyMixin(AttrAssertionMixin, TestCase):
-    "Tests of the HierarchyMixin."
+class TestHierarchy(AttrAssertionMixin, TestCase):
+    """Tests of the hierarchy capability of XBlocks."""
 
-    class HasChildren(HierarchyMixin):
-        """Toy class for ChildrenModelMetaclass testing"""
+    class HasChildren(XBlock):
+        """Toy class for hierarchy testing"""
         has_children = True
 
-    class WithoutChildren(HierarchyMixin):
-        """Toy class for ChildrenModelMetaclass testing"""
+    class WithoutChildren(XBlock):
+        """Toy class for hierarchy testing"""
 
     class InheritedChildren(HasChildren):
-        """Toy class for ChildrenModelMetaclass testing"""
+        """Toy class for hierarchy testing"""
 
     def test_children_metaclass(self):
-        # `HasChildren` and `WithoutChildren` both obtain the `children` attribute and
-        # the `has_children` method from the `ChildrenModelMetaclass`. Since this is not
-        # understood by static analysis, silence this error for the duration of this test.
-        # pylint: disable=E1101
-
         self.assertTrue(self.HasChildren.has_children)
         self.assertFalse(self.WithoutChildren.has_children)
         self.assertTrue(self.InheritedChildren.has_children)
@@ -139,40 +136,39 @@ class TestHierarchyMixin(AttrAssertionMixin, TestCase):
         self.assertEqual(Scope.children, self.InheritedChildren.children.scope)
 
 
-class TestIndexInfoMixin(AttrAssertionMixin):
-    """
-    Tests for Index
-    """
-    class IndexInfoMixinTester(IndexInfoMixin):
-        """Test class for index mixin"""
+class TestIndexInfo(AttrAssertionMixin):
+    """Tests for search index information."""
+
+    class IndexInfoMixinTester(Blocklike):
+        """Test class for index info capability of Blocklikes"""
 
     def test_index_info(self):
         self.assertHasAttr(self.IndexInfoMixinTester, 'index_dictionary')
-        with_index_info = self.IndexInfoMixinTester().index_dictionary()
+        with_index_info = self.IndexInfoMixinTester(runtime=None, scope_ids=None).index_dictionary()
         self.assertFalse(with_index_info)
         self.assertTrue(isinstance(with_index_info, dict))
 
 
-class TestViewsMixin(TestCase):
+class TestViews(TestCase):
     """
-    Tests for ViewsMixin
+    Tests for the views capability of XBlocks.
     """
     def test_supports_view_decorator(self):
         """
         Tests the @supports decorator for xBlock view methods
         """
-        class SupportsDecoratorTester(ViewsMixin):
+        class SupportsDecoratorTester(XBlock):
             """
             Test class for @supports decorator
             """
-            @ViewsMixin.supports("a_functionality")
+            @XBlock.supports("a_functionality")
             def functionality_supported_view(self):
                 """
                 A view that supports a functionality
                 """
                 # pragma: no cover
 
-            @ViewsMixin.supports("functionality1", "functionality2")
+            @XBlock.supports("functionality1", "functionality2")
             def multi_featured_view(self):
                 """
                 A view that supports multiple functionalities
@@ -185,7 +181,7 @@ class TestViewsMixin(TestCase):
                 """
                 # pragma: no cover
 
-        test_xblock = SupportsDecoratorTester()
+        test_xblock = SupportsDecoratorTester(None, None, None)
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
@@ -207,7 +203,7 @@ class TestViewsMixin(TestCase):
         """
         Tests overriding has_support
         """
-        class HasSupportOverrideTester(ViewsMixin):
+        class HasSupportOverrideTester(XBlock):
             """
             Test class for overriding has_support
             """
@@ -217,7 +213,7 @@ class TestViewsMixin(TestCase):
                 """
                 return functionality == "a_functionality"
 
-        test_xblock = HasSupportOverrideTester()
+        test_xblock = HasSupportOverrideTester(None, None, None)
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
@@ -230,8 +226,11 @@ class TestViewsMixin(TestCase):
 
 
 @ddt.ddt
-class TestXmlSerializationMixin(TestCase):
-    """ Tests for XmlSerialization Mixin """
+class TestXmlSerialization(TestCase):
+    """ Tests for XML (de)serialization capability of Blocklikes """
+
+    # pylint doesn't understand that @class_lazy fields is a dict.
+    # pylint: disable=unsubscriptable-object
 
     class TestXBlock(XBlock):
         """ XBlock for XML export test """
@@ -309,7 +308,7 @@ class TestXmlSerializationMixin(TestCase):
         node = etree.Element(self.test_xblock_tag)
 
         # Precondition check: no fields are set.
-        for field_name in self.test_xblock.fields.keys():  # pylint: disable=no-member
+        for field_name in self.test_xblock.fields.keys():
             self.assertFalse(self.test_xblock.fields[field_name].is_set_on(self.test_xblock))
 
         self.test_xblock.add_xml_to_node(node)
