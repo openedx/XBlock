@@ -385,7 +385,6 @@ def test_json_field_access():
             """Convert a datetime object to a string"""
             return value.strftime("%m/%d/%Y")
 
-    @Blocklike.needs("field-data")
     class FieldTester(Blocklike):
         """Toy class for field access testing"""
 
@@ -435,7 +434,6 @@ def test_defaults_not_shared():
 
 def test_object_identity():
     # Check that values that are modified are what is returned
-    @Blocklike.needs("field-data")
     class FieldTester(Blocklike):
         """Toy class for field access testing"""
         field_a = List(scope=Scope.settings)
@@ -476,7 +474,6 @@ def test_object_identity():
 
 def test_caching_is_per_instance():
     # Test that values cached for one instance do not appear on another
-    @Blocklike.needs("field-data")
     class FieldTester(Blocklike):
         """Toy class for field access testing"""
         field_a = List(scope=Scope.settings)

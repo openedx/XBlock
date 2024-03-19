@@ -623,6 +623,10 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
             node.set(field_name, text_value)
 
 
+# All Blocklike objects use the field-data service.
+Blocklike.needs('field-data')(Blocklike)
+
+
 class XBlockMixin(Blocklike):
     """
     Base class for custom XBlock mixins.
@@ -647,7 +651,6 @@ class _HasChildrenMetaclass(_AutoNamedFieldsMetaclass):
         return super().__new__(mcs, name, bases, attrs)
 
 
-@Blocklike.needs("field-data")
 class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
     """
     Base class for XBlocks. Derive from this class to create new type of XBlock.
@@ -927,7 +930,6 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
 
 
-@Blocklike.needs("field-data")
 class XBlockAside(Plugin, Blocklike):
     """
     Base class for XBlock-like objects that are rendered alongside :class:`.XBlock` views.
