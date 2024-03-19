@@ -629,10 +629,6 @@ class XBlockMixin(Blocklike):
 
     To provide custom attributes to all XBlock instances in a Runtime, extend this class and
     supply it to the Runtime's `mixins` parameter.
-
-    (...or don't do that, because it's confusing for other developers, and linters/type-checkers
-        won't understand that the mixins are part of XBlock instances, so your code will be full
-        of ignore statements :)
     """
 
 
