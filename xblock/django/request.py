@@ -1,5 +1,4 @@
 """Helpers for WebOb requests and responses."""
-from collections.abc import MutableMapping
 from itertools import chain, repeat
 from lazy import lazy
 
@@ -18,55 +17,6 @@ def webob_to_django_response(webob_response):
     for name, value in webob_response.headerlist:
         django_response[name] = value
     return django_response
-
-
-class HeaderDict(MutableMapping):
-    """
-    Provide a dictionary view of the HTTP headers in a
-    Django request.META dictionary that translates the
-    keys into actually HTTP header names
-    """
-    UNPREFIXED_HEADERS = ('CONTENT_TYPE', 'CONTENT_LENGTH')
-
-    def __init__(self, meta):
-        super().__init__()
-        self._meta = meta
-
-    def _meta_name(self, name):
-        """
-        Translate HTTP header names to the format used by Django request objects.
-
-        See https://docs.djangoproject.com/en/1.4/ref/request-response/#django.http.HttpRequest.META
-        """
-        name = name.upper().replace('-', '_')
-        if name not in self.UNPREFIXED_HEADERS:
-            name = 'HTTP_' + name
-        return name
-
-    def _un_meta_name(self, name):
-        """
-        Reverse of _meta_name
-        """
-        if name.startswith('HTTP_'):
-            name = name[5:]
-        return name.replace('_', '-').title()
-
-    def __getitem__(self, name):
-        return self._meta[self._meta_name(name)]
-
-    def __setitem__(self, name, value):
-        self._meta[self._meta_name(name)] = value
-
-    def __delitem__(self, name):
-        del self._meta[self._meta_name(name)]
-
-    def __iter__(self):
-        for key in self._meta:
-            if key in self.UNPREFIXED_HEADERS or key.startswith('HTTP_'):
-                yield self._un_meta_name(key)
-
-    def __len__(self):
-        return len(list(self))
 
 
 def querydict_to_multidict(query_dict, wrap=None):

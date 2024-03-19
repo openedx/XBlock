@@ -2,10 +2,61 @@
 Change history for XBlock
 =========================
 
-These are notable changes in XBlock.
-
 Unreleased
 ----------
+
+
+3.0.0 - 2024-03-18
+------------------
+
+Various extraneous classes have been removed from the XBlock API, simplifying its implementation
+and making debugging of XBlock instances easier. We believe that most, if not all, XBlock API users
+will be unaffected by this change. Some improvements have also been made to the reference documentation.
+
+Specific changes:
+
+* **Removed:** 
+
+  * ``xblock.XBlockMixin`` (still available as ``xblock.core.XBlockMixin``)
+  * ``xblock.core.SharedBlockBase`` (replaced with ``xblock.core.Blocklike``)
+  * ``xblock.internal.Nameable``
+  * ``xblock.internal.NamedAttributesMetaclass``
+  * ``xblock.django.request.HeadersDict``
+  * ``xblock.fields.XBlockMixin`` (still available as ``xblock.core.XBlockMixin``)
+  * ``xblock.mixins.RuntimeServicesMixin``
+  * ``xblock.mixins.ScopedStorageMixin``
+  * ``xblock.mixins.IndexInfoMixin``
+  * ``xblock.mixins.XmlSerializationMixin``
+  * ``xblock.mixins.HandlersMixin``
+  * ``xblock.mixins.ChildrenModelMetaclass``
+  * ``xblock.mixins.HierarchyMixin``
+  * ``xblock.mixins.ViewsMixin``
+
+* **Added:**
+
+  * ``xblock.core.Blocklike``, the new common ancestor of ``XBlock`` and ``XBlockAside``, and ``XBlockMixin``,
+    replacing ``xblock.core.SharedBlockBase``.
+
+  * New attributes on ``xblock.core.XBlockAside``, each behaving the same as their ``XBlock`` counterpart:
+
+    * ``usage_key``
+    * ``context_key``
+    * ``index_dictionary``
+
+  * Various new attributes on ``xblock.core.XBlockMixin``, encompassing the functionality of these former classes:
+
+    * ``xblock.mixins.IndexInfoMixin``
+    * ``xblock.mixins.XmlSerializationMixin``
+    * ``xblock.mixins.HandlersMixin``
+
+* **Docs**
+
+  * Various docstrings have been improved, some of which are published in the docs.
+  * XBlockAside will now be represented in the API docs, right below XBlock on the "XBlock API" page.
+  * XBlockMixin has been removed from the docs. 
+    It was only ever documented under the "Fields API" page (which didn't make any sense),
+    and it was barely even documented there. We considered adding it back to the "XBlock API" page,
+    but as noted in the class's new docstring, we do not want to encourage any new use of XBlockMixin.
 
 2.0.0 - 2024-02-26
 ------------------
