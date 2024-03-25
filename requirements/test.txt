@@ -10,7 +10,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-asgiref==3.7.2
+asgiref==3.8.1
     # via
     #   -r requirements/django.txt
     #   django
@@ -25,11 +25,11 @@ backports-zoneinfo==0.2.1 ; python_version < "3.9"
     # via
     #   -r requirements/django.txt
     #   django
-boto3==1.34.64
+boto3==1.34.69
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.64
+botocore==1.34.69
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -88,7 +88,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.99.6
+hypothesis==6.99.12
     # via -r requirements/test.in
 inflect==7.0.0
     # via jinja2-pluralize
@@ -233,7 +233,7 @@ tomli==2.0.1
     #   tox
 tomlkit==0.12.4
     # via pylint
-tox==4.14.1
+tox==4.14.2
     # via -r requirements/test.in
 typing-extensions==4.10.0
     # via
