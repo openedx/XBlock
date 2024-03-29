@@ -74,6 +74,7 @@ setup(
         'Natural Language :: English',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ]
 )
