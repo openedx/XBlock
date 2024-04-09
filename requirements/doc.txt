@@ -26,11 +26,11 @@ backports-zoneinfo==0.2.1 ; python_version < "3.9"
     #   django
 beautifulsoup4==4.12.3
     # via pydata-sphinx-theme
-boto3==1.34.79
+boto3==1.34.80
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.79
+botocore==1.34.80
     # via
     #   -r requirements/django.txt
     #   boto3
