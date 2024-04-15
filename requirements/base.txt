@@ -14,7 +14,7 @@ lxml==4.9.4
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-mako==1.3.2
+mako==1.3.3
     # via -r requirements/base.in
 markupsafe==2.1.5
     # via
