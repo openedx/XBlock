@@ -5,6 +5,11 @@ Change history for XBlock
 Unreleased
 ----------
 
+4.0.0 - 2024-04-18
+------------------
+
+* xblock.fragment has returned as a pass-though component to web_fragments.fragment
+
 
 3.0.0 - 2024-03-18
 ------------------
@@ -15,7 +20,7 @@ will be unaffected by this change. Some improvements have also been made to the 
 
 Specific changes:
 
-* **Removed:** 
+* **Removed:**
 
   * ``xblock.XBlockMixin`` (still available as ``xblock.core.XBlockMixin``)
   * ``xblock.core.SharedBlockBase`` (replaced with ``xblock.core.Blocklike``)
@@ -53,7 +58,7 @@ Specific changes:
 
   * Various docstrings have been improved, some of which are published in the docs.
   * XBlockAside will now be represented in the API docs, right below XBlock on the "XBlock API" page.
-  * XBlockMixin has been removed from the docs. 
+  * XBlockMixin has been removed from the docs.
     It was only ever documented under the "Fields API" page (which didn't make any sense),
     and it was barely even documented there. We considered adding it back to the "XBlock API" page,
     but as noted in the class's new docstring, we do not want to encourage any new use of XBlockMixin.
