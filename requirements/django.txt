@@ -8,9 +8,9 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-boto3==1.34.59
+boto3==1.34.88
     # via fs-s3fs
-botocore==1.34.59
+botocore==1.34.88
     # via
     #   boto3
     #   s3transfer
@@ -34,17 +34,15 @@ jmespath==1.0.1
     #   botocore
 lazy==1.6
     # via -r requirements/django.in
-lxml==4.9.4
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
-mako==1.3.2
+lxml==5.2.1
+    # via -r requirements/base.txt
+mako==1.3.3
     # via -r requirements/base.txt
 markupsafe==2.1.5
     # via
     #   -r requirements/base.txt
     #   mako
-openedx-django-pyfs==3.5.0
+openedx-django-pyfs==3.6.0
     # via -r requirements/django.in
 pbr==6.0.0
     # via
@@ -64,7 +62,7 @@ pytz==2024.1
     #   django
 pyyaml==6.0.1
     # via -r requirements/base.txt
-s3transfer==0.10.0
+s3transfer==0.10.1
     # via boto3
 simplejson==3.19.2
     # via -r requirements/base.txt
@@ -74,19 +72,19 @@ six==1.16.0
     #   fs
     #   fs-s3fs
     #   python-dateutil
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via django
 stevedore==5.2.0
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
-typing-extensions==4.10.0
+typing-extensions==4.11.0
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
 urllib3==1.26.18
     # via botocore
-web-fragments==2.1.0
+web-fragments==2.2.0
     # via -r requirements/base.txt
 webob==1.8.7
     # via -r requirements/base.txt
