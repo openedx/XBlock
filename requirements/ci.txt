@@ -26,7 +26,7 @@ platformdirs==4.2.0
     # via
     #   tox
     #   virtualenv
-pluggy==1.4.0
+pluggy==1.5.0
     # via tox
 pyproject-api==1.6.1
     # via tox
@@ -36,5 +36,5 @@ tomli==2.0.1
     #   tox
 tox==4.14.2
     # via -r requirements/ci.in
-virtualenv==20.25.1
+virtualenv==20.25.3
     # via tox
