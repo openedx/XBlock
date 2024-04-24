@@ -5,6 +5,11 @@ Change history for XBlock
 Unreleased
 ----------
 
+4.0.1 - 2024-04-24
+------------------
+
+* unpin lxml constraint.
+
 4.0.0 - 2024-04-18
 ------------------
 
