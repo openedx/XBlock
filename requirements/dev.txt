@@ -25,11 +25,11 @@ backports-zoneinfo==0.2.1 ; python_version < "3.9"
     # via
     #   -r requirements/test.txt
     #   django
-boto3==1.34.88
+boto3==1.34.93
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.34.88
+botocore==1.34.93
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -69,7 +69,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.4.4
+coverage[toml]==7.5.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -94,9 +94,13 @@ django==4.2.11
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   openedx-django-pyfs
+dnspython==2.6.1
+    # via
+    #   -r requirements/test.txt
+    #   pymongo
 edx-lint==5.3.6
     # via -r requirements/test.txt
-edx-opaque-keys==2.5.1
+edx-opaque-keys==2.9.0
     # via -r requirements/test.txt
 exceptiongroup==1.2.1
     # via
@@ -127,7 +131,7 @@ importlib-metadata==6.11.0
     #   -r requirements/test.txt
     #   build
     #   typeguard
-inflect==7.2.0
+inflect==7.2.1
     # via
     #   -r requirements/test.txt
     #   jinja2-pluralize
@@ -194,7 +198,7 @@ pbr==6.0.0
     #   stevedore
 pip-tools==7.4.1
     # via -r requirements/pip-tools.txt
-platformdirs==4.2.0
+platformdirs==4.2.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -234,7 +238,7 @@ pylint-plugin-utils==0.8.2
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==3.13.0
+pymongo==4.4.0
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
@@ -248,7 +252,7 @@ pyproject-hooks==1.0.0
     #   -r requirements/pip-tools.txt
     #   build
     #   pip-tools
-pytest==8.1.1
+pytest==8.2.0
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -318,7 +322,7 @@ tomlkit==0.12.4
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.14.2
+tox==4.15.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -339,7 +343,7 @@ urllib3==1.26.18
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.25.3
+virtualenv==20.26.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
