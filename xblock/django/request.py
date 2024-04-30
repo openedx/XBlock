@@ -9,7 +9,7 @@ from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 def webob_to_django_response(webob_response, streaming=False):
     """Returns a django response to the `webob_response`"""
-    if streaming :
+    if streaming:
         django_response = StreamingHttpResponse(
             webob_response.app_iter,
             content_type=webob_response.content_type,
