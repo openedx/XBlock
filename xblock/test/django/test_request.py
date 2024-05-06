@@ -44,7 +44,7 @@ class TestDjangoWebobRequest(TestCase):
 @pytest.mark.skipif(not HAS_DJANGO, reason='Django not available')
 class TestDjangoWebobResponse(TestCase):
     """
-    Tests of the webob_to_django_response function
+    Tests of the webob_to_django_response function with streaming=False
     """
     def _as_django(self, *args, **kwargs):
         """
@@ -65,6 +65,41 @@ class TestDjangoWebobResponse(TestCase):
 
         encoded_snowman = "\N{SNOWMAN}".encode()
         self.assertEqual(self._as_django(body=encoded_snowman, charset="utf-8").content, encoded_snowman)
+
+    def test_headers(self):
+        self.assertIn('X-Foo', self._as_django(headerlist=[('X-Foo', 'bar')]))
+        self.assertEqual(self._as_django(headerlist=[('X-Foo', 'bar')])['X-Foo'], 'bar')
+
+    def test_content_types(self):
+        # JSON content type (no charset should be returned)
+        self.assertEqual(
+            self._as_django(content_type='application/json')['Content-Type'],
+            'application/json'
+        )
+
+        # HTML content type (UTF-8 charset should be returned)
+        self.assertEqual(
+            self._as_django(content_type='text/html')['Content-Type'],
+            'text/html; charset=UTF-8'
+        )
+
+
+@pytest.mark.skipif(not HAS_DJANGO, reason='Django not available')
+class TestDjangoWebobResponseStreamed(TestCase):
+    """
+    Tests of the webob_to_django_response function with streaming=True
+    """
+    def _as_django(self, *args, **kwargs):
+        """
+        Return a :class:`django.http.HttpResponse` created from a `webob.Response`
+        initialized with `*args` and `**kwargs`
+        """
+        return webob_to_django_response(Response(*args, **kwargs), streaming=True)
+
+    def test_status_code(self):
+        self.assertEqual(self._as_django(status=200).status_code, 200)
+        self.assertEqual(self._as_django(status=404).status_code, 404)
+        self.assertEqual(self._as_django(status=500).status_code, 500)
 
     def test_headers(self):
         self.assertIn('X-Foo', self._as_django(headerlist=[('X-Foo', 'bar')]))
