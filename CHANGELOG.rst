@@ -5,6 +5,11 @@ Change history for XBlock
 Unreleased
 ----------
 
+4.1.0 - 2024-05-16
+------------------
+
+* optional streaming response support added to webob_to_django_response
+
 4.0.1 - 2024-04-24
 ------------------
 
