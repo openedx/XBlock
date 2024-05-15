@@ -3,17 +3,24 @@ from itertools import chain, repeat
 from lazy import lazy
 
 import webob
-from django.http import HttpResponse
+from django.http import StreamingHttpResponse, HttpResponse
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
-def webob_to_django_response(webob_response):
+def webob_to_django_response(webob_response, streaming=False):
     """Returns a django response to the `webob_response`"""
-    django_response = HttpResponse(
-        webob_response.app_iter,
-        content_type=webob_response.content_type,
-        status=webob_response.status_code,
-    )
+    if streaming:
+        django_response = StreamingHttpResponse(
+            webob_response.app_iter,
+            content_type=webob_response.content_type,
+            status=webob_response.status_code,
+        )
+    else:
+        django_response = HttpResponse(
+            webob_response.app_iter,
+            content_type=webob_response.content_type,
+            status=webob_response.status_code,
+        )
     for name, value in webob_response.headerlist:
         django_response[name] = value
     return django_response
