@@ -92,13 +92,7 @@ To package a new release:
 
 #. Update the version number in xblock/VERSION.txt.
 
-#. Tag the commit to be released::
-
-    git tag v1.2.17
-
-#. Push the tag and wait for Github Action to upload to PyPI::
-
-    git push --tags
+#. Use the github release mechanism to release a new version.  This will tag and publish the package.
 
 
 Using the XBlock-SDK
