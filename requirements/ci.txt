@@ -22,7 +22,7 @@ packaging==24.0
     # via
     #   pyproject-api
     #   tox
-platformdirs==4.2.1
+platformdirs==4.2.2
     # via
     #   tox
     #   virtualenv
@@ -36,5 +36,5 @@ tomli==2.0.1
     #   tox
 tox==4.15.0
     # via -r requirements/ci.in
-virtualenv==20.26.1
+virtualenv==20.26.2
     # via tox
