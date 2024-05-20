@@ -10,7 +10,7 @@ import os
 import warnings
 from collections import OrderedDict, defaultdict
 
-import pkg_resources
+import importlib.resources
 from lxml import etree
 from webob import Response
 
@@ -157,7 +157,13 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
 
-        return pkg_resources.resource_stream(cls.__module__, os.path.join(cls.resources_dir, uri))
+        return cls.open_resource(uri)
+
+    @classmethod
+    def open_resource(cls, uri):
+        return importlib.resources.files(inspect.getmodule(cls).__package__).joinpath(
+            os.path.join(cls.resources_dir, uri)
+        ).open('rb')
 
     @classmethod
     def json_handler(cls, func):
