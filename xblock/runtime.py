@@ -179,7 +179,7 @@ class KvsFieldData(FieldData):
         key = KeyValueStore.Key(
             scope=field.scope,
             user_id=user_id,
-            block_scope_id=block_id,
+            block_scope_id=block_id,  # pylint: disable=possibly-used-before-assignment
             field_name=name,
             block_family=block.entry_point,
         )
