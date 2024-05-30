@@ -5,6 +5,13 @@ Change history for XBlock
 Unreleased
 ----------
 
+5.0.0 - 2024-05-30
+------------------
+
+* dropped python 3.8 support
+* transitioned from deprecated pkg_resources lib to importlib.resources
+
+
 4.1.0 - 2024-05-16
 ------------------
 
