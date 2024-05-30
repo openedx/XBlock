@@ -45,7 +45,7 @@ One Time Setup
    cd XBlock
 
    # Set up a virtualenv using virtualenvwrapper with the same name as the repo and activate it
-   mkvirtualenv -p python3.8 XBlock
+   mkvirtualenv -p python3.11 XBlock
 
 Every time you develop something in this repo
 ---------------------------------------------
