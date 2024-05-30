@@ -7,6 +7,8 @@ import inspect
 import json
 import logging
 import os
+from types import MappingProxyType
+from typing import Final, final
 import warnings
 from collections import OrderedDict, defaultdict
 
@@ -23,7 +25,7 @@ from xblock.exceptions import (
 )
 from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
 from xblock.internal import class_lazy
-from xblock.plugin import Plugin
+from xblock.plugin import Plugin, PluginMissingError
 from xblock.validation import Validation
 
 # OrderedDict is used so that namespace attributes are put in predictable order
@@ -928,6 +930,83 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             True or False
         """
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
+
+
+class XBlock2(Plugin):
+    """
+    Base class for all v2 XBlocks, whether they are wrappers around a v1 XBlock,
+    or pure v2-only XBlocks. This ensures that `issubclass(block, XBlock2)` is
+    always useful.
+    """
+    has_children: Final = False
+
+    entry_point = 'xblock.v2'
+
+    @classmethod
+    def load_class(cls, identifier, default=None, select=None, fallback_to_v1=False):
+        """
+        Load a v2 XBlock, with optional fallback to v1
+        """
+        try:
+            return super().load_class(identifier, default, select)
+        except PluginMissingError:
+            if fallback_to_v1:
+                return XBlock.load_class(identifier, default, select)
+            if default:
+                return default
+            raise
+
+    def __init__(self, runtime, scope_ids):
+        """
+        Arguments:
+
+            runtime (:class:`.Runtime`): Use it to access the environment.
+                It is available in XBlock code as ``self.runtime``.
+
+            scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
+                scopes.
+        """
+        if self.has_children is not False:
+            raise ValueError('v2 XBlocks cannot declare has_children = True')
+        if hasattr(self, "student_view"):
+            raise AttributeError("v2 XBlocks must not declare a student_view() method.")
+
+        super().__init__(runtime=runtime, scope_ids=scope_ids)
+
+        # Prevent changes to _dirty_fields by forcing it to be a read-only dict. V2 XBlocks are expected to use the
+        # self.set_field[s]() API instead of writing to fields directly.
+        self._dirty_fields = MappingProxyType({})
+
+    @final
+    def save(self):
+        raise AttributeError("Calling .save() on a v2 XBlock is forbidden")
+
+    @property
+    def parent(self):
+        warnings.warn("Accessing .parent of v2 XBlocks is forbidden", stacklevel=2)
+        return None
+
+    @property
+    def _parent_block_id(self):
+        warnings.warn("Accessing ._parent_block_id of v2 XBlocks is forbidden", stacklevel=2)
+        return None
+
+
+class XBlock2Mixin(XBlock2):
+    """
+    Mixin that allows subclassing a v1 XBlock to become a v2 XBlock, allowing
+    both versions of the XBlock to be used, each with a different entry point.
+    """
+
+    @final
+    def student_view(self, _context):
+        raise AttributeError("v2 XBlocks do not support student_view()")
+
+
+class PureXBlock2(XBlock2, XBlock):
+    """
+    Base class for pure "v2" XBlocks, that don't need backwards compatibility with v1
+    """
 
 
 class XBlockAside(Plugin, Blocklike):
