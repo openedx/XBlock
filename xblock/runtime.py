@@ -19,7 +19,7 @@ import markupsafe
 
 from web_fragments.fragment import Fragment
 
-from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
+from xblock.core import XBlock, XBlockAside, XBlock2Mixin, XML_NAMESPACES
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
 from xblock.exceptions import (
@@ -1063,8 +1063,9 @@ class Runtime(metaclass=ABCMeta):
             else:
                 raise NoSuchHandlerError(f"Couldn't find handler {handler_name!r} for {block!r}")
 
-        # Write out dirty fields
-        block.save()
+        # Write out dirty fields (v1 XBlocks); for v2 this is handled by @json_handler
+        if not isinstance(block, XBlock2Mixin):
+            block.save()
         return results
 
     # Services

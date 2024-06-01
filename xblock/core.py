@@ -1,6 +1,7 @@
 """
 Base classes for all XBlock-like objects. Used by all XBlock Runtimes.
 """
+from contextlib import contextmanager
 import copy
 import functools
 import inspect
@@ -189,14 +190,28 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
                 request_json = json.loads(request.body.decode('utf-8'))
             except ValueError:
                 return JsonHandlerError(400, "Invalid JSON").get_response()
-            try:
-                response = func(self, request_json, suffix)
-            except JsonHandlerError as err:
-                return err.get_response()
-            if isinstance(response, Response):
-                return response
+            if isinstance(self, XBlock2Mixin):
+                # For XBlock v2 blocks, a json_handler is one of the only times where field edits are allowed.
+                with self._track_field_writes() as field_updates:
+                    try:
+                        response = func(self, request_json, suffix)
+                    except JsonHandlerError as err:
+                        return err.get_response(updated_fields=field_updates["updated_fields"])
+                    else:
+                        return Response(
+                            json.dumps({"data": response, "updated_fields": field_updates["updated_fields"]}),
+                            content_type='application/json',
+                            charset='utf8',
+                        )
             else:
-                return Response(json.dumps(response), content_type='application/json', charset='utf8')
+                try:
+                    response = func(self, request_json, suffix)
+                except JsonHandlerError as err:
+                    return err.get_response()
+                if isinstance(response, Response):
+                    return response
+                else:
+                    return Response(json.dumps(response), content_type='application/json', charset='utf8')
         return wrapper
 
     @classmethod
@@ -932,31 +947,23 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
 
 
-class XBlock2(Plugin):
+class XBlock2Mixin:
     """
-    Base class for all v2 XBlocks, whether they are wrappers around a v1 XBlock,
-    or pure v2-only XBlocks. This ensures that `issubclass(block, XBlock2)` is
-    always useful.
+    Mixin with shared implementation for all v2 XBlocks, whether they are
+    wrappers around a v1 XBlock, or pure v2-only XBlocks.
+     
+    Note: check if an XBlock is "v2" using `issubclass(block, XBlock2Mixin)`,
+    not `issubclass(block, XBlock2)`
     """
     has_children: Final = False
 
-    entry_point = 'xblock.v2'
-
-    @classmethod
-    def load_class(cls, identifier, default=None, select=None, fallback_to_v1=False):
-        """
-        Load a v2 XBlock, with optional fallback to v1
-        """
-        try:
-            return super().load_class(identifier, default, select)
-        except PluginMissingError:
-            if fallback_to_v1:
-                return XBlock.load_class(identifier, default, select)
-            if default:
-                return default
-            raise
-
-    def __init__(self, runtime, scope_ids):
+    def __init__(
+        self,
+        runtime,
+        field_data=None,
+        scope_ids=UNSET,
+        for_parent=None,
+        **kwargs):
         """
         Arguments:
 
@@ -968,14 +975,14 @@ class XBlock2(Plugin):
         """
         if self.has_children is not False:
             raise ValueError('v2 XBlocks cannot declare has_children = True')
-        if hasattr(self, "student_view"):
-            raise AttributeError("v2 XBlocks must not declare a student_view() method.")
+        
+        if field_data is not None:
+            raise ValueError('v2 XBlocks do not allow the deprecated field_data init parameter.')
+        
+        if for_parent is not None:
+            warnings.warn("Ignoring for_parent kwarg passed to a v2 XBlock init method", stacklevel=2)
 
-        super().__init__(runtime=runtime, scope_ids=scope_ids)
-
-        # Prevent changes to _dirty_fields by forcing it to be a read-only dict. V2 XBlocks are expected to use the
-        # self.set_field[s]() API instead of writing to fields directly.
-        self._dirty_fields = MappingProxyType({})
+        super().__init__(runtime, scope_ids=scope_ids, **kwargs)
 
     @final
     def save(self):
@@ -986,24 +993,39 @@ class XBlock2(Plugin):
         warnings.warn("Accessing .parent of v2 XBlocks is forbidden", stacklevel=2)
         return None
 
+    @parent.setter
+    def parent(self, value):
+        if value is not None:
+            raise ValueError("v2 XBlocks cannot have a parent.")
+        warnings.warn("Accessing .parent of v2 XBlocks is forbidden", stacklevel=2)
+
     @property
     def _parent_block_id(self):
         warnings.warn("Accessing ._parent_block_id of v2 XBlocks is forbidden", stacklevel=2)
         return None
 
+    @_parent_block_id.setter
+    def _parent_block_id(self, value):
+        if value is not None:
+            raise ValueError("v2 XBlocks cannot have a parent.")
 
-class XBlock2Mixin(XBlock2):
-    """
-    Mixin that allows subclassing a v1 XBlock to become a v2 XBlock, allowing
-    both versions of the XBlock to be used, each with a different entry point.
-    """
+    @contextmanager
+    def _track_field_writes(self):
+        if not isinstance(self, XBlock2Mixin):
+            raise TypeError("track_field_writes() is only compatible with XBlock2 instances")
+        if hasattr(self, "_collect_field_writes"):
+            raise RuntimeError("Nested _track_field_writes calls detected")
+        print("Starting handler...")
+        field_updates = {"updated_fields": {"user": {}, "content": {}}}
+        self._collect_field_writes = field_updates["updated_fields"]
+        try:
+            yield field_updates
+        finally:
+            delattr(self, "_collect_field_writes")
+        print("Ending handler...")
 
-    @final
-    def student_view(self, _context):
-        raise AttributeError("v2 XBlocks do not support student_view()")
 
-
-class PureXBlock2(XBlock2, XBlock):
+class XBlock2(XBlock2Mixin, XBlock):
     """
     Base class for pure "v2" XBlocks, that don't need backwards compatibility with v1
     """
