@@ -24,7 +24,7 @@ from xblock.exceptions import (
     KeyValueMultiSaveError,
     XBlockSaveError,
 )
-from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
+from xblock.fields import Field, List, Reference, ReferenceList, Scope, String, UserScope
 from xblock.internal import class_lazy
 from xblock.plugin import Plugin, PluginMissingError
 from xblock.validation import Validation
@@ -192,17 +192,22 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
                 return JsonHandlerError(400, "Invalid JSON").get_response()
             if isinstance(self, XBlock2Mixin):
                 # For XBlock v2 blocks, a json_handler is one of the only times where field edits are allowed.
-                with self._track_field_writes() as field_updates:
-                    try:
+                field_updates = {"updated_fields": {"user": {}, "content": {}}}
+                try:
+                    with self._track_field_writes(field_updates):
                         response = func(self, request_json, suffix)
-                    except JsonHandlerError as err:
-                        return err.get_response(updated_fields=field_updates["updated_fields"])
-                    else:
-                        return Response(
-                            json.dumps({"data": response, "updated_fields": field_updates["updated_fields"]}),
-                            content_type='application/json',
-                            charset='utf8',
-                        )
+                except JsonHandlerError as err:
+                    return err.get_response(updated_fields=field_updates["updated_fields"])
+                else:
+                    if response is None:
+                        response = {}
+                    elif not isinstance(response, dict):
+                        raise TypeError("json_handler functions must return a dict")
+                    return Response(
+                        json.dumps({"data": response, "updated_fields": field_updates["updated_fields"]}),
+                        content_type='application/json',
+                        charset='utf8',
+                    )
             else:
                 try:
                     response = func(self, request_json, suffix)
@@ -1010,18 +1015,23 @@ class XBlock2Mixin:
             raise ValueError("v2 XBlocks cannot have a parent.")
 
     @contextmanager
-    def _track_field_writes(self):
+    def _track_field_writes(self, field_updates):
         if not isinstance(self, XBlock2Mixin):
             raise TypeError("track_field_writes() is only compatible with XBlock2 instances")
-        if hasattr(self, "_collect_field_writes"):
-            raise RuntimeError("Nested _track_field_writes calls detected")
+        if self._dirty_fields:
+            raise ValueError("Found dirty fields before handler even started - shouldn't happen")
         print("Starting handler...")
-        field_updates = {"updated_fields": {"user": {}, "content": {}}}
-        self._collect_field_writes = field_updates["updated_fields"]
         try:
-            yield field_updates
+            yield
+            for field in self._dirty_fields.keys():
+                scope_type = "user" if field.scope.user != UserScope.NONE else "content"
+                field_updates["updated_fields"][scope_type][field.name] = field.to_json(getattr(self, field.name))
+            print("success, dirty fields: ", self._dirty_fields)
+            print("success, dirty fields: ", field_updates["updated_fields"])
+            self.force_save_fields([field.name for field in self._dirty_fields.keys()])
+            self.runtime.save_block(self)
         finally:
-            delattr(self, "_collect_field_writes")
+            self._dirty_fields.clear()
         print("Ending handler...")
 
 
