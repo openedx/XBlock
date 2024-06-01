@@ -955,12 +955,47 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
 class XBlock2Mixin:
     """
     Mixin with shared implementation for all v2 XBlocks, whether they are
-    wrappers around a v1 XBlock, or pure v2-only XBlocks.
-     
+    keeping backwards compatibility with v1 or not.
+
     Note: check if an XBlock is "v2" using `issubclass(block, XBlock2Mixin)`,
     not `issubclass(block, XBlock2)`
     """
     has_children: Final = False
+
+    def __init__(self, *args, **kwargs):
+        """
+        Validation during init
+        """
+        super().__init__(*args, **kwargs)
+        if self.has_children is not False:
+            raise ValueError('v2 XBlocks cannot declare has_children = True')
+
+    @contextmanager
+    def _track_field_writes(self, field_updates):
+        if not isinstance(self, XBlock2Mixin):
+            raise TypeError("track_field_writes() is only compatible with XBlock2 instances")
+        if self._dirty_fields:
+            raise ValueError("Found dirty fields before handler even started - shouldn't happen")
+        print("Starting handler...")
+        try:
+            yield
+            for field in self._dirty_fields.keys():
+                scope_type = "user" if field.scope.user != UserScope.NONE else "content"
+                field_updates["updated_fields"][scope_type][field.name] = field.to_json(getattr(self, field.name))
+            print("success, dirty fields: ", self._dirty_fields)
+            print("success, dirty fields: ", field_updates["updated_fields"])
+            print(f"{self}")
+            self.force_save_fields([field.name for field in self._dirty_fields.keys()])
+            self.runtime.save_block(self)
+        finally:
+            self._dirty_fields.clear()
+        print("Ending handler...")
+
+
+class XBlock2(XBlock2Mixin, XBlock):
+    """
+    Base class for pure "v2" XBlocks, that don't need backwards compatibility with v1
+    """
 
     def __init__(
         self,
@@ -968,15 +1003,10 @@ class XBlock2Mixin:
         field_data=None,
         scope_ids=UNSET,
         for_parent=None,
-        **kwargs):
+        **kwargs,
+    ):
         """
-        Arguments:
-
-            runtime (:class:`.Runtime`): Use it to access the environment.
-                It is available in XBlock code as ``self.runtime``.
-
-            scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
-                scopes.
+        Initialize this v2 XBlock, checking for deprecated usage first
         """
         if self.has_children is not False:
             raise ValueError('v2 XBlocks cannot declare has_children = True')
@@ -1013,32 +1043,6 @@ class XBlock2Mixin:
     def _parent_block_id(self, value):
         if value is not None:
             raise ValueError("v2 XBlocks cannot have a parent.")
-
-    @contextmanager
-    def _track_field_writes(self, field_updates):
-        if not isinstance(self, XBlock2Mixin):
-            raise TypeError("track_field_writes() is only compatible with XBlock2 instances")
-        if self._dirty_fields:
-            raise ValueError("Found dirty fields before handler even started - shouldn't happen")
-        print("Starting handler...")
-        try:
-            yield
-            for field in self._dirty_fields.keys():
-                scope_type = "user" if field.scope.user != UserScope.NONE else "content"
-                field_updates["updated_fields"][scope_type][field.name] = field.to_json(getattr(self, field.name))
-            print("success, dirty fields: ", self._dirty_fields)
-            print("success, dirty fields: ", field_updates["updated_fields"])
-            self.force_save_fields([field.name for field in self._dirty_fields.keys()])
-            self.runtime.save_block(self)
-        finally:
-            self._dirty_fields.clear()
-        print("Ending handler...")
-
-
-class XBlock2(XBlock2Mixin, XBlock):
-    """
-    Base class for pure "v2" XBlocks, that don't need backwards compatibility with v1
-    """
 
 
 class XBlockAside(Plugin, Blocklike):
