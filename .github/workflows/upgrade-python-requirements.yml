@@ -12,15 +12,14 @@ on:
 
 jobs:
   call-upgrade-python-requirements-workflow:
-    uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@master
+    uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@kdmccormick/testeng-ci-to-repo-tools
     # Do not run on forks
     if: github.repository_owner == 'openedx'
     with:
       branch: ${{ github.event.inputs.branch || 'master' }}
       # optional parameters below; fill in if you'd like github or email notifications
-      # user_reviewers: ""
-      team_reviewers: "axim-aximprovements"
-      email_address: "aximimprovements@axim.org"
+      user_reviewers: "kdmccormick"
+      email_address: "kyle@axim.org"
       send_success_notification: false
     secrets:
       requirements_bot_github_token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
