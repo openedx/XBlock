@@ -38,7 +38,7 @@ six==1.16.0
     #   python-dateutil
 stevedore==5.2.0
     # via edx-opaque-keys
-typing-extensions==4.12.1
+typing-extensions==4.12.2
     # via edx-opaque-keys
 web-fragments==2.2.0
     # via -r requirements/base.in
