@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via fs
 dnspython==2.6.1
     # via pymongo
-edx-opaque-keys==2.9.0
+edx-opaque-keys==2.10.0
     # via -r requirements/base.in
 fs==2.4.16
     # via -r requirements/base.in
@@ -22,7 +22,7 @@ markupsafe==2.1.5
     #   mako
 pbr==6.0.0
     # via stevedore
-pymongo==4.4.0
+pymongo==4.7.3
     # via edx-opaque-keys
 python-dateutil==2.9.0.post0
     # via -r requirements/base.in

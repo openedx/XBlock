@@ -12,7 +12,7 @@ importlib-metadata==6.11.0
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   build
-packaging==24.0
+packaging==24.1
     # via build
 pip-tools==7.4.1
     # via -r requirements/pip-tools.in

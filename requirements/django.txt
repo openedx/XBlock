@@ -29,7 +29,7 @@ dnspython==2.6.1
     # via
     #   -r requirements/base.txt
     #   pymongo
-edx-opaque-keys==2.9.0
+edx-opaque-keys==2.10.0
     # via -r requirements/base.txt
 fs==2.4.16
     # via
@@ -58,7 +58,7 @@ pbr==6.0.0
     # via
     #   -r requirements/base.txt
     #   stevedore
-pymongo==4.4.0
+pymongo==4.7.3
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
