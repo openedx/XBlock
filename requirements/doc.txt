@@ -52,7 +52,7 @@ docutils==0.19
     # via
     #   pydata-sphinx-theme
     #   sphinx
-edx-opaque-keys==2.9.0
+edx-opaque-keys==2.10.0
     # via -r requirements/django.txt
 fs==2.4.16
     # via
@@ -93,7 +93,7 @@ mock==5.1.0
     # via -r requirements/doc.in
 openedx-django-pyfs==3.6.0
     # via -r requirements/django.txt
-packaging==24.0
+packaging==24.1
     # via
     #   pydata-sphinx-theme
     #   sphinx
@@ -108,7 +108,7 @@ pygments==2.18.0
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-pymongo==4.4.0
+pymongo==4.7.3
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys

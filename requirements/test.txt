@@ -71,7 +71,7 @@ dnspython==2.6.1
     #   pymongo
 edx-lint==5.3.6
     # via -r requirements/test.in
-edx-opaque-keys==2.9.0
+edx-opaque-keys==2.10.0
     # via -r requirements/django.txt
 exceptiongroup==1.2.1
     # via
@@ -129,11 +129,11 @@ mccabe==0.7.0
     # via pylint
 mock==5.1.0
     # via -r requirements/test.in
-more-itertools==10.2.0
+more-itertools==10.3.0
     # via inflect
 openedx-django-pyfs==3.6.0
     # via -r requirements/django.txt
-packaging==24.0
+packaging==24.1
     # via
     #   pyproject-api
     #   pytest
@@ -173,7 +173,7 @@ pylint-plugin-utils==0.8.2
     # via
     #   pylint-celery
     #   pylint-django
-pymongo==4.4.0
+pymongo==4.7.3
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
