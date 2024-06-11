@@ -5,6 +5,12 @@ Change history for XBlock
 Unreleased
 ----------
 
+6.0.0 - 2024-08-05
+------------------
+
+* added type hints to all public classes, methods, and functions
+
+
 5.0.0 - 2024-05-30
 ------------------
 
