@@ -534,26 +534,26 @@ def test_field_serialization():
 
 
 def test_class_tags():
-    xblock = XBlock(None, None, None)
+    xblock = XBlock(None, scope_ids=Mock())
     assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable
 
     class Sub1Block(XBlock):
         """Toy XBlock"""
 
-    sub1block = Sub1Block(None, None, None)
+    sub1block = Sub1Block(None, scope_ids=Mock())
     assert sub1block._class_tags == set()  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
         """Toy XBlock"""
 
-    sub2block = Sub2Block(None, None, None)
+    sub2block = Sub2Block(None, scope_ids=Mock())
     assert sub2block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     class Sub3Block(Sub2Block):
         """Toy XBlock"""
 
-    sub3block = Sub3Block(None, None, None)
+    sub3block = Sub3Block(None, scope_ids=Mock())
     assert sub3block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("mixin")
@@ -563,7 +563,7 @@ def test_class_tags():
     class Sub4Block(MixinBlock, Sub3Block):
         """Toy XBlock"""
 
-    sub4block = Sub4Block(None, None, None)
+    sub4block = Sub4Block(None, scope_ids=Mock())
     assert sub4block._class_tags == {  # pylint: disable=comparison-with-callable
         "cat", "dog", "mixin"
     }
@@ -780,7 +780,7 @@ def test_services_decorators():
     class NoServicesBlock(XBlock):
         """XBlock requesting no services"""
 
-    no_services_block = NoServicesBlock(None, None, None)
+    no_services_block = NoServicesBlock(None, scope_ids=Mock())
     assert not NoServicesBlock._services_requested
     assert not no_services_block._services_requested
 

@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.11', '3.12']
+        python-version: ['3.11', '3.12']
         toxenv: [quality, django42]
 
     steps:
@@ -34,7 +34,7 @@ jobs:
       run: tox -e ${{ matrix.toxenv }}
 
     - name: Run Coverage
-      if: matrix.python-version == '3.8' && matrix.toxenv == 'django42'
+      if: matrix.python-version == '3.11' && matrix.toxenv == 'django42'
       uses: codecov/codecov-action@v4
       with:
         flags: unittests

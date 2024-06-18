@@ -6,25 +6,7 @@ The README file in this directory contains much more information.
 
 Much of this still needs to be organized.
 """
-try:
-    from django.core.exceptions import ImproperlyConfigured
-except ImportError:
-    class ImproperlyConfigured(Exception):
-        '''
-        If Django is installed, and djpyfs is installed, but we're not in a
-        Django app, we'll get this exception. We'd like to catch
-        it. But we don't want the try/except to fail even if we're
-        either in a proper Django app, or don't have Django installed
-        at all.
-        '''
-
-try:
-    from djpyfs import djpyfs
-except ImportError:
-    djpyfs = None
-except ImproperlyConfigured:
-    print("Warning! Django is not correctly configured.")
-    djpyfs = None  # pylint: disable=invalid-name
+from djpyfs import djpyfs  # type: ignore[import-untyped]
 
 from xblock.fields import Field, NO_CACHE_VALUE
 from xblock.fields import scope_key
@@ -186,17 +168,7 @@ class FSService(Service):
         Get the filesystem for the field specified in 'instance' and the
         xblock in 'xblock' It is locally scoped.
         """
-
-        # TODO: Get xblock from context, once the plumbing is piped through
-        if djpyfs:
-            return djpyfs.get_filesystem(scope_key(instance, xblock))
-        else:
-            # The reference implementation relies on djpyfs
-            # https://github.com/openedx/django-pyfs
-            # For Django runtimes, you may use this reference
-            # implementation. Otherwise, you will need to
-            # patch pyfilesystem yourself to implement get_url.
-            raise NotImplementedError("djpyfs not available")
+        return djpyfs.get_filesystem(scope_key(instance, xblock))
 
     def __repr__(self):
         return "File system object"
