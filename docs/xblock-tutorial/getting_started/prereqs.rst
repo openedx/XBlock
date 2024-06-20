@@ -16,7 +16,7 @@ Python 3.11
 ***********
 
 To run the a virtual environment and the XBlock SDK, and to build an XBlock,
-you must have Python 3.1 installed on your computer.
+you must have Python 3.11 installed on your computer.
 
 `Download Python`_ for your operating system and follow the installation
 instructions.
