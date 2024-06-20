@@ -157,10 +157,10 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
 
-        return cls.open_resource(uri)
+        return cls._open_resource(uri)
 
     @classmethod
-    def open_resource(cls, uri):
+    def _open_resource(cls, uri):
         return importlib.resources.files(inspect.getmodule(cls).__package__).joinpath(
             os.path.join(cls.resources_dir, uri)
         ).open('rb')
