@@ -22,7 +22,7 @@ class ResourceLoader:
         Gets the content of a resource
         """
         package_name = importlib.import_module(self.module_name).__package__
-        return importlib.resources.files(package_name).joinpath(resource_path).read_text()
+        return importlib.resources.files(package_name).joinpath(resource_path.lstrip('/')).read_text()
 
     def render_django_template(self, template_path, context=None, i18n_service=None):
         """
@@ -56,8 +56,7 @@ class ResourceLoader:
         )
         context = context or {}
         template_str = self.load_unicode(template_path)
-        directory = str(importlib.resources.as_file(
-            importlib.resources.files(sys.modules[self.module_name].__package__)))
+        directory = os.path.dirname(os.path.realpath(sys.modules[self.module_name].__file__))
         lookup = MakoTemplateLookup(directories=[directory])
         template = MakoTemplate(template_str, lookup=lookup)
         return template.render(**context)
