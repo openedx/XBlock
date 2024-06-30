@@ -22,7 +22,7 @@ markupsafe==2.1.5
     #   mako
 pbr==6.0.0
     # via stevedore
-pymongo==4.7.3
+pymongo==4.8.0
     # via edx-opaque-keys
 python-dateutil==2.9.0.post0
     # via -r requirements/base.in
