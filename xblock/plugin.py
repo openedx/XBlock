@@ -4,9 +4,9 @@ Generic plugin support so we can find XBlocks.
 This code is in the Runtime layer.
 """
 import functools
+import importlib.metadata
 import itertools
 import logging
-import pkg_resources
 
 from xblock.internal import class_lazy
 
@@ -100,7 +100,11 @@ class Plugin:
             if select is None:
                 select = default_select
 
-            all_entry_points = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
+            all_entry_points = [
+                entry_point
+                for entry_point in importlib.metadata.entry_points(group=cls.entry_point)
+                if entry_point.name == identifier
+            ]
             for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
                 if identifier == extra_identifier:
                     all_entry_points.append(extra_entry_point)
@@ -133,7 +137,7 @@ class Plugin:
         contexts. Hence, the flag.
         """
         all_classes = itertools.chain(
-            pkg_resources.iter_entry_points(cls.entry_point),
+            importlib.metadata.entry_points(group=cls.entry_point),
             (entry_point for identifier, entry_point in iter(cls.extra_entry_points)),
         )
         for class_ in all_classes:
