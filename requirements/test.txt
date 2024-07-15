@@ -12,7 +12,7 @@ asgiref==3.8.1
     # via
     #   -r requirements/django.txt
     #   django
-astroid==3.2.2
+astroid==3.2.3
     # via
     #   -r requirements/test.in
     #   pylint
@@ -23,11 +23,11 @@ backports-zoneinfo==0.2.1 ; python_version < "3.9"
     # via
     #   -r requirements/django.txt
     #   django
-boto3==1.34.140
+boto3==1.34.144
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.140
+botocore==1.34.144
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -47,7 +47,7 @@ code-annotations==1.8.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.5.4
+coverage[toml]==7.6.0
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -73,7 +73,7 @@ edx-lint==5.3.6
     # via -r requirements/test.in
 edx-opaque-keys==2.10.0
     # via -r requirements/django.txt
-exceptiongroup==1.2.1
+exceptiongroup==1.2.2
     # via
     #   hypothesis
     #   pytest
@@ -90,7 +90,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.105.0
+hypothesis==6.108.0
     # via -r requirements/test.in
 importlib-metadata==6.11.0
     # via
@@ -233,7 +233,7 @@ tomli==2.0.1
     #   pyproject-api
     #   pytest
     #   tox
-tomlkit==0.12.5
+tomlkit==0.13.0
     # via pylint
 tox==4.16.0
     # via -r requirements/test.in
