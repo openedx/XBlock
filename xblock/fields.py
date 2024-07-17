@@ -156,7 +156,7 @@ class Scope(ScopeBase):
 
     The `content` scope is used to save data for all users, for one particular
     block, across all runs of a course. An example might be an XBlock that
-    wishes to tabulate user "upvotes", or HTML content ti display literally on
+    wishes to tabulate user "upvotes", or HTML content to display literally on
     the page (this example being the reason this scope is named `content`).
 
     The `settings` scope is used to save data for all users, for one particular
