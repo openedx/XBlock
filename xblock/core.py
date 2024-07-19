@@ -6,7 +6,6 @@ import functools
 import inspect
 import json
 import logging
-import os
 import warnings
 from collections import OrderedDict, defaultdict
 
@@ -161,8 +160,12 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
 
     @classmethod
     def _open_resource(cls, uri):
-        return importlib.resources.files(inspect.getmodule(cls).__package__).joinpath(
-            os.path.join(cls.resources_dir, uri)
+        return importlib.resources.files(
+            inspect.getmodule(cls).__package__
+        ).joinpath(
+            cls.resources_dir
+        ).joinpath(
+            uri
         ).open('rb')
 
     @classmethod
