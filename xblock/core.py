@@ -1,12 +1,15 @@
 """
 Base classes for all XBlock-like objects. Used by all XBlock Runtimes.
 """
+from contextlib import contextmanager
 import copy
 import functools
 import inspect
 import json
 import logging
 import os
+from types import MappingProxyType
+from typing import Final, final
 import warnings
 from collections import OrderedDict, defaultdict
 
@@ -21,9 +24,9 @@ from xblock.exceptions import (
     KeyValueMultiSaveError,
     XBlockSaveError,
 )
-from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
+from xblock.fields import Field, List, Reference, ReferenceList, Scope, String, UserScope
 from xblock.internal import class_lazy
-from xblock.plugin import Plugin
+from xblock.plugin import Plugin, PluginMissingError
 from xblock.validation import Validation
 
 # OrderedDict is used so that namespace attributes are put in predictable order
@@ -187,14 +190,33 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
                 request_json = json.loads(request.body.decode('utf-8'))
             except ValueError:
                 return JsonHandlerError(400, "Invalid JSON").get_response()
-            try:
-                response = func(self, request_json, suffix)
-            except JsonHandlerError as err:
-                return err.get_response()
-            if isinstance(response, Response):
-                return response
+            if isinstance(self, XBlock2Mixin):
+                # For XBlock v2 blocks, a json_handler is one of the only times where field edits are allowed.
+                field_updates = {"updated_fields": {"user": {}, "content": {}}}
+                try:
+                    with self._track_field_writes(field_updates):
+                        response = func(self, request_json, suffix)
+                except JsonHandlerError as err:
+                    return err.get_response(updated_fields=field_updates["updated_fields"])
+                else:
+                    if response is None:
+                        response = {}
+                    elif not isinstance(response, dict):
+                        raise TypeError("json_handler functions must return a dict")
+                    return Response(
+                        json.dumps({"data": response, "updated_fields": field_updates["updated_fields"]}),
+                        content_type='application/json',
+                        charset='utf8',
+                    )
             else:
-                return Response(json.dumps(response), content_type='application/json', charset='utf8')
+                try:
+                    response = func(self, request_json, suffix)
+                except JsonHandlerError as err:
+                    return err.get_response()
+                if isinstance(response, Response):
+                    return response
+                else:
+                    return Response(json.dumps(response), content_type='application/json', charset='utf8')
         return wrapper
 
     @classmethod
@@ -928,6 +950,99 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             True or False
         """
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
+
+
+class XBlock2Mixin:
+    """
+    Mixin with shared implementation for all v2 XBlocks, whether they are
+    keeping backwards compatibility with v1 or not.
+
+    Note: check if an XBlock is "v2" using `issubclass(block, XBlock2Mixin)`,
+    not `issubclass(block, XBlock2)`
+    """
+    has_children: Final = False
+
+    def __init__(self, *args, **kwargs):
+        """
+        Validation during init
+        """
+        super().__init__(*args, **kwargs)
+        if self.has_children is not False:
+            raise ValueError('v2 XBlocks cannot declare has_children = True')
+
+    @contextmanager
+    def _track_field_writes(self, field_updates):
+        if not isinstance(self, XBlock2Mixin):
+            raise TypeError("track_field_writes() is only compatible with XBlock2 instances")
+        if self._dirty_fields:
+            raise ValueError("Found dirty fields before handler even started - shouldn't happen")
+        print("Starting handler...")
+        try:
+            yield
+            for field in self._dirty_fields.keys():
+                scope_type = "user" if field.scope.user != UserScope.NONE else "content"
+                field_updates["updated_fields"][scope_type][field.name] = field.to_json(getattr(self, field.name))
+            print("success, dirty fields: ", self._dirty_fields)
+            print("success, dirty fields: ", field_updates["updated_fields"])
+            print(f"{self}")
+            self.force_save_fields([field.name for field in self._dirty_fields.keys()])
+            self.runtime.save_block(self)
+        finally:
+            self._dirty_fields.clear()
+        print("Ending handler...")
+
+
+class XBlock2(XBlock2Mixin, XBlock):
+    """
+    Base class for pure "v2" XBlocks, that don't need backwards compatibility with v1
+    """
+
+    def __init__(
+        self,
+        runtime,
+        field_data=None,
+        scope_ids=UNSET,
+        for_parent=None,
+        **kwargs,
+    ):
+        """
+        Initialize this v2 XBlock, checking for deprecated usage first
+        """
+        if self.has_children is not False:
+            raise ValueError('v2 XBlocks cannot declare has_children = True')
+        
+        if field_data is not None:
+            raise ValueError('v2 XBlocks do not allow the deprecated field_data init parameter.')
+        
+        if for_parent is not None:
+            warnings.warn("Ignoring for_parent kwarg passed to a v2 XBlock init method", stacklevel=2)
+
+        super().__init__(runtime, scope_ids=scope_ids, **kwargs)
+
+    @final
+    def save(self):
+        raise AttributeError("Calling .save() on a v2 XBlock is forbidden")
+
+    @property
+    def parent(self):
+        warnings.warn("Accessing .parent of v2 XBlocks is forbidden", stacklevel=2)
+        return None
+
+    @parent.setter
+    def parent(self, value):
+        if value is not None:
+            raise ValueError("v2 XBlocks cannot have a parent.")
+        warnings.warn("Accessing .parent of v2 XBlocks is forbidden", stacklevel=2)
+
+    @property
+    def _parent_block_id(self):
+        warnings.warn("Accessing ._parent_block_id of v2 XBlocks is forbidden", stacklevel=2)
+        return None
+
+    @_parent_block_id.setter
+    def _parent_block_id(self, value):
+        if value is not None:
+            raise ValueError("v2 XBlocks cannot have a parent.")
 
 
 class XBlockAside(Plugin, Blocklike):
