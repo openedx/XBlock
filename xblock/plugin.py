@@ -100,7 +100,7 @@ class Plugin:
             if select is None:
                 select = default_select
 
-            all_entry_points = importlib.metadata.entry_points(group=cls.entry_point, name=identifier)
+            all_entry_points = list(importlib.metadata.entry_points(group=cls.entry_point, name=identifier))
             for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
                 if identifier == extra_identifier:
                     all_entry_points.append(extra_entry_point)

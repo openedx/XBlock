@@ -22,7 +22,11 @@ class ResourceLoader:
         Gets the content of a resource
         """
         package_name = importlib.import_module(self.module_name).__package__
-        # Strip leading slash to avoid importlib exception with absolute paths
+        # TODO: Add encoding on other places as well
+        # resource_path should be a relative path, but historically some callers passed it in
+        # with a leading slash, which pkg_resources tolerated and ignored. importlib is less
+        # forgiving, so in order to maintain backwards compatibility, we must strip off the
+        # leading slash is there is one to ensure we actually have a relative path.
         return importlib.resources.files(package_name).joinpath(resource_path.lstrip('/')).read_text(encoding="utf-8")
 
     def render_django_template(self, template_path, context=None, i18n_service=None):
