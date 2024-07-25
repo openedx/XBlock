@@ -1,13 +1,12 @@
 """
 Helper class (ResourceLoader) for loading resources used by an XBlock
 """
-
 import os
 import sys
 import warnings
 
-import pkg_resources
-from django.template import Context, Template, Engine
+import importlib.resources
+from django.template import Context, Engine, Template
 from django.template.backends.django import get_installed_libraries
 from mako.lookup import TemplateLookup as MakoTemplateLookup
 from mako.template import Template as MakoTemplate
@@ -22,8 +21,13 @@ class ResourceLoader:
         """
         Gets the content of a resource
         """
-        resource_content = pkg_resources.resource_string(self.module_name, resource_path)
-        return resource_content.decode('utf-8')
+        package_name = importlib.import_module(self.module_name).__package__
+        # TODO: Add encoding on other places as well
+        # resource_path should be a relative path, but historically some callers passed it in
+        # with a leading slash, which pkg_resources tolerated and ignored. importlib is less
+        # forgiving, so in order to maintain backwards compatibility, we must strip off the
+        # leading slash is there is one to ensure we actually have a relative path.
+        return importlib.resources.files(package_name).joinpath(resource_path.lstrip('/')).read_text(encoding="utf-8")
 
     def render_django_template(self, template_path, context=None, i18n_service=None):
         """
@@ -57,7 +61,10 @@ class ResourceLoader:
         )
         context = context or {}
         template_str = self.load_unicode(template_path)
-        lookup = MakoTemplateLookup(directories=[pkg_resources.resource_filename(self.module_name, '')])
+
+        package_name = importlib.import_module(self.module_name).__package__
+        directory = str(importlib.resources.files(package_name))
+        lookup = MakoTemplateLookup(directories=[directory])
         template = MakoTemplate(template_str, lookup=lookup)
         return template.render(**context)
 
