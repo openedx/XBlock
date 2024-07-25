@@ -32,6 +32,8 @@ setup(
     name='XBlock',
     version=VERSION,
     description='XBlock Core Library',
+    long_description=open('README.rst').read(),
+    long_description_content_type='text/x-rst',
     packages=[
         'xblock',
         'xblock.django',
