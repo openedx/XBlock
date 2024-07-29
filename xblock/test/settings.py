@@ -48,7 +48,7 @@ USE_L10N = True
 USE_TZ = True
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-LOCALE_PATHS = [str(PROJECT_ROOT + '/xblock/test/locale')]
+LOCALE_PATHS = [str(PROJECT_ROOT) + '/xblock/test/locale']
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
