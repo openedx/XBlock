@@ -90,7 +90,7 @@ To package a new release:
 
 #. Describe the release in CHANGELOG.rst
 
-#. Update the version number in xblock/VERSION.txt.
+#. Update the ``__version__`` number in `xblock/__init__.py`_
 
 #. Use the github release mechanism to release a new version.  This will tag and publish the package.
 
