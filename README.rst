@@ -38,19 +38,24 @@ Developing
 One Time Setup
 --------------
 
-.. code-block::
+First, clone the repository:
 
-   # Clone the repository
+.. code-block:: bash
+
    git clone git@github.com:openedx/XBlock.git
-   cd XBlock
 
-   # Set up a virtualenv using virtualenvwrapper with the same name as the repo and activate it
+Go to the XBlock directory, set up a virtual environment using ``virtualenvwrapper`` with
+the same name as the repo and activate it:
+
+.. code-block:: bash
+
+   cd XBlock
    mkvirtualenv -p python3.11 XBlock
 
 Every time you develop something in this repo
 ---------------------------------------------
 
-.. code-block::
+.. code-block:: bash
 
   # Activate the virtualenv
   workon XBlock
@@ -88,12 +93,14 @@ Deploying
 
 To package a new release:
 
-#. Describe the release in CHANGELOG.rst
+#. Describe the release in `CHANGELOG.rst`_
 
 #. Update the ``__version__`` number in `xblock/__init__.py`_
 
-#. Use the github release mechanism to release a new version.  This will tag and publish the package.
+#. Use the github release mechanism to release a new version. This will tag and publish the package.
 
+.. _CHANGELOG.rst: https://github.com/openedx/XBlock/blob/master/CHANGELOG.rst
+.. _xblock/__init__.py: https://github.com/openedx/XBlock/blob/master/xblock/__init__.py
 
 Using the XBlock-SDK
 ********************
@@ -104,13 +111,13 @@ that demonstrate XBlock functionality.
 
 You can find it in its own repository: https://github.com/openedx/xblock-sdk
 
-
 Getting Help
 ************
 
 Documentation
 =============
-The docs for the XBlock API is on Read The Docs:  https://xblock.readthedocs.org .
+
+The docs for the XBlock API is on Read The Docs: https://xblock.readthedocs.org .
 
 Reading the code
 ----------------
@@ -135,7 +142,9 @@ Making an XBlock can be as simple as creating a Python class with a few
 specific methods.
 
 Instructions for constructing a new XBlock along with examples can be found in
-the XBlock SDK: https://github.com/openedx/xblock-sdk
+the `XBlock SDK`_.
+
+.. _XBlock SDK: https://github.com/openedx/xblock-sdk
 
 More Help
 =========
@@ -165,8 +174,9 @@ License
 The code in this repository is licensed the Apache 2.0 license unless otherwise
 noted.
 
-Please see ``LICENSE.txt`` for details.
+Please see `LICENSE.txt`_ for details.
 
+.. _LICENSE.txt: https://github.com/openedx/XBlock/blob/master/LICENSE.txt
 
 Contributing
 ************
@@ -207,24 +217,24 @@ Please do not report security issues in public. Please email security@openedx.or
     :target: https://pypi.python.org/pypi/XBlock/
     :alt: PyPI
 
-.. |ci-badge| image:: https://github.com/openedx/XBlock/workflows/Python%20CI/badge.svg?branch=main
+.. |ci-badge| image:: https://github.com/openedx/XBlock/workflows/Python%20CI/badge.svg?branch=master
     :target: https://github.com/openedx/XBlock/actions
     :alt: CI
 
-.. |codecov-badge| image:: https://codecov.io/github/openedx/XBlock/coverage.svg?branch=main
-    :target: https://codecov.io/github/openedx/XBlock?branch=main
+.. |codecov-badge| image:: https://codecov.io/github/openedx/XBlock/coverage.svg?branch=master
+    :target: https://codecov.io/github/openedx/XBlock?branch=master
     :alt: Codecov
 
 .. |doc-badge| image:: https://readthedocs.org/projects/XBlock/badge/?version=latest
-    :target: https://XBlock.readthedocs.io/en/latest/
+    :target: https://edx.readthedocs.io/projects/xblock/en/latest/
     :alt: Documentation
 
 .. |pyversions-badge| image:: https://img.shields.io/pypi/pyversions/XBlock.svg
-    :target: https://pypi.python.org/pypi/XBlock/
+    :target: https://edx.readthedocs.io/projects/xblock/en/latest/
     :alt: Supported Python versions
 
 .. |license-badge| image:: https://img.shields.io/github/license/openedx/XBlock.svg
-    :target: https://github.com/openedx/XBlock/blob/main/LICENSE.txt
+    :target: https://github.com/openedx/XBlock/blob/master/LICENSE.txt
     :alt: License
 
 .. |status-badge| image:: https://img.shields.io/badge/Status-Maintained-brightgreen
