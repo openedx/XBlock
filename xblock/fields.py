@@ -1036,7 +1036,7 @@ class ReferenceList(List):
     It's up to the runtime to know how to dereference the elements of the list. The field type enables the
     runtime to know that it must do the interpretation.
     """
-    # this could define from_json and to_json as list comprehensions calling from/to_json on the list eles,
+    # this could define from_json and to_json as list comprehensions calling from/to_json on the list elements,
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
 
 
@@ -1047,7 +1047,7 @@ class ReferenceValueDict(Dict):
     It's up to the runtime to know how to dereference the elements of the list. The field type enables the
     runtime to know that it must do the interpretation.
     """
-    # this could define from_json and to_json as list comprehensions calling from/to_json on the list eles,
+    # this could define from_json and to_json as list comprehensions calling from/to_json on the list elements,
     # but since Reference doesn't stipulate a definition for from/to, that seems unnecessary at this time.
 
 
@@ -1071,7 +1071,7 @@ def scope_key(instance, xblock):
     We separate field portions with /. This gives a natural directory
     tree. This is nice in URLs and filenames (although not so nice in
     urls.py)
-    If a field starts with punctuatation, we prefix a _. This prevents hidden files.
+    If a field starts with punctuation, we prefix a _. This prevents hidden files.
 
     Uncommon characters, we encode as their ordinal value, surrounded by -.
     For example, tilde would be -126-.

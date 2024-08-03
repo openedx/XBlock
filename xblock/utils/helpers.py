@@ -10,7 +10,7 @@ def child_isinstance(block, child_id, block_class_or_mixin):
     Arguments:
     block -- the parent (or ancestor) of the child block in question
     child_id -- the usage key of the child block we are wondering about
-    block_class_or_mixin -- We return true if block's child indentified by child_id is an
+    block_class_or_mixin -- We return true if block's child identified by child_id is an
     instance of this.
 
     This method is equivalent to
