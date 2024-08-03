@@ -151,7 +151,7 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
         if not uri.startswith(cls.public_dir + '/'):
             raise DisallowedFileError(f"Only files from {cls.public_dir!r}/ are allowed: {uri!r}")
 
-        # Disalow paths that have a '/.' component, as `/./` is a no-op and `/../`
+        # Disallow paths that have a '/.' component, as `/./` is a no-op and `/../`
         # can be used to recurse back past the entry point of this XBlock.
         if "/." in uri:
             raise DisallowedFileError("Only safe file names are allowed: %r" % uri)
@@ -724,7 +724,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         plugin cannot import. The goal is to be able to use part of
         libraries from an XBlock (and thus have it installed), even if
         the overall XBlock cannot be used (e.g. depends on Django in a
-        non-Django application). There is diagreement about whether
+        non-Django application). There is disagreement about whether
         this is a good idea, or whether we should see failures early
         (e.g. on startup or first page load), and in what
         contexts. Hence, the flag.
