@@ -56,7 +56,7 @@ Every time you develop something in this repo
   workon XBlock
 
   # Grab the latest code
-  git checkout main
+  git checkout master
   git pull
 
   # Install/update the dev requirements
