@@ -10,7 +10,7 @@ chardet==5.2.0
     # via tox
 colorama==0.4.6
     # via tox
-coverage==7.6.0
+coverage==7.6.1
     # via -r requirements/ci.in
 distlib==0.3.8
     # via virtualenv
@@ -30,7 +30,7 @@ pluggy==1.5.0
     # via tox
 pyproject-api==1.7.1
     # via tox
-tox==4.16.0
+tox==4.17.0
     # via -r requirements/ci.in
 virtualenv==20.26.3
     # via tox

@@ -8,8 +8,8 @@ import warnings
 import importlib.resources
 from django.template import Context, Engine, Template
 from django.template.backends.django import get_installed_libraries
-from mako.lookup import TemplateLookup as MakoTemplateLookup
-from mako.template import Template as MakoTemplate
+from mako.lookup import TemplateLookup as MakoTemplateLookup  # type: ignore[import-untyped]
+from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
 
 
 class ResourceLoader:
