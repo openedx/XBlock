@@ -21,6 +21,10 @@ class UnambiguousBlock(XBlock):
     """A dummy class to find as a plugin."""
 
 
+class OverriddenBlock(XBlock):
+    """A dummy class to find as a plugin."""
+
+
 @XBlock.register_temp_plugin(AmbiguousBlock1, "bad_block")
 @XBlock.register_temp_plugin(AmbiguousBlock2, "bad_block")
 @XBlock.register_temp_plugin(UnambiguousBlock, "good_block")
@@ -50,6 +54,35 @@ def test_ambiguous_plugins():
 
     with pytest.raises(MyOwnException, match="This is boom"):
         XBlock.load_class("bad_block", select=boom)
+
+
+@XBlock.register_temp_plugin(OverriddenBlock, "overridden_block", group='xblock.v1.overrides')
+@XBlock.register_temp_plugin(AmbiguousBlock1, "overridden_block")
+@XBlock.register_temp_plugin(AmbiguousBlock2, "overridden_block")
+@XBlock.register_temp_plugin(UnambiguousBlock, "good_block")
+def test_plugin_override():
+    # We can load ok blocks even if there are bad blocks.
+    cls = XBlock.load_class("good_block")
+    assert cls is UnambiguousBlock
+
+    # Trying to load a block that is overridden returns the correct override
+    override = XBlock.load_class("overridden_block")
+    assert override is OverriddenBlock
+
+
+@XBlock.register_temp_plugin(AmbiguousBlock1, "overridden_block", group='xblock.v1.overrides')
+@XBlock.register_temp_plugin(AmbiguousBlock2, "overridden_block", group='xblock.v1.overrides')
+@XBlock.register_temp_plugin(OverriddenBlock, "overridden_block")
+def test_plugin_override_ambiguous():
+
+    # Trying to load a block that is overridden, but ambigous, errors.
+    expected_msg = (
+        "Ambiguous entry points for overridden_block: "
+        "xblock.test.test_plugin.AmbiguousBlock1, "
+        "xblock.test.test_plugin.AmbiguousBlock2"
+    )
+    with pytest.raises(AmbiguousPluginError, match=expected_msg):
+        XBlock.load_class("overridden_block")
 
 
 def test_nosuch_plugin():
