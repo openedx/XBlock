@@ -41,6 +41,37 @@ def default_select(identifier, all_entry_points):  # pylint: disable=inconsisten
         raise AmbiguousPluginError(all_entry_points)
 
 
+def select_with_overrides(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
+    """
+    Return overridden entry point, if present. Otherwise returns entry point.
+    Raise an exception when we have ambiguous entry points.
+    """
+
+    # Split entry points into overrides and non-overrides
+    overrides = []
+    block_entry_points = []
+
+    for block_entry_point in all_entry_points:
+        if "overrides" in block_entry_point.group:
+            overrides.append(block_entry_point)
+        else:
+            block_entry_points.append(block_entry_point)
+
+    # Overrides get priority
+    if len(overrides) == 1:
+        return overrides[0]
+    if len(overrides) > 1:
+        raise AmbiguousPluginError(all_entry_points)
+
+    # ... then default behavior
+    if len(block_entry_points) == 0:
+        raise PluginMissingError(identifier)
+    if len(block_entry_points) == 1:
+        return all_entry_points[0]
+    elif len(block_entry_points) > 1:
+        raise AmbiguousPluginError(all_entry_points)
+
+
 class Plugin:
     """Base class for a system that uses entry_points to load plugins.
 
@@ -98,9 +129,13 @@ class Plugin:
         if key not in PLUGIN_CACHE:
 
             if select is None:
-                select = default_select
+                select = select_with_overrides
 
-            all_entry_points = list(importlib.metadata.entry_points(group=cls.entry_point, name=identifier))
+            all_entry_points = [
+                *importlib.metadata.entry_points(group=f'{cls.entry_point}.overrides', name=identifier),
+                *importlib.metadata.entry_points(group=cls.entry_point, name=identifier)
+            ]
+
             for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
                 if identifier == extra_identifier:
                     all_entry_points.append(extra_entry_point)
@@ -146,7 +181,7 @@ class Plugin:
                     raise
 
     @classmethod
-    def register_temp_plugin(cls, class_, identifier=None, dist='xblock'):
+    def register_temp_plugin(cls, class_, identifier=None, dist='xblock', group='xblock.v1'):
         """Decorate a function to run with a temporary plugin available.
 
         Use it like this in tests::
@@ -164,6 +199,7 @@ class Plugin:
         entry_point = Mock(
             dist=Mock(key=dist),
             load=Mock(return_value=class_),
+            group=group
         )
         entry_point.name = identifier
 
