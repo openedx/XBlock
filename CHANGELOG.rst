@@ -5,6 +5,12 @@ Change history for XBlock
 Unreleased
 ----------
 
+5.1.0 - 2024-08-07
+------------------
+
+* added ability to override an XBlock with the 'xblock.{version}.overrides' entry point.
+
+
 5.0.0 - 2024-05-30
 ------------------
 
