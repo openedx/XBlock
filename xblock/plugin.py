@@ -41,7 +41,7 @@ def default_select(identifier, all_entry_points):  # pylint: disable=inconsisten
     block_entry_points = []
 
     for block_entry_point in all_entry_points:
-        if "overrides" in block_entry_point.group:
+        if block_entry_point.group.endswith('overrides'):
             overrides.append(block_entry_point)
         else:
             block_entry_points.append(block_entry_point)
