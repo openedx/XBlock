@@ -30,20 +30,9 @@ class AmbiguousPluginError(Exception):
 
 def default_select(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
     """
-    Raise an exception when we have ambiguous entry points.
-    """
+    Select the appropriate entry point for a given block.
+    Honors the ability to override and take preference over the default entry point.
 
-    if len(all_entry_points) == 0:
-        raise PluginMissingError(identifier)
-    if len(all_entry_points) == 1:
-        return all_entry_points[0]
-    elif len(all_entry_points) > 1:
-        raise AmbiguousPluginError(all_entry_points)
-
-
-def select_with_overrides(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
-    """
-    Return overridden entry point, if present. Otherwise returns entry point.
     Raise an exception when we have ambiguous entry points.
     """
 
@@ -60,13 +49,13 @@ def select_with_overrides(identifier, all_entry_points):  # pylint: disable=inco
     # Overrides get priority
     if len(overrides) == 1:
         return overrides[0]
-    if len(overrides) > 1:
+    elif len(overrides) > 1:
         raise AmbiguousPluginError(all_entry_points)
 
     # ... then default behavior
-    if len(block_entry_points) == 0:
+    elif len(block_entry_points) == 0:
         raise PluginMissingError(identifier)
-    if len(block_entry_points) == 1:
+    elif len(block_entry_points) == 1:
         return all_entry_points[0]
     elif len(block_entry_points) > 1:
         raise AmbiguousPluginError(all_entry_points)
@@ -129,7 +118,7 @@ class Plugin:
         if key not in PLUGIN_CACHE:
 
             if select is None:
-                select = select_with_overrides
+                select = default_select
 
             all_entry_points = [
                 *importlib.metadata.entry_points(group=f'{cls.entry_point}.overrides', name=identifier),
