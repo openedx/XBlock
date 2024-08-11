@@ -16,17 +16,17 @@ asgiref==3.8.1
     # via
     #   -r requirements/django.txt
     #   django
-babel==2.15.0
+babel==2.16.0
     # via
     #   pydata-sphinx-theme
     #   sphinx
 beautifulsoup4==4.12.3
     # via pydata-sphinx-theme
-boto3==1.34.153
+boto3==1.34.158
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.34.153
+botocore==1.34.158
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -35,7 +35,7 @@ certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests
-django==4.2.14
+django==4.2.15
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
@@ -72,7 +72,7 @@ jmespath==1.0.1
     #   botocore
 lazy==1.6
     # via -r requirements/django.txt
-lxml==5.2.2
+lxml==5.3.0
     # via -r requirements/django.txt
 mako==1.3.5
     # via -r requirements/django.txt
@@ -110,7 +110,7 @@ python-dateutil==2.9.0.post0
     #   botocore
 pytz==2024.1
     # via -r requirements/django.txt
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via -r requirements/django.txt
 requests==2.32.3
     # via sphinx
