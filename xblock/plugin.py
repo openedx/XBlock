@@ -52,7 +52,7 @@ def select_with_overrides(identifier, all_entry_points):
     block_entry_points = []
 
     for block_entry_point in all_entry_points:
-        if block_entry_point.group.endswith('overrides'):
+        if block_entry_point.group.endswith('.overrides'):
             overrides.append(block_entry_point)
         else:
             block_entry_points.append(block_entry_point)
