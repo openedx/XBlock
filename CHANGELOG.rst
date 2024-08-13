@@ -8,7 +8,8 @@ Unreleased
 5.1.0 - 2024-08-07
 ------------------
 
-* added ability to override an XBlock with the 'xblock.{version}.overrides' entry point.
+* added ability to override an XBlock with the 'xblock.v1.overrides' entry point
+* added ability to override an XBlock Aside with the 'xblock_asides.v1.overrides' entry point
 
 
 5.0.0 - 2024-05-30
