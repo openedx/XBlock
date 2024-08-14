@@ -57,14 +57,8 @@ def test_ambiguous_plugins():
 
 
 @XBlock.register_temp_plugin(OverriddenBlock, "overridden_block", group='xblock.v1.overrides')
-@XBlock.register_temp_plugin(AmbiguousBlock1, "overridden_block")
-@XBlock.register_temp_plugin(AmbiguousBlock2, "overridden_block")
-@XBlock.register_temp_plugin(UnambiguousBlock, "good_block")
+@XBlock.register_temp_plugin(UnambiguousBlock, "overridden_block")
 def test_plugin_override():
-    # We can load ok blocks even if there are bad blocks.
-    cls = XBlock.load_class("good_block")
-    assert cls is UnambiguousBlock
-
     # Trying to load a block that is overridden returns the correct override
     override = XBlock.load_class("overridden_block")
     assert override is OverriddenBlock
