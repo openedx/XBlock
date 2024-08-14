@@ -11,3 +11,4 @@ XBlocks and the edX Platform
    edx_lms
    devstack
    edx
+   overrides
