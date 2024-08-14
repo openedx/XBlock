@@ -30,7 +30,11 @@ class AmbiguousPluginError(Exception):
 
 def _default_select_no_override(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
     """
-    Raise an exception when we have ambiguous entry points.
+    Selects plugin for the given identifier, raising on error:
+
+    Raises:
+    - PluginMissingError when we don't have an entry point.
+    - AmbiguousPluginError when we have ambiguous entry points.
     """
 
     if len(all_entry_points) == 0:
@@ -43,8 +47,12 @@ def _default_select_no_override(identifier, all_entry_points):  # pylint: disabl
 
 def default_select(identifier, all_entry_points):
     """
-    Honors the ability for an XBlock to override the default entry point.
-    Raise an exception when we have ambiguous entry points.
+    Selects plugin for the given identifier with the ability for a Plugin to override
+    the default entry point.
+
+    Raises:
+    - PluginMissingError when we don't have an entry point or entry point to override.
+    - AmbiguousPluginError when we have ambiguous entry points.
     """
 
     # Split entry points into overrides and non-overrides
@@ -102,12 +110,20 @@ class Plugin:
     def load_class(cls, identifier, default=None, select=None):
         """Load a single class specified by identifier.
 
-        If `identifier` specifies more than a single class, and `select` is not None,
-        then call `select` on the list of entry_points. Otherwise, choose
-        the first one and log a warning.
+        By default, this returns the class mapped to `identifier` from entry_points
+        matching `{cls.entry_points}.overrides` or `{cls.entry_points}`, in that order.
 
-        If `default` is provided, return it if no entry_point matching
-        `identifier` is found. Otherwise, will raise a PluginMissingError
+        If multiple classes are found for either `{cls.entry_points}.overrides` or
+        `{cls.entry_points}`, it will raise an `AmbiguousPluginError`.
+
+        If no classes are found for `{cls.entry_points}`, it will raise a `PluginMissingError`.
+
+        Args:
+        - identifier: The class to match on.
+
+        Kwargs:
+        - default: A class to return if no entry_point matching `identifier` is found.
+        - select: A function to override our default_select functionality.
 
         If `select` is provided, it should be a callable of the form::
 
