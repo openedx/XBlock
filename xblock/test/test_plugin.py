@@ -64,6 +64,13 @@ def test_plugin_override():
     assert override is OverriddenBlock
 
 
+@XBlock.register_temp_plugin(OverriddenBlock, "overridden_block", group='xblock.v1.overrides')
+def test_plugin_override_missing_original():
+    # Trying to override a block that has no original block should raise an error
+    with pytest.raises(PluginMissingError, match="overridden_block"):
+        XBlock.load_class("overridden_block")
+
+
 @XBlock.register_temp_plugin(AmbiguousBlock1, "overridden_block", group='xblock.v1.overrides')
 @XBlock.register_temp_plugin(AmbiguousBlock2, "overridden_block", group='xblock.v1.overrides')
 @XBlock.register_temp_plugin(OverriddenBlock, "overridden_block")
