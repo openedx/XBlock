@@ -9,7 +9,7 @@ implementation.
 
 This can be done by:
 
-1. Creating an XBlock in a new or existing Django Plugin, installed into ``edx-platform``.
+1. Creating an XBlock in a new or existing package installed into ``edx-platform``.
 
 2. Adding the ``xblock.v1.overrides`` entry point in ``setup.py``, pointing to your
    custom XBlock.
@@ -28,8 +28,8 @@ Imagine there is an XBlock installed ``edx-platform``:
 
 .. code:: python
 
-    # edx-platform/xblocks/twitch_plays_pokemon.py
-    class TwitchPlaysPokemonBlock(XBlock):
+    # edx-platform/xblocks/video_block.py
+    class VideoBlock(XBlock):
     ...
 
     # edx-platform/setup.py
@@ -38,18 +38,18 @@ Imagine there is an XBlock installed ``edx-platform``:
 
         entry_points={
             "xblock.v1": [
-                "tpp = xblocks.twitch_plays_pokemon::TwitchPlaysPokemonBlock"
+                "video = xblocks.video_block::VideoBlock"
                 # ...
             ]
         }
     )
 
-If you then create your own Plugin App with a custom version of that XBlock...
+If you then create your own Python package with a custom version of that XBlock...
 
 .. code:: python
 
-    # your_plugin/xblocks/twitch_plays_pokemon.py
-    class YourTwitchPlaysPokemonBlock(XBlock):
+    # your_plugin/xblocks/video_block.py
+    class YourVideoBlock(XBlock):
     ...
 
     # your_plugin/setup.py
@@ -57,14 +57,14 @@ If you then create your own Plugin App with a custom version of that XBlock...
         # ...
         entry_points={
             "xblock.v1.overrides": [
-                "tpp = your_plugin.twitch_plays_pokemon::YourTwitchPlaysPokemonBlock"
+                "tpp = your_plugin.xblocks.video_block::YourVideoBlock"
                 # ...
             ],
         }
     )
 
-And install that app as a Django plugin, then your block should be loaded instead of the
-existing implementation.
+And install that package into your virtual environment, then your block should be
+loaded instead of the existing implementation.
 
 .. note::
 
