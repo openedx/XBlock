@@ -6,7 +6,7 @@ import pytest
 
 from xblock.core import XBlock
 from xblock import plugin
-from xblock.plugin import AmbiguousPluginError, PluginMissingError
+from xblock.plugin import AmbiguousPluginError, AmbiguousPluginOverrideError, PluginMissingError
 
 
 class AmbiguousBlock1(XBlock):
@@ -82,7 +82,7 @@ def test_plugin_override_ambiguous():
         "xblock.test.test_plugin.AmbiguousBlock1, "
         "xblock.test.test_plugin.AmbiguousBlock2"
     )
-    with pytest.raises(AmbiguousPluginError, match=expected_msg):
+    with pytest.raises(AmbiguousPluginOverrideError, match=expected_msg):
         XBlock.load_class("overridden_block")
 
 

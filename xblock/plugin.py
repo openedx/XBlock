@@ -28,6 +28,10 @@ class AmbiguousPluginError(Exception):
         super().__init__(msg)
 
 
+class AmbiguousPluginOverrideError(AmbiguousPluginError):
+    """Raised when a class name produces more than one override for an entry_point."""
+
+
 def _default_select_no_override(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
     """
     Selects plugin for the given identifier, raising on error:
@@ -72,7 +76,7 @@ def default_select(identifier, all_entry_points):
     if len(overrides) == 1:
         return overrides[0]
     elif len(overrides) > 1:
-        raise AmbiguousPluginError(all_entry_points)
+        raise AmbiguousPluginOverrideError(overrides)
     return default_plugin
 
 
