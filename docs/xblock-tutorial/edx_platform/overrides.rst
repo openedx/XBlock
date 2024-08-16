@@ -57,7 +57,7 @@ If you then create your own Python package with a custom version of that XBlock.
         # ...
         entry_points={
             "xblock.v1.overrides": [
-                "tpp = your_plugin.xblocks.video_block::YourVideoBlock"
+                "video = your_plugin.xblocks.video_block::YourVideoBlock"
                 # ...
             ],
         }
