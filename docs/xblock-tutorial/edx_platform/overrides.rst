@@ -30,7 +30,7 @@ Imagine there is an XBlock installed ``edx-platform``:
 
     # edx-platform/xblocks/video_block.py
     class VideoBlock(XBlock):
-    ...
+        ...
 
     # edx-platform/setup.py
     setup(
@@ -38,7 +38,7 @@ Imagine there is an XBlock installed ``edx-platform``:
 
         entry_points={
             "xblock.v1": [
-                "video = xblocks.video_block::VideoBlock"
+                "video = xblocks.video_block:VideoBlock"
                 # ...
             ]
         }
@@ -50,14 +50,14 @@ If you then create your own Python package with a custom version of that XBlock.
 
     # your_plugin/xblocks/video_block.py
     class YourVideoBlock(XBlock):
-    ...
+        ...
 
     # your_plugin/setup.py
     setup(
         # ...
         entry_points={
             "xblock.v1.overrides": [
-                "video = your_plugin.xblocks.video_block::YourVideoBlock"
+                "video = your_plugin.xblocks.video_block:YourVideoBlock"
                 # ...
             ],
         }
