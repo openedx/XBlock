@@ -10,9 +10,9 @@ appdirs==1.4.4
     #   fs
 asgiref==3.8.1
     # via django
-boto3==1.34.158
+boto3==1.35.0
     # via fs-s3fs
-botocore==1.34.158
+botocore==1.35.0
     # via
     #   boto3
     #   s3transfer
@@ -68,7 +68,7 @@ pyyaml==6.0.2
     # via -r requirements/base.txt
 s3transfer==0.10.2
     # via boto3
-simplejson==3.19.2
+simplejson==3.19.3
     # via -r requirements/base.txt
 six==1.16.0
     # via
@@ -90,7 +90,7 @@ urllib3==2.2.2
     # via botocore
 web-fragments==2.2.0
     # via -r requirements/base.txt
-webob==1.8.7
+webob==1.8.8
     # via -r requirements/base.txt
 
 # The following packages are considered to be unsafe in a requirements file:

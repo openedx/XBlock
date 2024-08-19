@@ -30,7 +30,7 @@ pytz==2024.1
     # via -r requirements/base.in
 pyyaml==6.0.2
     # via -r requirements/base.in
-simplejson==3.19.2
+simplejson==3.19.3
     # via -r requirements/base.in
 six==1.16.0
     # via
@@ -42,7 +42,7 @@ typing-extensions==4.12.2
     # via edx-opaque-keys
 web-fragments==2.2.0
     # via -r requirements/base.in
-webob==1.8.7
+webob==1.8.8
     # via -r requirements/base.in
 
 # The following packages are considered to be unsafe in a requirements file:
