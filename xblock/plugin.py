@@ -28,9 +28,17 @@ class AmbiguousPluginError(Exception):
         super().__init__(msg)
 
 
-def default_select(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
+class AmbiguousPluginOverrideError(AmbiguousPluginError):
+    """Raised when a class name produces more than one override for an entry_point."""
+
+
+def _default_select_no_override(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
     """
-    Raise an exception when we have ambiguous entry points.
+    Selects plugin for the given identifier, raising on error:
+
+    Raises:
+    - PluginMissingError when we don't have an entry point.
+    - AmbiguousPluginError when we have ambiguous entry points.
     """
 
     if len(all_entry_points) == 0:
@@ -39,6 +47,37 @@ def default_select(identifier, all_entry_points):  # pylint: disable=inconsisten
         return all_entry_points[0]
     elif len(all_entry_points) > 1:
         raise AmbiguousPluginError(all_entry_points)
+
+
+def default_select(identifier, all_entry_points):
+    """
+    Selects plugin for the given identifier with the ability for a Plugin to override
+    the default entry point.
+
+    Raises:
+    - PluginMissingError when we don't have an entry point or entry point to override.
+    - AmbiguousPluginError when we have ambiguous entry points.
+    """
+
+    # Split entry points into overrides and non-overrides
+    overrides = []
+    block_entry_points = []
+
+    for block_entry_point in all_entry_points:
+        if block_entry_point.group.endswith('.overrides'):
+            overrides.append(block_entry_point)
+        else:
+            block_entry_points.append(block_entry_point)
+
+    # Get the default entry point
+    default_plugin = _default_select_no_override(identifier, block_entry_points)
+
+    # If we have an unambiguous override, that gets priority. Otherwise, return default.
+    if len(overrides) == 1:
+        return overrides[0]
+    elif len(overrides) > 1:
+        raise AmbiguousPluginOverrideError(overrides)
+    return default_plugin
 
 
 class Plugin:
@@ -75,12 +114,20 @@ class Plugin:
     def load_class(cls, identifier, default=None, select=None):
         """Load a single class specified by identifier.
 
-        If `identifier` specifies more than a single class, and `select` is not None,
-        then call `select` on the list of entry_points. Otherwise, choose
-        the first one and log a warning.
+        By default, this returns the class mapped to `identifier` from entry_points
+        matching `{cls.entry_points}.overrides` or `{cls.entry_points}`, in that order.
 
-        If `default` is provided, return it if no entry_point matching
-        `identifier` is found. Otherwise, will raise a PluginMissingError
+        If multiple classes are found for either `{cls.entry_points}.overrides` or
+        `{cls.entry_points}`, it will raise an `AmbiguousPluginError`.
+
+        If no classes are found for `{cls.entry_points}`, it will raise a `PluginMissingError`.
+
+        Args:
+        - identifier: The class to match on.
+
+        Kwargs:
+        - default: A class to return if no entry_point matching `identifier` is found.
+        - select: A function to override our default_select functionality.
 
         If `select` is provided, it should be a callable of the form::
 
@@ -100,7 +147,11 @@ class Plugin:
             if select is None:
                 select = default_select
 
-            all_entry_points = list(importlib.metadata.entry_points(group=cls.entry_point, name=identifier))
+            all_entry_points = [
+                *importlib.metadata.entry_points(group=f'{cls.entry_point}.overrides', name=identifier),
+                *importlib.metadata.entry_points(group=cls.entry_point, name=identifier)
+            ]
+
             for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
                 if identifier == extra_identifier:
                     all_entry_points.append(extra_entry_point)
@@ -146,7 +197,7 @@ class Plugin:
                     raise
 
     @classmethod
-    def register_temp_plugin(cls, class_, identifier=None, dist='xblock'):
+    def register_temp_plugin(cls, class_, identifier=None, dist='xblock', group='xblock.v1'):
         """Decorate a function to run with a temporary plugin available.
 
         Use it like this in tests::
@@ -164,6 +215,7 @@ class Plugin:
         entry_point = Mock(
             dist=Mock(key=dist),
             load=Mock(return_value=class_),
+            group=group
         )
         entry_point.name = identifier
 
