@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.0
+boto3==1.35.5
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.0
+botocore==1.35.5
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -34,7 +34,7 @@ build==1.2.1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-cachetools==5.4.0
+cachetools==5.5.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -94,7 +94,7 @@ dnspython==2.6.1
     # via
     #   -r requirements/test.txt
     #   pymongo
-edx-lint==5.3.7
+edx-lint==5.4.0
     # via -r requirements/test.txt
 edx-opaque-keys==2.10.0
     # via -r requirements/test.txt
@@ -113,7 +113,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.111.1
+hypothesis==6.111.2
     # via -r requirements/test.txt
 inflect==7.3.1
     # via
@@ -163,7 +163,7 @@ more-itertools==10.4.0
     # via
     #   -r requirements/test.txt
     #   inflect
-openedx-django-pyfs==3.6.0
+openedx-django-pyfs==3.7.0
     # via -r requirements/test.txt
 packaging==24.1
     # via
@@ -280,7 +280,7 @@ sqlparse==0.5.1
     # via
     #   -r requirements/test.txt
     #   django
-stevedore==5.2.0
+stevedore==5.3.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
