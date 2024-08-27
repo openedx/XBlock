@@ -1,17 +1,22 @@
 """
 Base classes for all XBlock-like objects. Used by all XBlock Runtimes.
 """
+from __future__ import annotations
+
 import copy
 import functools
 import inspect
 import json
 import logging
+import typing as t
 import warnings
 from collections import OrderedDict, defaultdict
 
 import importlib.resources
 from lxml import etree
-from webob import Response
+from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from webob import Request, Response
+from web_fragments.fragment import Fragment
 
 from xblock.exceptions import (
     DisallowedFileError,
@@ -20,10 +25,16 @@ from xblock.exceptions import (
     KeyValueMultiSaveError,
     XBlockSaveError,
 )
-from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
+from xblock.field_data import FieldData
+from xblock.fields import Field, List, Reference, ReferenceListNotNone, Scope, ScopeIds, String
 from xblock.internal import class_lazy
 from xblock.plugin import Plugin
 from xblock.validation import Validation
+
+
+if t.TYPE_CHECKING:
+    from xblock.runtime import Runtime
+
 
 # OrderedDict is used so that namespace attributes are put in predictable order
 # This allows for simple string equality assertions in tests and have no other effects
@@ -34,8 +45,6 @@ XML_NAMESPACES = OrderedDict([
 
 # __all__ controls what classes end up in the docs.
 __all__ = ['XBlock', 'XBlockAside']
-
-UNSET = object()
 
 
 class Blocklike:
@@ -50,26 +59,28 @@ class Blocklike:
 
     (see XBlock and XBlockAside classes for details)
     """
-    resources_dir = ''
-    public_dir = 'public'
-    i18n_js_namespace = None
+    resources_dir: str = ''
+    public_dir: str = 'public'
+    i18n_js_namespace: str | None = None
+
+    entry_point: str  # Should be overwritten by children classes
 
     @classmethod
-    def get_resources_dir(cls):
+    def get_resources_dir(cls) -> str:
         """
         Gets the resource directory for this XBlock-like class.
         """
         return cls.resources_dir
 
     @classmethod
-    def get_public_dir(cls):
+    def get_public_dir(cls) -> str:
         """
         Gets the public directory for this XBlock-like class.
         """
         return cls.public_dir
 
     @classmethod
-    def get_i18n_js_namespace(cls):
+    def get_i18n_js_namespace(cls) -> str | None:
         """
         Gets the JavaScript translations namespace for this XBlock-like class.
 
@@ -80,7 +91,7 @@ class Blocklike:
         return cls.i18n_js_namespace
 
     @classmethod
-    def open_local_resource(cls, uri):
+    def open_local_resource(cls, uri: str | bytes) -> t.IO[bytes]:
         """
         Open a local resource.
 
@@ -128,8 +139,12 @@ class Blocklike:
             uri
         ).open('rb')
 
+    BlocklikeSubclass = t.TypeVar("BlocklikeSubclass", bound="Blocklike")
+
     @classmethod
-    def json_handler(cls, func):
+    def json_handler(
+        cls, func: t.Callable[[BlocklikeSubclass, t.Any, str], t.Any]
+    ) -> t.Callable[[BlocklikeSubclass, Request, str], Response]:
         """
         Wrap a handler to consume and produce JSON.
 
@@ -148,7 +163,7 @@ class Blocklike:
         """
         @cls.handler
         @functools.wraps(func)
-        def wrapper(self, request, suffix=''):
+        def wrapper(self: Blocklike.BlocklikeSubclass, request: Request, suffix: str = '') -> Response:
             """The wrapper function `json_handler` returns."""
             if request.method != "POST":
                 return JsonHandlerError(405, "Method must be POST").get_response(allow=["POST"])
@@ -167,17 +182,21 @@ class Blocklike:
         return wrapper
 
     @classmethod
-    def handler(cls, func):
+    def handler(
+        cls,
+        func: t.Callable[[BlocklikeSubclass, Request, str], Response],
+    ) -> t.Callable[[BlocklikeSubclass, Request, str], Response]:
         """
         A decorator to indicate a function is usable as a handler.
 
         The wrapped function must return a :class:`webob.Response` object.
         """
-        func._is_xblock_handler = True      # pylint: disable=protected-access
+        # pylint: disable=protected-access
+        func._is_xblock_handler = True  # type: ignore[attr-defined]
         return func
 
     @classmethod
-    def needs(cls, *service_names):
+    def needs(cls, *service_names: str):
         """
         A class decorator to indicate that an XBlock-like class needs particular services.
         """
@@ -188,7 +207,7 @@ class Blocklike:
         return _decorator
 
     @classmethod
-    def wants(cls, *service_names):
+    def wants(cls, *service_names: str):
         """
         A class decorator to indicate that a XBlock-like class wants particular services.
         """
@@ -199,7 +218,7 @@ class Blocklike:
         return _decorator
 
     @classmethod
-    def service_declaration(cls, service_name):
+    def service_declaration(cls, service_name: str):
         """
         Find and return a service declaration.
 
@@ -216,39 +235,45 @@ class Blocklike:
         return cls._combined_services.get(service_name)  # pylint: disable=no-member
 
     @class_lazy
-    def _services_requested(cls):  # pylint: disable=no-self-argument
+    def _services_requested(cls) -> dict[str, t.Any]:  # pylint: disable=no-self-argument
         """
         A per-class dictionary to store the services requested by a particular XBlock.
         """
         return {}
 
     @class_lazy
-    def _combined_services(cls):  # pylint: disable=no-self-argument
+    def _combined_services(cls) -> dict[str, t.Any]:  # pylint: disable=no-self-argument
         """
         A dictionary that collects all _services_requested by all ancestors of this XBlock class.
         """
         # The class declares what services it desires. To deal with subclasses,
         # especially mixins, properly, we have to walk up the inheritance
         # hierarchy, and combine all the declared services into one dictionary.
-        combined = {}
-        for parent in reversed(cls.mro()):  # pylint: disable=no-member
+        combined: dict[str, t.Any] = {}
+        for parent in reversed(cls._mro()):
             combined.update(getattr(parent, "_services_requested", {}))
         return combined
 
+    @classmethod
+    def _mro(cls) -> list[type[t.Self]]:
+        """
+        Silly helper for getting this object's/class's resolution order (MRO) without upsetting mypy or pylint.
+        """
+        return cls.mro()
+
     @class_lazy
-    def fields(cls):  # pylint: disable=no-self-argument
+    def fields(cls) -> dict[str, Field]:  # pylint: disable=no-self-argument
         """
         A dictionary mapping the attribute name to the Field object for all Field attributes of the class.
         """
-        fields = {}
+        fields: dict[str, Field] = {}
         # Loop through all of the baseclasses of cls, in
         # the order that methods are resolved (Method Resolution Order / mro)
         # and find all of their defined fields.
         #
         # Only save the first such defined field (as expected for method resolution)
-
-        bases = cls.mro()  # pylint: disable=no-member
-        local = bases.pop(0)
+        bases = cls._mro()
+        local = bases.pop(0)  # pylint: disable=no-member  # pylint thinks `bases` is a tuple?
 
         # First, descend the MRO from the top down, updating the 'fields' dictionary
         # so that the dictionary always has the most specific version of fields in it
@@ -263,17 +288,9 @@ class Blocklike:
         return fields
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys):
+    def parse_xml(cls, node: etree._Element, runtime: Runtime, keys: ScopeIds) -> Blocklike:
         """
         Use `node` to construct a new block.
-
-        Arguments:
-            node (:class:`~xml.etree.ElementTree.Element`): The xml node to parse into an xblock.
-
-            runtime (:class:`.Runtime`): The runtime to use while parsing.
-
-            keys (:class:`.ScopeIds`): The keys identifying where this block
-                will store its data.
         """
         block = runtime.construct_xblock_from_class(cls, keys)
 
@@ -293,6 +310,8 @@ class Blocklike:
 
         # Attributes become fields.
         for name, value in list(node.items()):  # lxml has no iteritems
+            if isinstance(name, bytes):
+                name = name.decode('utf-8')
             cls._set_field_if_present(block, name, value, {})
 
         # Text content becomes "content", if such a field exists.
@@ -306,7 +325,9 @@ class Blocklike:
         return block
 
     @classmethod
-    def _set_field_if_present(cls, block, name, value, attrs):
+    def _set_field_if_present(
+        cls, block: XBlock, name: str, value: t.Any, attrs: etree._Attrib | dict[str, str]
+    ) -> None:
         """
         Sets the field block.name, if block have such a field.
         """
@@ -319,7 +340,14 @@ class Blocklike:
         else:
             logging.warning("%s does not contain field %s", type(block), name)
 
-    def __init__(self, scope_ids, field_data=None, *, runtime, **kwargs):
+    def __init__(
+        self,
+        scope_ids: ScopeIds,
+        field_data: FieldData | None = None,
+        *,
+        runtime: Runtime,
+        **kwargs
+    ):
         """
         Arguments:
 
@@ -351,13 +379,13 @@ class Blocklike:
         else:
             self._deprecated_per_instance_field_data = None  # pylint: disable=invalid-name
 
-        self._field_data_cache = {}
-        self._dirty_fields = {}
-        self.scope_ids = scope_ids
+        self._field_data_cache: dict[str, t.Any] = {}
+        self._dirty_fields: dict[Field, t.Any] = {}
+        self.scope_ids: ScopeIds = scope_ids
 
         super().__init__(**kwargs)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attrs = []
         for field in self.fields.values():
             try:
@@ -380,7 +408,7 @@ class Blocklike:
         )
 
     @property
-    def usage_key(self):
+    def usage_key(self) -> UsageKey:
         """
         A key identifying this particular usage of the XBlock-like, unique across all learning contexts in the system.
 
@@ -389,7 +417,7 @@ class Blocklike:
         return self.scope_ids.usage_id
 
     @property
-    def context_key(self):
+    def context_key(self) -> LearningContextKey | None:
         """
         A key identifying the learning context (course, library, etc.) that contains this XBlock-like usage.
 
@@ -405,7 +433,7 @@ class Blocklike:
         """
         return getattr(self.scope_ids.usage_id, "context_key", None)
 
-    def index_dictionary(self):
+    def index_dictionary(self) -> dict[str, t.Any]:
         """
         Return a dict containing information that could be used to feed a search index.
 
@@ -436,7 +464,7 @@ class Blocklike:
 
         return _index_dictionary
 
-    def handle(self, handler_name, request, suffix=''):
+    def handle(self, handler_name: str, request: Request, suffix: str = '') -> Response:
         """
         Handle `request` with this block's runtime.
         """
@@ -504,7 +532,7 @@ class Blocklike:
         for field in fields:
             self._reset_dirty_field(field)
 
-    def _get_fields_to_save(self):
+    def _get_fields_to_save(self) -> t.Iterable[str]:
         """
         Get an xblock's dirty fields.
         """
@@ -513,13 +541,13 @@ class Blocklike:
         # pylint: disable=protected-access
         return [field.name for field in self._dirty_fields if field._is_dirty(self)]
 
-    def _clear_dirty_fields(self):
+    def _clear_dirty_fields(self) -> None:
         """
         Remove all dirty fields from an XBlock.
         """
         self._dirty_fields.clear()
 
-    def _reset_dirty_field(self, field):
+    def _reset_dirty_field(self, field: Field) -> None:
         """
         Resets dirty field value with the value from the field data cache.
         """
@@ -528,11 +556,10 @@ class Blocklike:
                 self._field_data_cache[field.name]
             )
 
-    def add_xml_to_node(self, node):
+    def add_xml_to_node(self, node: etree._Element) -> None:
         """
         For exporting, set data on `node` from ourselves.
         """
-        # pylint: disable=E1101
         # Set node.tag based on our class name.
         node.tag = self.xml_element_name()
         node.set('xblock-family', self.entry_point)
@@ -549,22 +576,23 @@ class Blocklike:
         if text is not None:
             node.text = text
 
-    def xml_element_name(self):
+    def xml_element_name(self) -> str:
         """
         What XML element name should be used for this block?
         """
         return self.scope_ids.block_type
 
-    def xml_text_content(self):
+    def xml_text_content(self) -> str | None:
         """
         What is the text content for this block's XML node?
         """
-        if 'content' in self.fields and self.content:  # pylint: disable=unsupported-membership-test
-            return self.content
+        # pylint: disable=unsupported-membership-test
+        if 'content' in self.fields and self.content:  # type: ignore[attr-defined]
+            return self.content  # type: ignore[attr-defined]
         else:
             return None
 
-    def _add_field(self, node, field_name, field):
+    def _add_field(self, node: etree._Element, field_name: str, field: Field) -> None:
         """
         Add xml representation of field to node.
 
@@ -591,6 +619,24 @@ class Blocklike:
             # Field will be output to XML as an attribute on the node.
             node.set(field_name, text_value)
 
+    def ugettext(self, text: str) -> str:
+        """
+        Translates message/text and returns it in a unicode string.
+        Using runtime to get i18n service.
+        """
+        runtime_service = self.runtime.service(self, "i18n")
+        runtime_ugettext = runtime_service.ugettext
+        return runtime_ugettext(text)
+
+    def validate(self) -> Validation:
+        """
+        Ask this xblock to validate itself. Subclasses are expected to override this
+        method, as there is currently only a no-op implementation. Any overriding method
+        should call super to collect validation results from its superclasses, and then
+        add any additional results as necessary.
+        """
+        return Validation(self.scope_ids.usage_id)
+
 
 # All Blocklike objects use the field-data service.
 Blocklike.needs('field-data')(Blocklike)
@@ -611,7 +657,7 @@ class _HasChildrenMetaclass(type):
     """
     def __new__(mcs, name, bases, attrs):
         if (attrs.get('has_children', False) or any(getattr(base, 'has_children', False) for base in bases)):
-            attrs['children'] = ReferenceList(
+            attrs['children'] = ReferenceListNotNone(
                 help='The ids of the children of this XBlock',
                 scope=Scope.children)
         else:
@@ -641,7 +687,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
     entry_point = 'xblock.v1'
 
     name = String(help="Short name for the block", scope=Scope.settings)
-    tags = List(help="Tags for this block", scope=Scope.settings)
+    tags: List[str] = List(help="Tags for this block", scope=Scope.settings)
 
     parent = Reference(help='The id of the parent of this XBlock', default=None, scope=Scope.parent)
 
@@ -649,26 +695,25 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
     # We just declare their types here to make static analyzers happy.
     # Note that children is only defined iff has_children is defined and True.
     has_children: bool
-    children: ReferenceList
+    children: ReferenceListNotNone
 
     @class_lazy
-    def _class_tags(cls):  # pylint: disable=no-self-argument
+    def _class_tags(cls) -> set[str]:  # pylint: disable=no-self-argument
         """
         Collect the tags from all base classes.
         """
-        class_tags = set()
-
-        for base in cls.mro()[1:]:  # pylint: disable=no-member
+        class_tags: set[str] = set()
+        for base in cls._mro()[1:]:
             class_tags.update(getattr(base, '_class_tags', set()))
 
         return class_tags
 
     @staticmethod
-    def tag(tags):
+    def tag(tags: str) -> t.Callable[[XBlock], XBlock]:
         """
         Returns a function that adds the words in `tags` as class tags to this class.
         """
-        def dec(cls):
+        def dec(cls: t.Self) -> t.Self:
             """Add the words in `tags` as class tags to this class."""
             # Add in this class's tags
             cls._class_tags.update(tags.replace(",", " ").split())  # pylint: disable=protected-access
@@ -676,7 +721,9 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         return dec
 
     @classmethod
-    def load_tagged_classes(cls, tag, fail_silently=True):
+    def load_tagged_classes(
+            cls, tag: str, fail_silently: bool = True
+    ) -> t.Iterable[tuple[str, type[XBlock]]]:
         """
         Produce a sequence of all XBlock classes tagged with `tag`.
 
@@ -694,17 +741,9 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
                 yield name, class_
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys):
+    def parse_xml(cls, node: etree._Element, runtime: Runtime, keys: ScopeIds) -> XBlock:
         """
         Use `node` to construct a new block.
-
-        Arguments:
-            node (:class:`~xml.etree.ElementTree.Element`): The xml node to parse into an xblock.
-
-            runtime (:class:`.Runtime`): The runtime to use while parsing.
-
-            keys (:class:`.ScopeIds`): The keys identifying where this block
-                will store its data.
         """
         block = runtime.construct_xblock_from_class(cls, keys)
 
@@ -724,6 +763,8 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
 
         # Attributes become fields.
         for name, value in list(node.items()):  # lxml has no iteritems
+            if isinstance(name, bytes):
+                name = name.decode('utf-8')
             cls._set_field_if_present(block, name, value, {})
 
         # Text content becomes "content", if such a field exists.
@@ -738,10 +779,11 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
 
     def __init__(
         self,
-        runtime,
-        field_data=None,
-        scope_ids=UNSET,
-        *args,  # pylint: disable=keyword-arg-before-vararg
+        runtime: Runtime,
+        field_data: FieldData | None = None,
+        scope_ids: ScopeIds | None = None,
+        *,
+        for_parent: XBlock | None = None,
         **kwargs
     ):
         """
@@ -757,53 +799,34 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
                 scopes.
         """
-        if scope_ids is UNSET:
+        if scope_ids is None:
             raise TypeError('scope_ids are required')
 
         # A cache of the parent block, retrieved from .parent
-        self._parent_block = None
-        self._parent_block_id = None
-        self._child_cache = {}
+        self._parent_block: XBlock | None = None
+        self._parent_block_id: UsageKey | None = None
+        self._child_cache: dict[UsageKey, XBlock] = {}
 
-        for_parent = kwargs.pop('for_parent', None)
         if for_parent is not None:
             self._parent_block = for_parent
             self._parent_block_id = for_parent.scope_ids.usage_id
 
         # Provide backwards compatibility for external access through _field_data
-        super().__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
+        super().__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, **kwargs)
 
-    def render(self, view, context=None):
+    def render(self, view: str, context: dict | None = None) -> Fragment:
         """Render `view` with this block's runtime and the supplied `context`"""
         return self.runtime.render(self, view, context)
 
-    def validate(self):
+    def add_xml_to_node(self, node: etree._Element) -> None:
         """
-        Ask this xblock to validate itself. Subclasses are expected to override this
-        method, as there is currently only a no-op implementation. Any overriding method
-        should call super to collect validation results from its superclasses, and then
-        add any additional results as necessary.
-        """
-        return Validation(self.scope_ids.usage_id)
-
-    def ugettext(self, text):
-        """
-        Translates message/text and returns it in a unicode string.
-        Using runtime to get i18n service.
-        """
-        runtime_service = self.runtime.service(self, "i18n")
-        runtime_ugettext = runtime_service.ugettext
-        return runtime_ugettext(text)
-
-    def add_xml_to_node(self, node):
-        """
-        For exporting, set data on etree.Element `node`.
+        For exporting, set data on etree._Element `node`.
         """
         super().add_xml_to_node(node)
         # Add children for each of our children.
         self.add_children_to_node(node)
 
-    def get_parent(self):
+    def get_parent(self) -> XBlock | None:
         """Return the parent block of this block, or None if there isn't one."""
         if not self.has_cached_parent:
             if self.parent is not None:
@@ -814,11 +837,11 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         return self._parent_block
 
     @property
-    def has_cached_parent(self):
+    def has_cached_parent(self) -> bool:
         """Return whether this block has a cached parent block."""
         return self.parent is not None and self._parent_block_id == self.parent
 
-    def get_child(self, usage_id):
+    def get_child(self, usage_id: UsageKey) -> XBlock:
         """Return the child identified by ``usage_id``."""
         if usage_id in self._child_cache:
             return self._child_cache[usage_id]
@@ -827,7 +850,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         self._child_cache[usage_id] = child_block
         return child_block
 
-    def get_children(self, usage_id_filter=None):
+    def get_children(self, usage_id_filter: t.Callable[[UsageKey], bool] | None = None) -> list[XBlock]:
         """
         Return instantiated XBlocks for each of this blocks ``children``.
         """
@@ -840,15 +863,15 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             if usage_id_filter is None or usage_id_filter(usage_id)
         ]
 
-    def clear_child_cache(self):
+    def clear_child_cache(self) -> None:
         """
         Reset the cache of children stored on this XBlock.
         """
         self._child_cache.clear()
 
-    def add_children_to_node(self, node):
+    def add_children_to_node(self, node: etree._Element) -> None:
         """
-        Add children to etree.Element `node`.
+        Add children to etree._Element `node`.
         """
         if self.has_children:
             for child_id in self.children:
@@ -856,7 +879,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
                 self.runtime.add_block_as_child_node(child, node)
 
     @classmethod
-    def supports(cls, *functionalities):
+    def supports(cls, *functionalities: str) -> t.Callable[[t.Callable], t.Callable]:
         """
         A view decorator to indicate that an xBlock view has support for the
         given functionalities.
@@ -865,20 +888,20 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             functionalities: String identifiers for the functionalities of the view.
                 For example: "multi_device".
         """
-        def _decorator(view):
+        def _decorator(view: t.Callable) -> t.Callable:
             """
             Internal decorator that updates the given view's list of supported
             functionalities.
             """
             # pylint: disable=protected-access
             if not hasattr(view, "_supports"):
-                view._supports = set()
+                view._supports = set()  # type: ignore[attr-defined]
             for functionality in functionalities:
-                view._supports.add(functionality)
+                view._supports.add(functionality)  # type: ignore[attr-defined]
             return view
         return _decorator
 
-    def has_support(self, view, functionality):
+    def has_support(self, view: t.Callable, functionality: str) -> bool:
         """
         Returns whether the given view has support for the given functionality.
 
@@ -899,6 +922,11 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
 
 
+# An XBlockAside's view method takes: itself, an XBlock, and optional context dict.
+# It returns a Fragment.
+AsideView = t.Callable[["XBlockAside", XBlock, t.Optional[dict]], Fragment]
+
+
 class XBlockAside(Plugin, Blocklike):
     """
     Base class for XBlock-like objects that are rendered alongside :class:`.XBlock` views.
@@ -916,7 +944,7 @@ class XBlockAside(Plugin, Blocklike):
     entry_point = "xblock_asides.v1"
 
     @classmethod
-    def aside_for(cls, view_name):
+    def aside_for(cls, view_name: str) -> t.Callable[[AsideView], AsideView]:
         """
         A decorator to indicate a function is the aside view for the given view_name.
 
@@ -960,7 +988,7 @@ class XBlockAside(Plugin, Blocklike):
                 combined_asides[view] = view_func.__name__
         return combined_asides
 
-    def aside_view_declaration(self, view_name):
+    def aside_view_declaration(self, view_name: str) -> AsideView | None:
         """
         Find and return a function object if one is an aside_view for the given view_name
 
@@ -978,7 +1006,7 @@ class XBlockAside(Plugin, Blocklike):
         else:
             return None
 
-    def needs_serialization(self):
+    def needs_serialization(self) -> bool:
         """
         Return True if the aside has any data to serialize to XML.
 

@@ -181,7 +181,7 @@ class TestViews(TestCase):
                 """
                 # pragma: no cover
 
-        test_xblock = SupportsDecoratorTester(None, None, None)
+        test_xblock = SupportsDecoratorTester(None, None, mock.Mock())
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
@@ -213,7 +213,7 @@ class TestViews(TestCase):
                 """
                 return functionality == "a_functionality"
 
-        test_xblock = HasSupportOverrideTester(None, None, None)
+        test_xblock = HasSupportOverrideTester(None, None, mock.Mock())
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
