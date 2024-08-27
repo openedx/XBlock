@@ -38,47 +38,7 @@ __all__ = ['XBlock', 'XBlockAside']
 UNSET = object()
 
 
-class _AutoNamedFieldsMetaclass(type):
-    """
-    Builds classes such that their Field attributes know their own names.
-
-    This allows XBlock API users to define fields without name redundancy, e.g. like this:
-
-        class MyBlock(XBlock):
-            my_field = Field(...)
-
-    rather than this:
-
-        class MyBlock(XBlock):
-            my_field = Field(name="my_field", ...)
-    """
-    def __new__(mcs, name, bases, attrs):
-        """
-        Ensure __name__ is set on all Field attributes, both on the new class and on its bases.
-        """
-        def needs_name(obj):
-            """
-            Is this object a Field that hasn't had its name assigned yet?
-            """
-            return isinstance(obj, Field) and not obj.__name__
-
-        # Iterate over the attrs before they're bound to the class
-        # so that we don't accidentally trigger any __get__ methods
-        for attr_name, attr in attrs.items():
-            if needs_name(attr):
-                attr.__name__ = attr_name
-
-        # Iterate over all of the base classes, so that we can add
-        # names to any mixins that don't include this metaclass, but that
-        # do include Fields
-        for base in bases:
-            for attr_name, attr in inspect.getmembers(base, predicate=needs_name):
-                attr.__name__ = attr_name
-
-        return super().__new__(mcs, name, bases, attrs)
-
-
-class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
+class Blocklike:
     """
     Shared base for XBlocks and XBlockAsides, providing these common capabilities:
 
@@ -645,7 +605,7 @@ class XBlockMixin(Blocklike):
     """
 
 
-class _HasChildrenMetaclass(_AutoNamedFieldsMetaclass):
+class _HasChildrenMetaclass(type):
     """
     Adds a ``children`` XBlock ReferenceList field to classes where ``has_children == True``.
     """
