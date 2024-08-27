@@ -1,6 +1,9 @@
 """
 Validation information for an xblock instance.
 """
+from __future__ import annotations
+
+import typing as t
 
 
 class ValidationMessage:
@@ -13,13 +16,13 @@ class ValidationMessage:
 
     TYPES = [WARNING, ERROR]
 
-    def __init__(self, message_type, message_text):
+    def __init__(self, message_type: str, message_text: str):
         """
         Create a new message.
 
         Args:
-            message_type (unicode): The type associated with this message. Must be included in `TYPES`.
-            message_text (unicode): The textual message.
+            message_type: The type associated with this message. Must be included in `TYPES`.
+            message_text: The textual message.
         """
         if message_type not in self.TYPES:
             raise TypeError("Unknown message_type: " + message_type)
@@ -28,7 +31,7 @@ class ValidationMessage:
         self.type = message_type
         self.text = message_text
 
-    def to_json(self):
+    def to_json(self) -> dict[str, str]:
         """
         Convert to a json-serializable representation.
 
@@ -49,18 +52,18 @@ class Validation:
     where `True` signifies that the xblock passes validation.
     """
 
-    def __init__(self, xblock_id):
+    def __init__(self, xblock_id: object):
         """
         Create a `Validation` instance.
 
         Args:
-            xblock_id (object): An identification object that must support conversion to unicode.
+            xblock_id: An identification object that must support conversion to unicode.
         """
-        self.messages = []
+        self.messages: list[ValidationMessage] = []
         self.xblock_id = xblock_id
 
     @property
-    def empty(self):
+    def empty(self) -> bool:
         """
         Is this object empty (contains no messages)?
 
@@ -69,42 +72,42 @@ class Validation:
         """
         return not self.messages
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         """
         Extended to return True if `empty` returns True
 
          Returns:
-            bool: True iff this instance has no validation issues.
+            True iff this instance has no validation issues.
         """
         return self.empty
 
     __nonzero__ = __bool__
 
-    def add(self, message):
+    def add(self, message: ValidationMessage) -> None:
         """
         Add a new validation message to this instance.
 
         Args:
-            message (ValidationMessage): A validation message to add to this instance's list of messages.
+            message: A validation message to add to this instance's list of messages.
         """
         if not isinstance(message, ValidationMessage):
             raise TypeError("Argument must of type ValidationMessage")
         self.messages.append(message)
 
-    def add_messages(self, validation):
+    def add_messages(self, validation: Validation) -> None:
         """
         Adds all the messages in the specified `Validation` object to this instance's
         messages array.
 
         Args:
-            validation (Validation): An object containing the messages to add to this instance's messages.
+            validation: An object containing the messages to add to this instance's messages.
         """
         if not isinstance(validation, Validation):
             raise TypeError("Argument must be of type Validation")
 
         self.messages.extend(validation.messages)
 
-    def to_json(self):
+    def to_json(self) -> dict[str, t.Any]:
         """
         Convert to a json-serializable representation.
 

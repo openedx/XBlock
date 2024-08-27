@@ -609,12 +609,12 @@ def test_unique_id_default():
     # Change the user id. Unique ID default should change for field_b with
     # user_state scope, but not for field_a with scope=settings.
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    block = TestBlock(runtime, DictFieldData({}), sids._replace(user_id='alice'))
+    block = TestBlock(runtime, DictFieldData({}), sids._replace(user_id='alice'))  # pylint: disable=no-member
     assert unique_a == block.field_a
     assert unique_b != block.field_b
     # Change the usage id. Unique ID default for both fields should change.
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    block = TestBlock(runtime, DictFieldData({}), sids._replace(usage_id='usage-2'))
+    block = TestBlock(runtime, DictFieldData({}), sids._replace(usage_id='usage-2'))  # pylint: disable=no-member
     assert unique_a != block.field_a
     assert unique_b != block.field_b
 

@@ -1,6 +1,8 @@
 """
 Machinery to make the common case easy when building new runtimes
 """
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 import functools
@@ -12,14 +14,16 @@ import json
 import logging
 import re
 import threading
+import typing as t
 import warnings
 
 from lxml import etree
 import markupsafe
 
+from opaque_keys.edx.keys import DefinitionKey, UsageKey
 from web_fragments.fragment import Fragment
 
-from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
+from xblock.core import Blocklike, XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
 from xblock.exceptions import (
@@ -38,40 +42,42 @@ log = logging.getLogger(__name__)
 class KeyValueStore(metaclass=ABCMeta):
     """The abstract interface for Key Value Stores."""
 
-    class Key(namedtuple("Key", "scope, user_id, block_scope_id, field_name, block_family")):
+    class Key(t.NamedTuple):
         """
         Keys are structured to retain information about the scope of the data.
         Stores can use this information however they like to store and retrieve
         data.
         """
-
-        def __new__(cls, scope, user_id, block_scope_id, field_name, block_family='xblock.v1'):
-            return super(KeyValueStore.Key, cls).__new__(cls, scope, user_id, block_scope_id, field_name, block_family)
+        scope: Scope
+        user_id: int | str | None
+        block_scope_id: UsageKey | DefinitionKey | str | None
+        field_name: str
+        block_family: str = "xblock.v1"
 
     @abstractmethod
-    def get(self, key):
+    def get(self, key: Key) -> t.Any:
         """Reads the value of the given `key` from storage."""
 
     @abstractmethod
-    def set(self, key, value):
+    def set(self, key: Key, value: t.Any) -> None:
         """Sets `key` equal to `value` in storage."""
 
     @abstractmethod
-    def delete(self, key):
+    def delete(self, key: Key) -> None:
         """Deletes `key` from storage."""
 
     @abstractmethod
-    def has(self, key):
+    def has(self, key: Key) -> bool:
         """Returns whether or not `key` is present in storage."""
 
-    def default(self, key):
+    def default(self, key: Key):
         """
         Returns the context relevant default of the given `key`
         or raise KeyError which will result in the field's global default.
         """
         raise KeyError(repr(key))
 
-    def set_many(self, update_dict):
+    def set_many(self, update_dict: dict[Key, t.Any]) -> None:
         """
         For each (`key, value`) in `update_dict`, set `key` to `value` in storage.
 
@@ -90,8 +96,8 @@ class DictKeyValueStore(KeyValueStore):
     A `KeyValueStore` that stores everything into a Python dictionary.
     """
 
-    def __init__(self, storage=None):
-        self.db_dict = storage if storage is not None else {}
+    def __init__(self, storage: dict[KeyValueStore.Key, t.Any] | None = None):
+        self.db_dict: dict[KeyValueStore.Key, t.Any] = storage if storage is not None else {}
 
     def get(self, key):
         return self.db_dict[key]
@@ -115,19 +121,19 @@ class KvsFieldData(FieldData):
     that uses the correct scoped keys for the underlying KeyValueStore
     """
 
-    def __init__(self, kvs, **kwargs):
+    def __init__(self, kvs: KeyValueStore, **kwargs):
         super().__init__(**kwargs)
         self._kvs = kvs
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{0.__class__.__name__}({0._kvs!r})".format(self)
 
-    def _getfield(self, block, name):
+    def _getfield(self, block: Blocklike, name: str) -> Field:
         """
         Return the field with the given `name` from `block`.
         If no field with `name` exists in any namespace, raises a KeyError.
 
-        :param block: xblock to retrieve the field from
+        :param block: Blocklike to retrieve the field from
         :type block: :class:`~xblock.core.XBlock`
         :param name: name of the field to retrieve
         :type name: str
@@ -143,7 +149,7 @@ class KvsFieldData(FieldData):
         # really doesn't name a field
         raise KeyError(name)
 
-    def _key(self, block, name):
+    def _key(self, block: Blocklike, name: str) -> KeyValueStore.Key:
         """
         Resolves `name` to a key, in the following form:
 
@@ -156,6 +162,7 @@ class KvsFieldData(FieldData):
         )
         """
         field = self._getfield(block, name)
+        block_id: UsageKey | DefinitionKey | str | None   # Type depends on field scope.
         if field.scope in (Scope.children, Scope.parent):
             block_id = block.scope_ids.usage_id
             user_id = None
@@ -179,13 +186,13 @@ class KvsFieldData(FieldData):
         key = KeyValueStore.Key(
             scope=field.scope,
             user_id=user_id,
-            block_scope_id=block_id,  # pylint: disable=possibly-used-before-assignment
+            block_scope_id=block_id,
             field_name=name,
             block_family=block.entry_point,
         )
         return key
 
-    def get(self, block, name):
+    def get(self, block: Blocklike, name: str) -> t.Any:
         """
         Retrieve the value for the field named `name`.
 
@@ -194,19 +201,19 @@ class KvsFieldData(FieldData):
         """
         return self._kvs.get(self._key(block, name))
 
-    def set(self, block, name, value):
+    def set(self, block: Blocklike, name: str, value: t.Any) -> None:
         """
         Set the value of the field named `name`
         """
         self._kvs.set(self._key(block, name), value)
 
-    def delete(self, block, name):
+    def delete(self, block: Blocklike, name: str) -> None:
         """
         Reset the value of the field named `name` to the default
         """
         self._kvs.delete(self._key(block, name))
 
-    def has(self, block, name):
+    def has(self, block: Blocklike, name: str) -> bool:
         """
         Return whether or not the field named `name` has a non-default value
         """
@@ -215,7 +222,7 @@ class KvsFieldData(FieldData):
         except KeyError:
             return False
 
-    def set_many(self, block, update_dict):
+    def set_many(self, block, update_dict: dict[str, t.Any]):
         """Update the underlying model with the correct values."""
         updated_dict = {}
 
@@ -225,7 +232,7 @@ class KvsFieldData(FieldData):
 
         self._kvs.set_many(updated_dict)
 
-    def default(self, block, name):
+    def default(self, block: Blocklike, name: str) -> t.Any:
         """
         Ask the kvs for the default (default implementation which other classes may override).
 
@@ -360,8 +367,8 @@ class IdGenerator(metaclass=ABCMeta):
 class MemoryIdManager(IdReader, IdGenerator):
     """A simple dict-based implementation of IdReader and IdGenerator."""
 
-    ASIDE_USAGE_ID = namedtuple('MemoryAsideUsageId', 'usage_id aside_type')
-    ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')
+    ASIDE_USAGE_ID = namedtuple('MemoryAsideUsageId', 'usage_id aside_type')  # type: ignore[name-match]
+    ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')  # type: ignore[name-match]
 
     def __init__(self):
         self._ids = itertools.count()
@@ -723,6 +730,7 @@ class Runtime(metaclass=ABCMeta):
             node (lxml.etree.Element): The DOM node to interpret.
             parent_id: The usage ID of the parent block
         """
+
         block_type = node.tag
         # remove xblock-family from elements
         node.attrib.pop('xblock-family', None)
@@ -1222,7 +1230,7 @@ class ObjectAggregator:
 
 
 # Cache of Mixologist generated classes
-_CLASS_CACHE = {}
+_CLASS_CACHE: dict[tuple[type, tuple[type, ...]], type] = {}
 _CLASS_CACHE_LOCK = threading.RLock()
 
 

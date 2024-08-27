@@ -17,14 +17,6 @@ from unittest import mock
 
 import django
 
-MOCK_MODULES = [
-    'webob',
-    'lxml'
-]
-
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock(class_that_is_extended=object)
-
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -111,6 +103,11 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# Display the type hints in the docs as part of the function signature.
+# This is the default, but it could be changed to "description" or "both".
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_typehints
+autodoc_typehints = "signature"
+
 # When auto-doc'ing a class, write the class' docstring and the __init__ docstring
 # into the class docs.
 autoclass_content = "both"
@@ -129,6 +126,40 @@ nitpick_ignore = [
     ('py:class', 'aside_fn'),
     ('py:class', 'webob.Request'),
     ('py:class', 'webob.Response'),
+    ('py:class', 'webob.request.Request'),
+    ('py:class', 'webob.response.Response'),
+    ('py:class', 'lxml.etree._Element'),
+    # As of Sphinx==8.0.2 and Python 3.11, its seems that Sphinx has bug(s) that make it
+    # unable to consistently recognize classes in otherwise-valid type annotations. So, since
+    # adding type hints to XBlock, we've had to add this big list of warning suppressions.
+    # If you're reading this in the future with newer versions of Sphinx and/or Python, feel
+    # free to try to whittle down this list:
+    ('py:class', 'Blocklike'),
+    ('py:class', 'BlocklikeSubclass'),
+    ('py:class', 'DefinitionKey'),
+    ('py:class', 'FieldValue'),
+    ('py:class', 'InnerFieldValue'),
+    ('py:class', 'Request'),
+    ('py:class', 'Response'),
+    ('py:class', 'UniqueIdPlaceholder'),
+    ('py:class', 'Unset'),
+    ('py:class', 'UsageKey'),
+    ('py:class', 'etree._Element'),
+    ('py:class', 'importlib.metadata.EntryPoint'),
+    ('py:class', 'importlib.metadata.EntryPoint'),
+    ('py:class', 'opaque_keys.edx.keys.DefinitionKey'),
+    ('py:class', 'opaque_keys.edx.keys.LearningContextKey'),
+    ('py:class', 'opaque_keys.edx.keys.UsageKey'),
+    ('py:class', 't.Any'),
+    ('py:class', 't.Callable'),
+    ('py:class', 't.Iterable'),
+    ('py:class', 'web_fragments.fragment.Fragment'),
+    ('py:class', 'xblock.core.Blocklike'),
+    ('py:class', 'xblock.fields.FieldValue'),
+    ('py:class', 'xblock.fields.InnerFieldValue'),
+    ('py:class', 'xblock.fields.UniqueIdPlaceholder'),
+    ('py:class', 'xblock.fields.Unset'),
+    ('py:class', 'xblock.validation.Validation'),
 ]
 
 suppress_warnings = [

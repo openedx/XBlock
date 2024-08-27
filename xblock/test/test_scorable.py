@@ -21,8 +21,8 @@ class StubScorableBlock(scorable.ScorableXBlockMixin):
     _allows_rescore = None
 
     def __init__(self, initial):
+        super().__init__(runtime=Mock(), field_data=Mock(), scope_ids=Mock())
         self.result = initial
-        self.runtime = Mock()
 
     def allows_rescore(self):
         if self._allows_rescore is not None:

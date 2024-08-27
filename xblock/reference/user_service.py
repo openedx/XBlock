@@ -1,6 +1,10 @@
 """
 This file supports the XBlock service that returns data about users.
 """
+from __future__ import annotations
+
+import typing as t
+
 from xblock.reference.plugins import Service
 
 
@@ -11,7 +15,7 @@ class UserService(Service):
     This service returns personally-identifiable information (PII).  If a runtime needed to control exposure to a
     user's PII, the runtime would deny access to this XBlock service.
     """
-    def get_current_user(self):
+    def get_current_user(self) -> XBlockUser:
         """
         This is default, example implementation.  Anything real needs to override
 
@@ -50,9 +54,9 @@ class XBlockUser:
 
     All of this data should be considered personally-identifiable information (PII).
     """
-    def __init__(self, is_current_user=False, emails=None, full_name=None):
+    def __init__(self, is_current_user: bool = False, emails: list[str] | None = None, full_name: str | None = None):
         # Set standardized attributes
         self.is_current_user = is_current_user
         self.emails = emails or []
         self.full_name = full_name
-        self.opt_attrs = {}
+        self.opt_attrs: dict[str, t.Any] = {}

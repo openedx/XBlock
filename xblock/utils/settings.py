@@ -1,7 +1,13 @@
 """
 This module contains a mixins that allows third party XBlocks to access Settings Service in edX LMS.
 """
+from __future__ import annotations
 
+import typing as t
+
+from web_fragments.fragment import Fragment
+
+from xblock.core import XBlockMixin
 from xblock.utils.resources import ResourceLoader
 
 
@@ -18,7 +24,7 @@ class XBlockWithSettingsMixin:
     """
     # block_settings_key = "XBlockName"  # (Optional)
 
-    def get_xblock_settings(self, default=None):
+    def get_xblock_settings(self, default: dict[str, t.Any] | None = None) -> dict[str, t.Any] | None:
         """
         Gets XBlock-specific settings for current XBlock
 
@@ -29,6 +35,7 @@ class XBlockWithSettingsMixin:
                       * No settings service is available
                       * As a `default` parameter to `SettingsService.get_settings_bucket`
         """
+        assert isinstance(self, XBlockMixin)
         settings_service = self.runtime.service(self, "settings")
         if settings_service:
             return settings_service.get_settings_bucket(self, default=default)
@@ -60,21 +67,22 @@ class ThemableXBlockMixin:
             'locations': ['public/themes/red.css']
         }
     """
-    default_theme_config = None
+    default_theme_config: dict[str, t.Any] | None = None
     theme_key = "theme"
 
-    def get_theme(self):
+    def get_theme(self) -> dict[str, t.Any] | None:
         """
         Gets theme settings from settings service. Falls back to default (LMS) theme
         if settings service is not available, xblock theme settings are not set or does
         contain mentoring theme settings.
         """
+        assert isinstance(self, XBlockWithSettingsMixin)
         xblock_settings = self.get_xblock_settings(default={})
         if xblock_settings and self.theme_key in xblock_settings:
             return xblock_settings[self.theme_key]
         return self.default_theme_config
 
-    def include_theme_files(self, fragment):
+    def include_theme_files(self, fragment: Fragment) -> None:
         """
         Gets theme configuration and renders theme css into fragment
         """
