@@ -331,6 +331,12 @@ class Field:
         self.xml_node = xml_node
         self.force_export = force_export
 
+    def __set_name__(self, owner: type, name: str):
+        """
+        Automatically record the name of this Field as it is defined on a class.
+        """
+        self.__name__ = name
+
     @property
     def default(self):
         """Returns the static value that this defaults to."""
