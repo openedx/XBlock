@@ -8,13 +8,16 @@ StudioEditableXBlockMixin to your XBlock.
 
 
 import logging
+import typing as t
+from dataclasses import dataclass
 
 import simplejson as json
+from opaque_keys.edx.keys import UsageKey
 from web_fragments.fragment import Fragment
 
-from xblock.core import XBlock, XBlockMixin
+from xblock.core import Blocklike, XBlock, XBlockMixin
 from xblock.exceptions import JsonHandlerError, NoSuchViewError
-from xblock.fields import Scope, JSONField, List, Integer, Float, Boolean, String, DateTime
+from xblock.fields import Scope, JSONField, List, Integer, Float, Boolean, String, DateTime, Field
 from xblock.utils.resources import ResourceLoader
 from xblock.validation import Validation
 
@@ -41,7 +44,12 @@ class FutureFields:
     XBlock may get persisted even if validation fails).
     """
 
-    def __init__(self, new_fields_dict, newly_removed_fields, fallback_obj):
+    def __init__(
+        self,
+        new_fields_dict: dict[str, t.Any],
+        newly_removed_fields: t.Iterable[str],
+        fallback_obj: Blocklike,
+    ):
         """
         Create an instance whose attributes come from new_fields_dict and fallback_obj.
 
@@ -54,7 +62,7 @@ class FutureFields:
         self._blacklist = newly_removed_fields
         self._fallback_obj = fallback_obj
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> object:
         try:
             return self._new_fields_dict[name]
         except KeyError:
@@ -64,13 +72,14 @@ class FutureFields:
             return getattr(self._fallback_obj, name)
 
 
-class StudioEditableXBlockMixin:
+class StudioEditableXBlockMixin(XBlockMixin):
     """
     An XBlock mixin to provide a configuration UI for an XBlock in Studio.
     """
-    editable_fields = ()  # Set this to a list of the names of fields to appear in the editor
+    # Set this to a list of the names of fields to appear in the editor
+    editable_fields: tuple[str, ...] = ()
 
-    def studio_view(self, context):
+    def studio_view(self, context: dict[str, t.Any]) -> Fragment:
         """
         Render a form for editing this XBlock
         """
@@ -92,10 +101,11 @@ class StudioEditableXBlockMixin:
         fragment.initialize_js('StudioEditableXBlockMixin')
         return fragment
 
-    def _make_field_info(self, field_name, field):  # pylint: disable=too-many-statements
+    def _make_field_info(self, field_name: str, field: Field) -> dict[str, t.Any]:
         """
         Create the information that the template needs to render a form field for this field.
         """
+        # pylint: disable=too-many-statements
         supported_field_types = (
             (Integer, 'integer'),
             (Float, 'float'),
@@ -199,12 +209,12 @@ class StudioEditableXBlockMixin:
         return info
 
     @XBlock.json_handler
-    def submit_studio_edits(self, data, suffix=''):  # pylint: disable=unused-argument
+    def submit_studio_edits(self, data: dict[str, t.Any], suffix='') -> t.Any:  # pylint: disable=unused-argument
         """
         AJAX handler for studio_view() Save button
         """
-        values = {}  # dict of new field values we are updating
-        to_reset = []  # list of field names to delete from this XBlock
+        values: dict[str, t.Any] = {}  # dict of new field values we are updating
+        to_reset: list[str] = []  # list of field names to delete from this XBlock
         for field_name in self.editable_fields:
             field = self.fields[field_name]
             if field_name in data['values']:
@@ -233,7 +243,7 @@ class StudioEditableXBlockMixin:
         else:
             raise JsonHandlerError(400, validation.to_json())
 
-    def clean_studio_edits(self, data):
+    def clean_studio_edits(self, data: dict[str, t.Any]) -> None:
         """
         Given POST data dictionary 'data', clean the data before validating it.
         e.g. fix capitalization, remove trailing spaces, etc.
@@ -242,7 +252,7 @@ class StudioEditableXBlockMixin:
         # if "name" in data:
         #     data["name"] = data["name"].strip()
 
-    def validate_field_data(self, validation, data):
+    def validate_field_data(self, validation: Validation, data: Blocklike | FutureFields) -> None:
         """
         Validate this block's field data. Instead of checking fields like self.name, check the
         fields set on data, e.g. data.name. This allows the same validation method to be re-used
@@ -256,7 +266,7 @@ class StudioEditableXBlockMixin:
         # if data.count <=0:
         #     validation.add(ValidationMessage(ValidationMessage.ERROR, u"Invalid count"))
 
-    def validate(self):
+    def validate(self) -> Validation:
         """
         Validates the state of this XBlock.
 
@@ -276,14 +286,32 @@ class StudioContainerXBlockMixin(XBlockMixin):
     """
     has_author_view = True  # Without this flag, studio will use student_view on newly-added blocks :/
 
-    def render_children(self, context, fragment, can_reorder=True, can_add=False):
+    # TYPING HACK:
+    # XBlockMixin is based on Blocklike, which doesn't support parent/child
+    # operations. However, this particular mixin helps render children, so
+    # we need to declare `children` (defined on XBlock) here to make mypy happy.
+    # In practical terms, this means that this mixin doesn't work on XBlockAsides,
+    # even though XBlockMixins generally should work on XBlockAsides.
+    # The "proper" fix here would be to extract XBlock's parent/child logic into
+    # its own mixin class, which both XBlock and this mixin could inherit from.
+    # We have not done this yet because it is tied up with the broader conversation
+    # of how to deprecate parent/child logic from the XBlock API altogether.
+    children: list[UsageKey]
+
+    def render_children(
+        self,
+        context: dict[str, t.Any],
+        fragment: Fragment,
+        can_reorder: bool = True,
+        can_add: bool = False,
+    ) -> None:
         """
         Renders the children of the module with HTML appropriate for Studio. If can_reorder is
         True, then the children will be rendered to support drag and drop.
         """
-        contents = []
+        contents: list[dict[str, t.Any]] = []
 
-        child_context = {'reorderable_items': set()}
+        child_context: dict[str, t.Any] = {'reorderable_items': set()}
         if context:
             child_context.update(context)
 
@@ -310,19 +338,22 @@ class StudioContainerXBlockMixin(XBlockMixin):
             'can_reorder': can_reorder,
         }))
 
-    def author_view(self, context):
+    def student_view(self, context: dict[str, t.Any]) -> Fragment:
+        raise NotImplementedError("StudioContainer XBlocks must implement a student_view")
+
+    def author_view(self, context: dict[str, t.Any]) -> Fragment:
         """
         Display a the studio editor when the user has clicked "View" to see the container view,
         otherwise just show the normal 'author_preview_view' or 'student_view' preview.
         """
         root_xblock = context.get('root_xblock')
 
-        if root_xblock and root_xblock.location == self.location:
+        if root_xblock and root_xblock.usage_key == self.usage_key:
             # User has clicked the "View" link. Show an editable preview of this block's children
             return self.author_edit_view(context)
         return self.author_preview_view(context)
 
-    def author_edit_view(self, context):
+    def author_edit_view(self, context: dict[str, t.Any]) -> Fragment:
         """
         Child blocks can override this to control the view shown to authors in Studio when
         editing this block's children.
@@ -331,7 +362,7 @@ class StudioContainerXBlockMixin(XBlockMixin):
         self.render_children(context, fragment, can_reorder=True, can_add=False)
         return fragment
 
-    def author_preview_view(self, context):
+    def author_preview_view(self, context: dict[str, t.Any]) -> Fragment:
         """
         Child blocks can override this to add a custom preview shown to authors in Studio when
         not editing this block's children.
@@ -339,71 +370,48 @@ class StudioContainerXBlockMixin(XBlockMixin):
         return self.student_view(context)
 
 
+@dataclass(frozen=True)
 class NestedXBlockSpec:
     """
     Class that allows detailed specification of allowed nested XBlocks. For use with
     StudioContainerWithNestedXBlocksMixin.allowed_nested_blocks
     """
+    # An XBlock class.
+    block: type[XBlock]
 
-    def __init__(
-            self, block, single_instance=False, disabled=False, disabled_reason=None, boilerplate=None,
-            category=None, label=None,
-    ):
-        self._block = block
-        self._single_instance = single_instance
-        self._disabled = disabled
-        self._disabled_reason = disabled_reason
-        self._boilerplate = boilerplate
-        # Some blocks may not be nesting-aware, but can be nested anyway with a bit of help.
-        # For example, if you wanted to include an XBlock from a different project that didn't
-        # yet use XBlock utils, you could specify the category and studio label here.
-        self._category = category
-        self._label = label
+    # If True, only allow single nested instance of XBlock
+    single_instance: bool = False
 
-    @property
-    def category(self):
-        """ Block category - used as a computer-readable name of an XBlock """
-        return self._category or self._block.CATEGORY
+    # If True, renders add buttons disabled - only use when XBlock can't be added at all (i.e. not available).
+    # To allow single instance of XBlock use single_instance property
+    disabled: bool = False
 
-    @property
-    def label(self):
-        """ Block label - used as human-readable name of an XBlock """
-        return self._label or self._block.STUDIO_LABEL
+    # If block is disabled this property is used as add button title, giving some hint about why it is disabled
+    disabled_reason: str | None = None
 
-    @property
-    def single_instance(self):
-        """ If True, only allow single nested instance of Xblock """
-        return self._single_instance
+    # If not None and not empty used as data-boilerplate attribute value
+    boilerplate: str | None = None
 
-    @property
-    def disabled(self):
-        """
-        If True, renders add buttons disabled - only use when XBlock can't be added at all (i.e. not available).
-        To allow single instance of XBlock use single_instance property
-        """
-        return self._disabled
+    # Some blocks may not be nesting-aware, but can be nested anyway with a bit of help.
+    # For example, if you wanted to include an XBlock from a different project that didn't
+    # yet use XBlock utils, you could specify the category and studio label here.
+    # Otherwise, `category` and `label` will be filled in from `block`
+    category: str = ""  # Computer-readable name of an XBlock
+    label: str = ""  # Human-readable name of an XBlock
 
-    @property
-    def disabled_reason(self):
-        """
-        If block is disabled this property is used as add button title, giving some hint about why it is disabled
-        """
-        return self._disabled_reason
-
-    @property
-    def boilerplate(self):
-        """ Boilerplate - if not None and not empty used as data-boilerplate attribute value """
-        return self._boilerplate
+    def __post_init__(self):
+        self.category = self.category or self.block.CATEGORY
+        self.label = self.label or self.block.STUDIO_LABEL
 
 
-class XBlockWithPreviewMixin:
+class XBlockWithPreviewMixin(XBlockMixin):
     """
     An XBlock mixin providing simple preview view. It is to be used with StudioContainerWithNestedXBlocksMixin to
     avoid adding studio wrappers (title, edit button, etc.) to a block when it is rendered as child in parent's
     author_preview_view
     """
 
-    def preview_view(self, context):
+    def preview_view(self, context: dict[str, t.Any]) -> Fragment:
         """
         Preview view - used by StudioContainerWithNestedXBlocksMixin to render nested xblocks in preview context.
         Default implementation uses author_view if available, otherwise falls back to student_view
@@ -414,22 +422,22 @@ class XBlockWithPreviewMixin:
         return renderer(context)
 
 
-class StudioContainerWithNestedXBlocksMixin(StudioContainerXBlockMixin):
+class StudioContainerWithNestedXBlocksMixin(StudioContainerXBlockMixin):  # pylint: disable=abstract-method
     """
     An XBlock mixin providing interface for specifying allowed nested blocks and adding/previewing them in Studio.
     """
     has_children = True
-    CHILD_PREVIEW_TEMPLATE = "templates/default_preview_view.html"
+    CHILD_PREVIEW_TEMPLATE: str = "templates/default_preview_view.html"
 
     @property
-    def loader(self):
+    def loader(self) -> ResourceLoader:
         """
         Loader for loading and rendering assets stored in child XBlock package
         """
         return loader
 
     @property
-    def allowed_nested_blocks(self):
+    def allowed_nested_blocks(self) -> list[type[XBlock] | NestedXBlockSpec]:
         """
         Returns a list of allowed nested XBlocks. Each item can be either
         * An XBlock class
@@ -441,7 +449,7 @@ class StudioContainerWithNestedXBlocksMixin(StudioContainerXBlockMixin):
         """
         return []
 
-    def get_nested_blocks_spec(self):
+    def get_nested_blocks_spec(self) -> list[NestedXBlockSpec]:
         """
         Converts allowed_nested_blocks items to NestedXBlockSpec to provide common interface
         """
@@ -450,7 +458,7 @@ class StudioContainerWithNestedXBlocksMixin(StudioContainerXBlockMixin):
             for block_spec in self.allowed_nested_blocks
         ]
 
-    def author_edit_view(self, context):
+    def author_edit_view(self, context: dict[str, t.Any]) -> Fragment:
         """
         View for adding/editing nested blocks
         """
@@ -473,7 +481,7 @@ class StudioContainerWithNestedXBlocksMixin(StudioContainerXBlockMixin):
         fragment.initialize_js('StudioContainerXBlockWithNestedXBlocksMixin')
         return fragment
 
-    def author_preview_view(self, context):
+    def author_preview_view(self, context: dict[str, t.Any]) -> Fragment:
         """
         View for previewing contents in studio.
         """
@@ -494,7 +502,7 @@ class StudioContainerWithNestedXBlocksMixin(StudioContainerXBlockMixin):
         fragment.add_content(self.loader.render_django_template(self.CHILD_PREVIEW_TEMPLATE, render_context))
         return fragment
 
-    def _render_child_fragment(self, child, context, view='student_view'):
+    def _render_child_fragment(self, child: XBlock, context: dict[str, t.Any], view: str = 'student_view') -> Fragment:
         """
         Helper method to overcome html block rendering quirks
         """
@@ -504,7 +512,7 @@ class StudioContainerWithNestedXBlocksMixin(StudioContainerXBlockMixin):
             if child.scope_ids.block_type == 'html' and getattr(self.runtime, 'is_author_mode', False):
                 # html block doesn't support preview_view, and if we use student_view Studio will wrap
                 # it in HTML that we don't want in the preview. So just render its HTML directly:
-                child_fragment = Fragment(child.data)
+                child_fragment = Fragment(child.data)  # type: ignore[attr-defined]
             else:
                 child_fragment = child.render('student_view', context)
 
