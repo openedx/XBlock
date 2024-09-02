@@ -20,7 +20,7 @@ markupsafe==2.1.5
     # via
     #   -r requirements/base.in
     #   mako
-pbr==6.0.0
+pbr==6.1.0
     # via stevedore
 pymongo==4.8.0
     # via edx-opaque-keys

@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.5
+boto3==1.35.10
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.5
+botocore==1.35.10
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -176,7 +176,7 @@ packaging==24.1
     #   tox
 path==17.0.0
     # via -r requirements/test.txt
-pbr==6.0.0
+pbr==6.1.0
     # via
     #   -r requirements/test.txt
     #   stevedore
@@ -202,7 +202,7 @@ pygments==2.18.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==3.2.6
+pylint==3.2.7
     # via
     #   -r requirements/test.txt
     #   edx-lint
