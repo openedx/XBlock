@@ -6,28 +6,12 @@ The README file in this directory contains much more information.
 
 Much of this still needs to be organized.
 """
-try:
-    from django.core.exceptions import ImproperlyConfigured
-except ImportError:
-    class ImproperlyConfigured(Exception):
-        '''
-        If Django is installed, and djpyfs is installed, but we're not in a
-        Django app, we'll get this exception. We'd like to catch
-        it. But we don't want the try/except to fail even if we're
-        either in a proper Django app, or don't have Django installed
-        at all.
-        '''
+from djpyfs import djpyfs  # type: ignore[import-untyped]
+from fs.base import FS
 
-try:
-    from djpyfs import djpyfs
-except ImportError:
-    djpyfs = None
-except ImproperlyConfigured:
-    print("Warning! Django is not correctly configured.")
-    djpyfs = None  # pylint: disable=invalid-name
-
-from xblock.fields import Field, NO_CACHE_VALUE
-from xblock.fields import scope_key
+from xblock.core import Blocklike
+from xblock.runtime import Runtime
+from xblock.fields import Field, NO_CACHE_VALUE, scope_key
 
 #  Finished services
 
@@ -83,19 +67,26 @@ class Service:
     * We'd like them to be able to load through Stevedor, and have a
       plug-in mechanism similar to XBlock.
     """
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        *,
+        runtime: Runtime | None = None,
+        xblock: Blocklike | None = None,
+        user: object | None = None,
+        **kwargs
+    ):
         # TODO: We need plumbing to set these
-        self._runtime = kwargs.get('runtime', None)
-        self._xblock = kwargs.get('xblock', None)
-        self._user = kwargs.get('user', None)
+        self._runtime = runtime
+        self._xblock = xblock
+        self._user = user
 
-    def xblock(self):
+    def xblock(self) -> Blocklike | None:
         """
         Accessor for the xblock calling the service. Returns None if unknown
         """
         return self._xblock
 
-    def runtime(self):
+    def runtime(self) -> Runtime | None:
         """
         Accessor for the runtime object. Returns None if unknown
         """
@@ -124,7 +115,7 @@ class Filesystem(Field):
     """
     MUTABLE = False
 
-    def __get__(self, xblock, xblock_class):
+    def __get__(self, xblock: Blocklike | None, xblock_class: type[Blocklike]):
         """
         Returns a `pyfilesystem` object which may be interacted with.
         """
@@ -143,14 +134,14 @@ class Filesystem(Field):
 
         return value
 
-    def __delete__(self, xblock):
+    def __delete__(self, xblock: Blocklike):
         """
         We don't support this until we figure out what this means. Files
         should be deleted through normal pyfilesystem operations.
         """
         raise NotImplementedError
 
-    def __set__(self, xblock, value):
+    def __set__(self, xblock: Blocklike, value: object):
         """
         We interact with a file system by `open`/`close`/`read`/`write`,
         not `set` and `get`.
@@ -181,22 +172,12 @@ class FSService(Service):
       but it is not clear XBlocks should know about it.
     """
     @public()
-    def load(self, instance, xblock):
+    def load(self, instance: Field, xblock: Blocklike) -> FS:
         """
         Get the filesystem for the field specified in 'instance' and the
         xblock in 'xblock' It is locally scoped.
         """
-
-        # TODO: Get xblock from context, once the plumbing is piped through
-        if djpyfs:
-            return djpyfs.get_filesystem(scope_key(instance, xblock))
-        else:
-            # The reference implementation relies on djpyfs
-            # https://github.com/openedx/django-pyfs
-            # For Django runtimes, you may use this reference
-            # implementation. Otherwise, you will need to
-            # patch pyfilesystem yourself to implement get_url.
-            raise NotImplementedError("djpyfs not available")
+        return djpyfs.get_filesystem(scope_key(instance, xblock))
 
     def __repr__(self):
         return "File system object"

@@ -8,9 +8,12 @@ astroid
 coverage
 ddt
 diff-cover >= 0.2.1
+django-stubs
 edx_lint
 hypothesis
+lxml-stubs
 mock
+mypy
 path
 pycodestyle
 pylint
@@ -18,3 +21,9 @@ pytest
 pytest-cov
 pytest-django
 tox
+types-python-dateutil
+types-pytz
+types-PyYAML
+types-setuptools
+types-simplejson
+types-WebOb
