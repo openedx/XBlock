@@ -3,7 +3,6 @@
 """
 Set up for XBlock
 """
-import codecs
 import os
 import os.path
 import re

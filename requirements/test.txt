@@ -19,11 +19,11 @@ astroid==3.2.4
     #   pylint-celery
 attrs==24.2.0
     # via hypothesis
-boto3==1.35.10
+boto3==1.35.13
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.10
+botocore==1.35.13
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -31,7 +31,9 @@ botocore==1.35.10
 cachetools==5.5.0
     # via tox
 chardet==5.2.0
-    # via tox
+    # via
+    #   diff-cover
+    #   tox
 click==8.1.7
     # via
     #   click-log
@@ -49,10 +51,8 @@ coverage[toml]==7.6.1
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.in
-diff-cover==4.0.0
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/test.in
+diff-cover==9.1.1
+    # via -r requirements/test.in
 dill==0.3.8
     # via pylint
 distlib==0.3.8
@@ -67,7 +67,7 @@ dnspython==2.6.1
     #   pymongo
 edx-lint==5.4.0
     # via -r requirements/test.in
-edx-opaque-keys==2.10.0
+edx-opaque-keys==2.11.0
     # via -r requirements/django.txt
 filelock==3.15.4
     # via
@@ -82,10 +82,8 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.111.2
+hypothesis==6.112.0
     # via -r requirements/test.in
-inflect==7.3.1
-    # via jinja2-pluralize
 iniconfig==2.0.0
     # via pytest
 isort==5.13.2
@@ -94,9 +92,6 @@ jinja2==3.1.4
     # via
     #   code-annotations
     #   diff-cover
-    #   jinja2-pluralize
-jinja2-pluralize==0.3.0
-    # via diff-cover
 jmespath==1.0.1
     # via
     #   -r requirements/django.txt
@@ -117,8 +112,6 @@ mccabe==0.7.0
     # via pylint
 mock==5.1.0
     # via -r requirements/test.in
-more-itertools==10.4.0
-    # via inflect
 openedx-django-pyfs==3.7.0
     # via -r requirements/django.txt
 packaging==24.1
@@ -174,7 +167,7 @@ pytest==8.3.2
     #   pytest-django
 pytest-cov==5.0.0
     # via -r requirements/test.in
-pytest-django==4.8.0
+pytest-django==4.9.0
     # via -r requirements/test.in
 python-dateutil==2.9.0.post0
     # via
@@ -218,13 +211,10 @@ tomlkit==0.13.2
     # via pylint
 tox==4.18.0
     # via -r requirements/test.in
-typeguard==4.3.0
-    # via inflect
 typing-extensions==4.12.2
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
-    #   typeguard
 urllib3==2.2.2
     # via
     #   -r requirements/django.txt

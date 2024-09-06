@@ -17,7 +17,7 @@ formats:
 
 # Set the version of python needed to build these docs.
 build:
-  os: "ubuntu-22.04"
+  os: "ubuntu-lts-latest"
   tools:
     python: "3.11"
 

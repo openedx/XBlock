@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.10
+boto3==1.35.13
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.10
+botocore==1.35.13
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -43,6 +43,7 @@ chardet==5.2.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
+    #   diff-cover
     #   tox
 click==8.1.7
     # via
@@ -72,10 +73,8 @@ coverage[toml]==7.6.1
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==4.0.0
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/test.txt
+diff-cover==9.1.1
+    # via -r requirements/test.txt
 dill==0.3.8
     # via
     #   -r requirements/test.txt
@@ -85,7 +84,7 @@ distlib==0.3.8
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   virtualenv
-django==4.2.15
+django==4.2.16
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
@@ -96,7 +95,7 @@ dnspython==2.6.1
     #   pymongo
 edx-lint==5.4.0
     # via -r requirements/test.txt
-edx-opaque-keys==2.10.0
+edx-opaque-keys==2.11.0
     # via -r requirements/test.txt
 filelock==3.15.4
     # via
@@ -113,12 +112,8 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.111.2
+hypothesis==6.112.0
     # via -r requirements/test.txt
-inflect==7.3.1
-    # via
-    #   -r requirements/test.txt
-    #   jinja2-pluralize
 iniconfig==2.0.0
     # via
     #   -r requirements/test.txt
@@ -131,11 +126,6 @@ jinja2==3.1.4
     # via
     #   -r requirements/test.txt
     #   code-annotations
-    #   diff-cover
-    #   jinja2-pluralize
-jinja2-pluralize==0.3.0
-    # via
-    #   -r requirements/test.txt
     #   diff-cover
 jmespath==1.0.1
     # via
@@ -159,10 +149,6 @@ mccabe==0.7.0
     #   pylint
 mock==5.1.0
     # via -r requirements/test.txt
-more-itertools==10.4.0
-    # via
-    #   -r requirements/test.txt
-    #   inflect
 openedx-django-pyfs==3.7.0
     # via -r requirements/test.txt
 packaging==24.1
@@ -243,7 +229,7 @@ pytest==8.3.2
     #   pytest-django
 pytest-cov==5.0.0
     # via -r requirements/test.txt
-pytest-django==4.8.0
+pytest-django==4.9.0
     # via -r requirements/test.txt
 python-dateutil==2.9.0.post0
     # via
@@ -297,15 +283,10 @@ tox==4.18.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
-typeguard==4.3.0
-    # via
-    #   -r requirements/test.txt
-    #   inflect
 typing-extensions==4.12.2
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
-    #   typeguard
 urllib3==2.2.2
     # via
     #   -r requirements/test.txt
