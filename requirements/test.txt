@@ -19,11 +19,11 @@ astroid==3.2.4
     #   pylint-celery
 attrs==24.2.0
     # via hypothesis
-boto3==1.35.10
+boto3==1.35.14
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.10
+botocore==1.35.14
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -67,9 +67,9 @@ dnspython==2.6.1
     #   pymongo
 edx-lint==5.4.0
     # via -r requirements/test.in
-edx-opaque-keys==2.10.0
+edx-opaque-keys==2.11.0
     # via -r requirements/django.txt
-filelock==3.15.4
+filelock==3.16.0
     # via
     #   tox
     #   virtualenv
@@ -82,9 +82,9 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.111.2
+hypothesis==6.112.0
     # via -r requirements/test.in
-inflect==7.3.1
+inflect==7.4.0
     # via jinja2-pluralize
 iniconfig==2.0.0
     # via pytest
@@ -117,7 +117,7 @@ mccabe==0.7.0
     # via pylint
 mock==5.1.0
     # via -r requirements/test.in
-more-itertools==10.4.0
+more-itertools==10.5.0
     # via inflect
 openedx-django-pyfs==3.7.0
     # via -r requirements/django.txt
@@ -132,7 +132,7 @@ pbr==6.1.0
     # via
     #   -r requirements/django.txt
     #   stevedore
-platformdirs==4.2.2
+platformdirs==4.3.1
     # via
     #   pylint
     #   tox
@@ -174,7 +174,7 @@ pytest==8.3.2
     #   pytest-django
 pytest-cov==5.0.0
     # via -r requirements/test.in
-pytest-django==4.8.0
+pytest-django==4.9.0
     # via -r requirements/test.in
 python-dateutil==2.9.0.post0
     # via
@@ -216,7 +216,7 @@ text-unidecode==1.3
     # via python-slugify
 tomlkit==0.13.2
     # via pylint
-tox==4.18.0
+tox==4.18.1
     # via -r requirements/test.in
 typeguard==4.3.0
     # via inflect
@@ -229,7 +229,7 @@ urllib3==2.2.2
     # via
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.26.3
+virtualenv==20.26.4
     # via tox
 web-fragments==2.2.0
     # via -r requirements/django.txt
