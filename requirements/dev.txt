@@ -73,7 +73,7 @@ coverage[toml]==7.6.1
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==9.1.1
+diff-cover==9.2.0
     # via -r requirements/test.txt
 dill==0.3.8
     # via
@@ -114,10 +114,6 @@ fs-s3fs==1.1.1
     #   openedx-django-pyfs
 hypothesis==6.112.0
     # via -r requirements/test.txt
-inflect==7.4.0
-    # via
-    #   -r requirements/test.txt
-    #   jinja2-pluralize
 iniconfig==2.0.0
     # via
     #   -r requirements/test.txt
@@ -153,10 +149,6 @@ mccabe==0.7.0
     #   pylint
 mock==5.1.0
     # via -r requirements/test.txt
-more-itertools==10.5.0
-    # via
-    #   -r requirements/test.txt
-    #   inflect
 openedx-django-pyfs==3.7.0
     # via -r requirements/test.txt
 packaging==24.1
@@ -176,7 +168,7 @@ pbr==6.1.0
     #   stevedore
 pip-tools==7.4.1
     # via -r requirements/pip-tools.txt
-platformdirs==4.3.1
+platformdirs==4.3.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
