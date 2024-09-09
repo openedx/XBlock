@@ -21,16 +21,16 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.13
+boto3==1.35.14
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.13
+botocore==1.35.14
     # via
     #   -r requirements/test.txt
     #   boto3
     #   s3transfer
-build==1.2.1
+build==1.2.2
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
@@ -97,7 +97,7 @@ edx-lint==5.4.0
     # via -r requirements/test.txt
 edx-opaque-keys==2.11.0
     # via -r requirements/test.txt
-filelock==3.15.4
+filelock==3.16.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -114,6 +114,10 @@ fs-s3fs==1.1.1
     #   openedx-django-pyfs
 hypothesis==6.112.0
     # via -r requirements/test.txt
+inflect==7.4.0
+    # via
+    #   -r requirements/test.txt
+    #   jinja2-pluralize
 iniconfig==2.0.0
     # via
     #   -r requirements/test.txt
@@ -149,6 +153,10 @@ mccabe==0.7.0
     #   pylint
 mock==5.1.0
     # via -r requirements/test.txt
+more-itertools==10.5.0
+    # via
+    #   -r requirements/test.txt
+    #   inflect
 openedx-django-pyfs==3.7.0
     # via -r requirements/test.txt
 packaging==24.1
@@ -168,7 +176,7 @@ pbr==6.1.0
     #   stevedore
 pip-tools==7.4.1
     # via -r requirements/pip-tools.txt
-platformdirs==4.2.2
+platformdirs==4.3.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -279,7 +287,7 @@ tomlkit==0.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.18.0
+tox==4.18.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -291,7 +299,7 @@ urllib3==2.2.2
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.26.3
+virtualenv==20.26.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
