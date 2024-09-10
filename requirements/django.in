@@ -8,7 +8,3 @@
 Django
 openedx-django-pyfs>=1.0.5
 lazy
-
-# Needed until we drop testing on Python 3.8 so that
-# we don't try to install this on newer versions of python.
-backports.zoneinfo;python_version<"3.9"

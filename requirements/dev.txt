@@ -43,6 +43,7 @@ chardet==5.2.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
+    #   diff-cover
     #   tox
 click==8.1.7
     # via
@@ -72,10 +73,8 @@ coverage[toml]==7.6.1
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==4.0.0
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/test.txt
+diff-cover==9.2.0
+    # via -r requirements/test.txt
 dill==0.3.8
     # via
     #   -r requirements/test.txt
@@ -115,10 +114,6 @@ fs-s3fs==1.1.1
     #   openedx-django-pyfs
 hypothesis==6.112.0
     # via -r requirements/test.txt
-inflect==7.4.0
-    # via
-    #   -r requirements/test.txt
-    #   jinja2-pluralize
 iniconfig==2.0.0
     # via
     #   -r requirements/test.txt
@@ -131,11 +126,6 @@ jinja2==3.1.4
     # via
     #   -r requirements/test.txt
     #   code-annotations
-    #   diff-cover
-    #   jinja2-pluralize
-jinja2-pluralize==0.3.0
-    # via
-    #   -r requirements/test.txt
     #   diff-cover
 jmespath==1.0.1
     # via
@@ -159,10 +149,6 @@ mccabe==0.7.0
     #   pylint
 mock==5.1.0
     # via -r requirements/test.txt
-more-itertools==10.5.0
-    # via
-    #   -r requirements/test.txt
-    #   inflect
 openedx-django-pyfs==3.7.0
     # via -r requirements/test.txt
 packaging==24.1
@@ -182,7 +168,7 @@ pbr==6.1.0
     #   stevedore
 pip-tools==7.4.1
     # via -r requirements/pip-tools.txt
-platformdirs==4.3.1
+platformdirs==4.3.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -297,15 +283,10 @@ tox==4.18.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
-typeguard==4.3.0
-    # via
-    #   -r requirements/test.txt
-    #   inflect
 typing-extensions==4.12.2
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
-    #   typeguard
 urllib3==2.2.2
     # via
     #   -r requirements/test.txt
