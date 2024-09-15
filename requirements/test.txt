@@ -19,11 +19,11 @@ astroid==3.2.4
     #   pylint-celery
 attrs==24.2.0
     # via hypothesis
-boto3==1.35.14
+boto3==1.35.19
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.14
+botocore==1.35.19
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.112.0
+hypothesis==6.112.1
     # via -r requirements/test.in
 iniconfig==2.0.0
     # via pytest
@@ -125,7 +125,7 @@ pbr==6.1.0
     # via
     #   -r requirements/django.txt
     #   stevedore
-platformdirs==4.3.2
+platformdirs==4.3.3
     # via
     #   pylint
     #   tox
@@ -160,7 +160,7 @@ pymongo==4.8.0
     #   edx-opaque-keys
 pyproject-api==1.7.1
     # via tox
-pytest==8.3.2
+pytest==8.3.3
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -175,7 +175,7 @@ python-dateutil==2.9.0.post0
     #   botocore
 python-slugify==8.0.4
     # via code-annotations
-pytz==2024.1
+pytz==2024.2
     # via -r requirements/django.txt
 pyyaml==6.0.2
     # via
@@ -215,7 +215,7 @@ typing-extensions==4.12.2
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
-urllib3==2.2.2
+urllib3==2.2.3
     # via
     #   -r requirements/django.txt
     #   botocore

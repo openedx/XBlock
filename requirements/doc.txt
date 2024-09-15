@@ -22,11 +22,11 @@ babel==2.16.0
     #   sphinx
 beautifulsoup4==4.12.3
     # via pydata-sphinx-theme
-boto3==1.35.14
+boto3==1.35.19
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.14
+botocore==1.35.19
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -59,7 +59,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-idna==3.8
+idna==3.9
     # via requests
 imagesize==1.4.1
     # via sphinx
@@ -108,7 +108,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/django.txt
     #   botocore
-pytz==2024.1
+pytz==2024.2
     # via -r requirements/django.txt
 pyyaml==6.0.2
     # via -r requirements/django.txt
@@ -162,7 +162,7 @@ typing-extensions==4.12.2
     #   -r requirements/django.txt
     #   edx-opaque-keys
     #   pydata-sphinx-theme
-urllib3==2.2.2
+urllib3==2.2.3
     # via
     #   -r requirements/django.txt
     #   botocore
