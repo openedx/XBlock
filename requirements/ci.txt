@@ -14,7 +14,7 @@ coverage==7.6.1
     # via -r requirements/ci.in
 distlib==0.3.8
     # via virtualenv
-filelock==3.16.0
+filelock==3.16.1
     # via
     #   tox
     #   virtualenv
@@ -22,15 +22,15 @@ packaging==24.1
     # via
     #   pyproject-api
     #   tox
-platformdirs==4.3.3
+platformdirs==4.3.6
     # via
     #   tox
     #   virtualenv
 pluggy==1.5.0
     # via tox
-pyproject-api==1.7.1
+pyproject-api==1.8.0
     # via tox
-tox==4.18.1
+tox==4.20.0
     # via -r requirements/ci.in
-virtualenv==20.26.4
+virtualenv==20.26.6
     # via tox

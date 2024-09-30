@@ -4,3 +4,4 @@ extension-pkg-whitelist=lxml
 [MESSAGES CONTROL]
 disable+=
     django-not-configured,
+    too-many-positional-arguments,
