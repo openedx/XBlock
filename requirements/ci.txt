@@ -30,7 +30,7 @@ pluggy==1.5.0
     # via tox
 pyproject-api==1.8.0
     # via tox
-tox==4.20.0
+tox==4.21.2
     # via -r requirements/ci.in
 virtualenv==20.26.6
     # via tox
