@@ -12,7 +12,7 @@ asgiref==3.8.1
     # via
     #   -r requirements/test.txt
     #   django
-astroid==3.3.4
+astroid==3.3.5
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.29
+boto3==1.35.34
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.29
+botocore==1.35.34
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -89,7 +89,7 @@ django==4.2.16
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-dnspython==2.6.1
+dnspython==2.7.0
     # via
     #   -r requirements/test.txt
     #   pymongo
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.112.1
+hypothesis==6.112.3
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -208,7 +208,7 @@ pylint-plugin-utils==0.8.2
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==4.9.1
+pymongo==4.10.1
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
@@ -217,7 +217,7 @@ pyproject-api==1.8.0
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-pyproject-hooks==1.1.0
+pyproject-hooks==1.2.0
     # via
     #   -r requirements/pip-tools.txt
     #   build
@@ -279,7 +279,7 @@ tomlkit==0.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.20.0
+tox==4.21.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
