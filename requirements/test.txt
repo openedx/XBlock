@@ -19,11 +19,11 @@ astroid==3.3.5
     #   pylint-celery
 attrs==24.2.0
     # via hypothesis
-boto3==1.35.34
+boto3==1.35.39
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.34
+botocore==1.35.39
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -45,7 +45,7 @@ code-annotations==1.8.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.6.1
+coverage[toml]==7.6.2
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -55,7 +55,7 @@ diff-cover==9.2.0
     # via -r requirements/test.in
 dill==0.3.9
     # via pylint
-distlib==0.3.8
+distlib==0.3.9
     # via virtualenv
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.112.3
+hypothesis==6.115.0
     # via -r requirements/test.in
 iniconfig==2.0.0
     # via pytest
@@ -103,7 +103,7 @@ lxml==5.3.0
     # via -r requirements/django.txt
 mako==1.3.5
     # via -r requirements/django.txt
-markupsafe==2.1.5
+markupsafe==3.0.1
     # via
     #   -r requirements/django.txt
     #   jinja2
@@ -148,7 +148,7 @@ pylint==3.3.1
     #   pylint-plugin-utils
 pylint-celery==0.3
     # via edx-lint
-pylint-django==2.5.5
+pylint-django==2.6.1
     # via edx-lint
 pylint-plugin-utils==0.8.2
     # via
@@ -181,7 +181,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/django.txt
     #   code-annotations
-s3transfer==0.10.2
+s3transfer==0.10.3
     # via
     #   -r requirements/django.txt
     #   boto3
