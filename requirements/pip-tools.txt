@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-build==1.2.2
+build==1.2.2.post1
     # via pip-tools
 click==8.1.7
     # via pip-tools
