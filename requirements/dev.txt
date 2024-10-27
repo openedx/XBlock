@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.44
+boto3==1.35.49
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.44
+botocore==1.35.49
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -66,7 +66,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.6.3
+coverage[toml]==7.6.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.115.3
+hypothesis==6.115.5
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -136,7 +136,7 @@ lazy==1.6
     # via -r requirements/test.txt
 lxml==5.3.0
     # via -r requirements/test.txt
-mako==1.3.5
+mako==1.3.6
     # via -r requirements/test.txt
 markupsafe==3.0.2
     # via
@@ -279,7 +279,7 @@ tomlkit==0.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.23.0
+tox==4.23.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -298,7 +298,7 @@ virtualenv==20.27.0
     #   tox
 web-fragments==2.2.0
     # via -r requirements/test.txt
-webob==1.8.8
+webob==1.8.9
     # via -r requirements/test.txt
 wheel==0.44.0
     # via
