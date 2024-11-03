@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.49
+boto3==1.35.54
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.49
+botocore==1.35.54
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -93,7 +93,7 @@ dnspython==2.7.0
     # via
     #   -r requirements/test.txt
     #   pymongo
-edx-lint==5.4.0
+edx-lint==5.4.1
     # via -r requirements/test.txt
 edx-opaque-keys==2.11.0
     # via -r requirements/test.txt
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.115.5
+hypothesis==6.116.0
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -227,7 +227,7 @@ pytest==8.3.3
     #   -r requirements/test.txt
     #   pytest-cov
     #   pytest-django
-pytest-cov==5.0.0
+pytest-cov==6.0.0
     # via -r requirements/test.txt
 pytest-django==4.9.0
     # via -r requirements/test.txt
@@ -291,7 +291,7 @@ urllib3==2.2.3
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.27.0
+virtualenv==20.27.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
