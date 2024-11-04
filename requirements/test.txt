@@ -19,11 +19,11 @@ astroid==3.3.5
     #   pylint-celery
 attrs==24.2.0
     # via hypothesis
-boto3==1.35.49
+boto3==1.35.54
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.49
+botocore==1.35.54
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -65,7 +65,7 @@ dnspython==2.7.0
     # via
     #   -r requirements/django.txt
     #   pymongo
-edx-lint==5.4.0
+edx-lint==5.4.1
     # via -r requirements/test.in
 edx-opaque-keys==2.11.0
     # via -r requirements/django.txt
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.115.5
+hypothesis==6.116.0
     # via -r requirements/test.in
 iniconfig==2.0.0
     # via pytest
@@ -165,7 +165,7 @@ pytest==8.3.3
     #   -r requirements/test.in
     #   pytest-cov
     #   pytest-django
-pytest-cov==5.0.0
+pytest-cov==6.0.0
     # via -r requirements/test.in
 pytest-django==4.9.0
     # via -r requirements/test.in
@@ -219,7 +219,7 @@ urllib3==2.2.3
     # via
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.27.0
+virtualenv==20.27.1
     # via tox
 web-fragments==2.2.0
     # via -r requirements/django.txt
