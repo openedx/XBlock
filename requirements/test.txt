@@ -19,11 +19,11 @@ astroid==3.3.5
     #   pylint-celery
 attrs==24.2.0
     # via hypothesis
-boto3==1.35.54
+boto3==1.35.57
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.54
+botocore==1.35.57
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.116.0
+hypothesis==6.118.3
     # via -r requirements/test.in
 iniconfig==2.0.0
     # via pytest
@@ -114,7 +114,7 @@ mock==5.1.0
     # via -r requirements/test.in
 openedx-django-pyfs==3.7.0
     # via -r requirements/django.txt
-packaging==24.1
+packaging==24.2
     # via
     #   pyproject-api
     #   pytest

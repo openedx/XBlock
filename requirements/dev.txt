@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.54
+boto3==1.35.57
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.54
+botocore==1.35.57
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.116.0
+hypothesis==6.118.3
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -151,7 +151,7 @@ mock==5.1.0
     # via -r requirements/test.txt
 openedx-django-pyfs==3.7.0
     # via -r requirements/test.txt
-packaging==24.1
+packaging==24.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/pip-tools.txt
@@ -300,7 +300,7 @@ web-fragments==2.2.0
     # via -r requirements/test.txt
 webob==1.8.9
     # via -r requirements/test.txt
-wheel==0.44.0
+wheel==0.45.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
