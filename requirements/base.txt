@@ -36,7 +36,7 @@ six==1.16.0
     # via
     #   fs
     #   python-dateutil
-stevedore==5.3.0
+stevedore==5.4.0
     # via edx-opaque-keys
 typing-extensions==4.12.2
     # via edx-opaque-keys

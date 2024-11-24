@@ -19,11 +19,11 @@ astroid==3.3.5
     #   pylint-celery
 attrs==24.2.0
     # via hypothesis
-boto3==1.35.63
+boto3==1.35.68
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.63
+botocore==1.35.68
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -41,7 +41,7 @@ click==8.1.7
     #   edx-lint
 click-log==0.4.0
     # via edx-lint
-code-annotations==1.8.1
+code-annotations==1.8.2
     # via edx-lint
 colorama==0.4.6
     # via tox
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.119.1
+hypothesis==6.119.4
     # via -r requirements/test.in
 iniconfig==2.0.0
     # via pytest
@@ -181,7 +181,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/django.txt
     #   code-annotations
-s3transfer==0.10.3
+s3transfer==0.10.4
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -200,7 +200,7 @@ sqlparse==0.5.2
     # via
     #   -r requirements/django.txt
     #   django
-stevedore==5.3.0
+stevedore==5.4.0
     # via
     #   -r requirements/django.txt
     #   code-annotations

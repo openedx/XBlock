@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.63
+boto3==1.35.68
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.63
+botocore==1.35.68
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -57,7 +57,7 @@ click-log==0.4.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
-code-annotations==1.8.1
+code-annotations==1.8.2
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.119.1
+hypothesis==6.119.4
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -245,7 +245,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/test.txt
     #   code-annotations
-s3transfer==0.10.3
+s3transfer==0.10.4
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -266,7 +266,7 @@ sqlparse==0.5.2
     # via
     #   -r requirements/test.txt
     #   django
-stevedore==5.3.0
+stevedore==5.4.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -300,7 +300,7 @@ web-fragments==2.2.0
     # via -r requirements/test.txt
 webob==1.8.9
     # via -r requirements/test.txt
-wheel==0.45.0
+wheel==0.45.1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
