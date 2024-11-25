@@ -16,7 +16,7 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-wheel==0.45.0
+wheel==0.45.1
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
