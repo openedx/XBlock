@@ -12,7 +12,7 @@ asgiref==3.8.1
     # via
     #   -r requirements/test.txt
     #   django
-astroid==3.3.5
+astroid==3.3.6
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -21,11 +21,11 @@ attrs==24.2.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.76
+boto3==1.35.81
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.76
+botocore==1.35.81
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -57,7 +57,7 @@ click-log==0.4.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
-code-annotations==2.0.0
+code-annotations==2.1.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -73,7 +73,7 @@ coverage[toml]==7.6.9
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==9.2.0
+diff-cover==9.2.1
     # via -r requirements/test.txt
 dill==0.3.9
     # via
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.122.1
+hypothesis==6.122.3
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -262,7 +262,7 @@ sortedcontainers==2.4.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-sqlparse==0.5.2
+sqlparse==0.5.3
     # via
     #   -r requirements/test.txt
     #   django
