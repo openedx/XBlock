@@ -12,20 +12,20 @@ asgiref==3.8.1
     # via
     #   -r requirements/test.txt
     #   django
-astroid==3.3.6
+astroid==3.3.7
     # via
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-attrs==24.2.0
+attrs==24.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.81
+boto3==1.35.86
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.81
+botocore==1.35.86
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -45,7 +45,7 @@ chardet==5.2.0
     #   -r requirements/test.txt
     #   diff-cover
     #   tox
-click==8.1.7
+click==8.1.8
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.122.3
+hypothesis==6.122.6
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -122,7 +122,7 @@ isort==5.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-jinja2==3.1.4
+jinja2==3.1.5
     # via
     #   -r requirements/test.txt
     #   code-annotations
