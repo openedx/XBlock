@@ -12,18 +12,18 @@ asgiref==3.8.1
     # via
     #   -r requirements/django.txt
     #   django
-astroid==3.3.7
+astroid==3.3.8
     # via
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
 attrs==24.3.0
     # via hypothesis
-boto3==1.35.86
+boto3==1.35.90
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.86
+botocore==1.35.90
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -45,7 +45,7 @@ code-annotations==2.1.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.6.9
+coverage[toml]==7.6.10
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.122.6
+hypothesis==6.123.2
     # via -r requirements/test.in
 iniconfig==2.0.0
     # via pytest
@@ -119,7 +119,7 @@ packaging==24.2
     #   pyproject-api
     #   pytest
     #   tox
-path==17.0.0
+path==17.1.0
     # via -r requirements/test.in
 pbr==6.1.0
     # via
@@ -139,7 +139,7 @@ pycodestyle==2.12.1
     # via -r requirements/test.in
 pygments==2.18.0
     # via diff-cover
-pylint==3.3.2
+pylint==3.3.3
     # via
     #   -r requirements/test.in
     #   edx-lint
@@ -215,7 +215,7 @@ typing-extensions==4.12.2
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
-urllib3==2.2.3
+urllib3==2.3.0
     # via
     #   -r requirements/django.txt
     #   botocore
