@@ -22,7 +22,7 @@ from xblock.fields import (
     ScopeIds, Sentinel, UNIQUE_ID, scope_key, Date, Timedelta, RelativeTime, ScoreField, ListScoreField
 )
 from xblock.scorable import Score
-from xblock.test.tools import TestRuntime
+from xblock.test.tools import TestRuntime, make_scope_ids_for_testing
 
 
 class FieldTest(unittest.TestCase):
@@ -41,7 +41,7 @@ class FieldTest(unittest.TestCase):
             field_x = self.FIELD_TO_TEST(enforce_type=enforce_type)
 
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
-        return TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+        return TestBlock(runtime, scope_ids=make_scope_ids_for_testing())
 
     def set_and_get_field(self, arg, enforce_type):
         """
@@ -717,10 +717,11 @@ def test_scope_key():
         pref_lst = List(scope=Scope.preferences, name='')
         user_info_lst = List(scope=Scope.user_info, name='')
 
-    sids = ScopeIds(user_id="_bob",
-                    block_type="b.12#ob",
-                    def_id="..",
-                    usage_id="..")
+    sids = make_scope_ids_for_testing(
+        user_id="_bob",
+        block_type="b.12#ob",
+        block_id="..",
+    )
 
     field_data = DictFieldData({})
 
@@ -763,10 +764,11 @@ def test_unique_id_default():
         field_a = String(default=UNIQUE_ID, scope=Scope.settings)
         field_b = String(default=UNIQUE_ID, scope=Scope.user_state)
 
-    sids = ScopeIds(user_id="bob",
-                    block_type="bobs-type",
-                    def_id="definition-id",
-                    usage_id="usage-id")
+    sids = make_scope_ids_for_testing(
+        user_id="bob",
+        block_type="bobs-type",
+        block_id="usage-id",
+    )
 
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
     block = TestBlock(runtime, DictFieldData({}), sids)
@@ -828,7 +830,7 @@ def test_set_incomparable_fields():
     not_timezone_aware = dt.datetime(2015, 1, 1)
     timezone_aware = dt.datetime(2015, 1, 1, tzinfo=pytz.UTC)
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
+    field_tester = FieldTester(runtime, scope_ids=make_scope_ids_for_testing())
     field_tester.incomparable = not_timezone_aware
     field_tester.incomparable = timezone_aware
     assert field_tester.incomparable == timezone_aware
@@ -853,7 +855,7 @@ def test_twofaced_field_access():
 
     original_json = "YYY"
     runtime = TestRuntime(services={'field-data': DictFieldData({'how_many': original_json})})
-    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
+    field_tester = FieldTester(runtime, scope_ids=make_scope_ids_for_testing())
 
     # Test that the native value isn't equal to the original json we specified.
     assert field_tester.how_many != original_json
@@ -879,7 +881,7 @@ def test_setting_the_same_value_marks_field_as_dirty():
         dict_field = Dict(scope=Scope.settings)
 
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
+    field_tester = FieldTester(runtime, scope_ids=make_scope_ids_for_testing())
 
     # precondition checks
     assert len(field_tester._dirty_fields) == 0
