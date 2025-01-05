@@ -21,11 +21,11 @@ attrs==24.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.90
+boto3==1.35.92
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.90
+botocore==1.35.92
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -291,7 +291,7 @@ urllib3==2.3.0
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.28.0
+virtualenv==20.28.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
