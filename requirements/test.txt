@@ -13,6 +13,8 @@ asgiref==3.8.1
     #   -r requirements/django.txt
     #   django
 astroid==3.3.8
+    #   django-stubs
+astroid==3.3.6
     # via
     #   -r requirements/test.in
     #   pylint
@@ -60,7 +62,13 @@ distlib==0.3.9
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
+    #   django-stubs
+    #   django-stubs-ext
     #   openedx-django-pyfs
+django-stubs==5.1.1
+    # via -r requirements/test.in
+django-stubs-ext==5.1.1
+    # via django-stubs
 dnspython==2.7.0
     # via
     #   -r requirements/django.txt
@@ -101,6 +109,8 @@ lazy==1.6
     # via -r requirements/django.txt
 lxml==5.3.0
     # via -r requirements/django.txt
+lxml-stubs==0.5.1
+    # via -r requirements/test.in
 mako==1.3.8
     # via -r requirements/django.txt
 markupsafe==3.0.2
@@ -112,6 +122,10 @@ mccabe==0.7.0
     # via pylint
 mock==5.1.0
     # via -r requirements/test.in
+mypy==1.13.0
+    # via -r requirements/test.in
+mypy-extensions==1.0.0
+    # via mypy
 openedx-django-pyfs==3.7.0
     # via -r requirements/django.txt
 packaging==24.2
@@ -211,10 +225,27 @@ tomlkit==0.13.2
     # via pylint
 tox==4.23.2
     # via -r requirements/test.in
+types-python-dateutil==2.9.0.20241206
+    # via -r requirements/test.in
+types-pytz==2024.2.0.20241003
+    # via -r requirements/test.in
+types-pyyaml==6.0.12.20240917
+    # via
+    #   -r requirements/test.in
+    #   django-stubs
+types-setuptools==75.6.0.20241126
+    # via -r requirements/test.in
+types-simplejson==3.19.0.20240801
+    # via -r requirements/test.in
+types-webob==1.8.0.20241205
+    # via -r requirements/test.in
 typing-extensions==4.12.2
     # via
     #   -r requirements/django.txt
+    #   django-stubs
+    #   django-stubs-ext
     #   edx-opaque-keys
+    #   mypy
 urllib3==2.3.0
     # via
     #   -r requirements/django.txt

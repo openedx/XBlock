@@ -3,25 +3,27 @@ Helper class (ResourceLoader) for loading resources used by an XBlock
 """
 import os
 import sys
+import typing as t
 import warnings
 
 import importlib.resources
 from django.template import Context, Engine, Template
 from django.template.backends.django import get_installed_libraries
-from mako.lookup import TemplateLookup as MakoTemplateLookup
-from mako.template import Template as MakoTemplate
+from mako.lookup import TemplateLookup as MakoTemplateLookup  # type: ignore[import-untyped]
+from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
 
 
 class ResourceLoader:
     """Loads resources relative to the module named by the module_name parameter."""
-    def __init__(self, module_name):
+    def __init__(self, module_name: str):
         self.module_name = module_name
 
-    def load_unicode(self, resource_path):
+    def load_unicode(self, resource_path: str) -> str:
         """
         Gets the content of a resource
         """
         package_name = importlib.import_module(self.module_name).__package__
+        assert package_name
         # TODO: Add encoding on other places as well
         # resource_path should be a relative path, but historically some callers passed it in
         # with a leading slash, which pkg_resources tolerated and ignored. importlib is less
@@ -29,7 +31,7 @@ class ResourceLoader:
         # leading slash is there is one to ensure we actually have a relative path.
         return importlib.resources.files(package_name).joinpath(resource_path.lstrip('/')).read_text(encoding="utf-8")
 
-    def render_django_template(self, template_path, context=None, i18n_service=None):
+    def render_django_template(self, template_path: str, context: dict[str, t.Any] | None = None, i18n_service=None):
         """
         Evaluate a django template by resource path, applying the provided context.
         """
@@ -49,7 +51,7 @@ class ResourceLoader:
 
         return rendered
 
-    def render_mako_template(self, template_path, context=None):
+    def render_mako_template(self, template_path: str, context: dict[str, t.Any] | None = None) -> str:
         """
         Evaluate a mako template by resource path, applying the provided context
         Note: This function has been deprecated. Consider using Django templates or React UI instead of mako.
@@ -63,12 +65,13 @@ class ResourceLoader:
         template_str = self.load_unicode(template_path)
 
         package_name = importlib.import_module(self.module_name).__package__
+        assert package_name
         directory = str(importlib.resources.files(package_name))
         lookup = MakoTemplateLookup(directories=[directory])
         template = MakoTemplate(template_str, lookup=lookup)
         return template.render(**context)
 
-    def render_template(self, template_path, context=None):
+    def render_template(self, template_path: str, context: dict[str, t.Any] | None = None) -> str:
         """
         This function has been deprecated. It calls render_django_template to support backwards compatibility.
         """
@@ -77,7 +80,13 @@ class ResourceLoader:
         )
         return self.render_django_template(template_path, context)
 
-    def render_js_template(self, template_path, element_id, context=None, i18n_service=None):
+    def render_js_template(
+        self,
+        template_path: str,
+        element_id: str,
+        context: dict[str, t.Any] | None = None,
+        i18n_service=None
+    ) -> str:
         """
         Render a js template.
         """
@@ -87,17 +96,24 @@ class ResourceLoader:
             self.render_django_template(template_path, context, i18n_service)
         )
 
-    def load_scenarios_from_path(self, relative_scenario_dir, include_identifier=False):
+    def load_scenarios_from_path(
+        self,
+        relative_scenario_dir: str,
+        include_identifier: bool = False,
+    ) -> list[tuple[str, str]] | list[tuple[str, str, str]]:
         """
         Returns an array of (title, xmlcontent) from files contained in a specified directory,
         formatted as expected for the return value of the workbench_scenarios() method.
 
         If `include_identifier` is True, returns an array of (identifier, title, xmlcontent).
         """
-        base_dir = os.path.dirname(os.path.realpath(sys.modules[self.module_name].__file__))
+        module_path = sys.modules[self.module_name].__file__
+        assert module_path
+        base_dir = os.path.dirname(os.path.realpath(module_path))
         scenario_dir = os.path.join(base_dir, relative_scenario_dir)
 
         scenarios = []
+        scenarios_with_id = []
         if os.path.isdir(scenario_dir):
             for template in sorted(os.listdir(scenario_dir)):
                 if not template.endswith('.xml'):
@@ -109,6 +125,9 @@ class ResourceLoader:
                 if not include_identifier:
                     scenarios.append((title, scenario))
                 else:
-                    scenarios.append((identifier, title, scenario))
+                    scenarios_with_id.append((identifier, title, scenario))
 
-        return scenarios
+        if not include_identifier:
+            return scenarios
+        else:
+            return scenarios_with_id

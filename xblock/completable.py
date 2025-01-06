@@ -1,6 +1,7 @@
 """
 This module defines CompletableXBlockMixin and completion mode enumeration.
 """
+from xblock.core import Blocklike, XBlockMixin
 
 
 class XBlockCompletionMode:
@@ -12,7 +13,7 @@ class XBlockCompletionMode:
     EXCLUDED = "excluded"
 
     @classmethod
-    def get_mode(cls, block_class):
+    def get_mode(cls, block_class: Blocklike | type[Blocklike]) -> str:
         """
         Return the effective completion mode for a given block.
 
@@ -21,17 +22,17 @@ class XBlockCompletionMode:
         return getattr(block_class, 'completion_mode', cls.COMPLETABLE)
 
 
-class CompletableXBlockMixin:
+class CompletableXBlockMixin(XBlockMixin):
     """
     This mixin sets attributes and provides helper method to integrate XBlock with Completion API.
     """
 
-    has_custom_completion = True
-    completion_mode = XBlockCompletionMode.COMPLETABLE
+    has_custom_completion: bool = True
+    completion_mode: str = XBlockCompletionMode.COMPLETABLE
 
     # To read more on the debate about using the terms percent vs ratio, see:
     # https://openedx.atlassian.net/wiki/spaces/OpenDev/pages/245465398/Naming+with+Percent+or+Ratio
-    def emit_completion(self, completion_percent):
+    def emit_completion(self, completion_percent: float) -> None:
         """
         Emits completion event through Completion API.
 

@@ -3,16 +3,19 @@ Generic plugin support so we can find XBlocks.
 
 This code is in the Runtime layer.
 """
+from __future__ import annotations
+
 import functools
-import importlib.metadata
+from importlib.metadata import entry_points, EntryPoint
 import itertools
 import logging
+import typing as t
 
 from xblock.internal import class_lazy
 
 log = logging.getLogger(__name__)
 
-PLUGIN_CACHE = {}
+PLUGIN_CACHE: dict[tuple[str, str], type[Plugin]] = {}
 
 
 class PluginMissingError(Exception):
@@ -21,7 +24,7 @@ class PluginMissingError(Exception):
 
 class AmbiguousPluginError(Exception):
     """Raised when a class name produces more than one entry_point."""
-    def __init__(self, all_entry_points):
+    def __init__(self, all_entry_points: list[EntryPoint]):
         classes = (entpt.load() for entpt in all_entry_points)
         desc = ", ".join("{0.__module__}.{0.__name__}".format(cls) for cls in classes)
         msg = f"Ambiguous entry points for {all_entry_points[0].name}: {desc}"
@@ -32,7 +35,7 @@ class AmbiguousPluginOverrideError(AmbiguousPluginError):
     """Raised when a class name produces more than one override for an entry_point."""
 
 
-def _default_select_no_override(identifier, all_entry_points):  # pylint: disable=inconsistent-return-statements
+def _default_select_no_override(identifier: str, all_entry_points: list[EntryPoint]) -> EntryPoint:
     """
     Selects plugin for the given identifier, raising on error:
 
@@ -40,16 +43,14 @@ def _default_select_no_override(identifier, all_entry_points):  # pylint: disabl
     - PluginMissingError when we don't have an entry point.
     - AmbiguousPluginError when we have ambiguous entry points.
     """
-
-    if len(all_entry_points) == 0:
+    if not all_entry_points:
         raise PluginMissingError(identifier)
-    if len(all_entry_points) == 1:
-        return all_entry_points[0]
-    elif len(all_entry_points) > 1:
+    if len(all_entry_points) > 1:
         raise AmbiguousPluginError(all_entry_points)
+    return all_entry_points[0]
 
 
-def default_select(identifier, all_entry_points):
+def default_select(identifier: str, all_entry_points: list[EntryPoint]) -> EntryPoint:
     """
     Selects plugin for the given identifier with the ability for a Plugin to override
     the default entry point.
@@ -81,14 +82,14 @@ def default_select(identifier, all_entry_points):
 
 
 class Plugin:
-    """Base class for a system that uses entry_points to load plugins.
+    """
+    Base class for a system that uses entry_points to load plugins.
 
     Implementing classes are expected to have the following attributes:
 
         `entry_point`: The name of the entry point to load plugins from.
-
     """
-    entry_point = None  # Should be overwritten by children classes
+    entry_point: str  # Should be overwritten by children classes
 
     @class_lazy
     def extra_entry_points(cls):  # pylint: disable=no-self-argument
@@ -101,7 +102,7 @@ class Plugin:
         return []
 
     @classmethod
-    def _load_class_entry_point(cls, entry_point):
+    def _load_class_entry_point(cls, entry_point: EntryPoint) -> type[t.Self]:
         """
         Load `entry_point`, and set the `entry_point.name` as the
         attribute `plugin_name` on the loaded object
@@ -111,7 +112,12 @@ class Plugin:
         return class_
 
     @classmethod
-    def load_class(cls, identifier, default=None, select=None):
+    def load_class(
+        cls,
+        identifier: str,
+        default: type[t.Self] | None = None,
+        select: t.Callable[[str, list[EntryPoint]], EntryPoint] | None = None,
+    ) -> type[t.Self]:
         """Load a single class specified by identifier.
 
         By default, this returns the class mapped to `identifier` from entry_points
@@ -148,10 +154,9 @@ class Plugin:
                 select = default_select
 
             all_entry_points = [
-                *importlib.metadata.entry_points(group=f'{cls.entry_point}.overrides', name=identifier),
-                *importlib.metadata.entry_points(group=cls.entry_point, name=identifier)
+                *entry_points(group=f'{cls.entry_point}.overrides', name=identifier),
+                *entry_points(group=cls.entry_point, name=identifier)
             ]
-
             for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
                 if identifier == extra_identifier:
                     all_entry_points.append(extra_entry_point)
@@ -165,10 +170,16 @@ class Plugin:
 
             PLUGIN_CACHE[key] = cls._load_class_entry_point(selected_entry_point)
 
-        return PLUGIN_CACHE[key]
+        result = PLUGIN_CACHE[key]
+        if not issubclass(result, cls):
+            raise TypeError(
+                f"{cls.__name__}.load_class('{identifier}') found the class {result.__name__}; "
+                f"expected a subclass of {cls.__name__}."
+            )
+        return result
 
     @classmethod
-    def load_classes(cls, fail_silently=True):
+    def load_classes(cls, fail_silently: bool = True) -> t.Iterable[tuple[str, type[t.Self]]]:
         """Load all the classes for a plugin.
 
         Produces a sequence containing the identifiers and their corresponding
@@ -184,7 +195,7 @@ class Plugin:
         contexts. Hence, the flag.
         """
         all_classes = itertools.chain(
-            importlib.metadata.entry_points(group=cls.entry_point),
+            entry_points(group=cls.entry_point),
             (entry_point for identifier, entry_point in iter(cls.extra_entry_points)),
         )
         for class_ in all_classes:
@@ -197,15 +208,21 @@ class Plugin:
                     raise
 
     @classmethod
-    def register_temp_plugin(cls, class_, identifier=None, dist='xblock', group='xblock.v1'):
-        """Decorate a function to run with a temporary plugin available.
+    def register_temp_plugin(
+        cls,
+        class_: type,
+        identifier: str | None = None,
+        dist: str = 'xblock',
+        group: str = 'xblock.v1',
+    ) -> t.Callable[[t.Callable], t.Callable]:
+        """
+        Decorate a function to run with a temporary plugin available.
 
         Use it like this in tests::
 
             @register_temp_plugin(MyXBlockClass):
             def test_the_thing():
                 # Here I can load MyXBlockClass by name.
-
         """
         from unittest.mock import Mock  # pylint: disable=import-outside-toplevel
 
@@ -219,7 +236,7 @@ class Plugin:
         )
         entry_point.name = identifier
 
-        def _decorator(func):
+        def _decorator(func: t.Callable) -> t.Callable:
             @functools.wraps(func)
             def _inner(*args, **kwargs):
                 global PLUGIN_CACHE  # pylint: disable=global-statement
