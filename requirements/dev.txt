@@ -21,11 +21,11 @@ attrs==24.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.35.92
+boto3==1.35.97
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.35.92
+botocore==1.35.97
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.123.2
+hypothesis==6.123.15
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -184,7 +184,7 @@ pluggy==1.5.0
     #   tox
 pycodestyle==2.12.1
     # via -r requirements/test.txt
-pygments==2.18.0
+pygments==2.19.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -287,8 +287,9 @@ typing-extensions==4.12.2
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
-urllib3==2.3.0
+urllib3==2.2.3
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   botocore
 virtualenv==20.28.1
