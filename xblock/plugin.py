@@ -142,28 +142,42 @@ class Plugin:
         """
         identifier = identifier.lower()
         key = (cls.entry_point, identifier)
-        if key not in PLUGIN_CACHE:
 
-            if select is None:
-                select = default_select
+        if key in PLUGIN_CACHE:
+            xblock_cls = PLUGIN_CACHE[key] or default
+            if xblock_cls:
+                return xblock_cls
 
-            all_entry_points = [
-                *importlib.metadata.entry_points(group=f'{cls.entry_point}.overrides', name=identifier),
-                *importlib.metadata.entry_points(group=cls.entry_point, name=identifier)
-            ]
+            # If the key was in PLUGIN_CACHE, but the value stored was None, and
+            # there was no default class to fall back to, we give up and raise
+            # PluginMissingError. This is for performance reasons. We've cached
+            # the fact that there is no XBlock class that maps to this
+            # identifier, and it is very expensive to check through the entry
+            # points each time. This assumes that XBlock class mappings do not
+            # change during the life of the process.
+            raise PluginMissingError(identifier)
 
-            for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
-                if identifier == extra_identifier:
-                    all_entry_points.append(extra_entry_point)
+        if select is None:
+            select = default_select
 
-            try:
-                selected_entry_point = select(identifier, all_entry_points)
-            except PluginMissingError:
-                if default is not None:
-                    return default
-                raise
+        all_entry_points = [
+            *importlib.metadata.entry_points(group=f'{cls.entry_point}.overrides', name=identifier),
+            *importlib.metadata.entry_points(group=cls.entry_point, name=identifier)
+        ]
 
-            PLUGIN_CACHE[key] = cls._load_class_entry_point(selected_entry_point)
+        for extra_identifier, extra_entry_point in iter(cls.extra_entry_points):
+            if identifier == extra_identifier:
+                all_entry_points.append(extra_entry_point)
+
+        try:
+            selected_entry_point = select(identifier, all_entry_points)
+        except PluginMissingError:
+            PLUGIN_CACHE[key] = None
+            if default is not None:
+                return default
+            raise
+
+        PLUGIN_CACHE[key] = cls._load_class_entry_point(selected_entry_point)
 
         return PLUGIN_CACHE[key]
 
