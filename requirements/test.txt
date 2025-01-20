@@ -19,11 +19,11 @@ astroid==3.3.8
     #   pylint-celery
 attrs==24.3.0
     # via hypothesis
-boto3==1.35.97
+boto3==1.36.2
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.35.97
+botocore==1.36.2
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -41,7 +41,7 @@ click==8.1.8
     #   edx-lint
 click-log==0.4.0
     # via edx-lint
-code-annotations==2.1.0
+code-annotations==2.2.0
     # via edx-lint
 colorama==0.4.6
     # via tox
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.123.15
+hypothesis==6.124.1
     # via -r requirements/test.in
 iniconfig==2.0.0
     # via pytest
@@ -181,7 +181,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/django.txt
     #   code-annotations
-s3transfer==0.10.4
+s3transfer==0.11.1
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -220,7 +220,7 @@ urllib3==2.2.3
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.28.1
+virtualenv==20.29.1
     # via tox
 web-fragments==2.2.0
     # via -r requirements/django.txt

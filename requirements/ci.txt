@@ -32,5 +32,5 @@ pyproject-api==1.8.0
     # via tox
 tox==4.23.2
     # via -r requirements/ci.in
-virtualenv==20.28.1
+virtualenv==20.29.1
     # via tox
