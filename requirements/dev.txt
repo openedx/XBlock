@@ -17,15 +17,15 @@ astroid==3.3.8
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-attrs==24.3.0
+attrs==25.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.36.2
+boto3==1.36.6
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.36.2
+botocore==1.36.6
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -34,7 +34,7 @@ build==1.2.2.post1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -93,11 +93,11 @@ dnspython==2.7.0
     # via
     #   -r requirements/test.txt
     #   pymongo
-edx-lint==5.4.1
+edx-lint==5.6.0
     # via -r requirements/test.txt
 edx-opaque-keys==2.11.0
     # via -r requirements/test.txt
-filelock==3.16.1
+filelock==3.17.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.124.1
+hypothesis==6.124.7
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -212,7 +212,7 @@ pymongo==4.10.1
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
-pyproject-api==1.8.0
+pyproject-api==1.9.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -245,7 +245,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/test.txt
     #   code-annotations
-s3transfer==0.11.1
+s3transfer==0.11.2
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -279,7 +279,7 @@ tomlkit==0.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.23.2
+tox==4.24.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
