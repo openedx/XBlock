@@ -161,7 +161,8 @@ class SplitFieldData(FieldData):
         for key, value in update_dict.items():
             update_dicts[self._field_data(block, key)][key] = value
         for field_data, new_update_dict in update_dicts.items():
-            field_data.set_many(block, new_update_dict)
+            if field_data is not None:  # Ignore fields from scopes that are not loaded
+                field_data.set_many(block, new_update_dict)
 
     def delete(self, block, name):
         self._field_data(block, name).delete(block, name)
