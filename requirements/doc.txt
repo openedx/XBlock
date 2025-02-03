@@ -16,22 +16,22 @@ asgiref==3.8.1
     # via
     #   -r requirements/django.txt
     #   django
-babel==2.16.0
+babel==2.17.0
     # via
     #   pydata-sphinx-theme
     #   sphinx
 beautifulsoup4==4.12.3
     # via pydata-sphinx-theme
-boto3==1.36.6
+boto3==1.36.11
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.36.6
+botocore==1.36.11
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
-certifi==2024.12.14
+certifi==2025.1.31
     # via requests
 charset-normalizer==3.4.1
     # via requests
@@ -98,7 +98,7 @@ pygments==2.19.1
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-pymongo==4.10.1
+pymongo==4.11
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
@@ -106,7 +106,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/django.txt
     #   botocore
-pytz==2024.2
+pytz==2025.1
     # via -r requirements/django.txt
 pyyaml==6.0.2
     # via -r requirements/django.txt
