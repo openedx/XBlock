@@ -5,6 +5,11 @@ Change history for XBlock
 Unreleased
 ----------
 
+5.1.2 - 2025-02-07
+------------------
+
+* throws InvalidScopeError if the scope is not defined
+
 5.1.0 - 2024-08-07
 ------------------
 
