@@ -145,10 +145,12 @@ class SplitFieldData(FieldData):
         """Return the field data for the field `name` on the :class:`~xblock.core.XBlock` `block`"""
         scope = block.fields[name].scope
 
-        if scope not in self._scope_mappings:
+        scope_mapping = self._scope_mappings.get(scope)
+
+        if scope_mapping is None:
             raise InvalidScopeError(scope)
 
-        return self._scope_mappings[scope]
+        return scope_mapping
 
     def get(self, block, name):
         return self._field_data(block, name).get(block, name)

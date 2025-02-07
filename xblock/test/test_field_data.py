@@ -40,6 +40,11 @@ class TestSplitFieldData:
             Scope.content: self.content,
             Scope.settings: self.settings
         })
+        self.split_empty = SplitFieldData({
+            Scope.content: self.content,
+            Scope.settings: self.settings,
+            Scope.user_state: None,
+        })
         self.runtime = TestRuntime(services={'field-data': self.split})
         self.block = TestingBlock(
             runtime=self.runtime,
@@ -75,6 +80,10 @@ class TestSplitFieldData:
     def test_invalid_scope(self):
         with pytest.raises(InvalidScopeError):
             self.split.get(self.block, 'user_state')
+
+    def test_empty_scope(self):
+        with pytest.raises(InvalidScopeError):
+            self.split_empty.get(self.block, 'user_state')
 
     def test_default(self):
         self.split.default(self.block, 'content')
