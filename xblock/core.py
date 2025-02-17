@@ -799,6 +799,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         """
         if scope_ids is UNSET:
             raise TypeError('scope_ids are required')
+        scope_ids.validate_types()
 
         # A cache of the parent block, retrieved from .parent
         self._parent_block = None
