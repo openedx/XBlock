@@ -10,9 +10,9 @@ appdirs==1.4.4
     #   fs
 asgiref==3.8.1
     # via django
-boto3==1.36.21
+boto3==1.36.26
     # via fs-s3fs
-botocore==1.36.21
+botocore==1.36.26
     # via
     #   boto3
     #   s3transfer
@@ -78,7 +78,7 @@ six==1.17.0
     #   python-dateutil
 sqlparse==0.5.3
     # via django
-stevedore==5.4.0
+stevedore==5.4.1
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
