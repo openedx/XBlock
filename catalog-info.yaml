@@ -9,10 +9,10 @@ metadata:
   name: 'XBlock'
   description: "Framework for building custom learning components that run in the Open edX LMS!"
   links:
-    - url: "https://xblock.readthedocs.org"
+    - url: "https://docs.openedx.org/projects/xblock/en/latest/"
       title: "XBlock Docs"
       icon: "LocalLibrary"
-    - url: "https://edx.readthedocs.io/projects/xblock-tutorial/en/latest/overview/introduction.html"
+    - url: "https://docs.openedx.org/projects/xblock/en/latest/xblock-tutorial/index.html"
       title: "XBlock Tutorial"
       # Backstage uses the MaterialUI Icon Set.
       # https://mui.com/material-ui/material-icons/

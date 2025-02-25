@@ -226,11 +226,11 @@ Please do not report security issues in public. Please email security@openedx.or
     :alt: Codecov
 
 .. |doc-badge| image:: https://readthedocs.org/projects/XBlock/badge/?version=latest
-    :target: https://edx.readthedocs.io/projects/xblock/en/latest/
+    :target: https://docs.openedx.org/projects/xblock/en/latest/
     :alt: Documentation
 
 .. |pyversions-badge| image:: https://img.shields.io/pypi/pyversions/XBlock.svg
-    :target: https://edx.readthedocs.io/projects/xblock/en/latest/
+    :target: https://docs.openedx.org/projects/xblock/en/latest/
     :alt: Supported Python versions
 
 .. |license-badge| image:: https://img.shields.io/github/license/openedx/XBlock.svg

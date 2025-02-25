@@ -55,16 +55,16 @@
 
 .. _thumbs.css: https://github.com/openedx/xblock-sdk/blob/master/sample_xblocks/thumbs/static/css/thumbs.css
 
-.. _Google Drive file tool: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/google_docs.html
+.. _Google Drive file tool: https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/add_google_drive.html
 
-.. _Open Response Assessments: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html
+.. _Open Response Assessments: https://docs.openedx.org/en/latest/educators/concepts/exercise_tools/OpenResponseAssessments.html
 
-.. _Google calendar tool: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/google_calendar.html
+.. _Google calendar tool: https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/embed_google_calendar.html
 
-.. _Finding the Usage ID for Course Content: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_features/lti/lti_address_content.html#finding-the-usage-id-for-course-content
+.. _Finding the Usage ID for Course Content: https://docs.openedx.org/en/latest/educators/how-tos/advanced_features/lti_determine_content_address.html#finding-the-usage-id-for-course-content
 
 .. _Installing, Configuring, and Running the Open edX Platform: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/index.html
 
-.. _Developing Course Components: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/developing_course/course_components.html
+.. _Developing Course Components: https://docs.openedx.org/en/latest/educators/references/course_development/what_is_a_component.html
 
 .. _HTML unicode characters: https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
