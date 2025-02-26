@@ -231,6 +231,5 @@ For courses created prior to October 2014, the ``usage_id`` begins with
 ``https://courses.edx.org/xblock/i4x://edX/DemoX.1/problem/47bf6dbce8374b789e3ebdefd74db332``
 
 
-.. TODO Update this URL once docs move to docs.openedx.org
-.. _XBlock Runtime API: http://edx.readthedocs.io/projects/xblock/en/latest/
+.. _XBlock Runtime API: https://docs.openedx.org/projects/xblock/en/latest/
 .. include:: ../../links.rst
