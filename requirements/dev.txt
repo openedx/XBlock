@@ -21,11 +21,11 @@ attrs==25.1.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.37.4
+boto3==1.37.9
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.37.4
+botocore==1.37.9
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -84,7 +84,7 @@ distlib==0.3.9
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   virtualenv
-django==4.2.19
+django==4.2.20
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.127.3
+hypothesis==6.127.9
     # via -r requirements/test.txt
 iniconfig==2.0.0
     # via
@@ -122,7 +122,7 @@ isort==6.0.1
     # via
     #   -r requirements/test.txt
     #   pylint
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -147,7 +147,7 @@ mccabe==0.7.0
     # via
     #   -r requirements/test.txt
     #   pylint
-mock==5.1.0
+mock==5.2.0
     # via -r requirements/test.txt
 openedx-django-pyfs==3.7.0
     # via -r requirements/test.txt
@@ -208,7 +208,7 @@ pylint-plugin-utils==0.8.2
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==4.11.1
+pymongo==4.11.2
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
@@ -222,7 +222,7 @@ pyproject-hooks==1.2.0
     #   -r requirements/pip-tools.txt
     #   build
     #   pip-tools
-pytest==8.3.4
+pytest==8.3.5
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -245,7 +245,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/test.txt
     #   code-annotations
-s3transfer==0.11.3
+s3transfer==0.11.4
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -279,7 +279,7 @@ tomlkit==0.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.24.1
+tox==4.24.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -292,7 +292,7 @@ urllib3==2.2.3
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.29.2
+virtualenv==20.29.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
