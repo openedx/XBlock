@@ -63,7 +63,7 @@
 
 .. _Finding the Usage ID for Course Content: https://docs.openedx.org/en/latest/educators/how-tos/advanced_features/lti_determine_content_address.html#finding-the-usage-id-for-course-content
 
-.. _Installing, Configuring, and Running the Open edX Platform: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/index.html
+.. _Installing, Configuring, and Running the Open edX Platform: https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/index.html
 
 .. _Developing Course Components: https://docs.openedx.org/en/latest/educators/references/course_development/what_is_a_component.html
 
