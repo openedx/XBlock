@@ -2,4 +2,4 @@
 Open edX Glossary
 #################
 
-:doc:`docs-openedx-org:developers/references/glossary`
+:doc:`docs-openedx-org:glossary`
