@@ -24,6 +24,7 @@ metadata:
     # names that might be interested in changes to the architecture of this
     # component.
     openedx.org/arch-interest-groups: "feanil"
+    openedx.org/release: master
 spec:
 
   # (Required) This can be a group (`group:<github_group_name>`) or a user (`user:<github_username>`).
