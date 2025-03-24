@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.37.13
+boto3==1.37.18
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.37.13
+botocore==1.37.18
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -66,7 +66,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.6.12
+coverage[toml]==7.7.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -95,7 +95,7 @@ dnspython==2.7.0
     #   pymongo
 edx-lint==5.6.0
     # via -r requirements/test.txt
-edx-opaque-keys==2.11.0
+edx-opaque-keys==2.12.0
     # via -r requirements/test.txt
 filelock==3.18.0
     # via
@@ -112,9 +112,9 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.129.2
+hypothesis==6.130.2
     # via -r requirements/test.txt
-iniconfig==2.0.0
+iniconfig==2.1.0
     # via
     #   -r requirements/test.txt
     #   pytest
@@ -168,7 +168,7 @@ pbr==6.1.1
     #   stevedore
 pip-tools==7.4.1
     # via -r requirements/pip-tools.txt
-platformdirs==4.3.6
+platformdirs==4.3.7
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -188,7 +188,7 @@ pygments==2.19.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==3.3.5
+pylint==3.3.6
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -208,7 +208,7 @@ pylint-plugin-utils==0.8.2
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==4.11.2
+pymongo==4.11.3
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
