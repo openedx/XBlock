@@ -13,10 +13,19 @@ from unittest.mock import patch, MagicMock, Mock
 
 import ddt
 import pytest
+from lxml import etree
 from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryLocatorV2
 from webob import Response
 
 from xblock.core import Blocklike, XBlock
+from xblock.core import (
+    name_to_pathname,
+    is_pointer_tag,
+    load_definition_xml,
+    format_filepath,
+    file_to_xml,
+    XML_PARSER,
+)
 from xblock.exceptions import (
     XBlockSaveError,
     KeyValueMultiSaveError,
@@ -1163,3 +1172,59 @@ class TestScopeIdProperties(unittest.TestCase):
         block = XBlock(Mock(spec=Runtime), scope_ids=scope_ids)
         self.assertEqual(block.usage_key, "myWeirdOldUsageId")
         self.assertIsNone(block.context_key)
+
+
+class TestCoreFunctions(unittest.TestCase):
+    """
+    Tests for core functions in XBlock.
+    """
+    def test_name_to_pathname(self):
+        self.assertEqual(name_to_pathname("course:subcourse"), "course/subcourse")
+        self.assertEqual(name_to_pathname("module:lesson:part"), "module/lesson/part")
+        self.assertEqual(name_to_pathname("no_colon"), "no_colon")
+
+    def test_is_pointer_tag(self):
+        # Case 1: Valid pointer tag
+        xml_obj = etree.Element("some_tag", url_name="test_url")
+        self.assertTrue(is_pointer_tag(xml_obj))
+
+        # Case 2: Valid course pointer tag
+        xml_obj = etree.Element("course", url_name="test_url", course="test_course", org="test_org")
+        self.assertTrue(is_pointer_tag(xml_obj))
+
+        # Case 3: Invalid case - extra attribute
+        xml_obj = etree.Element("some_tag", url_name="test_url", extra_attr="invalid")
+        self.assertFalse(is_pointer_tag(xml_obj))
+
+        # Case 4: Invalid case - has text
+        xml_obj = etree.Element("some_tag", url_name="test_url")
+        xml_obj.text = "invalid_text"
+        self.assertFalse(is_pointer_tag(xml_obj))
+
+        # Case 5: Invalid case - has children
+        xml_obj = etree.Element("some_tag", url_name="test_url")
+        _ = etree.SubElement(xml_obj, "child")
+        self.assertFalse(is_pointer_tag(xml_obj))
+
+    @patch("xblock.core.load_file")
+    def test_load_definition_xml(self, mock_load_file):
+        mock_load_file.return_value = "<mock_xml />"
+        node = etree.Element("course", url_name="test_url")
+        runtime = Mock()
+        def_id = "mock_id"
+
+        definition_xml, filepath = load_definition_xml(node, runtime, def_id)
+        self.assertEqual(filepath, "course/test_url.xml")
+        self.assertEqual(definition_xml, "<mock_xml />")
+        mock_load_file.assert_called_once()
+
+    def test_format_filepath(self):
+        self.assertEqual(format_filepath("course", "test_url"), "course/test_url.xml")
+
+    @patch("xblock.core.etree.parse")
+    def test_file_to_xml(self, mock_etree_parse):
+        mock_etree_parse.return_value.getroot.return_value = "mock_xml_root"
+        file_object = Mock()
+        result = file_to_xml(file_object)
+        self.assertEqual(result, "mock_xml_root")
+        mock_etree_parse.assert_called_once_with(file_object, parser=XML_PARSER)
