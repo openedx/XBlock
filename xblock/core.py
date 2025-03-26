@@ -32,10 +32,83 @@ XML_NAMESPACES = OrderedDict([
     ("block", "http://code.edx.org/xblock/block"),
 ])
 
+XML_PARSER = etree.XMLParser(dtd_validation=False, load_dtd=False, remove_blank_text=True, encoding='utf-8')
+
 # __all__ controls what classes end up in the docs.
 __all__ = ['XBlock', 'XBlockAside']
 
 UNSET = object()
+
+
+def name_to_pathname(name):
+    """
+    Convert a location name for use in a path: replace ':' with '/'.
+    This allows users of the xml format to organize content into directories
+    """
+    return name.replace(':', '/')
+
+
+def is_pointer_tag(xml_obj):
+    """
+    Check if xml_obj is a pointer tag: <blah url_name="something" />.
+    No children, one attribute named url_name, no text.
+
+    Special case for course roots: the pointer is
+      <course url_name="something" org="myorg" course="course">
+
+    xml_obj: an etree Element
+
+    Returns a bool.
+    """
+    if xml_obj.tag != "course":
+        expected_attr = {'url_name'}
+    else:
+        expected_attr = {'url_name', 'course', 'org'}
+
+    actual_attr = set(xml_obj.attrib.keys())
+
+    has_text = xml_obj.text is not None and len(xml_obj.text.strip()) > 0
+
+    return len(xml_obj) == 0 and actual_attr == expected_attr and not has_text
+
+
+def load_definition_xml(node, runtime, def_id):
+    """
+    Loads definition_xml stored in a dedicated file
+    """
+    url_name = node.get('url_name')
+    filepath = format_filepath(node.tag, name_to_pathname(url_name))
+    definition_xml = load_file(filepath, runtime.resources_fs, def_id)
+    return definition_xml, filepath
+
+
+def format_filepath(category, name):
+    return f'{category}/{name}.xml'
+
+
+def load_file(filepath, fs, def_id):  # pylint: disable=invalid-name
+    """
+    Open the specified file in fs, and call cls.file_to_xml on it,
+    returning the lxml object.
+
+    Add details and reraise on error.
+    """
+    try:
+        with fs.open(filepath) as xml_file:
+            return file_to_xml(xml_file)
+    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        # Add info about where we are, but keep the traceback
+        raise Exception(f'Unable to load file contents at path {filepath} for item {def_id}: {err}') from err
+
+
+def file_to_xml(file_object):
+    """
+    Used when this module wants to parse a file object to xml
+    that will be converted to the definition.
+
+    Returns an lxml Element
+    """
+    return etree.parse(file_object, parser=XML_PARSER).getroot()
 
 
 class _AutoNamedFieldsMetaclass(type):
@@ -746,6 +819,11 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             keys (:class:`.ScopeIds`): The keys identifying where this block
                 will store its data.
         """
+        if is_pointer_tag(node):
+            # new style:
+            # read the actual definition file--named using url_name.replace(':','/')
+            node, _ = load_definition_xml(node, runtime, keys.def_id)
+
         block = runtime.construct_xblock_from_class(cls, keys)
 
         # The base implementation: child nodes become child blocks.

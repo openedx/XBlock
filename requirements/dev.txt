@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.130.2
+hypothesis==6.130.3
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
