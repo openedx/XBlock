@@ -26,7 +26,7 @@ pymongo==4.11.3
     # via edx-opaque-keys
 python-dateutil==2.9.0.post0
     # via -r requirements/base.in
-pytz==2025.1
+pytz==2025.2
     # via -r requirements/base.in
 pyyaml==6.0.2
     # via -r requirements/base.in
@@ -38,7 +38,7 @@ six==1.17.0
     #   python-dateutil
 stevedore==5.4.1
     # via edx-opaque-keys
-typing-extensions==4.12.2
+typing-extensions==4.13.0
     # via edx-opaque-keys
 web-fragments==2.2.0
     # via -r requirements/base.in
