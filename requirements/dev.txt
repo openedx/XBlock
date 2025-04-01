@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.37.18
+boto3==1.37.23
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.37.18
+botocore==1.37.23
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.130.2
+hypothesis==6.130.5
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
@@ -182,7 +182,7 @@ pluggy==1.5.0
     #   diff-cover
     #   pytest
     #   tox
-pycodestyle==2.12.1
+pycodestyle==2.13.0
     # via -r requirements/test.txt
 pygments==2.19.1
     # via
@@ -239,7 +239,7 @@ python-slugify==8.0.4
     # via
     #   -r requirements/test.txt
     #   code-annotations
-pytz==2025.1
+pytz==2025.2
     # via -r requirements/test.txt
 pyyaml==6.0.2
     # via
@@ -279,11 +279,11 @@ tomlkit==0.13.2
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.24.2
+tox==4.25.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
-typing-extensions==4.12.2
+typing-extensions==4.13.0
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys

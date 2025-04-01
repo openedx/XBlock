@@ -22,11 +22,11 @@ babel==2.17.0
     #   sphinx
 beautifulsoup4==4.13.3
     # via pydata-sphinx-theme
-boto3==1.37.18
+boto3==1.37.23
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.37.18
+botocore==1.37.23
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -108,7 +108,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/django.txt
     #   botocore
-pytz==2025.1
+pytz==2025.2
     # via -r requirements/django.txt
 pyyaml==6.0.2
     # via -r requirements/django.txt
@@ -159,7 +159,7 @@ stevedore==5.4.1
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
-typing-extensions==4.12.2
+typing-extensions==4.13.0
     # via
     #   -r requirements/django.txt
     #   beautifulsoup4
