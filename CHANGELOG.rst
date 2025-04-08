@@ -5,6 +5,11 @@ Change history for XBlock
 Unreleased
 ----------
 
+5.2.0 - 2025-04-08
+------------------
+
+* Added support for Django 5.2
+
 5.1.2 - 2025-02-07
 ------------------
 
