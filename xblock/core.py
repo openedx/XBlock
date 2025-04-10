@@ -749,8 +749,6 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
                 will store its data.
         """
         if is_pointer_tag(node):
-            # new style:
-            # read the actual definition file--named using url_name.replace(':','/')
             node, _ = load_definition_xml(node, runtime, keys.def_id)
 
         block = runtime.construct_xblock_from_class(cls, keys)
