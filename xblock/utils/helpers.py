@@ -63,7 +63,17 @@ def is_pointer_tag(xml_obj):
 
 def load_definition_xml(node, runtime, def_id):
     """
-    Loads definition_xml stored in a dedicated file
+    Parses and loads an XML definition file based on a given node, runtime
+    environment, and definition ID.
+
+    Arguments:
+    node: XML element containing attributes for definition loading.
+    runtime: The runtime environment that provides resource access.
+    def_id: Unique identifier for the definition being loaded.
+
+    Returns:
+    tuple: A tuple containing the loaded XML definition and the
+    corresponding file path.
     """
     url_name = node.get('url_name')
     filepath = format_filepath(node.tag, name_to_pathname(url_name))
@@ -72,6 +82,9 @@ def load_definition_xml(node, runtime, def_id):
 
 
 def format_filepath(category, name):
+    """
+    Construct a formatted filepath string based on the given category and name.
+    """
     return f'{category}/{name}.xml'
 
 
