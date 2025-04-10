@@ -3,6 +3,7 @@ Tests for helpers.py
 """
 
 import unittest
+from io import BytesIO
 from unittest.mock import patch, Mock
 from lxml import etree
 
@@ -15,7 +16,6 @@ from xblock.utils.helpers import (
     load_definition_xml,
     format_filepath,
     file_to_xml,
-    XML_PARSER,
 )
 
 
@@ -137,10 +137,15 @@ class TestPointerTagParsing(unittest.TestCase):
     def test_format_filepath(self):
         self.assertEqual(format_filepath("course", "test_url"), "course/test_url.xml")
 
-    @patch("xblock.utils.helpers.etree.parse")
-    def test_file_to_xml(self, mock_etree_parse):
-        mock_etree_parse.return_value.getroot.return_value = "mock_xml_root"
-        file_object = Mock()
-        result = file_to_xml(file_object)
-        self.assertEqual(result, "mock_xml_root")
-        mock_etree_parse.assert_called_once_with(file_object, parser=XML_PARSER)
+    def test_file_to_xml(self):
+        """Test that `file_to_xml` correctly parses XML from a file object."""
+        # Create a BytesIO object
+        file_obj = BytesIO(b"<root><child>Value</child></root>")
+
+        # Parse the XML
+        result = file_to_xml(file_obj)
+
+        # Verify the result
+        self.assertEqual(result.tag, 'root')
+        self.assertEqual(result[0].tag, 'child')
+        self.assertEqual(result[0].text, 'Value')
