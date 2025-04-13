@@ -10,9 +10,9 @@ appdirs==1.4.4
     #   fs
 asgiref==3.8.1
     # via django
-boto3==1.37.28
+boto3==1.37.33
     # via fs-s3fs
-botocore==1.37.28
+botocore==1.37.33
     # via
     #   boto3
     #   s3transfer
@@ -42,7 +42,7 @@ lazy==1.6
     # via -r requirements/django.in
 lxml==5.3.2
     # via -r requirements/base.txt
-mako==1.3.9
+mako==1.3.10
     # via -r requirements/base.txt
 markupsafe==3.0.2
     # via
@@ -54,7 +54,7 @@ pbr==6.1.1
     # via
     #   -r requirements/base.txt
     #   stevedore
-pymongo==4.11.3
+pymongo==4.12.0
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
@@ -82,7 +82,7 @@ stevedore==5.4.1
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
-typing-extensions==4.13.1
+typing-extensions==4.13.2
     # via
     #   -r requirements/base.txt
     #   edx-opaque-keys
