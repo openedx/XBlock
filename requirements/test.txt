@@ -19,11 +19,11 @@ astroid==3.3.9
     #   pylint-celery
 attrs==25.3.0
     # via hypothesis
-boto3==1.37.37
+boto3==1.38.3
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.37.37
+botocore==1.38.3
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -67,7 +67,7 @@ dnspython==2.7.0
     #   pymongo
 edx-lint==5.6.0
     # via -r requirements/test.in
-edx-opaque-keys==2.12.0
+edx-opaque-keys==3.0.0
     # via -r requirements/django.txt
 filelock==3.18.0
     # via
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.131.6
+hypothesis==6.131.9
     # via -r requirements/test.in
 iniconfig==2.1.0
     # via pytest
@@ -99,7 +99,7 @@ jmespath==1.0.1
     #   botocore
 lazy==1.6
     # via -r requirements/django.txt
-lxml==5.3.2
+lxml==5.4.0
     # via -r requirements/django.txt
 mako==1.3.10
     # via -r requirements/django.txt
@@ -181,7 +181,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/django.txt
     #   code-annotations
-s3transfer==0.11.5
+s3transfer==0.12.0
     # via
     #   -r requirements/django.txt
     #   boto3
