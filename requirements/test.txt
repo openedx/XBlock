@@ -19,11 +19,11 @@ astroid==3.3.9
     #   pylint-celery
 attrs==25.3.0
     # via hypothesis
-boto3==1.38.3
+boto3==1.38.8
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.38.3
+botocore==1.38.8
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -154,7 +154,7 @@ pylint-plugin-utils==0.8.2
     # via
     #   pylint-celery
     #   pylint-django
-pymongo==4.12.0
+pymongo==4.12.1
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
