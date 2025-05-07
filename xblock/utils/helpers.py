@@ -98,7 +98,7 @@ def load_file(filepath, fs, def_id):  # pylint: disable=invalid-name
     try:
         with fs.open(filepath) as xml_file:
             return file_to_xml(xml_file)
-    except Exception as err:  # lint-amnesty
+    except Exception as err:
         # Add info about where we are, but keep the traceback
         raise Exception(f'Unable to load file contents at path {filepath} for item {def_id}: {err}') from err
 
