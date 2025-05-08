@@ -23,8 +23,8 @@ from xblock.exceptions import (
 from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
 from xblock.internal import class_lazy
 from xblock.plugin import Plugin
-from xblock.utils.helpers import is_pointer_tag, load_definition_xml
 from xblock.validation import Validation
+from xblock.xml import is_pointer_tag, load_definition_xml
 
 # OrderedDict is used so that namespace attributes are put in predictable order
 # This allows for simple string equality assertions in tests and have no other effects
