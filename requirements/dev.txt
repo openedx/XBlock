@@ -12,7 +12,7 @@ asgiref==3.8.1
     # via
     #   -r requirements/test.txt
     #   django
-astroid==3.3.9
+astroid==3.3.10
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.38.8
+boto3==1.38.13
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.38.8
+botocore==1.38.13
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -45,7 +45,7 @@ chardet==5.2.0
     #   -r requirements/test.txt
     #   diff-cover
     #   tox
-click==8.1.8
+click==8.2.0
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
@@ -84,7 +84,7 @@ distlib==0.3.9
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   virtualenv
-django==4.2.20
+django==4.2.21
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.131.9
+hypothesis==6.131.15
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
@@ -149,7 +149,7 @@ mccabe==0.7.0
     #   pylint
 mock==5.2.0
     # via -r requirements/test.txt
-openedx-django-pyfs==3.7.0
+openedx-django-pyfs==3.8.0
     # via -r requirements/test.txt
 packaging==25.0
     # via
@@ -168,7 +168,7 @@ pbr==6.1.1
     #   stevedore
 pip-tools==7.4.1
     # via -r requirements/pip-tools.txt
-platformdirs==4.3.7
+platformdirs==4.3.8
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -188,7 +188,7 @@ pygments==2.19.1
     # via
     #   -r requirements/test.txt
     #   diff-cover
-pylint==3.3.6
+pylint==3.3.7
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -292,12 +292,12 @@ urllib3==2.2.3
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.30.0
+virtualenv==20.31.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-web-fragments==3.0.0
+web-fragments==3.1.0
     # via -r requirements/test.txt
 webob==1.8.9
     # via -r requirements/test.txt

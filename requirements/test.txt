@@ -12,18 +12,18 @@ asgiref==3.8.1
     # via
     #   -r requirements/django.txt
     #   django
-astroid==3.3.9
+astroid==3.3.10
     # via
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
 attrs==25.3.0
     # via hypothesis
-boto3==1.38.8
+boto3==1.38.13
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.38.8
+botocore==1.38.13
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -34,7 +34,7 @@ chardet==5.2.0
     # via
     #   diff-cover
     #   tox
-click==8.1.8
+click==8.2.0
     # via
     #   click-log
     #   code-annotations
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.131.9
+hypothesis==6.131.15
     # via -r requirements/test.in
 iniconfig==2.1.0
     # via pytest
@@ -112,7 +112,7 @@ mccabe==0.7.0
     # via pylint
 mock==5.2.0
     # via -r requirements/test.in
-openedx-django-pyfs==3.7.0
+openedx-django-pyfs==3.8.0
     # via -r requirements/django.txt
 packaging==25.0
     # via
@@ -125,7 +125,7 @@ pbr==6.1.1
     # via
     #   -r requirements/django.txt
     #   stevedore
-platformdirs==4.3.7
+platformdirs==4.3.8
     # via
     #   pylint
     #   tox
@@ -139,7 +139,7 @@ pycodestyle==2.13.0
     # via -r requirements/test.in
 pygments==2.19.1
     # via diff-cover
-pylint==3.3.6
+pylint==3.3.7
     # via
     #   -r requirements/test.in
     #   edx-lint
@@ -220,9 +220,9 @@ urllib3==2.2.3
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.30.0
+virtualenv==20.31.2
     # via tox
-web-fragments==3.0.0
+web-fragments==3.1.0
     # via -r requirements/django.txt
 webob==1.8.9
     # via -r requirements/django.txt

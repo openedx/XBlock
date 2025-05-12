@@ -40,7 +40,7 @@ stevedore==5.4.1
     # via edx-opaque-keys
 typing-extensions==4.13.2
     # via edx-opaque-keys
-web-fragments==3.0.0
+web-fragments==3.1.0
     # via -r requirements/base.in
 webob==1.8.9
     # via -r requirements/base.in
