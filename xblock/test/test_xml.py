@@ -4,13 +4,11 @@ Tests for xblock/xml.py
 
 import unittest
 from io import BytesIO
-from unittest.mock import patch, Mock
 from lxml import etree
 
 from xblock.xml import (
     name_to_pathname,
     is_pointer_tag,
-    load_definition_xml,
     format_filepath,
     file_to_xml,
 )
@@ -47,18 +45,6 @@ class TestPointerTagParsing(unittest.TestCase):
         xml_obj = etree.Element("some_tag", url_name="test_url")
         _ = etree.SubElement(xml_obj, "child")
         self.assertFalse(is_pointer_tag(xml_obj))
-
-    @patch("xblock.xml.load_file")
-    def test_load_definition_xml(self, mock_load_file):
-        mock_load_file.return_value = "<mock_xml />"
-        node = etree.Element("course", url_name="test_url")
-        runtime = Mock()
-        def_id = "mock_id"
-
-        definition_xml, filepath = load_definition_xml(node, runtime, def_id)
-        self.assertEqual(filepath, "course/test_url.xml")
-        self.assertEqual(definition_xml, "<mock_xml />")
-        mock_load_file.assert_called_once()
 
     def test_format_filepath(self):
         self.assertEqual(format_filepath("course", "test_url"), "course/test_url.xml")

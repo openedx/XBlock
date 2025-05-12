@@ -24,7 +24,7 @@ from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
 from xblock.internal import class_lazy
 from xblock.plugin import Plugin
 from xblock.validation import Validation
-from xblock.xml import is_pointer_tag, load_definition_xml
+from xblock.xml import is_pointer_tag
 
 # OrderedDict is used so that namespace attributes are put in predictable order
 # This allows for simple string equality assertions in tests and have no other effects
@@ -749,7 +749,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
                 will store its data.
         """
         if is_pointer_tag(node):
-            node, _ = load_definition_xml(node, runtime, keys.def_id)
+            node, _ = runtime.load_definition_xml(node, keys.def_id)
 
         block = runtime.construct_xblock_from_class(cls, keys)
 
