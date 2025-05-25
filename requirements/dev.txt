@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.38.18
+boto3==1.38.23
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.38.18
+botocore==1.38.23
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -34,7 +34,7 @@ build==1.2.2.post1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-cachetools==5.5.2
+cachetools==6.0.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -45,7 +45,7 @@ chardet==5.2.0
     #   -r requirements/test.txt
     #   diff-cover
     #   tox
-click==8.2.0
+click==8.2.1
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
@@ -66,14 +66,14 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.8.0
+coverage[toml]==7.8.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==9.2.4
+diff-cover==9.3.0
     # via -r requirements/test.txt
 dill==0.4.0
     # via
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.131.18
+hypothesis==6.131.27
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
@@ -245,7 +245,7 @@ pyyaml==6.0.2
     # via
     #   -r requirements/test.txt
     #   code-annotations
-s3transfer==0.12.0
+s3transfer==0.13.0
     # via
     #   -r requirements/test.txt
     #   boto3
