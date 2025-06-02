@@ -19,11 +19,11 @@ astroid==3.3.10
     #   pylint-celery
 attrs==25.3.0
     # via hypothesis
-boto3==1.38.23
+boto3==1.38.27
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.38.23
+botocore==1.38.27
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -51,7 +51,7 @@ coverage[toml]==7.8.2
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.in
-diff-cover==9.3.0
+diff-cover==9.3.1
     # via -r requirements/test.in
 dill==0.4.0
     # via pylint
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.131.27
+hypothesis==6.132.0
     # via -r requirements/test.in
 iniconfig==2.1.0
     # via pytest
