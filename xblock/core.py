@@ -24,6 +24,7 @@ from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
 from xblock.internal import class_lazy
 from xblock.plugin import Plugin
 from xblock.validation import Validation
+from xblock.xml import is_pointer_tag
 
 # OrderedDict is used so that namespace attributes are put in predictable order
 # This allows for simple string equality assertions in tests and have no other effects
@@ -31,6 +32,7 @@ XML_NAMESPACES = OrderedDict([
     ("option", "http://code.edx.org/xblock/option"),
     ("block", "http://code.edx.org/xblock/block"),
 ])
+
 
 # __all__ controls what classes end up in the docs.
 __all__ = ['XBlock', 'XBlockAside']
@@ -746,6 +748,9 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             keys (:class:`.ScopeIds`): The keys identifying where this block
                 will store its data.
         """
+        if is_pointer_tag(node):
+            node, _ = runtime.load_definition_xml(node, keys.def_id)
+
         block = runtime.construct_xblock_from_class(cls, keys)
 
         # The base implementation: child nodes become child blocks.
