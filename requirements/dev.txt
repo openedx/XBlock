@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-asgiref==3.9.0
+asgiref==3.9.1
     # via
     #   -r requirements/test.txt
     #   django
@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.39.3
+boto3==1.39.4
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.39.3
+botocore==1.39.4
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -73,7 +73,7 @@ coverage[toml]==7.9.2
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==9.4.1
+diff-cover==9.5.0
     # via -r requirements/test.txt
 dill==0.4.0
     # via
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.135.26
+hypothesis==6.135.29
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
