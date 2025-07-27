@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.39.9
+boto3==1.39.14
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.39.9
+botocore==1.39.14
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -66,7 +66,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.9.2
+coverage[toml]==7.10.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.136.0
+hypothesis==6.136.4
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
@@ -281,7 +281,7 @@ tomlkit==0.13.3
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.27.0
+tox==4.28.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -294,7 +294,7 @@ urllib3==2.2.3
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.31.2
+virtualenv==20.32.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
