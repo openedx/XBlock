@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.39.14
+boto3==1.40.0
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.39.14
+botocore==1.40.0
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -66,7 +66,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.10.0
+coverage[toml]==7.10.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -86,7 +86,7 @@ distlib==0.4.0
     #   virtualenv
 django==4.2.23
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c https:/raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   openedx-django-pyfs
 dnspython==2.7.0
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.136.4
+hypothesis==6.136.6
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
@@ -160,13 +160,13 @@ packaging==25.0
     #   pyproject-api
     #   pytest
     #   tox
-path==17.1.0
+path==17.1.1
     # via -r requirements/test.txt
 pbr==6.1.1
     # via
     #   -r requirements/test.txt
     #   stevedore
-pip-tools==7.4.1
+pip-tools==7.5.0
     # via -r requirements/pip-tools.txt
 platformdirs==4.3.8
     # via
@@ -281,7 +281,7 @@ tomlkit==0.13.3
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.28.3
+tox==4.28.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -289,9 +289,8 @@ typing-extensions==4.14.1
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
-urllib3==2.2.3
+urllib3==2.5.0
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   botocore
 virtualenv==20.32.0
