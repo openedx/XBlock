@@ -22,11 +22,11 @@ babel==2.17.0
     #   sphinx
 beautifulsoup4==4.13.4
     # via pydata-sphinx-theme
-boto3==1.40.0
+boto3==1.40.1
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.40.0
+botocore==1.40.1
     # via
     #   -r requirements/django.txt
     #   boto3
