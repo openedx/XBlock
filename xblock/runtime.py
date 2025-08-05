@@ -31,6 +31,7 @@ from xblock.exceptions import (
     FieldDataDeprecationWarning,
     UserIdDeprecationWarning,
 )
+from xblock.xml import format_filepath, load_file, name_to_pathname
 
 log = logging.getLogger(__name__)
 
@@ -791,6 +792,24 @@ class Runtime(metaclass=ABCMeta):
         """
         child = etree.SubElement(node, "unknown")
         block.add_xml_to_node(child)
+
+    def load_definition_xml(self, node, def_id):
+        """
+        Load an XML definition for a block.
+        This method can be overridden in different runtime environments.
+
+        Args:
+            node: XML element containing attributes for definition loading
+            def_id: Unique identifier for the definition being loaded
+
+        Returns:
+            tuple: A tuple containing the loaded XML definition and the
+            corresponding file path or identifier
+        """
+        url_name = node.get('url_name')
+        filepath = format_filepath(node.tag, name_to_pathname(url_name))
+        definition_xml = load_file(filepath, self.resources_fs, def_id)  # pylint: disable=no-member
+        return definition_xml, filepath
 
     # Rendering
 
