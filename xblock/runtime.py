@@ -624,6 +624,18 @@ class Runtime(metaclass=ABCMeta):
         """
         return XBlockAside.load_class(aside_type, select=self.select)
 
+    def load_block_type_with_mixins(self, block_type):
+        """
+        Returns a subclass of :class:`.XBlock` that corresponds to the specified `block_type` plus its `mixins`.
+        """
+        return self.mixologist.mix(self.load_block_type(block_type))
+
+    def load_aside_type_with_mixins(self, aside_type):
+        """
+        Returns a subclass of :class:`.XBlockAside` that corresponds to the specified `aside_type`.
+        """
+        return self.mixologist.mix(self.load_aside_type(aside_type))
+    
     # pylint: disable=keyword-arg-before-vararg
     def construct_xblock(self, block_type, scope_ids, field_data=None, *args, **kwargs):
         r"""
