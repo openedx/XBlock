@@ -19,11 +19,11 @@ astroid==3.3.11
     #   pylint-celery
 attrs==25.3.0
     # via hypothesis
-boto3==1.40.6
+boto3==1.40.11
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.40.6
+botocore==1.40.11
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -45,7 +45,7 @@ code-annotations==2.3.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.10.2
+coverage[toml]==7.10.3
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -69,7 +69,7 @@ edx-lint==5.6.0
     # via -r requirements/test.in
 edx-opaque-keys==3.0.0
     # via -r requirements/django.txt
-filelock==3.18.0
+filelock==3.19.1
     # via
     #   tox
     #   virtualenv
@@ -82,7 +82,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.137.1
+hypothesis==6.138.2
     # via -r requirements/test.in
 iniconfig==2.1.0
     # via pytest
@@ -121,7 +121,7 @@ packaging==25.0
     #   tox
 path==17.1.1
     # via -r requirements/test.in
-pbr==6.1.1
+pbr==7.0.0
     # via
     #   -r requirements/django.txt
     #   stevedore
@@ -222,7 +222,7 @@ urllib3==2.5.0
     # via
     #   -r requirements/django.txt
     #   botocore
-virtualenv==20.33.1
+virtualenv==20.34.0
     # via tox
 web-fragments==3.1.0
     # via -r requirements/django.txt
