@@ -19,11 +19,11 @@ astroid==3.3.11
     #   pylint-celery
 attrs==25.3.0
     # via hypothesis
-boto3==1.40.11
+boto3==1.40.16
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.40.11
+botocore==1.40.16
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -45,7 +45,7 @@ code-annotations==2.3.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.10.3
+coverage[toml]==7.10.5
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -99,7 +99,7 @@ jmespath==1.0.1
     #   botocore
 lazy==1.6
     # via -r requirements/django.txt
-lxml==6.0.0
+lxml==6.0.1
     # via -r requirements/django.txt
 mako==1.3.10
     # via -r requirements/django.txt
@@ -121,7 +121,7 @@ packaging==25.0
     #   tox
 path==17.1.1
     # via -r requirements/test.in
-pbr==7.0.0
+pbr==7.0.1
     # via
     #   -r requirements/django.txt
     #   stevedore
@@ -157,7 +157,7 @@ pylint-plugin-utils==0.9.0
     # via
     #   pylint-celery
     #   pylint-django
-pymongo==4.14.0
+pymongo==4.14.1
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
