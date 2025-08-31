@@ -20,8 +20,6 @@ markupsafe==3.0.2
     # via
     #   -r requirements/base.in
     #   mako
-pbr==7.0.1
-    # via stevedore
 pymongo==4.14.1
     # via edx-opaque-keys
 python-dateutil==2.9.0.post0
@@ -36,9 +34,9 @@ six==1.17.0
     # via
     #   fs
     #   python-dateutil
-stevedore==5.4.1
+stevedore==5.5.0
     # via edx-opaque-keys
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via edx-opaque-keys
 web-fragments==3.1.0
     # via -r requirements/base.in
