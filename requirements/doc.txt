@@ -22,11 +22,11 @@ babel==2.17.0
     #   sphinx
 beautifulsoup4==4.13.5
     # via pydata-sphinx-theme
-boto3==1.40.30
+boto3==1.40.35
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.40.30
+botocore==1.40.35
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -96,7 +96,7 @@ pygments==2.19.2
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-pymongo==4.15.0
+pymongo==4.15.1
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
