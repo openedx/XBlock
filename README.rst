@@ -117,7 +117,7 @@ Getting Help
 Documentation
 =============
 
-The docs for the XBlock API is on Read The Docs: https://xblock.readthedocs.org .
+The docs for the XBlock API is on Read The Docs: https://docs.openedx.org/projects/xblock/en/latest/xblock-tutorial/index.html .
 
 Reading the code
 ----------------
