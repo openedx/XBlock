@@ -10,7 +10,7 @@ chardet==5.2.0
     # via tox
 colorama==0.4.6
     # via tox
-coverage==7.10.6
+coverage==7.10.7
     # via -r requirements/ci.in
 distlib==0.4.0
     # via virtualenv
