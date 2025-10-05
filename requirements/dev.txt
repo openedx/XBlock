@@ -21,11 +21,11 @@ attrs==25.3.0
     # via
     #   -r requirements/test.txt
     #   hypothesis
-boto3==1.40.42
+boto3==1.40.45
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.40.42
+botocore==1.40.45
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -86,7 +86,7 @@ distlib==0.4.0
     #   virtualenv
 django==4.2.25
     # via
-    #   -c https:/raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   openedx-django-pyfs
 dnspython==2.8.0
@@ -112,7 +112,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.140.2
+hypothesis==6.140.3
     # via -r requirements/test.txt
 iniconfig==2.1.0
     # via
@@ -162,7 +162,7 @@ packaging==25.0
     #   tox
 path==17.1.1
     # via -r requirements/test.txt
-pip-tools==7.5.0
+pip-tools==7.5.1
     # via -r requirements/pip-tools.txt
 platformdirs==4.4.0
     # via
@@ -206,7 +206,7 @@ pylint-plugin-utils==0.9.0
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==4.15.1
+pymongo==4.15.2
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
@@ -277,7 +277,7 @@ tomlkit==0.13.3
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.30.2
+tox==4.30.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
