@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-asgiref==3.9.2
+asgiref==3.10.0
     # via
     #   -r requirements/django.txt
     #   django
@@ -17,13 +17,13 @@ astroid==3.3.11
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
-attrs==25.3.0
+attrs==25.4.0
     # via hypothesis
-boto3==1.40.45
+boto3==1.40.46
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.40.45
+botocore==1.40.46
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -138,7 +138,7 @@ pygments==2.19.2
     # via
     #   diff-cover
     #   pytest
-pylint==3.3.8
+pylint==3.3.9
     # via
     #   -r requirements/test.in
     #   edx-lint
