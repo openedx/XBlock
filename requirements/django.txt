@@ -8,11 +8,11 @@ appdirs==1.4.4
     # via
     #   -r requirements/base.txt
     #   fs
-asgiref==3.9.2
+asgiref==3.10.0
     # via django
-boto3==1.40.45
+boto3==1.40.46
     # via fs-s3fs
-botocore==1.40.45
+botocore==1.40.46
     # via
     #   boto3
     #   s3transfer
