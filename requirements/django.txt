@@ -10,13 +10,13 @@ appdirs==1.4.4
     #   fs
 asgiref==3.10.0
     # via django
-boto3==1.40.55
+boto3==1.40.68
     # via fs-s3fs
-botocore==1.40.55
+botocore==1.40.68
     # via
     #   boto3
     #   s3transfer
-django==4.2.25
+django==5.2.8
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.in
