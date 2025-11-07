@@ -39,6 +39,7 @@ requirements: ## install development environment requirements
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
 	pip install -qr requirements/pip-tools.txt
+	pip install -qr requirements/pip.txt
 	# Make sure to compile files after any other files they include!
 	pip-compile -v --upgrade --rebuild --allow-unsafe -o requirements/pip.txt requirements/pip.in
 	pip-compile -v --upgrade --rebuild -o requirements/pip-tools.txt requirements/pip-tools.in
