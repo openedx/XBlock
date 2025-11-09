@@ -17,11 +17,11 @@ astroid==3.3.11
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.40.68
+boto3==1.40.69
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.40.68
+botocore==1.40.69
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -62,7 +62,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.11.1
+coverage[toml]==7.11.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -216,7 +216,7 @@ pyproject-hooks==1.2.0
     #   -r requirements/pip-tools.txt
     #   build
     #   pip-tools
-pytest==8.4.2
+pytest==9.0.0
     # via
     #   -r requirements/test.txt
     #   pytest-cov
