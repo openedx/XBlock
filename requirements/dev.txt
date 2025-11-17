@@ -17,11 +17,11 @@ astroid==3.3.11
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.40.69
+boto3==1.40.74
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.40.69
+botocore==1.40.74
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -30,7 +30,7 @@ build==1.3.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-cachetools==6.2.1
+cachetools==6.2.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -41,7 +41,7 @@ chardet==5.2.0
     #   -r requirements/test.txt
     #   diff-cover
     #   tox
-click==8.3.0
+click==8.3.1
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
@@ -62,14 +62,14 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.11.2
+coverage[toml]==7.11.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==9.7.1
+diff-cover==9.7.2
     # via -r requirements/test.txt
 dill==0.4.0
     # via
@@ -108,7 +108,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.147.0
+hypothesis==6.148.0
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
@@ -158,7 +158,7 @@ packaging==25.0
     #   tox
 path==17.1.1
     # via -r requirements/test.txt
-pip-tools==7.5.1
+pip-tools==7.5.2
     # via -r requirements/pip-tools.txt
 platformdirs==4.5.0
     # via
@@ -202,7 +202,7 @@ pylint-plugin-utils==0.9.0
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==4.15.3
+pymongo==4.15.4
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
@@ -216,7 +216,7 @@ pyproject-hooks==1.2.0
     #   -r requirements/pip-tools.txt
     #   build
     #   pip-tools
-pytest==9.0.0
+pytest==9.0.1
     # via
     #   -r requirements/test.txt
     #   pytest-cov
