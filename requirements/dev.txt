@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-asgiref==3.10.0
+asgiref==3.11.0
     # via
     #   -r requirements/test.txt
     #   django
@@ -17,11 +17,11 @@ astroid==3.3.11
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.40.74
+boto3==1.41.2
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.40.74
+botocore==1.41.2
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -62,7 +62,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.11.3
+coverage[toml]==7.12.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -108,7 +108,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.148.0
+hypothesis==6.148.2
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
@@ -239,7 +239,7 @@ pyyaml==6.0.3
     # via
     #   -r requirements/test.txt
     #   code-annotations
-s3transfer==0.14.0
+s3transfer==0.15.0
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -260,7 +260,7 @@ sqlparse==0.5.3
     # via
     #   -r requirements/test.txt
     #   django
-stevedore==5.5.0
+stevedore==5.6.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
