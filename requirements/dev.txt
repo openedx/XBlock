@@ -17,11 +17,11 @@ astroid==3.3.11
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.41.5
+boto3==1.42.4
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.41.5
+botocore==1.42.4
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -80,7 +80,7 @@ distlib==0.4.0
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   virtualenv
-django==5.2.8
+django==5.2.9
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
@@ -108,7 +108,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.148.3
+hypothesis==6.148.7
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
@@ -160,7 +160,7 @@ path==17.1.1
     # via -r requirements/test.txt
 pip-tools==7.5.2
     # via -r requirements/pip-tools.txt
-platformdirs==4.5.0
+platformdirs==4.5.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -202,7 +202,7 @@ pylint-plugin-utils==0.9.0
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==4.15.4
+pymongo==4.15.5
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
@@ -216,7 +216,7 @@ pyproject-hooks==1.2.0
     #   -r requirements/pip-tools.txt
     #   build
     #   pip-tools
-pytest==9.0.1
+pytest==9.0.2
     # via
     #   -r requirements/test.txt
     #   pytest-cov
@@ -239,7 +239,7 @@ pyyaml==6.0.3
     # via
     #   -r requirements/test.txt
     #   code-annotations
-s3transfer==0.15.0
+s3transfer==0.16.0
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -281,7 +281,7 @@ typing-extensions==4.15.0
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
-urllib3==2.5.0
+urllib3==2.6.0
     # via
     #   -r requirements/test.txt
     #   botocore
