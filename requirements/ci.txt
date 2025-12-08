@@ -22,7 +22,7 @@ packaging==25.0
     # via
     #   pyproject-api
     #   tox
-platformdirs==4.5.0
+platformdirs==4.5.1
     # via
     #   tox
     #   virtualenv
