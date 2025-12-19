@@ -5,6 +5,14 @@ Change history for XBlock
 Unreleased
 ----------
 
+5.3.0 - 2025-12-19
+------------------
+
+* Add exceptions NotFoundError and ProcessingError
+* Adds fields from xmodule into XBlock
+* Adds Progress from xmodule into XBlock
+* Adds ShowCorrectness from xmodule.graders into XBlock
+
 5.2.0 - 2025-04-08
 ------------------
 
