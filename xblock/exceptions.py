@@ -153,7 +153,6 @@ class XBlockParseException(Exception):
 class NotFoundError(Exception):
     """
     Raised when a requested XBlock resource or entity cannot be found.
-
     """
 
 
