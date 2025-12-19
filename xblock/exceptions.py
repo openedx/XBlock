@@ -148,3 +148,16 @@ class XBlockParseException(Exception):
     """
     Raised if parsing the XBlock olx fails.
     """
+
+
+class NotFoundError(Exception):
+    """
+    Raised when a requested XBlock resource or entity cannot be found.
+
+    """
+
+
+class ProcessingError(Exception):
+    """
+    Raised when an error occurs while processing an XBlock request.
+    """
