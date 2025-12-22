@@ -1,9 +1,12 @@
 """
 Scorable.
 """
-from collections import namedtuple
-import logging
 
+import logging
+from collections import namedtuple
+from datetime import datetime
+
+from pytz import UTC
 
 log = logging.getLogger(__name__)
 
@@ -112,3 +115,38 @@ class ScorableXBlockMixin:
             'only_if_higher': only_if_higher,
         }
         self.runtime.publish(self, 'grade', grade_dict)
+
+
+class ShowCorrectness:
+    """
+    Helper class for determining whether correctness is currently hidden for a block.
+
+    When correctness is hidden, this limits the user's access to the correct/incorrect flags, messages, problem scores,
+    and aggregate subsection and course grades.
+    """
+
+    # Constants used to indicate when to show correctness
+    ALWAYS = "always"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+    NEVER_BUT_INCLUDE_GRADE = "never_but_include_grade"
+
+    @classmethod
+    def correctness_available(cls, show_correctness="", due_date=None, has_staff_access=False):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if show_correctness in (cls.NEVER, cls.NEVER_BUT_INCLUDE_GRADE):
+            return False
+
+        if has_staff_access:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+
+        if show_correctness == cls.PAST_DUE:
+            # Is it now past the due date?
+            return due_date is None or due_date < datetime.now(UTC)
+
+        # else: show_correctness == cls.ALWAYS
+        return True
