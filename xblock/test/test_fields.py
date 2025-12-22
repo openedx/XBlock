@@ -19,9 +19,9 @@ from xblock.core import XBlock, Scope
 from xblock.field_data import DictFieldData
 from xblock.fields import (
     Any, Boolean, Dict, Field, Float, Integer, List, Set, String, XMLString, DateTime, Reference, ReferenceList,
-    ScopeIds, Sentinel, UNIQUE_ID, scope_key,
+    ScopeIds, Sentinel, UNIQUE_ID, scope_key, Date, Timedelta, RelativeTime, ScoreField, ListScoreField
 )
-
+from xblock.scorable import Score
 from xblock.test.tools import TestRuntime
 
 
@@ -275,10 +275,104 @@ class XMLStringTest(FieldTest):
         self.assertEqual(unchecked_xml_string.to_json(input_text), input_text)
 
 
+class DateTest(unittest.TestCase):
+    """Tests JSON conversion and type enforcement for Date fields."""
+
+    date = Date()
+
+    def compare_dates(self, dt1, dt2, expected_delta):
+        """Assert that two datetime objects differ by the expected timedelta."""
+        assert (dt1 - dt2) == expected_delta, (((str(dt1) + "-") + str(dt2)) + "!=") + str(expected_delta)
+
+    def test_from_json(self):
+        """Test conversion from iso compatible date strings to struct_time"""
+        self.compare_dates(
+            DateTest.date.from_json("2013-01-01"), DateTest.date.from_json("2012-12-31"), dt.timedelta(days=1)
+        )
+        self.compare_dates(
+            DateTest.date.from_json("2013-01-01T00"),
+            DateTest.date.from_json("2012-12-31T23"),
+            dt.timedelta(hours=1),
+        )
+        self.compare_dates(
+            DateTest.date.from_json("2013-01-01T00:00"),
+            DateTest.date.from_json("2012-12-31T23:59"),
+            dt.timedelta(minutes=1),
+        )
+        self.compare_dates(
+            DateTest.date.from_json("2013-01-01T00:00:00"),
+            DateTest.date.from_json("2012-12-31T23:59:59"),
+            dt.timedelta(seconds=1),
+        )
+        self.compare_dates(
+            DateTest.date.from_json("2013-01-01T00:00:00Z"),
+            DateTest.date.from_json("2012-12-31T23:59:59Z"),
+            dt.timedelta(seconds=1),
+        )
+        self.compare_dates(
+            DateTest.date.from_json("2012-12-31T23:00:01-01:00"),
+            DateTest.date.from_json("2013-01-01T00:00:00+01:00"),
+            dt.timedelta(hours=1, seconds=1),
+        )
+
+    def test_enforce_type(self):
+        """Test enforcement of input types for Date field."""
+        assert DateTest.date.enforce_type(None) is None
+        assert DateTest.date.enforce_type("") is None
+        assert DateTest.date.enforce_type("2012-12-31T23:00:01") == dt.datetime(2012, 12, 31, 23, 0, 1, tzinfo=pytz.UTC)
+        assert DateTest.date.enforce_type(1234567890000) == dt.datetime(2009, 2, 13, 23, 31, 30, tzinfo=pytz.UTC)
+        assert DateTest.date.enforce_type(dt.datetime(2014, 5, 9, 21, 1, 27, tzinfo=pytz.UTC)) == dt.datetime(
+            2014, 5, 9, 21, 1, 27, tzinfo=pytz.UTC
+        )
+        with self.assertRaises(TypeError):
+            DateTest.date.enforce_type([1])
+
+    def test_return_none(self):
+        """Test that invalid or empty inputs return None for Date field."""
+        assert DateTest.date.from_json("") is None
+        assert DateTest.date.from_json(None) is None
+        with self.assertRaises(TypeError):
+            DateTest.date.from_json(["unknown value"])
+
+    def test_old_due_date_format(self):
+        """Test parsing of non-standard human-readable date formats."""
+        current = dt.datetime.today()
+        assert dt.datetime(current.year, 3, 12, 12, tzinfo=pytz.UTC) == DateTest.date.from_json("March 12 12:00")
+        assert dt.datetime(current.year, 12, 4, 16, 30, tzinfo=pytz.UTC) == DateTest.date.from_json("December 4 16:30")
+        assert DateTest.date.from_json("12 12:00") is None
+
+    def test_non_std_from_json(self):
+        """
+        Test the non-standard args being passed to from_json
+        """
+        now = dt.datetime.now(pytz.UTC)
+        delta = now - dt.datetime.fromtimestamp(0, pytz.UTC)
+        assert DateTest.date.from_json(delta.total_seconds() * 1000) == now
+        yesterday = dt.datetime.now(pytz.UTC) - dt.timedelta(days=-1)
+        assert DateTest.date.from_json(yesterday) == yesterday
+
+    def test_to_json(self):
+        """
+        Test converting time reprs to iso dates
+        """
+        assert (
+            DateTest.date.to_json(
+                dt.datetime.strptime("2012-12-31T23:59:59Z", "%Y-%m-%dT%H:%M:%SZ")
+            ) == "2012-12-31T23:59:59Z"
+        )
+
+        assert DateTest.date.to_json(DateTest.date.from_json("2012-12-31T23:59:59Z")) == "2012-12-31T23:59:59Z"
+        assert (
+            DateTest.date.to_json(DateTest.date.from_json("2012-12-31T23:00:01-01:00")) == "2012-12-31T23:00:01-01:00"
+        )
+        with self.assertRaises(TypeError):
+            DateTest.date.to_json("2012-12-31T23:00:01-01:00")
+
+
 @ddt.ddt
-class DateTest(FieldTest):
+class DateTimeTest(FieldTest):
     """
-    Tests of the Date field.
+    Tests of the DateTime field.
     """
     FIELD_TO_TEST = DateTime
 
@@ -382,6 +476,83 @@ class DateTest(FieldTest):
     def test_serialize_error(self):
         with self.assertRaises(TypeError):
             DateTime().to_json('not a datetime')
+
+
+class TimedeltaTest(unittest.TestCase):
+    """Tests JSON conversion and type enforcement for Timedelta fields."""
+
+    delta = Timedelta()
+
+    def test_from_json(self):
+        """Test conversion from string representations to timedelta objects."""
+        assert TimedeltaTest.delta.from_json("1 day 12 hours 59 minutes 59 seconds") == dt.timedelta(
+            days=1, hours=12, minutes=59, seconds=59
+        )
+
+        assert TimedeltaTest.delta.from_json("1 day 46799 seconds") == dt.timedelta(days=1, seconds=46799)
+
+    def test_enforce_type(self):
+        """Test enforcement of input types for Timedelta field."""
+        assert TimedeltaTest.delta.enforce_type(None) is None
+        assert TimedeltaTest.delta.enforce_type(dt.timedelta(days=1, seconds=46799)) == dt.timedelta(
+            days=1, seconds=46799
+        )
+        assert TimedeltaTest.delta.enforce_type("1 day 46799 seconds") == dt.timedelta(days=1, seconds=46799)
+        with self.assertRaises(TypeError):
+            TimedeltaTest.delta.enforce_type([1])
+
+    def test_to_json(self):
+        """Test converting timedelta objects to string representations."""
+        assert "1 days 46799 seconds" == TimedeltaTest.delta.to_json(
+            dt.timedelta(days=1, hours=12, minutes=59, seconds=59)
+        )
+
+
+class RelativeTimeTest(unittest.TestCase):
+    """Tests JSON conversion and type enforcement for RelativeTime fields."""
+
+    delta = RelativeTime()
+
+    def test_from_json(self):
+        """Test conversion from string or numeric values to timedelta objects."""
+        assert RelativeTimeTest.delta.from_json("0:05:07") == dt.timedelta(seconds=307)
+
+        assert RelativeTimeTest.delta.from_json(100.0) == dt.timedelta(seconds=100)
+        assert RelativeTimeTest.delta.from_json(None) == dt.timedelta(seconds=0)
+
+        with self.assertRaises(TypeError):
+            RelativeTimeTest.delta.from_json(1234)  # int
+
+        with self.assertRaises(ValueError):
+            RelativeTimeTest.delta.from_json("77:77:77")
+
+    def test_enforce_type(self):
+        """Test enforcement of input types for RelativeTime field."""
+        assert RelativeTimeTest.delta.enforce_type(None) is None
+        assert RelativeTimeTest.delta.enforce_type(dt.timedelta(days=1, seconds=46799)) == dt.timedelta(
+            days=1, seconds=46799
+        )
+        assert RelativeTimeTest.delta.enforce_type("0:05:07") == dt.timedelta(seconds=307)
+        with self.assertRaises(TypeError):
+            RelativeTimeTest.delta.enforce_type([1])
+
+    def test_to_json(self):
+        """Test converting timedelta objects to HH:MM:SS string format."""
+        assert "01:02:03" == RelativeTimeTest.delta.to_json(dt.timedelta(seconds=3723))
+        assert "00:00:00" == RelativeTimeTest.delta.to_json(None)
+        assert "00:01:40" == RelativeTimeTest.delta.to_json(100.0)
+
+        error_msg = "RelativeTime max value is 23:59:59=86400.0 seconds, but 90000.0 seconds is passed"
+        with self.assertRaisesRegex(ValueError, error_msg):
+            RelativeTimeTest.delta.to_json(dt.timedelta(seconds=90000))
+
+        with self.assertRaises(TypeError):
+            RelativeTimeTest.delta.to_json("123")
+
+    def test_str(self):
+        """Test that RelativeTime outputs correct HH:MM:SS string representations."""
+        assert "01:02:03" == RelativeTimeTest.delta.to_json(dt.timedelta(seconds=3723))
+        assert "11:02:03" == RelativeTimeTest.delta.to_json(dt.timedelta(seconds=39723))
 
 
 class AnyTest(FieldTest):
@@ -929,3 +1100,101 @@ class FieldSerializationTest(unittest.TestCase):
         """ Cases that raises various exceptions."""
         with self.assertRaises(Exception):
             _type().from_string(string)
+
+
+@ddt.ddt
+class ScoreFieldTest(unittest.TestCase):
+    """
+    Tests for ScoreField and ListScoreField.
+    """
+
+    FIELD_TO_TEST = ScoreField
+
+    def test_score_field_basic_serialization(self):
+        """Test basic JSON -> Score object conversion."""
+        field = ScoreField()
+        data = {"raw_earned": 5, "raw_possible": 10}
+
+        result = field.from_json(data)
+
+        self.assertIsInstance(result, Score)
+        self.assertEqual(result.raw_earned, 5)
+        self.assertEqual(result.raw_possible, 10)
+
+    def test_score_field_idempotency(self):
+        """Test that passing a Score object returns it unchanged."""
+        field = ScoreField()
+        score = Score(raw_earned=5, raw_possible=10)
+        self.assertEqual(field.from_json(score), score)
+
+    def test_score_field_none(self):
+        """Test that None is handled correctly."""
+        field = ScoreField()
+        self.assertIsNone(field.from_json(None))
+
+    @ddt.data(
+        {"raw_earned": 5},  # Missing key
+        {"raw_possible": 10},  # Missing key
+        {"raw_earned": 5, "raw_possible": 10, "extra": 1},  # Extra key
+    )
+    def test_score_field_invalid_structure(self, data):
+        """Test TypeError is raised for incorrect dictionary structure."""
+        field = ScoreField()
+        with self.assertRaises(TypeError):
+            field.from_json(data)
+
+    @ddt.data(
+        {"raw_earned": -1, "raw_possible": 10},  # Negative earned
+        {"raw_earned": 5, "raw_possible": -1},  # Negative possible
+        {"raw_earned": 11, "raw_possible": 10},  # Earned > Possible
+    )
+    def test_score_field_validation_logic(self, data):
+        """Test ValueError is raised for logic violations."""
+        field = ScoreField(display_name="Test Score")
+        # The error message relies on display_name, so we set it to ensure formatting works
+        with self.assertRaises(ValueError):
+            field.from_json(data)
+
+    def test_list_score_field_success(self):
+        """Test deserializing a list of score dictionaries."""
+        field = ListScoreField()
+        data = [{"raw_earned": 5, "raw_possible": 10}, {"raw_earned": 0, "raw_possible": 5}]
+
+        results = field.from_json(data)
+
+        self.assertIsInstance(results, list)
+        self.assertEqual(len(results), 2)
+        self.assertIsInstance(results[0], Score)
+        self.assertIsInstance(results[1], Score)
+        self.assertEqual(results[0].raw_earned, 5)
+        self.assertEqual(results[1].raw_possible, 5)
+
+    def test_list_score_field_empty(self):
+        """Test handling of empty lists."""
+        field = ListScoreField()
+        self.assertEqual(field.from_json([]), [])
+
+    def test_list_score_field_none(self):
+        """Test handling of None for the list field."""
+        field = ListScoreField()
+        self.assertIsNone(field.from_json(None))
+
+    def test_list_score_field_type_error(self):
+        """Test that passing a non-list raises TypeError."""
+        field = ListScoreField()
+        with self.assertRaisesRegex(TypeError, "Value must be a list"):
+            field.from_json({"not": "a list"})
+
+    def test_list_score_field_propagates_validation_error(self):
+        """
+        Test that if a single item in the list is invalid,
+        the specific validation error from ScoreField bubbles up.
+        """
+        field = ListScoreField()
+        data = [
+            {"raw_earned": 5, "raw_possible": 10},  # Valid
+            {"raw_earned": 15, "raw_possible": 10},  # Invalid (Earned > Possible)
+        ]
+
+        with self.assertRaises(ValueError):
+            field.from_json(data)
