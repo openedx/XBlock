@@ -17,11 +17,11 @@ astroid==3.3.11
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.14
+boto3==1.42.17
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.14
+botocore==1.42.17
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -108,7 +108,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.148.7
+hypothesis==6.148.8
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
