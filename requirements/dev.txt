@@ -12,16 +12,16 @@ asgiref==3.11.0
     # via
     #   -r requirements/test.txt
     #   django
-astroid==3.3.11
+astroid==4.0.3
     # via
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.17
+boto3==1.42.21
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.17
+botocore==1.42.21
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -62,14 +62,14 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.13.0
+coverage[toml]==7.13.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   pytest-cov
 ddt==1.7.2
     # via -r requirements/test.txt
-diff-cover==10.0.0
+diff-cover==10.1.0
     # via -r requirements/test.txt
 dill==0.4.0
     # via
@@ -93,7 +93,7 @@ edx-lint==5.6.0
     # via -r requirements/test.txt
 edx-opaque-keys==3.0.0
     # via -r requirements/test.txt
-filelock==3.20.1
+filelock==3.20.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -108,13 +108,13 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.148.8
+hypothesis==6.148.11
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
     #   -r requirements/test.txt
     #   pytest
-isort==6.1.0
+isort==7.0.0
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -182,7 +182,7 @@ pygments==2.19.2
     #   -r requirements/test.txt
     #   diff-cover
     #   pytest
-pylint==3.3.9
+pylint==4.0.4
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -193,7 +193,7 @@ pylint-celery==0.3
     # via
     #   -r requirements/test.txt
     #   edx-lint
-pylint-django==2.6.1
+pylint-django==2.7.0
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -273,7 +273,7 @@ tomlkit==0.13.3
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.32.0
+tox==4.33.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
