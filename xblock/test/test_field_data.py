@@ -8,7 +8,7 @@ from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, String
 from xblock.field_data import SplitFieldData, ReadOnlyFieldData
-from xblock.test.tools import TestRuntime
+from xblock.test.tools import TestRuntime, make_scope_ids_for_testing
 
 
 class TestingBlock(XBlock):
@@ -48,7 +48,7 @@ class TestSplitFieldData:
         self.runtime = TestRuntime(services={'field-data': self.split})
         self.block = TestingBlock(
             runtime=self.runtime,
-            scope_ids=Mock(),
+            scope_ids=make_scope_ids_for_testing(),
         )
     # pylint: enable=attribute-defined-outside-init
 
