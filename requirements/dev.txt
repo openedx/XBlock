@@ -17,11 +17,11 @@ astroid==4.0.3
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.25
+boto3==1.42.30
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.25
+botocore==1.42.30
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -108,7 +108,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.150.0
+hypothesis==6.150.2
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
@@ -269,7 +269,7 @@ text-unidecode==1.3
     # via
     #   -r requirements/test.txt
     #   python-slugify
-tomlkit==0.13.3
+tomlkit==0.14.0
     # via
     #   -r requirements/test.txt
     #   pylint
