@@ -6,9 +6,9 @@ import pytest
 
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
-from xblock.fields import Scope, String
+from xblock.fields import Scope, String, ScopeIds
 from xblock.field_data import SplitFieldData, ReadOnlyFieldData
-from xblock.test.tools import TestRuntime, make_scope_ids_for_testing
+from xblock.test.tools import TestRuntime
 
 
 class TestingBlock(XBlock):
@@ -48,7 +48,7 @@ class TestSplitFieldData:
         self.runtime = TestRuntime(services={'field-data': self.split})
         self.block = TestingBlock(
             runtime=self.runtime,
-            scope_ids=make_scope_ids_for_testing(),
+            scope_ids=Mock(spec=ScopeIds),
         )
     # pylint: enable=attribute-defined-outside-init
 
@@ -105,7 +105,7 @@ class TestReadOnlyFieldData:
         self.runtime = TestRuntime(services={'field-data': self.read_only})
         self.block = TestingBlock(
             runtime=self.runtime,
-            scope_ids=Mock(),
+            scope_ids=Mock(spec=ScopeIds),
         )
     # pylint: enable=attribute-defined-outside-init
 

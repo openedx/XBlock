@@ -1,63 +1,14 @@
 """
 Tools for testing XBlocks
 """
-from contextlib import contextmanager
-from opaque_keys.edx.keys import UsageKeyV2, LearningContextKey, DefinitionKey
-from functools import partial
-from xblock.fields import ScopeIds
+import typing as t
+
 import warnings
+from contextlib import contextmanager
+from functools import partial
 
+from opaque_keys.edx.keys import CourseKey, DefinitionKey, UsageKey, LearningContextKey
 from xblock.runtime import Runtime, MemoryIdManager
-
-
-def make_scope_ids_for_testing(
-    user_id=99,
-    context_slug="myContext",
-    block_type="myType",
-    block_id="myId",
-):
-    """
-    Make an instance of ScopeIds suitable for testing XBlock.
-    Any or all parameters can be omitted.
-    """
-    return ScopeIds(
-        user_id=user_id,
-        block_type=block_type,
-        def_id=TestDefinitionKey(block_type, block_id),
-        usage_id=TestUsageKey(TestContextKey(context_slug), block_type, block_id),
-    )
-
-
-class TestDefinitionKey(DefinitionKey):
-    """
-    A simple definition key type for testing XBlock
-
-    When serialized, these keys look like:
-        td:myType.myId
-    """
-    CANONICAL_NAMESPACE = 'td'  # "Test Definition"
-    KEY_FIELDS = ('block_type', 'block_id')
-    block_type: str
-    block_id: str
-    __slots__ = KEY_FIELDS
-    CHECKED_INIT = False
-
-    def __init__(self, block_type: str, block_id: str):
-        super().__init__(block_type=block_type, block_id=block_id)
-
-    def _to_string(self) -> str:
-        """
-        Serialize this key as a string
-        """
-        return f"{self.block_type}.{self.block_id}"
-
-    @classmethod
-    def _from_string(cls, serialized: str):
-        """
-        Instantiate this key from a serialized string
-        """
-        (block_type, block_id) = serialized.split('.')
-        return cls(block_type, block_id)
 
 
 class TestContextKey(LearningContextKey):
@@ -65,7 +16,7 @@ class TestContextKey(LearningContextKey):
     A simple context key type for testing XBlock
 
     When serialized, these keys look like:
-        tc:myContext 
+        tc:myContext
     """
     CANONICAL_NAMESPACE = 'tc'  # "Test Context"
     KEY_FIELDS = ('slug',)
@@ -90,37 +41,92 @@ class TestContextKey(LearningContextKey):
         return cls(serialized)
 
 
-class TestUsageKey(UsageKeyV2):
+class TestDefinitionKey(DefinitionKey):
     """
-    A simple usage key type for testing XBlock
+    A simple definition key type for testing XBlock
 
     When serialized, these keys look like:
-        tu:myContext.myType.myId
+        td:myType$myId
     """
-    CANONICAL_NAMESPACE = 'tu'  # "Test Usage"
-    KEY_FIELDS = ('context_key', 'block_type', 'block_id')
-    context_key: TestContextKey
+    CANONICAL_NAMESPACE = 'td'  # "Test Definition"
+    KEY_FIELDS = ('block_type', 'block_id')
     block_type: str
     block_id: str
     __slots__ = KEY_FIELDS
     CHECKED_INIT = False
 
-    def __init__(self, context_key: TestContextKey, block_type: str, block_id: str):
-        super().__init__(context_key=context_key, block_type=block_type, block_id=block_id)
+    def __init__(self, block_type: str, block_id: str):
+        super().__init__(block_type=block_type, block_id=block_id)
 
     def _to_string(self) -> str:
         """
         Serialize this key as a string
         """
-        return ".".join((self.context_key.slug, self.block_type, self.block_id))
+        return f"{self.block_type}${self.block_id}"
 
     @classmethod
     def _from_string(cls, serialized: str):
         """
         Instantiate this key from a serialized string
         """
-        (context_slug, block_type, block_id) = serialized.split('.')
-        return cls(TestContextKey(context_slug), block_type, block_id)
+        (block_type, block_id) = serialized.split('$')
+        return cls(block_type, block_id)
+
+
+class TestUsageKey(UsageKey):
+    """
+    A simple usage key type for testing XBlock
+
+    When serialized, these keys look like:
+        tu:myContext$myType$myId
+    """
+    CANONICAL_NAMESPACE = 'tu'  # "Test Usage"
+    KEY_FIELDS = ('context_key', 'definition_key')
+    context_key: TestContextKey
+    definition_key: TestDefinitionKey
+    __slots__ = KEY_FIELDS
+    CHECKED_INIT = False
+
+    def __init__(self, context_key: TestContextKey, definition_key: TestDefinitionKey):
+        super().__init__(context_key=context_key, definition_key=definition_key)
+
+    @property
+    def block_type(self) -> str:
+        """
+        The XBlock type of this usage.
+        """
+        return self.definition_key.block_type
+
+    @property
+    def block_id(self) -> str:
+        """
+        The name of this usage.
+        """
+        return self.definition_key.block_id
+
+    @property
+    def course_key(self) -> LearningContextKey:
+        raise ValueError("Cannot use this key type in the context of courses")
+
+    def map_into_course(self, course_key: CourseKey) -> t.Self:
+        raise ValueError("Cannot use this key type in the context of courses")
+
+    def _to_string(self) -> str:
+        """
+        Serialize this key as a string
+        """
+        return "$".join((self.context_key.slug, self.block_type, self.block_id))
+
+    @classmethod
+    def _from_string(cls, serialized: str) -> t.Self:
+        """
+        Instantiate this key from a serialized string
+        """
+        (context_slug, block_type, block_id) = serialized.split('$')
+        return cls(
+            context_key=TestContextKey(context_slug),
+            definition_key=TestDefinitionKey(block_type, block_id),
+        )
 
 
 def blocks_are_equivalent(block1, block2):

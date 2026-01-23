@@ -338,7 +338,7 @@ def test_mixin_field_access():
     })
     runtime = TestRuntime(Mock(), mixins=[TestSimpleMixin], services={'field-data': field_data})
 
-    field_tester = runtime.construct_xblock_from_class(FieldTester, Mock())
+    field_tester = runtime.construct_xblock_from_class(FieldTester, Mock(spec=ScopeIds))
 
     assert field_tester.field_a == 5
     assert field_tester.field_b == 10
@@ -559,7 +559,7 @@ def test_ugettext_calls():
     Test ugettext calls in xblock.
     """
     runtime = TestRuntime()
-    block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
+    block = XBlockWithServices(runtime, scope_ids=Mock(spec=ScopeIds))
     assert block.ugettext('test') == 'test'
     assert isinstance(block.ugettext('test'), str)
 
@@ -567,7 +567,7 @@ def test_ugettext_calls():
     runtime = TestRuntime(services={
         'i18n': None
     })
-    block = XBlockWithServices(runtime, scope_ids=Mock(spec=[]))
+    block = XBlockWithServices(runtime, scope_ids=Mock(spec=ScopeIds))
     with pytest.raises(NoSuchServiceError):
         block.ugettext('test')
 

@@ -22,7 +22,7 @@ from xblock.fields import (
     ScopeIds, Sentinel, UNIQUE_ID, scope_key, Date, Timedelta, RelativeTime, ScoreField, ListScoreField
 )
 from xblock.scorable import Score
-from xblock.test.tools import TestRuntime, make_scope_ids_for_testing
+from xblock.test.tools import TestRuntime, TestDefinitionKey, TestUsageKey, TestContextKey
 
 
 class FieldTest(unittest.TestCase):
@@ -41,7 +41,7 @@ class FieldTest(unittest.TestCase):
             field_x = self.FIELD_TO_TEST(enforce_type=enforce_type)
 
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
-        return TestBlock(runtime, scope_ids=make_scope_ids_for_testing())
+        return TestBlock(runtime, scope_ids=Mock(spec=ScopeIds))
 
     def set_and_get_field(self, arg, enforce_type):
         """
@@ -717,26 +717,33 @@ def test_scope_key():
         pref_lst = List(scope=Scope.preferences, name='')
         user_info_lst = List(scope=Scope.user_info, name='')
 
-    sids = make_scope_ids_for_testing(
+    def_key = TestDefinitionKey("b.12#ob", "..")
+    sids = ScopeIds(
         user_id="_bob",
-        block_type="b.12#ob",
-        block_id="..",
+        block_type=def_key.block_type,
+        def_id=def_key,
+        usage_id=TestUsageKey(TestContextKey("ctx!"), def_key),
     )
-
     field_data = DictFieldData({})
 
     runtime = TestRuntime(Mock(), services={'field-data': field_data})
     block = TestBlock(runtime, None, sids)
 
-    # Format: usage or block ID/field_name/user_id
-    for item, correct_key in [[TestBlock.field_x, "__..../field__x/NONE.NONE"],
-                              [TestBlock.user_info_lst, "NONE.NONE/user__info__lst/____bob"],
-                              [TestBlock.pref_lst, "b..12_35_ob/pref__lst/____bob"],
-                              [TestBlock.user_lst, "__..../user__lst/____bob"],
-                              [TestBlock.uss_lst, "__..../uss__lst/NONE.NONE"],
-                              [TestBlock.settings_lst, "__..../settings__lst/NONE.NONE"]]:
-        key = scope_key(item, block)
-        assert key == correct_key
+    # Format: <usage or block ID>/<field_name>/<user_id>
+    # Note that <usage or block ID> for TestUsageKey, that is:
+    #    tu:<context>$<type>$<id>                <- original
+    #    tu: <context>$   <type>$   <id>
+    #    tu-_<context>_36_<type>_36_<id>         <- encoded
+    # And for our particular example usage key, that's:
+    #    tu:ctx!$b.12#ob$..                      <- original
+    #    tu: ctx!    $  b. 12#     ob$   . .
+    #    tu-_ctx_33__36_b..12_35_ob_36_....    <- encoded
+    assert scope_key(TestBlock.field_x, block) == "tu-_ctx_33__36_b..12_35_ob_36_..../field__x/NONE.NONE"
+    assert scope_key(TestBlock.user_info_lst, block) == "NONE.NONE/user__info__lst/____bob"
+    assert scope_key(TestBlock.pref_lst, block) == "b..12_35_ob/pref__lst/____bob"
+    assert scope_key(TestBlock.user_lst, block) == "__..../user__lst/____bob"
+    assert scope_key(TestBlock.uss_lst, block) == "__..../uss__lst/NONE.NONE"
+    assert scope_key(TestBlock.settings_lst, block) == "__..../settings__lst/NONE.NONE"
 
 
 def test_field_display_name():
@@ -764,10 +771,12 @@ def test_unique_id_default():
         field_a = String(default=UNIQUE_ID, scope=Scope.settings)
         field_b = String(default=UNIQUE_ID, scope=Scope.user_state)
 
-    sids = make_scope_ids_for_testing(
-        user_id="bob",
-        block_type="bobs-type",
-        block_id="usage-id",
+    def_key = TestDefinitionKey("b.12#ob", "..")
+    sids = ScopeIds(
+        user_id="_bob",
+        block_type=def_key.block_type,
+        def_id=def_key,
+        usage_id=TestUsageKey(TestContextKey("blah!"), def_key),
     )
 
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
@@ -830,7 +839,7 @@ def test_set_incomparable_fields():
     not_timezone_aware = dt.datetime(2015, 1, 1)
     timezone_aware = dt.datetime(2015, 1, 1, tzinfo=pytz.UTC)
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    field_tester = FieldTester(runtime, scope_ids=make_scope_ids_for_testing())
+    field_tester = FieldTester(runtime, scope_ids=Mock(scope_ids=ScopeIds))
     field_tester.incomparable = not_timezone_aware
     field_tester.incomparable = timezone_aware
     assert field_tester.incomparable == timezone_aware
@@ -855,7 +864,7 @@ def test_twofaced_field_access():
 
     original_json = "YYY"
     runtime = TestRuntime(services={'field-data': DictFieldData({'how_many': original_json})})
-    field_tester = FieldTester(runtime, scope_ids=make_scope_ids_for_testing())
+    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # Test that the native value isn't equal to the original json we specified.
     assert field_tester.how_many != original_json
@@ -881,7 +890,7 @@ def test_setting_the_same_value_marks_field_as_dirty():
         dict_field = Dict(scope=Scope.settings)
 
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    field_tester = FieldTester(runtime, scope_ids=make_scope_ids_for_testing())
+    field_tester = FieldTester(runtime, scope_ids=Mock(spec=ScopeIds))
 
     # precondition checks
     assert len(field_tester._dirty_fields) == 0

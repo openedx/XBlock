@@ -144,7 +144,9 @@ class TestIndexInfo(AttrAssertionMixin):
 
     def test_index_info(self):
         self.assertHasAttr(self.IndexInfoMixinTester, 'index_dictionary')
-        with_index_info = self.IndexInfoMixinTester(runtime=None, scope_ids=None).index_dictionary()
+        with_index_info = self.IndexInfoMixinTester(
+            runtime=None, scope_ids=mock.Mock(spec=ScopeIds)
+        ).index_dictionary()
         self.assertFalse(with_index_info)
         self.assertTrue(isinstance(with_index_info, dict))
 
@@ -181,7 +183,7 @@ class TestViews(TestCase):
                 """
                 # pragma: no cover
 
-        test_xblock = SupportsDecoratorTester(None, None, None)
+        test_xblock = SupportsDecoratorTester(None, None, mock.Mock(spec=ScopeIds))
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
@@ -213,7 +215,7 @@ class TestViews(TestCase):
                 """
                 return functionality == "a_functionality"
 
-        test_xblock = HasSupportOverrideTester(None, None, None)
+        test_xblock = HasSupportOverrideTester(None, None, mock.Mock(spec=ScopeIds))
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),

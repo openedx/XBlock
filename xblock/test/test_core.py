@@ -45,7 +45,7 @@ def test_field_access():
 
     field_data = DictFieldData({'field_a': 5, 'float_a': 6.1, 'field_x': 15})
 
-    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock(spec=ScopeIds))
     # Verify that the fields have been set
     assert field_tester.field_a == 5
     assert field_tester.field_b == 10
@@ -153,7 +153,10 @@ def test_set_field_access():
         field_c = Set(scope=Scope.content, default=[4, 5, 6])
         field_d = Set(scope=Scope.settings)
 
-    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]}), Mock())
+    field_tester = FieldTester(
+        MagicMock(),
+        DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]}), Mock(spec=ScopeIds),
+    )
 
     # Check initial values have been set properly
     assert {200} == field_tester.field_a
@@ -279,7 +282,7 @@ def test_dict_field_access():
     field_tester = FieldTester(
         TestRuntime(services={'field-data': field_data}),
         None,
-        Mock()
+        Mock(spec=ScopeIds),
     )
 
     # Check initial values have been set properly
@@ -524,7 +527,7 @@ def test_field_serialization():
     field_tester = FieldTester(
         TestRuntime(services={'field-data': field_data}),
         None,
-        Mock(),
+        Mock(spec=ScopeIds),
     )
 
     assert field_tester.field == 4
@@ -763,7 +766,7 @@ def test_change_mutable_default():
 
 def test_handle_shortcut():
     runtime = Mock(spec=['handle'])
-    scope_ids = Mock(spec=[])
+    scope_ids = Mock(spec=Mock(spec=ScopeIds))
     request = Mock(spec=[])
     block = XBlock(runtime, None, scope_ids)
 
@@ -780,7 +783,7 @@ def test_services_decorators():
     class NoServicesBlock(XBlock):
         """XBlock requesting no services"""
 
-    no_services_block = NoServicesBlock(None, None, None)
+    no_services_block = NoServicesBlock(None, None, Mock(scope_ids=ScopeIds))
     assert not NoServicesBlock._services_requested
     assert not no_services_block._services_requested
 
@@ -789,7 +792,7 @@ def test_services_decorators():
     class ServiceUsingBlock(XBlock):
         """XBlock using some services."""
 
-    service_using_block = ServiceUsingBlock(None, scope_ids=Mock())
+    service_using_block = ServiceUsingBlock(None, scope_ids=Mock(spec=ScopeIds))
     assert ServiceUsingBlock._services_requested == {
         'n': 'need', 'w': 'want'
     }
@@ -809,7 +812,7 @@ def test_services_decorators_with_inheritance():
     class SubServiceUsingBlock(ServiceUsingBlock):
         """Does this class properly inherit services from ServiceUsingBlock?"""
 
-    sub_service_using_block = SubServiceUsingBlock(None, scope_ids=Mock())
+    sub_service_using_block = SubServiceUsingBlock(None, scope_ids=Mock(spec=ScopeIds))
     assert sub_service_using_block.service_declaration("n1") == "need"
     assert sub_service_using_block.service_declaration("w1") == "want"
     assert sub_service_using_block.service_declaration("n2") == "need"
@@ -974,7 +977,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "public/\N{SNOWMAN}.js",
     )
     def test_open_good_local_resource(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             assert loadable.open_local_resource(uri) == "!" + uri + "!"
             assert loadable.open_local_resource(uri.encode('utf-8')) == "!" + uri + "!"
@@ -988,7 +991,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "public/\N{SNOWMAN}.js".encode(),
     )
     def test_open_good_local_resource_binary(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             assert loadable.open_local_resource(uri) == "!" + uri.decode('utf-8') + "!"
 
@@ -1002,7 +1005,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "static/\N{SNOWMAN}.js",
     )
     def test_open_bad_local_resource(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             msg_pattern = ".*: %s" % re.escape(repr(uri))
             with pytest.raises(DisallowedFileError, match=msg_pattern):
@@ -1018,7 +1021,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "static/\N{SNOWMAN}.js".encode(),
     )
     def test_open_bad_local_resource_binary(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             msg = ".*: %s" % re.escape(repr(uri.decode('utf-8')))
             with pytest.raises(DisallowedFileError, match=msg):
@@ -1040,7 +1043,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "static/\N{SNOWMAN}.js",
     )
     def test_open_local_resource_with_no_resources_dir(self, uri):
-        unloadable = self.UnloadableXBlock(None, scope_ids=Mock())
+        unloadable = self.UnloadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
 
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             msg = "not configured to serve local resources"
