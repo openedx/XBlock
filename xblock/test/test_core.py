@@ -537,26 +537,26 @@ def test_field_serialization():
 
 
 def test_class_tags():
-    xblock = XBlock(None, None, None)
+    xblock = XBlock(None, None, Mock(ScopeIds))
     assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable
 
     class Sub1Block(XBlock):
         """Toy XBlock"""
 
-    sub1block = Sub1Block(None, None, None)
+    sub1block = Sub1Block(None, None, Mock(ScopeIds))
     assert sub1block._class_tags == set()  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
         """Toy XBlock"""
 
-    sub2block = Sub2Block(None, None, None)
+    sub2block = Sub2Block(None, None, Mock(ScopeIds))
     assert sub2block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     class Sub3Block(Sub2Block):
         """Toy XBlock"""
 
-    sub3block = Sub3Block(None, None, None)
+    sub3block = Sub3Block(None, None, Mock(ScopeIds))
     assert sub3block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("mixin")
@@ -566,7 +566,7 @@ def test_class_tags():
     class Sub4Block(MixinBlock, Sub3Block):
         """Toy XBlock"""
 
-    sub4block = Sub4Block(None, None, None)
+    sub4block = Sub4Block(None, None, Mock(ScopeIds))
     assert sub4block._class_tags == {  # pylint: disable=comparison-with-callable
         "cat", "dog", "mixin"
     }
@@ -766,7 +766,7 @@ def test_change_mutable_default():
 
 def test_handle_shortcut():
     runtime = Mock(spec=['handle'])
-    scope_ids = Mock(spec=Mock(spec=ScopeIds))
+    scope_ids = Mock(spec=ScopeIds)
     request = Mock(spec=[])
     block = XBlock(runtime, None, scope_ids)
 
@@ -783,7 +783,7 @@ def test_services_decorators():
     class NoServicesBlock(XBlock):
         """XBlock requesting no services"""
 
-    no_services_block = NoServicesBlock(None, None, Mock(scope_ids=ScopeIds))
+    no_services_block = NoServicesBlock(None, None, Mock(ScopeIds))
     assert not NoServicesBlock._services_requested
     assert not no_services_block._services_requested
 
@@ -792,7 +792,7 @@ def test_services_decorators():
     class ServiceUsingBlock(XBlock):
         """XBlock using some services."""
 
-    service_using_block = ServiceUsingBlock(None, scope_ids=Mock(spec=ScopeIds))
+    service_using_block = ServiceUsingBlock(None, scope_ids=Mock(ScopeIds))
     assert ServiceUsingBlock._services_requested == {
         'n': 'need', 'w': 'want'
     }

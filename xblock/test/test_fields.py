@@ -22,7 +22,7 @@ from xblock.fields import (
     ScopeIds, Sentinel, UNIQUE_ID, scope_key, Date, Timedelta, RelativeTime, ScoreField, ListScoreField
 )
 from xblock.scorable import Score
-from xblock.test.tools import TestRuntime, TestDefinitionKey, TestUsageKey, TestContextKey
+from xblock.test.tools import TestRuntime, TestKey
 
 
 class FieldTest(unittest.TestCase):
@@ -717,33 +717,36 @@ def test_scope_key():
         pref_lst = List(scope=Scope.preferences, name='')
         user_info_lst = List(scope=Scope.user_info, name='')
 
-    def_key = TestDefinitionKey("b.12#ob", "..")
-    sids = ScopeIds(
-        user_id="_bob",
-        block_type=def_key.block_type,
-        def_id=def_key,
-        usage_id=TestUsageKey(TestContextKey("ctx!"), def_key),
-    )
+    usage_key = TestKey("b.12#ob", "..")
+    sids = ScopeIds(user_id="_bob", block_type=usage_key.block_type, def_id=usage_key, usage_id=usage_key)
     field_data = DictFieldData({})
 
     runtime = TestRuntime(Mock(), services={'field-data': field_data})
     block = TestBlock(runtime, None, sids)
 
-    # Format: <usage or block ID>/<field_name>/<user_id>
-    # Note that <usage or block ID> for TestUsageKey, that is:
-    #    tu:<context>$<type>$<id>                <- original
-    #    tu: <context>$   <type>$   <id>
-    #    tu-_<context>_36_<type>_36_<id>         <- encoded
-    # And for our particular example usage key, that's:
-    #    tu:ctx!$b.12#ob$..                      <- original
-    #    tu: ctx!    $  b. 12#     ob$   . .
-    #    tu-_ctx_33__36_b..12_35_ob_36_....    <- encoded
-    assert scope_key(TestBlock.field_x, block) == "tu-_ctx_33__36_b..12_35_ob_36_..../field__x/NONE.NONE"
+    # Format: <usage_key|type>/<field_name>/<user_id>
+    # Note that our <usage_key> is a TestKey, which is formatted as:
+    #    tk:<type>$<id>             <- original
+    #    tk: <type>$   <id>
+    #    tk-_<type>_36_<id>         <- encoded
+    # And our particular <type> is:
+    #    b.12#ob                    <- original
+    #    b. 12#   ob
+    #    b..12_35_ob                <- encoded
+    # And our particular <id> is:
+    #   ..                          <- original
+    #   . .
+    #   ....                        <- encoded
+    # And so the full formatted TestKey instance is:
+    #    tk:b.12#ob$..              <- original
+    #    tk: b. 12#   ob$   . .
+    #    tk-_b..12_35_ob_36_....    <- encoded
+    assert scope_key(TestBlock.field_x, block) == "tk-_b..12_35_ob_36_..../field__x/NONE.NONE"
     assert scope_key(TestBlock.user_info_lst, block) == "NONE.NONE/user__info__lst/____bob"
     assert scope_key(TestBlock.pref_lst, block) == "b..12_35_ob/pref__lst/____bob"
-    assert scope_key(TestBlock.user_lst, block) == "__..../user__lst/____bob"
-    assert scope_key(TestBlock.uss_lst, block) == "__..../uss__lst/NONE.NONE"
-    assert scope_key(TestBlock.settings_lst, block) == "__..../settings__lst/NONE.NONE"
+    assert scope_key(TestBlock.user_lst, block) == "tk-_b..12_35_ob_36_..../user__lst/____bob"
+    assert scope_key(TestBlock.uss_lst, block) == "tk-_b..12_35_ob_36_..../uss__lst/NONE.NONE"
+    assert scope_key(TestBlock.settings_lst, block) == "tk-_b..12_35_ob_36_..../settings__lst/NONE.NONE"
 
 
 def test_field_display_name():
@@ -771,12 +774,12 @@ def test_unique_id_default():
         field_a = String(default=UNIQUE_ID, scope=Scope.settings)
         field_b = String(default=UNIQUE_ID, scope=Scope.user_state)
 
-    def_key = TestDefinitionKey("b.12#ob", "..")
+    usage_key = TestKey("b.12#ob", "..")
     sids = ScopeIds(
         user_id="_bob",
-        block_type=def_key.block_type,
-        def_id=def_key,
-        usage_id=TestUsageKey(TestContextKey("blah!"), def_key),
+        block_type=usage_key.block_type,
+        def_id=usage_key,
+        usage_id=usage_key,
     )
 
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
@@ -839,7 +842,7 @@ def test_set_incomparable_fields():
     not_timezone_aware = dt.datetime(2015, 1, 1)
     timezone_aware = dt.datetime(2015, 1, 1, tzinfo=pytz.UTC)
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    field_tester = FieldTester(runtime, scope_ids=Mock(scope_ids=ScopeIds))
+    field_tester = FieldTester(runtime, scope_ids=Mock(ScopeIds))
     field_tester.incomparable = not_timezone_aware
     field_tester.incomparable = timezone_aware
     assert field_tester.incomparable == timezone_aware

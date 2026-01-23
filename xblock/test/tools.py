@@ -11,44 +11,19 @@ from opaque_keys.edx.keys import CourseKey, DefinitionKey, UsageKey, LearningCon
 from xblock.runtime import Runtime, MemoryIdManager
 
 
-class TestContextKey(LearningContextKey):
+class TestKey(UsageKey, DefinitionKey):
     """
-    A simple context key type for testing XBlock
+    A simple way to identify block usages and definitions using just type and ID slug.
 
-    When serialized, these keys look like:
-        tc:myContext
+    This key can serve as both an identifer for block Usages and block Definitions.
+    (This aligns the new Learning-Core-based XBlockRuntimes in openedx-platform, which
+     don't differentiate between usage and definition--UsageKeyV2s are used for both).
+
+    This class is exclusively for XBlock framework test code!
+
+    Serialization --> tk:<block_type>$<block_id>
     """
-    CANONICAL_NAMESPACE = 'tc'  # "Test Context"
-    KEY_FIELDS = ('slug',)
-    slug: str
-    __slots__ = KEY_FIELDS
-    CHECKED_INIT = False
-
-    def __init__(self, slug: str):
-        super().__init__(slug=slug)
-
-    def _to_string(self) -> str:
-        """
-        Serialize this key as a string
-        """
-        return self.slug
-
-    @classmethod
-    def _from_string(cls, serialized: str):
-        """
-        Instantiate this key from a serialized string
-        """
-        return cls(serialized)
-
-
-class TestDefinitionKey(DefinitionKey):
-    """
-    A simple definition key type for testing XBlock
-
-    When serialized, these keys look like:
-        td:myType$myId
-    """
-    CANONICAL_NAMESPACE = 'td'  # "Test Definition"
+    CANONICAL_NAMESPACE = 'tk'  # "Test Key"
     KEY_FIELDS = ('block_type', 'block_id')
     block_type: str
     block_id: str
@@ -59,74 +34,37 @@ class TestDefinitionKey(DefinitionKey):
         super().__init__(block_type=block_type, block_id=block_id)
 
     def _to_string(self) -> str:
-        """
-        Serialize this key as a string
-        """
         return f"{self.block_type}${self.block_id}"
 
     @classmethod
     def _from_string(cls, serialized: str):
-        """
-        Instantiate this key from a serialized string
-        """
-        (block_type, block_id) = serialized.split('$')
-        return cls(block_type, block_id)
-
-
-class TestUsageKey(UsageKey):
-    """
-    A simple usage key type for testing XBlock
-
-    When serialized, these keys look like:
-        tu:myContext$myType$myId
-    """
-    CANONICAL_NAMESPACE = 'tu'  # "Test Usage"
-    KEY_FIELDS = ('context_key', 'definition_key')
-    context_key: TestContextKey
-    definition_key: TestDefinitionKey
-    __slots__ = KEY_FIELDS
-    CHECKED_INIT = False
-
-    def __init__(self, context_key: TestContextKey, definition_key: TestDefinitionKey):
-        super().__init__(context_key=context_key, definition_key=definition_key)
+        return cls(*serialized.split("$"))
 
     @property
-    def block_type(self) -> str:
-        """
-        The XBlock type of this usage.
-        """
-        return self.definition_key.block_type
+    def definition_key(self) -> DefinitionKey:
+        return self
 
     @property
-    def block_id(self) -> str:
+    def context_key(self) -> LearningContextKey:
         """
-        The name of this usage.
-        """
-        return self.definition_key.block_id
+        Raise an error because core XBlock code should be oblivious to LearningContexts.
 
-    @property
-    def course_key(self) -> LearningContextKey:
-        raise ValueError("Cannot use this key type in the context of courses")
+        Within the actual openedx-platform runtimes, every Usage belongs to a LearningContext.
+        Within the XBlock framework, though, we are oblivious to the idea of LearningContexts. We just deal
+        with opaque UsageKeys instead. It's a nice simplifying assumption to have.
+        So, rather than return fake context key here, let's fail the unit test.
+        Future devs: if you really need to add LearningContext awareness in the XBlock framework,
+        you could define a TestContextKey class and return a static instance of it from this method.
+        """
+        raise TypeError(
+            "Cannot access the Context of a TestKey "
+            "(are you sure you need to call .context_key in order to test XBlock code?)"
+        )
+
+    course_key = context_key  # the UsageKey class demands this for backcompat.
 
     def map_into_course(self, course_key: CourseKey) -> t.Self:
         raise ValueError("Cannot use this key type in the context of courses")
-
-    def _to_string(self) -> str:
-        """
-        Serialize this key as a string
-        """
-        return "$".join((self.context_key.slug, self.block_type, self.block_id))
-
-    @classmethod
-    def _from_string(cls, serialized: str) -> t.Self:
-        """
-        Instantiate this key from a serialized string
-        """
-        (context_slug, block_type, block_id) = serialized.split('$')
-        return cls(
-            context_key=TestContextKey(context_slug),
-            definition_key=TestDefinitionKey(block_type, block_id),
-        )
 
 
 def blocks_are_equivalent(block1, block2):
