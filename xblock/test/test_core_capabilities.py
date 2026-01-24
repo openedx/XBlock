@@ -20,7 +20,7 @@ from xblock.core import Blocklike, XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
 from xblock.field_data import DictFieldData
 from xblock.runtime import Runtime
-from xblock.test.tools import TestRuntime
+from xblock.test.tools import TestRuntime, TestKey
 
 
 class AttrAssertionMixin(TestCase):
@@ -275,7 +275,8 @@ class TestXmlSerialization(TestCase):
         """ Creates a test block """
         block_type = block_type if block_type else self.TestXBlock
         runtime_mock = mock.Mock(spec=Runtime)
-        scope_ids = ScopeIds("user_id", block_type.etree_node_tag, "def_id", "usage_id")
+        test_key = TestKey(block_type.etree_node_tag, "usage_id")
+        scope_ids = ScopeIds("user_id", test_key.block_type, test_key, test_key)
         return block_type(runtime=runtime_mock, field_data=DictFieldData({}), scope_ids=scope_ids)
 
     def _assert_node_attributes(self, node, expected_attributes, entry_point=None):

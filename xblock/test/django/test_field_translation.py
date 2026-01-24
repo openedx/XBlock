@@ -15,7 +15,7 @@ from xblock.runtime import (
     DictKeyValueStore,
     KvsFieldData,
 )
-from xblock.test.tools import TestRuntime
+from xblock.test.tools import TestRuntime, TestKey
 
 
 class TestXBlockStringFieldDefaultTranslation(TestCase):
@@ -45,7 +45,8 @@ class TestXBlockStringFieldDefaultTranslation(TestCase):
         # Change language to 'de'.
         user_language = 'de'
         with translation.override(user_language):
-            tester = runtime.construct_xblock_from_class(XBlockTest, ScopeIds('s0', 'XBlockTest', 'd0', 'u0'))
+            test_key = TestKey("XBlockTest", "k0")
+            tester = runtime.construct_xblock_from_class(XBlockTest, ScopeIds('s0', 'XBlockTest', test_key, test_key))
 
             # Assert instantiated XBlock str_field value is not yet evaluated.
             assert 'django.utils.functional.' in str(type(tester.str_field))

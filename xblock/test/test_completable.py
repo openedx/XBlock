@@ -15,6 +15,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import Runtime
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
+from xblock.test.tools import TestKey
 
 
 @ddt.ddt
@@ -77,7 +78,8 @@ class CompletableXBlockMixinTest(TestCase):
         """
         block_type = block_type if block_type else self.TestBuddyXBlock
         runtime = runtime if runtime else mock.Mock(spec=Runtime)
-        scope_ids = ScopeIds("user_id", "test_buddy", "def_id", "usage_id")
+        test_key = TestKey("test_buddy", "test_id")
+        scope_ids = ScopeIds("user_id", "test_buddy", test_key, test_key)
         return block_type(runtime=runtime, scope_ids=scope_ids)
 
     def test_has_custom_completion_property(self):

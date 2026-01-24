@@ -29,7 +29,7 @@ from xblock.runtime import (
 )
 from xblock.field_data import DictFieldData, FieldData
 
-from xblock.test.tools import unabc, WarningTestMixin, TestRuntime
+from xblock.test.tools import unabc, WarningTestMixin, TestRuntime, TestKey
 
 
 class TestMixin:
@@ -112,7 +112,11 @@ def test_db_model_keys():
     key_store = DictKeyValueStore()
     field_data = KvsFieldData(key_store)
     runtime = TestRuntime(Mock(), mixins=[TestMixin], services={'field-data': field_data})
-    tester = runtime.construct_xblock_from_class(TestXBlock, ScopeIds('s0', 'TestXBlock', 'd0', 'u0'))
+    test_def_key = TestKey("TestXBlock", "d0")
+    test_usage_key = TestKey("TestXBlock", "u0")
+    tester = runtime.construct_xblock_from_class(
+        TestXBlock, ScopeIds('s0', 'TestXBlock', test_def_key, test_usage_key)
+    )
 
     assert not field_data.has(tester, 'not a field')
 
@@ -136,36 +140,36 @@ def test_db_model_keys():
         return key_store.db_dict[new_key]
 
     # Examine each value in the database and ensure that keys were constructed correctly
-    assert get_key_value(Scope.content, None, 'd0', 'content') == 'new content'
-    assert get_key_value(Scope.settings, None, 'u0', 'settings') == 'new settings'
-    assert get_key_value(Scope.user_state, 's0', 'u0', 'user_state') == 'new user_state'
+    assert get_key_value(Scope.content, None, test_def_key, 'content') == 'new content'
+    assert get_key_value(Scope.settings, None, test_usage_key, 'settings') == 'new settings'
+    assert get_key_value(Scope.user_state, 's0', test_usage_key, 'user_state') == 'new user_state'
     assert get_key_value(Scope.preferences, 's0', 'TestXBlock', 'preferences') == 'new preferences'
     assert get_key_value(Scope.user_info, 's0', None, 'user_info') == 'new user_info'
     assert get_key_value(Scope(UserScope.NONE, BlockScope.TYPE), None, 'TestXBlock', 'by_type') == 'new by_type'
     assert get_key_value(Scope(UserScope.NONE, BlockScope.ALL), None, None, 'for_all') == 'new for_all'
-    assert get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', 'd0', 'user_def') == 'new user_def'
+    assert get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', test_def_key, 'user_def') == 'new user_def'
     assert get_key_value(Scope(UserScope.ALL, BlockScope.ALL), None, None, 'agg_global') == 'new agg_global'
     assert get_key_value(Scope(UserScope.ALL, BlockScope.TYPE), None, 'TestXBlock', 'agg_type') == 'new agg_type'
-    assert get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, 'd0', 'agg_def') == 'new agg_def'
-    assert get_key_value(Scope.user_state_summary, None, 'u0', 'agg_usage') == 'new agg_usage'
-    assert get_key_value(Scope.content, None, 'd0', 'mixin_content') == 'new mixin_content'
-    assert get_key_value(Scope.settings, None, 'u0', 'mixin_settings') == 'new mixin_settings'
-    assert get_key_value(Scope.user_state, 's0', 'u0', 'mixin_user_state') == 'new mixin_user_state'
+    assert get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, test_def_key, 'agg_def') == 'new agg_def'
+    assert get_key_value(Scope.user_state_summary, None, test_usage_key, 'agg_usage') == 'new agg_usage'
+    assert get_key_value(Scope.content, None, test_def_key, 'mixin_content') == 'new mixin_content'
+    assert get_key_value(Scope.settings, None, test_usage_key, 'mixin_settings') == 'new mixin_settings'
+    assert get_key_value(Scope.user_state, 's0', test_usage_key, 'mixin_user_state') == 'new mixin_user_state'
     assert get_key_value(Scope.preferences, 's0', 'TestXBlock', 'mixin_preferences') == 'new mixin_preferences'
     assert get_key_value(Scope.user_info, 's0', None, 'mixin_user_info') == 'new mixin_user_info'
     assert get_key_value(Scope(UserScope.NONE, BlockScope.TYPE), None, 'TestXBlock', 'mixin_by_type') == \
         'new mixin_by_type'
     assert get_key_value(Scope(UserScope.NONE, BlockScope.ALL), None, None, 'mixin_for_all') == \
         'new mixin_for_all'
-    assert get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', 'd0', 'mixin_user_def') == \
+    assert get_key_value(Scope(UserScope.ONE, BlockScope.DEFINITION), 's0', test_def_key, 'mixin_user_def') == \
         'new mixin_user_def'
     assert get_key_value(Scope(UserScope.ALL, BlockScope.ALL), None, None, 'mixin_agg_global') == \
         'new mixin_agg_global'
     assert get_key_value(Scope(UserScope.ALL, BlockScope.TYPE), None, 'TestXBlock', 'mixin_agg_type') == \
         'new mixin_agg_type'
-    assert get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, 'd0', 'mixin_agg_def') == \
+    assert get_key_value(Scope(UserScope.ALL, BlockScope.DEFINITION), None, test_def_key, 'mixin_agg_def') == \
         'new mixin_agg_def'
-    assert get_key_value(Scope.user_state_summary, None, 'u0', 'mixin_agg_usage') == 'new mixin_agg_usage'
+    assert get_key_value(Scope.user_state_summary, None, test_usage_key, 'mixin_agg_usage') == 'new mixin_agg_usage'
 
 
 @unabc("{} shouldn't be used in tests")

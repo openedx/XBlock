@@ -13,6 +13,7 @@ from unittest.mock import patch, MagicMock, Mock
 
 import ddt
 import pytest
+from opaque_keys.edx.keys import DefinitionKey
 from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryLocatorV2
 from webob import Response
 
@@ -1144,25 +1145,9 @@ class TestScopeIdProperties(unittest.TestCase):
         scope_ids = ScopeIds(
             user_id="myUser",
             block_type="myType",
-            def_id="myDefId",
+            def_id=Mock(spec=DefinitionKey),
             usage_id=self.library_block_key,
         )
         block = XBlock(Mock(spec=Runtime), scope_ids=scope_ids)
         self.assertEqual(block.usage_key, self.library_block_key)
         self.assertEqual(block.context_key, self.library_key)
-
-    def test_key_properties_when_usage_is_not_an_opaque_key(self):
-        """
-        Tests a legacy scenario that we believe only happens in xblock-sdk at this point.
-
-        Remove this test as part of https://github.com/openedx/XBlock/issues/708.
-        """
-        scope_ids = ScopeIds(
-            user_id="myUser",
-            block_type="myType",
-            def_id="myDefId",
-            usage_id="myWeirdOldUsageId",
-        )
-        block = XBlock(Mock(spec=Runtime), scope_ids=scope_ids)
-        self.assertEqual(block.usage_key, "myWeirdOldUsageId")
-        self.assertIsNone(block.context_key)
