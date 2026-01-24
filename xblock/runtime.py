@@ -1,6 +1,8 @@
 """
 Machinery to make the common case easy when building new runtimes
 """
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 import functools
@@ -12,6 +14,7 @@ import json
 import logging
 import re
 import threading
+import typing as t
 import warnings
 
 from lxml import etree
@@ -19,6 +22,7 @@ import markupsafe
 
 from web_fragments.fragment import Fragment
 
+from opaque_keys.edx.keys import UsageKey, DefinitionKey, LearningContextKey, CourseKey
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
@@ -357,6 +361,86 @@ class IdGenerator(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
+class _InMemoryDefinitionKey(DefinitionKey):
+    """
+    A simple way to identify definition by a type and a slug.
+
+    Serialization --> md:<block_type>:<slug>
+
+    Note: This class is NOT part of the public XBlock API.
+    """
+    CANONICAL_NAMESPACE = 'md'  # "(In-)Memory Definition"
+    KEY_FIELDS = ("block_type", "slug")
+    block_type: str
+    slug: str
+    __slots__ = KEY_FIELDS
+    CHECKED_INIT = False
+
+    def __init__(self, block_type: str, slug: str):
+        super().__init__(block_type=block_type, slug=slug)
+
+    def _to_string(self) -> str:
+        return f"{self.block_type}:{self.slug}"
+    @classmethod
+    def _from_string(cls, serialized: str):
+        try:
+            block_type, slug = serialized.split(":")
+        except ValueError as exc:
+            raise ValueError(f"invalid {cls.__name__}: {serialized}") from exc
+        return _InMemoryDefinitionKey(block_type, slug)
+
+
+class _InMemoryUsageKey(UsageKey):
+    """
+    A simple way to identify usages by (i) a definition key and (ii) an additional usage slug.
+
+    Serialization --> mb:<block_type>:<definition_slug>:<usage_slug>
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ <- the "block_id"
+
+    Note: The details of this class and its serialization are NOT part of the public XBlock API.
+    """
+    CANONICAL_NAMESPACE = 'mb'  # "(In-)Memory Block"
+    KEY_FIELDS = ('definition_key', 'slug')
+    definition_key: _InMemoryDefinitionKey
+    slug: str
+    __slots__ = KEY_FIELDS
+    CHECKED_INIT = False
+
+    def __init__(self, definition_key: _InMemoryDefinitionKey, slug: str):
+        super().__init__(definition_key=definition_key, slug=slug)
+
+    @property
+    def block_type(self) -> str:
+        return self.definition_key.block_type
+
+    @property
+    def block_id(self) -> str:
+        return f"{self.definition_key.slug}:{self.slug}"
+
+    def _to_string(self) -> str:
+        return f"{self.block_type}:{self.block_id}"
+
+    @classmethod
+    def _from_string(cls, serialized: str):
+        try:
+            block_type, definition_slug, usage_slug = serialized.split(":")
+        except ValueError as exc:
+            raise ValueError(f"invalid {cls.__name__}: {serialized}") from exc
+        return cls(_InMemoryDefinitionKey(block_type, definition_slug), usage_slug)
+
+    @property
+    def context_key(self) -> LearningContextKey:
+        """
+        Raise an error because these blocks exist outside a LearningContext.
+        """
+        raise TypeError("Usages managed by MemoryIdManager do not have a LearningContext")
+
+    course_key = context_key  # the UsageKey class demands this for backcompat.
+
+    def map_into_course(self, course_key: CourseKey) -> t.Self:
+        return course_key.make_usage_key(self.block_type, self.block_id)
+
+
 class MemoryIdManager(IdReader, IdGenerator):
     """A simple dict-based implementation of IdReader and IdGenerator."""
 
@@ -364,18 +448,16 @@ class MemoryIdManager(IdReader, IdGenerator):
     ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')
 
     def __init__(self):
-        self._ids = itertools.count()
-        self._usages = {}
-        self._definitions = {}
+        self._ids: t.Iterator[int] = itertools.count()
+        self._usages: dict[DefinitionKey, _InMemoryUsageKey] = {}
 
-    def _next_id(self, prefix):
+    def _next_id(self, prefix) -> str:
         """Generate a new id."""
         return f"{prefix}_{next(self._ids)}"
 
-    def clear(self):
+    def clear(self) -> None:
         """Remove all entries."""
         self._usages.clear()
-        self._definitions.clear()
 
     def create_aside(self, definition_id, usage_id, aside_type):
         """Create the aside."""
@@ -392,37 +474,33 @@ class MemoryIdManager(IdReader, IdGenerator):
         """Extract the original xblock's definition_id from an aside's definition_id."""
         return aside_id.definition_id
 
-    def create_usage(self, def_id):
+    def create_usage(self, def_id: DefinitionKey) -> _InMemoryUsageKey:
         """Make a usage, storing its definition id."""
-        usage_id = self._next_id("u")
-        self._usages[usage_id] = def_id
-        return usage_id
+        if not isinstance(def_id, _InMemoryDefinitionKey):
+            raise TypeError(
+                f"got def_id of type {type(def_id)}, expected def_id of type {_InMemoryDefinitionKey.__name__}"
+            )
+        usage_key = _InMemoryUsageKey(def_id, self._next_id("u"))
+        self._usages[usage_key] = def_id
+        return usage_key
 
-    def get_definition_id(self, usage_id):
+    def get_definition_id(self, usage_id: UsageKey) -> _InMemoryDefinitionKey:
         """Get a definition_id by its usage id."""
         try:
             return self._usages[usage_id]
         except KeyError:
             raise NoSuchUsage(repr(usage_id))  # pylint: disable= raise-missing-from
 
-    def create_definition(self, block_type, slug=None):
-        """Make a definition, storing its block type."""
+    def create_definition(self, block_type: str, slug: str | None = None) -> _InMemoryDefinitionKey:
+        """Make a definition, including its block type in its key."""
         prefix = "d"
         if slug:
             prefix += "_" + slug
-        def_id = self._next_id(prefix)
-        self._definitions[def_id] = block_type
-        return def_id
+        return _InMemoryDefinitionKey(block_type, self._next_id(prefix))
 
-    def get_block_type(self, def_id):
+    def get_block_type(self, def_id: DefinitionKey) -> str:
         """Get a block_type by its definition id."""
-        try:
-            return self._definitions[def_id]
-        except KeyError:
-            try:
-                return def_id.aside_type
-            except AttributeError:
-                raise NoSuchDefinition(repr(def_id))  # pylint: disable= raise-missing-from
+        return def_id.block_type
 
     def get_aside_type_from_definition(self, aside_id):
         """Get an aside's type from its definition id."""

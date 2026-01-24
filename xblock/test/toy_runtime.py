@@ -52,7 +52,7 @@ class ToyRuntimeKeyValueStore(KeyValueStore):
             key_list.append(key.scope.block.attr_name)
 
         if key.block_scope_id is not None:
-            key_list.append(key.block_scope_id)
+            key_list.append(str(key.block_scope_id))
         if key.user_id:
             key_list.append(key.user_id)
         return ".".join(key_list)

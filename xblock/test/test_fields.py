@@ -774,7 +774,7 @@ def test_unique_id_default():
         field_a = String(default=UNIQUE_ID, scope=Scope.settings)
         field_b = String(default=UNIQUE_ID, scope=Scope.user_state)
 
-    usage_key = TestKey("b.12#ob", "..")
+    usage_key = TestKey("testtype", "..")
     sids = ScopeIds(
         user_id="_bob",
         block_type=usage_key.block_type,
@@ -799,7 +799,7 @@ def test_unique_id_default():
     assert unique_b != block.field_b
     # Change the usage id. Unique ID default for both fields should change.
     runtime = TestRuntime(services={'field-data': DictFieldData({})})
-    block = TestBlock(runtime, DictFieldData({}), sids._replace(usage_id='usage-2'))
+    block = TestBlock(runtime, DictFieldData({}), sids._replace(usage_id=TestKey("testtype", "usage-2")))
     assert unique_a != block.field_a
     assert unique_b != block.field_b
 
