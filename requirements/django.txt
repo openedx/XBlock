@@ -10,9 +10,9 @@ appdirs==1.4.4
     #   fs
 asgiref==3.11.0
     # via django
-boto3==1.42.30
+boto3==1.42.34
     # via fs-s3fs
-botocore==1.42.30
+botocore==1.42.34
     # via
     #   boto3
     #   s3transfer
@@ -34,7 +34,7 @@ fs==2.4.16
     #   openedx-django-pyfs
 fs-s3fs==1.1.1
     # via openedx-django-pyfs
-jmespath==1.0.1
+jmespath==1.1.0
     # via
     #   boto3
     #   botocore
