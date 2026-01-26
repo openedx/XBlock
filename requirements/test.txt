@@ -17,11 +17,11 @@ astroid==4.0.3
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
-boto3==1.42.30
+boto3==1.42.34
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.30
+botocore==1.42.34
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -51,7 +51,7 @@ ddt==1.7.2
     # via -r requirements/test.in
 diff-cover==10.2.0
     # via -r requirements/test.in
-dill==0.4.0
+dill==0.4.1
     # via pylint
 distlib==0.4.0
     # via virtualenv
@@ -80,7 +80,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-hypothesis==6.150.2
+hypothesis==6.150.3
     # via -r requirements/test.in
 iniconfig==2.3.0
     # via pytest
@@ -90,7 +90,7 @@ jinja2==3.1.6
     # via
     #   code-annotations
     #   diff-cover
-jmespath==1.0.1
+jmespath==1.1.0
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -112,7 +112,7 @@ mock==5.2.0
     # via -r requirements/test.in
 openedx-django-pyfs==3.8.0
     # via -r requirements/django.txt
-packaging==25.0
+packaging==26.0
     # via
     #   pyproject-api
     #   pytest
