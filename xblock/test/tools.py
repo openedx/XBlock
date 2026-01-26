@@ -1,14 +1,21 @@
 """
 Tools for testing XBlocks
 """
-import typing as t
 
+import itertools
+import typing as t
 import warnings
 from contextlib import contextmanager
 from functools import partial
 
+from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, DefinitionKey, UsageKey, LearningContextKey
-from xblock.runtime import Runtime, MemoryIdManager
+from xblock.exceptions import (
+    NoSuchUsage,
+    NoSuchDefinition,
+)
+from xblock.fields import DefinitionId
+from xblock.runtime import Runtime, IdGenerator, IdReader
 
 
 class TestKey(UsageKey, DefinitionKey):
@@ -163,6 +170,80 @@ class WarningTestMixin:
             self.assertTrue(any(issubclass(warning.category, warning_class) for warning in warns))
 
 
+class ToyIdManager(IdReader, IdGenerator):
+    """A simple dict-based implementation of IdReader and IdGenerator."""
+
+
+    def __init__(self):
+        self._ids = itertools.count()
+        self._usages: dict[UsageKey, DefinitionId] = {}  # usage_id to def_id
+        self._definitions: dict[DefinitionId, str] = {}  # def_id to block_type
+
+    def _next_id(self, prefix) -> str:
+        """Generate a new id."""
+        return f"{prefix}_{next(self._ids)}"
+
+    def clear(self) -> None:
+        """Remove all entries."""
+        self._usages.clear()
+        self._definitions.clear()
+
+    def create_aside(self, definition_id, usage_id, aside_type) -> tuple[AsideDefinitionKeyV2, AsideUsageKeyV2]:
+        """Create the aside."""
+        return (
+            AsideDefinitionKeyV2(definition_id, aside_type),
+            AsideUsageKeyV2(usage_id, aside_type),
+        )
+
+    def get_usage_id_from_aside(self, aside_id) -> UsageKey:
+        """Extract the usage_id from the aside's usage_id."""
+        return aside_id.usage_id
+
+    def get_definition_id_from_aside(self, aside_id) -> DefinitionId:
+        """Extract the original xblock's definition_id from an aside's definition_id."""
+        return aside_id.definition_id
+
+    def create_usage(self, def_id) -> UsageKey:
+        """Make a usage, storing its definition id."""
+        usage_id = TestKey(self.get_block_type(def_id), self._next_id("u"))
+        self._usages[usage_id] = def_id
+        return usage_id
+
+    def get_definition_id(self, usage_id: UsageKey) -> DefinitionId:
+        """Get a definition_id by its usage id."""
+        try:
+            return self._usages[usage_id]
+        except KeyError:
+            raise NoSuchUsage(repr(usage_id))  # pylint: disable= raise-missing-from
+
+    def create_definition(self, block_type: str, slug: str | None = None) -> DefinitionId:
+        """Make a definition, storing its block type."""
+        prefix = "d"
+        if slug:
+            prefix += "_" + slug
+        def_id = self._next_id(prefix)
+        self._definitions[def_id] = block_type
+        return def_id
+
+    def get_block_type(self, def_id: DefinitionId) -> str:
+        """Get a block_type by its definition id."""
+        try:
+            return self._definitions[def_id]
+        except KeyError:
+            try:
+                return def_id.aside_type
+            except AttributeError:
+                raise NoSuchDefinition(repr(def_id))  # pylint: disable= raise-missing-from
+
+    def get_aside_type_from_definition(self, aside_id: AsideDefinitionKeyV2) -> str:
+        """Get an aside's type from its definition id."""
+        return aside_id.aside_type
+
+    def get_aside_type_from_usage(self, aside_id: AsideUsageKeyV2) -> str:
+        """Get an aside's type from its usage id."""
+        return aside_id.aside_type
+
+
 @unabc("{} shouldn't be used in tests")
 class TestRuntime(Runtime):
     """
@@ -172,11 +253,11 @@ class TestRuntime(Runtime):
 
     # unabc doesn't squash pylint errors
     def __init__(self, *args, **kwargs):
-        memory_id_manager = MemoryIdManager()
+        id_manager = ToyIdManager()
         # Provide an IdReader if one isn't already passed to the runtime.
         if not args:
-            kwargs.setdefault('id_reader', memory_id_manager)
-        kwargs.setdefault('id_generator', memory_id_manager)
+            kwargs.setdefault('id_reader', id_manager)
+        kwargs.setdefault('id_generator', id_manager)
         super().__init__(*args, **kwargs)
 
     def handler_url(self, *args, **kwargs):

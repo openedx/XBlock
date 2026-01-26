@@ -16,9 +16,12 @@ import logging
 import re
 import time
 import traceback
+import typing as t
 import warnings
 
+from bson.objectid import ObjectId
 from opaque_keys.edx.keys import UsageKey, DefinitionKey
+from opaque_keys.edx.locator import LocalId
 
 import dateutil.parser
 from lxml import etree
@@ -244,6 +247,11 @@ class Scope(ScopeBase):
         return hash(('xblock.fields.Scope', self.user, self.block))
 
 
+
+OptionalUserId: t.TypeAlias = int | str | None
+DefinitionId: t.TypeAlias = DefinitionKey | UsageKey | ObjectId | LocalId | str
+
+
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     """
     A simple wrapper to collect all of the ids needed to correctly identify an XBlock
@@ -264,13 +272,12 @@ class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
         enforce the types here, per:
         https://github.com/openedx/XBlock/issues/708
         """
-        if self.user_id is not None:
-            if not isinstance(self.user_id, (int, str)):
-                raise TypeError(f"got {self.user_id=}; should be an int, str, or None")
+        if not isinstance(self.user_id, OptionalUserId):
+            raise TypeError(f"got {self.user_id=}; should be an int, str, or None")
         if not isinstance(self.block_type, str):
             raise TypeError(f"got {self.block_type=}; should be a str")
-        if not isinstance(self.def_id, DefinitionKey):
-            raise TypeError(f"got {self.def_id=}; should be a DefinitionKey")
+        if not isinstance(self.def_id, DefinitionId):
+            raise TypeError(f"got {self.def_id=}; should be one of: {DefinitionId}")
         if not isinstance(self.usage_id, UsageKey):
             raise TypeError(f"got {self.usage_id=}; should be a UsageKey")
 
