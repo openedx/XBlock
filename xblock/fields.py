@@ -247,8 +247,8 @@ class Scope(ScopeBase):
         return hash(('xblock.fields.Scope', self.user, self.block))
 
 
-OptionalUserId: t.TypeAlias = int | str | None
-DefinitionId: t.TypeAlias = DefinitionKey | UsageKey | ObjectId | LocalId | str
+UserScopeId: t.TypeAlias = int | str | None
+DefinitionScopeId: t.TypeAlias = DefinitionKey | UsageKey | ObjectId | LocalId | str | None
 
 
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
@@ -271,12 +271,12 @@ class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
         enforce the types here, per:
         https://github.com/openedx/XBlock/issues/708
         """
-        if not isinstance(self.user_id, OptionalUserId):
+        if not isinstance(self.user_id, UserScopeId):
             raise TypeError(f"got {self.user_id=}; should be an int, str, or None")
         if not isinstance(self.block_type, str):
             raise TypeError(f"got {self.block_type=}; should be a str")
-        if not isinstance(self.def_id, DefinitionId):
-            raise TypeError(f"got {self.def_id=}; should be one of: {DefinitionId}")
+        if not isinstance(self.def_id, DefinitionScopeId):
+            raise TypeError(f"got {self.def_id=}; should be one of: {DefinitionScopeId}")
         if not isinstance(self.usage_id, UsageKey):
             raise TypeError(f"got {self.usage_id=}; should be a UsageKey")
 

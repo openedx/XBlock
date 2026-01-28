@@ -14,7 +14,7 @@ from xblock.exceptions import (
     NoSuchUsage,
     NoSuchDefinition,
 )
-from xblock.fields import DefinitionId
+from xblock.fields import DefinitionScopeId
 from xblock.runtime import Runtime, IdGenerator, IdReader
 
 
@@ -175,8 +175,8 @@ class ToyIdManager(IdReader, IdGenerator):
 
     def __init__(self):
         self._ids = itertools.count()
-        self._usages: dict[UsageKey, DefinitionId] = {}  # usage_id to def_id
-        self._definitions: dict[DefinitionId, str] = {}  # def_id to block_type
+        self._usages: dict[UsageKey, DefinitionScopeId] = {}  # usage_id to def_id
+        self._definitions: dict[DefinitionScopeId, str] = {}  # def_id to block_type
 
     def _next_id(self, prefix) -> str:
         """Generate a new id."""
@@ -198,7 +198,7 @@ class ToyIdManager(IdReader, IdGenerator):
         """Extract the usage_id from the aside's usage_id."""
         return aside_id.usage_key
 
-    def get_definition_id_from_aside(self, aside_id: AsideDefinitionKeyV2) -> DefinitionId:
+    def get_definition_id_from_aside(self, aside_id: AsideDefinitionKeyV2) -> DefinitionScopeId:
         """Extract the original xblock's definition_id from an aside's definition_id."""
         return aside_id.definition_key
 
@@ -208,14 +208,14 @@ class ToyIdManager(IdReader, IdGenerator):
         self._usages[usage_id] = def_id
         return usage_id
 
-    def get_definition_id(self, usage_id: UsageKey) -> DefinitionId:
+    def get_definition_id(self, usage_id: UsageKey) -> DefinitionScopeId:
         """Get a definition_id by its usage id."""
         try:
             return self._usages[usage_id]
         except KeyError:
             raise NoSuchUsage(repr(usage_id))  # pylint: disable= raise-missing-from
 
-    def create_definition(self, block_type: str, slug: str | None = None) -> DefinitionId:
+    def create_definition(self, block_type: str, slug: str | None = None) -> DefinitionScopeId:
         """Make a definition, storing its block type."""
         prefix = "d"
         if slug:
@@ -224,7 +224,7 @@ class ToyIdManager(IdReader, IdGenerator):
         self._definitions[def_id] = block_type
         return def_id
 
-    def get_block_type(self, def_id: DefinitionId) -> str:
+    def get_block_type(self, def_id: DefinitionScopeId) -> str:
         """Get a block_type by its definition id."""
         try:
             return self._definitions[def_id]
