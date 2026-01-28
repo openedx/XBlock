@@ -247,7 +247,6 @@ class Scope(ScopeBase):
         return hash(('xblock.fields.Scope', self.user, self.block))
 
 
-
 OptionalUserId: t.TypeAlias = int | str | None
 DefinitionId: t.TypeAlias = DefinitionKey | UsageKey | ObjectId | LocalId | str
 

@@ -173,7 +173,6 @@ class WarningTestMixin:
 class ToyIdManager(IdReader, IdGenerator):
     """A simple dict-based implementation of IdReader and IdGenerator."""
 
-
     def __init__(self):
         self._ids = itertools.count()
         self._usages: dict[UsageKey, DefinitionId] = {}  # usage_id to def_id
@@ -195,13 +194,13 @@ class ToyIdManager(IdReader, IdGenerator):
             AsideUsageKeyV2(usage_id, aside_type),
         )
 
-    def get_usage_id_from_aside(self, aside_id) -> UsageKey:
+    def get_usage_id_from_aside(self, aside_id: AsideUsageKeyV2) -> UsageKey:
         """Extract the usage_id from the aside's usage_id."""
-        return aside_id.usage_id
+        return aside_id.usage_key
 
-    def get_definition_id_from_aside(self, aside_id) -> DefinitionId:
+    def get_definition_id_from_aside(self, aside_id: AsideDefinitionKeyV2) -> DefinitionId:
         """Extract the original xblock's definition_id from an aside's definition_id."""
-        return aside_id.definition_id
+        return aside_id.definition_key
 
     def create_usage(self, def_id) -> UsageKey:
         """Make a usage, storing its definition id."""
@@ -221,7 +220,7 @@ class ToyIdManager(IdReader, IdGenerator):
         prefix = "d"
         if slug:
             prefix += "_" + slug
-        def_id = self._next_id(prefix)
+        def_id = self._next_id(prefix)  # note that str is a valid DefinitionId
         self._definitions[def_id] = block_type
         return def_id
 

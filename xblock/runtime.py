@@ -22,6 +22,7 @@ from web_fragments.fragment import Fragment
 
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 from xblock.field_data import FieldData
+from xblock.fields import Field, Scope, BlockScope, UserScope, ScopeIds
 from xblock.exceptions import (
     NoSuchViewError,
     NoSuchHandlerError,
