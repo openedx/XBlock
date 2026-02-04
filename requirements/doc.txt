@@ -12,21 +12,21 @@ appdirs==1.4.4
     # via
     #   -r requirements/django.txt
     #   fs
-asgiref==3.11.0
+asgiref==3.11.1
     # via
     #   -r requirements/django.txt
     #   django
-babel==2.17.0
+babel==2.18.0
     # via
     #   pydata-sphinx-theme
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-boto3==1.42.34
+boto3==1.42.41
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.34
+botocore==1.42.41
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -35,7 +35,7 @@ certifi==2026.1.4
     # via requests
 charset-normalizer==3.4.4
     # via requests
-django==5.2.10
+django==5.2.11
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
