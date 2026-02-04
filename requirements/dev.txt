@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/test.txt
     #   fs
-asgiref==3.11.0
+asgiref==3.11.1
     # via
     #   -r requirements/test.txt
     #   django
@@ -17,11 +17,11 @@ astroid==4.0.3
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.34
+boto3==1.42.41
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.34
+botocore==1.42.41
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -30,7 +30,7 @@ build==1.4.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-cachetools==6.2.4
+cachetools==7.0.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -62,7 +62,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.13.1
+coverage[toml]==7.13.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -80,7 +80,7 @@ distlib==0.4.0
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   virtualenv
-django==5.2.10
+django==5.2.11
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
@@ -108,7 +108,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.150.3
+hypothesis==6.151.5
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
