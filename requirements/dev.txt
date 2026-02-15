@@ -17,11 +17,11 @@ astroid==4.0.4
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.44
+boto3==1.42.49
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.44
+botocore==1.42.49
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -30,7 +30,7 @@ build==1.4.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-cachetools==7.0.0
+cachetools==7.0.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -62,7 +62,7 @@ colorama==0.4.6
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-coverage[toml]==7.13.3
+coverage[toml]==7.13.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -93,7 +93,7 @@ edx-lint==5.6.0
     # via -r requirements/test.txt
 edx-opaque-keys==3.0.0
     # via -r requirements/test.txt
-filelock==3.20.3
+filelock==3.24.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -108,7 +108,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.151.5
+hypothesis==6.151.6
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
@@ -159,9 +159,9 @@ packaging==26.0
     #   wheel
 path==17.1.1
     # via -r requirements/test.txt
-pip-tools==7.5.2
+pip-tools==7.5.3
     # via -r requirements/pip-tools.txt
-platformdirs==4.5.1
+platformdirs==4.9.1
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -224,7 +224,7 @@ pytest==9.0.2
     #   pytest-django
 pytest-cov==7.0.0
     # via -r requirements/test.txt
-pytest-django==4.11.1
+pytest-django==4.12.0
     # via -r requirements/test.txt
 python-dateutil==2.9.0.post0
     # via
@@ -274,7 +274,7 @@ tomlkit==0.14.0
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.34.1
+tox==4.35.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
