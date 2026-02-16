@@ -14,5 +14,5 @@ pip==25.3
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/pip.in
-setuptools==81.0.0
+setuptools==82.0.0
     # via -r requirements/pip.in
