@@ -3,8 +3,9 @@ Fields declare storage for XBlock data.  They use abstract notions of
 **scopes** to associate each field with particular sets of blocks and users.
 The hosting runtime application decides what actual storage mechanism to use
 for each scope.
-
 """
+from __future__ import annotations
+
 from collections import namedtuple
 import copy
 import datetime
@@ -15,7 +16,12 @@ import logging
 import re
 import time
 import traceback
+import typing as t
 import warnings
+
+from bson.objectid import ObjectId
+from opaque_keys.edx.keys import UsageKey, DefinitionKey
+from opaque_keys.edx.locator import LocalId
 
 import dateutil.parser
 from lxml import etree
@@ -241,6 +247,10 @@ class Scope(ScopeBase):
         return hash(('xblock.fields.Scope', self.user, self.block))
 
 
+UserScopeId: t.TypeAlias = int | str | None
+DefinitionScopeId: t.TypeAlias = DefinitionKey | UsageKey | ObjectId | LocalId | str | None
+
+
 class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     """
     A simple wrapper to collect all of the ids needed to correctly identify an XBlock
@@ -249,6 +259,26 @@ class ScopeIds(namedtuple('ScopeIds', 'user_id block_type def_id usage_id')):
     for instance, the `def_id` identifies scopes that use BlockScope.DEFINITION.
     """
     __slots__ = ()
+
+    def validate_types(self):
+        """
+        Raise an AssertionError if any of the ids are an unexpected type.
+
+        Originally, these fields were all freely-typed; but in practice,
+        edx-platform's XBlock runtime would fail if the ids did not match the
+        types below. In order to make the XBlock library reflect the
+        edx-platform reality and improve type-safety, we've decided to actually
+        enforce the types here, per:
+        https://github.com/openedx/XBlock/issues/708
+        """
+        if not isinstance(self.user_id, UserScopeId):
+            raise TypeError(f"got {self.user_id=}; should be an int, str, or None")
+        if not isinstance(self.block_type, str):
+            raise TypeError(f"got {self.block_type=}; should be a str")
+        if not isinstance(self.def_id, DefinitionScopeId):
+            raise TypeError(f"got {self.def_id=}; should be one of: {DefinitionScopeId}")
+        if not isinstance(self.usage_id, UsageKey):
+            raise TypeError(f"got {self.usage_id=}; should be a UsageKey")
 
 
 # Define special reference that can be used as a field's default in field
