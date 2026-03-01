@@ -6,8 +6,6 @@
 #
 cachetools==7.0.1
     # via tox
-chardet==5.2.0
-    # via tox
 colorama==0.4.6
     # via tox
 coverage==7.13.4
@@ -16,6 +14,7 @@ distlib==0.4.0
     # via virtualenv
 filelock==3.24.3
     # via
+    #   python-discovery
     #   tox
     #   virtualenv
 packaging==26.0
@@ -24,13 +23,16 @@ packaging==26.0
     #   tox
 platformdirs==4.9.2
     # via
+    #   python-discovery
     #   tox
     #   virtualenv
 pluggy==1.6.0
     # via tox
 pyproject-api==1.10.0
     # via tox
-tox==4.44.0
+python-discovery==1.1.0
+    # via virtualenv
+tox==4.46.3
     # via -r requirements/ci.in
-virtualenv==20.38.0
+virtualenv==21.1.0
     # via tox
