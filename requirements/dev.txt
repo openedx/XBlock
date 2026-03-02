@@ -17,11 +17,11 @@ astroid==4.0.4
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.54
+boto3==1.42.59
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.54
+botocore==1.42.59
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -35,12 +35,10 @@ cachetools==7.0.1
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-chardet==5.2.0
+chardet==6.0.0.post1
     # via
-    #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   diff-cover
-    #   tox
 click==8.3.1
     # via
     #   -r requirements/pip-tools.txt
@@ -91,12 +89,13 @@ dnspython==2.8.0
     #   pymongo
 edx-lint==5.6.0
     # via -r requirements/test.txt
-edx-opaque-keys==3.0.0
+edx-opaque-keys==3.1.0
     # via -r requirements/test.txt
 filelock==3.24.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
+    #   python-discovery
     #   tox
     #   virtualenv
 fs==2.4.16
@@ -114,7 +113,7 @@ iniconfig==2.3.0
     # via
     #   -r requirements/test.txt
     #   pytest
-isort==8.0.0
+isort==8.0.1
     # via
     #   -r requirements/test.txt
     #   pylint
@@ -166,6 +165,7 @@ platformdirs==4.9.2
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   pylint
+    #   python-discovery
     #   tox
     #   virtualenv
 pluggy==1.6.0
@@ -230,6 +230,11 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/test.txt
     #   botocore
+python-discovery==1.1.0
+    # via
+    #   -r requirements/ci.txt
+    #   -r requirements/test.txt
+    #   virtualenv
 python-slugify==8.0.4
     # via
     #   -r requirements/test.txt
@@ -274,7 +279,7 @@ tomlkit==0.14.0
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.44.0
+tox==4.46.3
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -286,7 +291,7 @@ urllib3==2.6.3
     # via
     #   -r requirements/test.txt
     #   botocore
-virtualenv==20.38.0
+virtualenv==21.1.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
