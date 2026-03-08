@@ -24,7 +24,7 @@ pymongo==4.16.0
     # via edx-opaque-keys
 python-dateutil==2.9.0.post0
     # via -r requirements/base.in
-pytz==2025.2
+pytz==2026.1.post1
     # via -r requirements/base.in
 pyyaml==6.0.3
     # via -r requirements/base.in
