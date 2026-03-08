@@ -19,7 +19,7 @@ formats:
 build:
   os: "ubuntu-lts-latest"
   tools:
-    python: "3.11"
+    python: "3.12"
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
