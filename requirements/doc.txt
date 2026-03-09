@@ -22,20 +22,20 @@ babel==2.18.0
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-boto3==1.42.59
+boto3==1.42.63
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.59
+botocore==1.42.63
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
 certifi==2026.2.25
     # via requests
-charset-normalizer==3.4.4
+charset-normalizer==3.4.5
     # via requests
-django==5.2.11
+django==5.2.12
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
@@ -61,7 +61,7 @@ fs-s3fs==1.1.1
     #   openedx-django-pyfs
 idna==3.11
     # via requests
-imagesize==1.4.1
+imagesize==2.0.0
     # via sphinx
 jinja2==3.1.6
     # via sphinx
@@ -104,7 +104,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/django.txt
     #   botocore
-pytz==2025.2
+pytz==2026.1.post1
     # via -r requirements/django.txt
 pyyaml==6.0.3
     # via -r requirements/django.txt
