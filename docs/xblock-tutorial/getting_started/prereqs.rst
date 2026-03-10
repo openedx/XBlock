@@ -12,11 +12,11 @@ To build an XBlock, you must have the following tools on your computer.
 
 
 ***********
-Python 3.11
+Python 3.12
 ***********
 
 To run the a virtual environment and the XBlock SDK, and to build an XBlock,
-you must have Python 3.11 installed on your computer.
+you must have Python 3.12 installed on your computer.
 
 `Download Python`_ for your operating system and follow the installation
 instructions.
@@ -48,7 +48,7 @@ applications you might need.
 The instructions and examples in this tutorial use `VirtualEnv`_ and
 `VirtualEnvWrapper`_ to build XBlocks. You can also use `PyEnv`_.
 
-After you have installed Python 3.11, follow the `VirtualEnv Installation`_
+After you have installed Python 3.12, follow the `VirtualEnv Installation`_
 instructions.
 
 For information on creating the virtual environment for your XBlock, see
