@@ -13,6 +13,7 @@ from unittest.mock import patch, MagicMock, Mock
 
 import ddt
 import pytest
+from opaque_keys.edx.keys import DefinitionKey
 from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryLocatorV2
 from webob import Response
 
@@ -45,7 +46,7 @@ def test_field_access():
 
     field_data = DictFieldData({'field_a': 5, 'float_a': 6.1, 'field_x': 15})
 
-    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock())
+    field_tester = FieldTester(TestRuntime(services={'field-data': field_data}), scope_ids=Mock(spec=ScopeIds))
     # Verify that the fields have been set
     assert field_tester.field_a == 5
     assert field_tester.field_b == 10
@@ -153,7 +154,10 @@ def test_set_field_access():
         field_c = Set(scope=Scope.content, default=[4, 5, 6])
         field_d = Set(scope=Scope.settings)
 
-    field_tester = FieldTester(MagicMock(), DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]}), Mock())
+    field_tester = FieldTester(
+        MagicMock(),
+        DictFieldData({'field_a': [200], 'field_b': [11, 12, 13]}), Mock(spec=ScopeIds),
+    )
 
     # Check initial values have been set properly
     assert {200} == field_tester.field_a
@@ -279,7 +283,7 @@ def test_dict_field_access():
     field_tester = FieldTester(
         TestRuntime(services={'field-data': field_data}),
         None,
-        Mock()
+        Mock(spec=ScopeIds),
     )
 
     # Check initial values have been set properly
@@ -524,7 +528,7 @@ def test_field_serialization():
     field_tester = FieldTester(
         TestRuntime(services={'field-data': field_data}),
         None,
-        Mock(),
+        Mock(spec=ScopeIds),
     )
 
     assert field_tester.field == 4
@@ -534,26 +538,26 @@ def test_field_serialization():
 
 
 def test_class_tags():
-    xblock = XBlock(None, None, None)
+    xblock = XBlock(None, None, Mock(ScopeIds))
     assert xblock._class_tags == set()  # pylint: disable=comparison-with-callable
 
     class Sub1Block(XBlock):
         """Toy XBlock"""
 
-    sub1block = Sub1Block(None, None, None)
+    sub1block = Sub1Block(None, None, Mock(ScopeIds))
     assert sub1block._class_tags == set()  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("cat dog")
     class Sub2Block(Sub1Block):
         """Toy XBlock"""
 
-    sub2block = Sub2Block(None, None, None)
+    sub2block = Sub2Block(None, None, Mock(ScopeIds))
     assert sub2block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     class Sub3Block(Sub2Block):
         """Toy XBlock"""
 
-    sub3block = Sub3Block(None, None, None)
+    sub3block = Sub3Block(None, None, Mock(ScopeIds))
     assert sub3block._class_tags == {"cat", "dog"}  # pylint: disable=comparison-with-callable
 
     @XBlock.tag("mixin")
@@ -563,7 +567,7 @@ def test_class_tags():
     class Sub4Block(MixinBlock, Sub3Block):
         """Toy XBlock"""
 
-    sub4block = Sub4Block(None, None, None)
+    sub4block = Sub4Block(None, None, Mock(ScopeIds))
     assert sub4block._class_tags == {  # pylint: disable=comparison-with-callable
         "cat", "dog", "mixin"
     }
@@ -763,7 +767,7 @@ def test_change_mutable_default():
 
 def test_handle_shortcut():
     runtime = Mock(spec=['handle'])
-    scope_ids = Mock(spec=[])
+    scope_ids = Mock(spec=ScopeIds)
     request = Mock(spec=[])
     block = XBlock(runtime, None, scope_ids)
 
@@ -780,7 +784,7 @@ def test_services_decorators():
     class NoServicesBlock(XBlock):
         """XBlock requesting no services"""
 
-    no_services_block = NoServicesBlock(None, None, None)
+    no_services_block = NoServicesBlock(None, None, Mock(ScopeIds))
     assert not NoServicesBlock._services_requested
     assert not no_services_block._services_requested
 
@@ -789,7 +793,7 @@ def test_services_decorators():
     class ServiceUsingBlock(XBlock):
         """XBlock using some services."""
 
-    service_using_block = ServiceUsingBlock(None, scope_ids=Mock())
+    service_using_block = ServiceUsingBlock(None, scope_ids=Mock(ScopeIds))
     assert ServiceUsingBlock._services_requested == {
         'n': 'need', 'w': 'want'
     }
@@ -809,7 +813,7 @@ def test_services_decorators_with_inheritance():
     class SubServiceUsingBlock(ServiceUsingBlock):
         """Does this class properly inherit services from ServiceUsingBlock?"""
 
-    sub_service_using_block = SubServiceUsingBlock(None, scope_ids=Mock())
+    sub_service_using_block = SubServiceUsingBlock(None, scope_ids=Mock(spec=ScopeIds))
     assert sub_service_using_block.service_declaration("n1") == "need"
     assert sub_service_using_block.service_declaration("w1") == "want"
     assert sub_service_using_block.service_declaration("n2") == "need"
@@ -974,7 +978,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "public/\N{SNOWMAN}.js",
     )
     def test_open_good_local_resource(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             assert loadable.open_local_resource(uri) == "!" + uri + "!"
             assert loadable.open_local_resource(uri.encode('utf-8')) == "!" + uri + "!"
@@ -988,7 +992,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "public/\N{SNOWMAN}.js".encode(),
     )
     def test_open_good_local_resource_binary(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             assert loadable.open_local_resource(uri) == "!" + uri.decode('utf-8') + "!"
 
@@ -1002,7 +1006,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "static/\N{SNOWMAN}.js",
     )
     def test_open_bad_local_resource(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             msg_pattern = ".*: %s" % re.escape(repr(uri))
             with pytest.raises(DisallowedFileError, match=msg_pattern):
@@ -1018,7 +1022,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "static/\N{SNOWMAN}.js".encode(),
     )
     def test_open_bad_local_resource_binary(self, uri):
-        loadable = self.LoadableXBlock(None, scope_ids=Mock())
+        loadable = self.LoadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             msg = ".*: %s" % re.escape(repr(uri.decode('utf-8')))
             with pytest.raises(DisallowedFileError, match=msg):
@@ -1040,7 +1044,7 @@ class OpenLocalResourceTest(unittest.TestCase):
         "static/\N{SNOWMAN}.js",
     )
     def test_open_local_resource_with_no_resources_dir(self, uri):
-        unloadable = self.UnloadableXBlock(None, scope_ids=Mock())
+        unloadable = self.UnloadableXBlock(None, scope_ids=Mock(spec=ScopeIds))
 
         with patch('xblock.core.Blocklike._open_resource', self.stub_open_resource):
             msg = "not configured to serve local resources"
@@ -1141,25 +1145,9 @@ class TestScopeIdProperties(unittest.TestCase):
         scope_ids = ScopeIds(
             user_id="myUser",
             block_type="myType",
-            def_id="myDefId",
+            def_id=Mock(spec=DefinitionKey),
             usage_id=self.library_block_key,
         )
         block = XBlock(Mock(spec=Runtime), scope_ids=scope_ids)
         self.assertEqual(block.usage_key, self.library_block_key)
         self.assertEqual(block.context_key, self.library_key)
-
-    def test_key_properties_when_usage_is_not_an_opaque_key(self):
-        """
-        Tests a legacy scenario that we believe only happens in xblock-sdk at this point.
-
-        Remove this test as part of https://github.com/openedx/XBlock/issues/708.
-        """
-        scope_ids = ScopeIds(
-            user_id="myUser",
-            block_type="myType",
-            def_id="myDefId",
-            usage_id="myWeirdOldUsageId",
-        )
-        block = XBlock(Mock(spec=Runtime), scope_ids=scope_ids)
-        self.assertEqual(block.usage_key, "myWeirdOldUsageId")
-        self.assertIsNone(block.context_key)

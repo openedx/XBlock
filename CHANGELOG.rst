@@ -5,6 +5,16 @@ Change history for XBlock
 Unreleased
 ----------
 
+6.0.0 - 2026-01-20
+------------------
+
+* Raise an exception when scope IDs are missing or are not the expected types. In
+  particular, definition IDs must be DefinitionKey instances and usage IDs must be
+  UsageKey instances. This has been effectively true within edx-platform (the lone
+  production client of the XBlock library) for a long time, but explictly
+  enforcing it will now allow us to add strong type annotations to XBlock in an
+  upcoming release.
+
 5.3.0 - 2025-12-19
 ------------------
 
