@@ -20,7 +20,7 @@ from xblock.core import Blocklike, XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import List, Scope, Integer, String, ScopeIds, UNIQUE_ID, DateTime
 from xblock.field_data import DictFieldData
 from xblock.runtime import Runtime
-from xblock.test.tools import TestRuntime
+from xblock.test.tools import TestRuntime, TestKey
 
 
 class AttrAssertionMixin(TestCase):
@@ -144,7 +144,9 @@ class TestIndexInfo(AttrAssertionMixin):
 
     def test_index_info(self):
         self.assertHasAttr(self.IndexInfoMixinTester, 'index_dictionary')
-        with_index_info = self.IndexInfoMixinTester(runtime=None, scope_ids=None).index_dictionary()
+        with_index_info = self.IndexInfoMixinTester(
+            runtime=None, scope_ids=mock.Mock(spec=ScopeIds)
+        ).index_dictionary()
         self.assertFalse(with_index_info)
         self.assertTrue(isinstance(with_index_info, dict))
 
@@ -181,7 +183,7 @@ class TestViews(TestCase):
                 """
                 # pragma: no cover
 
-        test_xblock = SupportsDecoratorTester(None, None, None)
+        test_xblock = SupportsDecoratorTester(None, None, mock.Mock(spec=ScopeIds))
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
@@ -213,7 +215,7 @@ class TestViews(TestCase):
                 """
                 return functionality == "a_functionality"
 
-        test_xblock = HasSupportOverrideTester(None, None, None)
+        test_xblock = HasSupportOverrideTester(None, None, mock.Mock(spec=ScopeIds))
 
         for view_name, functionality, expected_result in (
                 ("functionality_supported_view", "a_functionality", True),
@@ -273,7 +275,8 @@ class TestXmlSerialization(TestCase):
         """ Creates a test block """
         block_type = block_type if block_type else self.TestXBlock
         runtime_mock = mock.Mock(spec=Runtime)
-        scope_ids = ScopeIds("user_id", block_type.etree_node_tag, "def_id", "usage_id")
+        test_key = TestKey(block_type.etree_node_tag, "usage_id")
+        scope_ids = ScopeIds("user_id", test_key.block_type, test_key, test_key)
         return block_type(runtime=runtime_mock, field_data=DictFieldData({}), scope_ids=scope_ids)
 
     def _assert_node_attributes(self, node, expected_attributes, entry_point=None):

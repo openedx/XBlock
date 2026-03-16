@@ -8,6 +8,7 @@ from unittest.mock import Mock, MagicMock, patch
 import ddt
 
 from xblock.core import XBlock
+from xblock.fields import ScopeIds
 from xblock.utils.settings import XBlockWithSettingsMixin, ThemableXBlockMixin
 
 
@@ -48,7 +49,7 @@ class TestXBlockWithSettingsMixin(unittest.TestCase):
 
     @ddt.data(None, 1, "2", [3, 4], {5: '6'})
     def test_no_settings_service_return_default(self, default_value):
-        xblock = DummyXBlockWithSettings(self.runtime, scope_ids=Mock())
+        xblock = DummyXBlockWithSettings(self.runtime, scope_ids=Mock(spec=ScopeIds))
         self.runtime.service.return_value = None
         self.assertEqual(xblock.get_xblock_settings(default=default_value), default_value)
 
@@ -59,7 +60,7 @@ class TestXBlockWithSettingsMixin(unittest.TestCase):
     ))
     @ddt.unpack
     def test_invokes_get_settings_bucket_and_returns_result(self, block, settings_service_return_value, default):
-        xblock = block(self.runtime, scope_ids=Mock())
+        xblock = block(self.runtime, scope_ids=Mock(spec=ScopeIds))
 
         self.settings_service.get_settings_bucket = Mock(return_value=settings_service_return_value)
         self.assertEqual(xblock.get_xblock_settings(default=default), settings_service_return_value)
@@ -78,13 +79,13 @@ class TestThemableXBlockMixin(unittest.TestCase):
 
     @ddt.data(DummyXBlockWithSettings, OtherXBlockWithSettings)
     def test_theme_uses_default_theme_if_settings_service_is_not_available(self, xblock_class):
-        xblock = xblock_class(self.runtime_mock, scope_ids=Mock())
+        xblock = xblock_class(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         self.runtime_mock.service = Mock(return_value=None)
         self.assertEqual(xblock.get_theme(), xblock_class.default_theme_config)
 
     @ddt.data(DummyXBlockWithSettings, OtherXBlockWithSettings)
     def test_theme_uses_default_theme_if_no_theme_is_set(self, xblock_class):
-        xblock = xblock_class(self.runtime_mock, scope_ids=Mock())
+        xblock = xblock_class(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         self.service_mock.get_settings_bucket = Mock(return_value=None)
         self.assertEqual(xblock.get_theme(), xblock_class.default_theme_config)
         self.service_mock.get_settings_bucket.assert_called_once_with(xblock, default={})
@@ -95,7 +96,7 @@ class TestThemableXBlockMixin(unittest.TestCase):
     ))
     @ddt.unpack
     def test_theme_raises_if_theme_object_is_not_iterable(self, xblock_class, theme_config):
-        xblock = xblock_class(self.runtime_mock, scope_ids=Mock())
+        xblock = xblock_class(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         self.service_mock.get_settings_bucket = Mock(return_value=theme_config)
         with self.assertRaises(TypeError):
             xblock.get_theme()
@@ -107,7 +108,7 @@ class TestThemableXBlockMixin(unittest.TestCase):
     ))
     @ddt.unpack
     def test_theme_uses_default_theme_if_no_mentoring_theme_is_set_up(self, xblock_class, theme_config):
-        xblock = xblock_class(self.runtime_mock, scope_ids=Mock())
+        xblock = xblock_class(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         self.service_mock.get_settings_bucket = Mock(return_value=theme_config)
         self.assertEqual(xblock.get_theme(), xblock_class.default_theme_config)
         self.service_mock.get_settings_bucket.assert_called_once_with(xblock, default={})
@@ -118,13 +119,13 @@ class TestThemableXBlockMixin(unittest.TestCase):
     ))
     @ddt.unpack
     def test_theme_correctly_returns_configured_theme(self, xblock_class, theme_config):
-        xblock = xblock_class(self.runtime_mock, scope_ids=Mock())
+        xblock = xblock_class(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         self.service_mock.get_settings_bucket = Mock(return_value={xblock_class.theme_key: theme_config})
         self.assertEqual(xblock.get_theme(), theme_config)
 
     @ddt.data(DummyXBlockWithSettings, OtherXBlockWithSettings)
     def test_theme_files_are_loaded_from_correct_package(self, xblock_class):
-        xblock = xblock_class(self.runtime_mock, scope_ids=Mock())
+        xblock = xblock_class(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         fragment = MagicMock()
         package_name = 'some_package'
         theme_config = {xblock_class.theme_key: {'package': package_name, 'locations': ['lms.css']}}
@@ -141,7 +142,7 @@ class TestThemableXBlockMixin(unittest.TestCase):
     )
     @ddt.unpack
     def test_theme_files_are_added_to_fragment(self, package_name, locations):
-        xblock = DummyXBlockWithSettings(self.runtime_mock, scope_ids=Mock())
+        xblock = DummyXBlockWithSettings(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         fragment = MagicMock()
         theme_config = {DummyXBlockWithSettings.theme_key: {'package': package_name, 'locations': locations}}
         self.service_mock.get_settings_bucket = Mock(return_value=theme_config)
@@ -154,7 +155,7 @@ class TestThemableXBlockMixin(unittest.TestCase):
 
     @ddt.data(None, {}, {'locations': ['red.css']})
     def test_invalid_default_theme_config(self, theme_config):
-        xblock = DummyXBlockWithSettings(self.runtime_mock, scope_ids=Mock())
+        xblock = DummyXBlockWithSettings(self.runtime_mock, scope_ids=Mock(spec=ScopeIds))
         xblock.default_theme_config = theme_config
         self.service_mock.get_settings_bucket = Mock(return_value={})
         fragment = MagicMock()

@@ -1,13 +1,14 @@
 """
 Machinery to make the common case easy when building new runtimes
 """
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 import functools
 import gettext
 from io import BytesIO, StringIO
 import importlib
-import itertools
 import json
 import logging
 import re
@@ -20,8 +21,8 @@ import markupsafe
 from web_fragments.fragment import Fragment
 
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
-from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
+from xblock.fields import Field, Scope, BlockScope, UserScope, ScopeIds
 from xblock.exceptions import (
     NoSuchViewError,
     NoSuchHandlerError,
@@ -355,82 +356,6 @@ class IdGenerator(metaclass=ABCMeta):
 
         """
         raise NotImplementedError()
-
-
-class MemoryIdManager(IdReader, IdGenerator):
-    """A simple dict-based implementation of IdReader and IdGenerator."""
-
-    ASIDE_USAGE_ID = namedtuple('MemoryAsideUsageId', 'usage_id aside_type')
-    ASIDE_DEFINITION_ID = namedtuple('MemoryAsideDefinitionId', 'definition_id aside_type')
-
-    def __init__(self):
-        self._ids = itertools.count()
-        self._usages = {}
-        self._definitions = {}
-
-    def _next_id(self, prefix):
-        """Generate a new id."""
-        return f"{prefix}_{next(self._ids)}"
-
-    def clear(self):
-        """Remove all entries."""
-        self._usages.clear()
-        self._definitions.clear()
-
-    def create_aside(self, definition_id, usage_id, aside_type):
-        """Create the aside."""
-        return (
-            self.ASIDE_DEFINITION_ID(definition_id, aside_type),
-            self.ASIDE_USAGE_ID(usage_id, aside_type),
-        )
-
-    def get_usage_id_from_aside(self, aside_id):
-        """Extract the usage_id from the aside's usage_id."""
-        return aside_id.usage_id
-
-    def get_definition_id_from_aside(self, aside_id):
-        """Extract the original xblock's definition_id from an aside's definition_id."""
-        return aside_id.definition_id
-
-    def create_usage(self, def_id):
-        """Make a usage, storing its definition id."""
-        usage_id = self._next_id("u")
-        self._usages[usage_id] = def_id
-        return usage_id
-
-    def get_definition_id(self, usage_id):
-        """Get a definition_id by its usage id."""
-        try:
-            return self._usages[usage_id]
-        except KeyError:
-            raise NoSuchUsage(repr(usage_id))  # pylint: disable= raise-missing-from
-
-    def create_definition(self, block_type, slug=None):
-        """Make a definition, storing its block type."""
-        prefix = "d"
-        if slug:
-            prefix += "_" + slug
-        def_id = self._next_id(prefix)
-        self._definitions[def_id] = block_type
-        return def_id
-
-    def get_block_type(self, def_id):
-        """Get a block_type by its definition id."""
-        try:
-            return self._definitions[def_id]
-        except KeyError:
-            try:
-                return def_id.aside_type
-            except AttributeError:
-                raise NoSuchDefinition(repr(def_id))  # pylint: disable= raise-missing-from
-
-    def get_aside_type_from_definition(self, aside_id):
-        """Get an aside's type from its definition id."""
-        return aside_id.aside_type
-
-    def get_aside_type_from_usage(self, aside_id):
-        """Get an aside's type from its usage id."""
-        return aside_id.aside_type
 
 
 class Runtime(metaclass=ABCMeta):

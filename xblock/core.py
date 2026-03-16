@@ -20,7 +20,7 @@ from xblock.exceptions import (
     KeyValueMultiSaveError,
     XBlockSaveError,
 )
-from xblock.fields import Field, List, Reference, ReferenceList, Scope, String
+from xblock.fields import Field, List, Reference, ReferenceList, Scope, String, ScopeIds
 from xblock.internal import class_lazy
 from xblock.plugin import Plugin
 from xblock.validation import Validation
@@ -393,6 +393,9 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
 
         self._field_data_cache = {}
         self._dirty_fields = {}
+        if not isinstance(scope_ids, ScopeIds):
+            raise TypeError(f"got {scope_ids=}; should be a ScopeIds instance")
+        scope_ids.validate_types()
         self.scope_ids = scope_ids
 
         super().__init__(**kwargs)
@@ -780,9 +783,8 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         self,
         runtime,
         field_data=None,
-        scope_ids=UNSET,
-        *args,  # pylint: disable=keyword-arg-before-vararg
-        **kwargs
+        scope_ids=None,
+        **kwargs,
     ):
         """
         Arguments:
@@ -797,9 +799,6 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             scope_ids (:class:`.ScopeIds`): Identifiers needed to resolve
                 scopes.
         """
-        if scope_ids is UNSET:
-            raise TypeError('scope_ids are required')
-
         # A cache of the parent block, retrieved from .parent
         self._parent_block = None
         self._parent_block_id = None
@@ -811,7 +810,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             self._parent_block_id = for_parent.scope_ids.usage_id
 
         # Provide backwards compatibility for external access through _field_data
-        super().__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, *args, **kwargs)
+        super().__init__(runtime=runtime, scope_ids=scope_ids, field_data=field_data, **kwargs)
 
     def render(self, view, context=None):
         """Render `view` with this block's runtime and the supplied `context`"""
