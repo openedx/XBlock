@@ -22,11 +22,11 @@ babel==2.18.0
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-boto3==1.42.63
+boto3==1.42.68
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.63
+botocore==1.42.68
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -83,13 +83,11 @@ markupsafe==3.0.3
     #   mako
 mock==5.2.0
     # via -r requirements/doc.in
-openedx-django-pyfs==3.8.0
+openedx-django-pyfs==4.0.0
     # via -r requirements/django.txt
 packaging==26.0
-    # via
-    #   pydata-sphinx-theme
-    #   sphinx
-pydata-sphinx-theme==0.15.4
+    # via sphinx
+pydata-sphinx-theme==0.16.1
     # via sphinx-book-theme
 pygments==2.19.2
     # via
@@ -133,7 +131,7 @@ sphinx==9.0.4
     #   -r requirements/doc.in
     #   pydata-sphinx-theme
     #   sphinx-book-theme
-sphinx-book-theme==1.1.4
+sphinx-book-theme==1.2.0
     # via -r requirements/doc.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
@@ -166,7 +164,7 @@ urllib3==2.6.3
     #   -r requirements/django.txt
     #   botocore
     #   requests
-web-fragments==3.1.0
+web-fragments==4.0.0
     # via -r requirements/django.txt
 webob==1.8.9
     # via -r requirements/django.txt
