@@ -50,7 +50,7 @@ the same name as the repo and activate it:
 .. code-block:: bash
 
    cd XBlock
-   mkvirtualenv -p python3.11 XBlock
+   mkvirtualenv -p python3.12 XBlock
 
 Every time you develop something in this repo
 ---------------------------------------------
