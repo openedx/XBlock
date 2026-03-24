@@ -17,18 +17,18 @@ astroid==4.0.4
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
-boto3==1.42.68
+boto3==1.42.74
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.68
+botocore==1.42.74
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
 cachetools==7.0.5
     # via tox
-chardet==7.1.0
+chardet==7.3.0
     # via diff-cover
 click==8.3.1
     # via
@@ -37,11 +37,11 @@ click==8.3.1
     #   edx-lint
 click-log==0.4.0
     # via edx-lint
-code-annotations==2.3.2
+code-annotations==3.0.0
     # via edx-lint
 colorama==0.4.6
     # via tox
-coverage[toml]==7.13.4
+coverage[toml]==7.13.5
     # via
     #   -r requirements/test.in
     #   pytest-cov
@@ -162,7 +162,7 @@ pytest==9.0.2
     #   -r requirements/test.in
     #   pytest-cov
     #   pytest-django
-pytest-cov==7.0.0
+pytest-cov==7.1.0
     # via -r requirements/test.in
 pytest-django==4.12.0
     # via -r requirements/test.in
@@ -170,7 +170,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/django.txt
     #   botocore
-python-discovery==1.1.3
+python-discovery==1.2.0
     # via virtualenv
 python-slugify==8.0.4
     # via code-annotations
@@ -210,7 +210,7 @@ tomli-w==1.2.0
     # via tox
 tomlkit==0.14.0
     # via pylint
-tox==4.49.1
+tox==4.50.3
     # via -r requirements/test.in
 typing-extensions==4.15.0
     # via
