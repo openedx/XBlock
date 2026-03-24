@@ -3,10 +3,9 @@ import logging
 import json
 
 from xblock.fields import Scope
-from xblock.runtime import (
-    KvsFieldData, KeyValueStore, Runtime, MemoryIdManager
-)
-from xblock.test.tools import unabc
+from xblock.runtime import KvsFieldData, KeyValueStore, Runtime
+from xblock.test.tools import unabc, ToyIdManager
+
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +51,7 @@ class ToyRuntimeKeyValueStore(KeyValueStore):
             key_list.append(key.scope.block.attr_name)
 
         if key.block_scope_id is not None:
-            key_list.append(key.block_scope_id)
+            key_list.append(str(key.block_scope_id))
         if key.user_id:
             key_list.append(key.user_id)
         return ".".join(key_list)
@@ -142,5 +141,6 @@ class ToyRuntime(Runtime):
 # Our global state (the "database").
 TOYRUNTIME_KVS = ToyRuntimeKeyValueStore({})
 
+
 # Our global id manager
-ID_MANAGER = MemoryIdManager()
+ID_MANAGER = ToyIdManager()
