@@ -17,18 +17,18 @@ astroid==4.0.4
     #   -r requirements/test.in
     #   pylint
     #   pylint-celery
-boto3==1.42.74
+boto3==1.42.78
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.74
+botocore==1.42.78
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
 cachetools==7.0.5
     # via tox
-chardet==7.3.0
+chardet==7.4.0.post1
     # via diff-cover
 click==8.3.1
     # via
@@ -170,8 +170,10 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements/django.txt
     #   botocore
-python-discovery==1.2.0
-    # via virtualenv
+python-discovery==1.2.1
+    # via
+    #   tox
+    #   virtualenv
 python-slugify==8.0.4
     # via code-annotations
 pytz==2026.1.post1
@@ -210,7 +212,7 @@ tomli-w==1.2.0
     # via tox
 tomlkit==0.14.0
     # via pylint
-tox==4.50.3
+tox==4.51.0
     # via -r requirements/test.in
 typing-extensions==4.15.0
     # via
