@@ -19,6 +19,7 @@ import markupsafe
 
 from web_fragments.fragment import Fragment
 
+from xblock.cds_init_args_mixin import CdsInitArgsMixin
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
@@ -1273,6 +1274,24 @@ class Mixologist:
         else:
             base_class = cls
             mixins = self._mixins
+            if (
+                hasattr(base_class, "__name__")
+                and base_class.__name__ == "VideoBlock"
+                and getattr(base_class, "is_extracted", False)
+            ):
+                def _is_xmodule_mixin(mixin):
+                    return (
+                        getattr(mixin, "__name__", None) == "XModuleMixin"
+                        or f"{getattr(mixin, '__module__', '')}.{getattr(mixin, '__name__', '')}"
+                        == "xmodule.x_module.XModuleMixin"
+                    )
+
+                # Split Mongo passes ``cds_init_args`` into the block constructor; XModuleMixin pops it.
+                # If we drop XModuleMixin, substitute this minimal mixin in the same MRO slot.
+                mixins = tuple(
+                    CdsInitArgsMixin if _is_xmodule_mixin(m) else m
+                    for m in mixins
+                )
 
         mixin_key = (base_class, mixins)
 
