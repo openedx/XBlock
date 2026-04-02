@@ -6,6 +6,9 @@ runtime mixin list so ``construct_xblock_from_class(..., cds_init_args=...)`` st
 """
 
 
+from xblock.fields import Scope, UserScope
+
+
 class PlaceholderXModuleMixin:
     """
     Initialization data used by SplitModuleStoreRuntime to defer FieldData initialization.
@@ -27,6 +30,8 @@ class PlaceholderXModuleMixin:
         args = self._cds_init_args
         self._cds_init_args = False
         return args
+
+    # has_score = False
 
     @property
     def course_id(self):
@@ -74,3 +79,82 @@ class PlaceholderXModuleMixin:
         Preferred forms for new code: `self.usage_key.block_id`
         """
         return self.usage_key.block_id
+
+    def get_icon_class(self):
+        """
+        Return a css class identifying this module in the context of an icon
+        """
+        return 'other'
+        # return self.icon_class
+
+    @property
+    def display_name_with_default(self):
+        """
+        Return a display name for the module: use display_name if defined in
+        metadata, otherwise convert the url name.
+        """
+        return (
+            self.display_name if self.display_name is not None
+            else self.usage_key.block_id.replace('_', ' ')
+        )
+
+    def bind_for_student(self, user_id, wrappers=None):
+        """
+        Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
+
+        Arguments:
+            user_id: The user_id to set in scope_ids
+            wrappers: These are a list functions that put a wrapper, such as
+                      LmsFieldData or OverrideFieldData, around the field_data.
+                      Note that the functions will be applied in the order in
+                      which they're listed. So [f1, f2] -> f2(f1(field_data))
+        """
+
+        # Skip rebinding if we're already bound a user, and it's this user.
+        if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
+            if getattr(self.runtime, "position", None):
+                self.position = self.runtime.position  # update the position of the tab
+            return
+
+        # If we are switching users mid-request, save the data from the old user.
+        self.save()
+
+        # Update scope_ids to point to the new user.
+        self.scope_ids = self.scope_ids._replace(user_id=user_id)
+
+        # Clear out any cached instantiated children.
+        self.clear_child_cache()
+
+        # Clear out any cached field data scoped to the old user.
+        for field in self.fields.values():
+            if field.scope in (Scope.parent, Scope.children):
+                continue
+
+            if field.scope.user == UserScope.ONE:
+                field._del_cached_value(self)  # pylint: disable=protected-access
+                # not the most elegant way of doing this, but if we're removing
+                # a field from the module's field_data_cache, we should also
+                # remove it from its _dirty_fields
+                if field in self._dirty_fields:
+                    del self._dirty_fields[field]
+
+        if wrappers:
+            # Put user-specific wrappers around the field-data service for this block.
+            # Note that these are different from modulestore.xblock_field_data_wrappers, which are not user-specific.
+            wrapped_field_data = self.runtime.service(self, "field-data-unbound")
+            for wrapper in wrappers:
+                wrapped_field_data = wrapper(wrapped_field_data)
+            self._bound_field_data = wrapped_field_data
+            if getattr(self.runtime, "uses_deprecated_field_data", False):
+                # This approach is deprecated but OldModuleStoreRuntime still requires it.
+                # For SplitModuleStoreRuntime, don't set ._field_data this way.
+                self._field_data = wrapped_field_data
+
+    def get_required_block_descriptors(self):
+        """
+        Return a list of XBlock instances upon which this block depends but are
+        not children of this block.
+
+        TODO: Move this method directly to the ConditionalBlock.
+        """
+        return []

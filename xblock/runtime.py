@@ -1228,6 +1228,16 @@ _CLASS_CACHE = {}
 _CLASS_CACHE_LOCK = threading.RLock()
 
 
+STANDARD_COMPLIANT_XBLOCKS = [
+    "WordCloudBlock",
+    "VideoBlock",
+    "LTIBlock",
+    "HtmlBlock",
+    "AnnotatableBlock",
+    "ProblemBlock",
+]
+
+
 class Mixologist:
     """
     Provides a facility to dynamically generate classes with additional mixins.
@@ -1264,8 +1274,6 @@ class Mixologist:
         :type cls: `class`
         """
 
-        STANDARD_XBLOCK = "WordCloudBlock"
-
         if hasattr(cls, 'unmixed_class'):
             base_class = cls.unmixed_class
             old_mixins = cls.__bases__[1:]  # Skip the original unmixed class
@@ -1279,7 +1287,7 @@ class Mixologist:
             mixins = self._mixins
             if (
                 hasattr(base_class, "__name__")
-                and base_class.__name__ in settings.STANDARD_COMPLIANT_XBLOCKS
+                and base_class.__name__ in STANDARD_COMPLIANT_XBLOCKS
                 and getattr(base_class, "is_extracted", False)
             ):
                 def _is_xmodule_mixin(mixin):
