@@ -17,11 +17,11 @@ astroid==4.0.4
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.78
+boto3==1.42.83
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.78
+botocore==1.42.83
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -35,11 +35,11 @@ cachetools==7.0.5
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
     #   tox
-chardet==7.4.0.post1
+chardet==7.4.0.post2
     # via
     #   -r requirements/test.txt
     #   diff-cover
-click==8.3.1
+click==8.3.2
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
@@ -89,7 +89,7 @@ dnspython==2.8.0
     #   pymongo
 edx-lint==6.0.0
     # via -r requirements/test.txt
-edx-opaque-keys==3.1.0
+edx-opaque-keys==4.0.0
     # via -r requirements/test.txt
 filelock==3.25.2
     # via
@@ -107,7 +107,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.151.9
+hypothesis==6.151.10
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
@@ -178,7 +178,7 @@ pluggy==1.6.0
     #   tox
 pycodestyle==2.14.0
     # via -r requirements/test.txt
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   -r requirements/test.txt
     #   diff-cover
@@ -285,7 +285,7 @@ tomlkit==0.14.0
     # via
     #   -r requirements/test.txt
     #   pylint
-tox==4.51.0
+tox==4.52.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt

@@ -36,7 +36,7 @@ python-discovery==1.2.1
     #   virtualenv
 tomli-w==1.2.0
     # via tox
-tox==4.51.0
+tox==4.52.0
     # via -r requirements/ci.in
 virtualenv==21.2.0
     # via tox
