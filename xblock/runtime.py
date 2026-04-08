@@ -31,6 +31,8 @@ from xblock.exceptions import (
     FieldDataDeprecationWarning,
     UserIdDeprecationWarning,
 )
+from xblock.xmodule_utils import PlaceholderXModuleMixin
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -1226,6 +1228,16 @@ _CLASS_CACHE = {}
 _CLASS_CACHE_LOCK = threading.RLock()
 
 
+STANDARD_COMPLIANT_XBLOCKS = [
+    "WordCloudBlock",
+    "VideoBlock",
+    "LTIBlock",
+    "HtmlBlock",
+    "AnnotatableBlock",
+    "ProblemBlock",
+]
+
+
 class Mixologist:
     """
     Provides a facility to dynamically generate classes with additional mixins.
@@ -1273,6 +1285,24 @@ class Mixologist:
         else:
             base_class = cls
             mixins = self._mixins
+            if (
+                hasattr(base_class, "__name__")
+                and base_class.__name__ in STANDARD_COMPLIANT_XBLOCKS
+                and getattr(base_class, "is_extracted", False)
+            ):
+                def _is_xmodule_mixin(mixin):
+                    return (
+                        getattr(mixin, "__name__", None) == "XModuleMixin"
+                        or f"{getattr(mixin, '__module__', '')}.{getattr(mixin, '__name__', '')}"
+                        == "xmodule.x_module.XModuleMixin"
+                    )
+
+                # Split Mongo passes ``cds_init_args`` into the block constructor; XModuleMixin pops it.
+                # If we drop XModuleMixin, substitute this minimal mixin in the same MRO slot.
+                mixins = tuple(
+                    PlaceholderXModuleMixin if _is_xmodule_mixin(m) else m
+                    for m in mixins
+                )
 
         mixin_key = (base_class, mixins)
 
