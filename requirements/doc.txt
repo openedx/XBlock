@@ -22,11 +22,11 @@ babel==2.18.0
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-boto3==1.42.83
+boto3==1.42.88
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.83
+botocore==1.42.88
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -35,7 +35,7 @@ certifi==2026.2.25
     # via requests
 charset-normalizer==3.4.7
     # via requests
-django==5.2.12
+django==5.2.13
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/django.txt
@@ -72,7 +72,7 @@ jmespath==1.1.0
     #   botocore
 lazy==1.6
     # via -r requirements/django.txt
-lxml==6.0.2
+lxml==6.0.3
     # via -r requirements/django.txt
 mako==1.3.10
     # via -r requirements/django.txt
