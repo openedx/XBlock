@@ -1163,3 +1163,207 @@ class TestScopeIdProperties(unittest.TestCase):
         block = XBlock(Mock(spec=Runtime), scope_ids=scope_ids)
         self.assertEqual(block.usage_key, "myWeirdOldUsageId")
         self.assertIsNone(block.context_key)
+
+
+class TestGetExplicitlySetFieldsByScope(unittest.TestCase):
+    """
+    Tests for ``Blocklike.get_explicitly_set_fields_by_scope``.
+    """
+
+    class FieldBlock(XBlock):
+        """XBlock with fields across multiple scopes for testing."""
+        content_field = String(scope=Scope.content, default="default_content")
+        settings_field = String(scope=Scope.settings, default="default_settings")
+        mutable_content = List(scope=Scope.content)
+        mutable_settings = List(scope=Scope.settings)
+
+    def _make_block(self, field_data_dict=None):
+        field_data = DictFieldData(field_data_dict or {})
+        runtime = TestRuntime(services={'field-data': field_data})
+        return self.FieldBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+
+    def test_no_explicitly_set_fields(self):
+        """Fields not explicitly set should not appear in the result."""
+        block = self._make_block()
+        assert block.get_explicitly_set_fields_by_scope(Scope.content) == {}
+        assert block.get_explicitly_set_fields_by_scope(Scope.settings) == {}
+
+    def test_explicitly_set_via_field_data(self):
+        """Fields present in the field data store are considered explicitly set."""
+        block = self._make_block({
+            'content_field': 'custom_content',
+            'settings_field': 'custom_settings',
+        })
+        content = block.get_explicitly_set_fields_by_scope(Scope.content)
+        settings = block.get_explicitly_set_fields_by_scope(Scope.settings)
+
+        assert content == {'content_field': 'custom_content'}
+        assert settings == {'settings_field': 'custom_settings'}
+
+    def test_explicitly_set_via_assignment(self):
+        """Fields set by attribute assignment should appear after save."""
+        block = self._make_block()
+        block.content_field = 'new_content'
+        block.settings_field = 'new_settings'
+        block.save()
+
+        content = block.get_explicitly_set_fields_by_scope(Scope.content)
+        settings = block.get_explicitly_set_fields_by_scope(Scope.settings)
+
+        assert content == {'content_field': 'new_content'}
+        assert settings == {'settings_field': 'new_settings'}
+
+    def test_scope_filtering(self):
+        """Only fields of the requested scope should be returned."""
+        block = self._make_block({
+            'content_field': 'some_content',
+            'settings_field': 'some_settings',
+        })
+        content = block.get_explicitly_set_fields_by_scope(Scope.content)
+        assert 'content_field' in content
+        assert 'settings_field' not in content
+
+    def test_mutable_fields(self):
+        """Mutable field types (List, Dict) should work correctly."""
+        block = self._make_block({
+            'mutable_content': [1, 2, 3],
+            'mutable_settings': ['a', 'b'],
+        })
+        content = block.get_explicitly_set_fields_by_scope(Scope.content)
+        settings = block.get_explicitly_set_fields_by_scope(Scope.settings)
+
+        assert content == {'mutable_content': [1, 2, 3]}
+        assert settings == {'mutable_settings': ['a', 'b']}
+
+    def test_field_set_to_none(self):
+        """Fields explicitly set to None should still appear in the result."""
+        block = self._make_block({'content_field': None})
+        content = block.get_explicitly_set_fields_by_scope(Scope.content)
+        assert 'content_field' in content
+        assert content['content_field'] is None
+
+    def test_default_scope_is_content(self):
+        """The default scope parameter should be Scope.content."""
+        block = self._make_block({
+            'content_field': 'value',
+            'settings_field': 'value',
+        })
+        result = block.get_explicitly_set_fields_by_scope()
+        assert 'content_field' in result
+        assert 'settings_field' not in result
+
+    def test_deleted_field_not_returned(self):
+        """A field that was set and then deleted should no longer appear."""
+        block = self._make_block({'content_field': 'will_delete'})
+        assert 'content_field' in block.get_explicitly_set_fields_by_scope(Scope.content)
+
+        del block.content_field
+        assert 'content_field' not in block.get_explicitly_set_fields_by_scope(Scope.content)
+
+
+class TestGetIconClass(unittest.TestCase):
+    """
+    Tests for ``XBlock.get_icon_class``.
+    """
+
+    def test_default_icon_class(self):
+        """Block without icon_class attribute should return 'other'."""
+        class PlainBlock(XBlock):
+            pass
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        block = PlainBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+        assert block.get_icon_class() == 'other'
+
+    def test_custom_icon_class(self):
+        """Block with icon_class attribute should return that value."""
+        class VideoLikeBlock(XBlock):
+            icon_class = 'video'
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        block = VideoLikeBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+        assert block.get_icon_class() == 'video'
+
+    def test_problem_icon_class(self):
+        """Verify the 'problem' icon class."""
+        class ProblemLikeBlock(XBlock):
+            icon_class = 'problem'
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        block = ProblemLikeBlock(runtime, scope_ids=Mock(spec=ScopeIds))
+        assert block.get_icon_class() == 'problem'
+
+
+@ddt.ddt
+class TestDisplayNameWithDefault(unittest.TestCase):
+    """
+    Tests for ``XBlock.display_name_with_default``.
+    """
+
+    class BlockWithDisplayName(XBlock):
+        display_name = String(default="Default Name", scope=Scope.settings)
+
+    def test_explicit_display_name(self):
+        """When display_name is explicitly set, it should be returned."""
+        runtime = TestRuntime(services={'field-data': DictFieldData({
+            'display_name': 'My Custom Name',
+        })})
+        block = self.BlockWithDisplayName(runtime, scope_ids=Mock(spec=ScopeIds))
+        assert block.display_name_with_default() == 'My Custom Name'
+
+    def test_field_default_used_when_not_set(self):
+        """When display_name is not explicitly set, the field default is used."""
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        block = self.BlockWithDisplayName(runtime, scope_ids=Mock(spec=ScopeIds))
+        # Field has default="Default Name", so that's returned
+        assert block.display_name_with_default() == "Default Name"
+
+    def test_empty_string_falls_back_to_usage_key(self):
+        """When display_name is empty string (falsy), fall back to usage_key.block_id."""
+        usage_key = Mock()
+        usage_key.block_id = "my_block_id"
+        scope_ids = Mock(spec=ScopeIds)
+        scope_ids.usage_id = usage_key
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({'display_name': ''})})
+        block = self.BlockWithDisplayName(runtime, scope_ids=scope_ids)
+        assert block.display_name_with_default() == "my block id"
+
+    def test_none_display_name_falls_back_to_usage_key(self):
+        """When display_name is explicitly None (falsy), fall back to usage_key.block_id."""
+        usage_key = Mock()
+        usage_key.block_id = "my_block_id"
+        scope_ids = Mock(spec=ScopeIds)
+        scope_ids.usage_id = usage_key
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({'display_name': None})})
+        block = self.BlockWithDisplayName(runtime, scope_ids=scope_ids)
+        assert block.display_name_with_default() == "my block id"
+
+    def test_no_display_name_field_falls_back_to_usage_key(self):
+        """Block without display_name field at all should fall back to usage_key.block_id."""
+        class NoDisplayNameBlock(XBlock):
+            pass
+
+        usage_key = Mock()
+        usage_key.block_id = "some_block"
+        scope_ids = Mock(spec=ScopeIds)
+        scope_ids.usage_id = usage_key
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        block = NoDisplayNameBlock(runtime, scope_ids=scope_ids)
+        assert block.display_name_with_default() == "some block"
+
+    def test_underscores_replaced_with_spaces(self):
+        """The fallback name should replace underscores with spaces."""
+        class NoDisplayNameBlock(XBlock):
+            pass
+
+        usage_key = Mock()
+        usage_key.block_id = "intro_to_python_101"
+        scope_ids = Mock(spec=ScopeIds)
+        scope_ids.usage_id = usage_key
+
+        runtime = TestRuntime(services={'field-data': DictFieldData({})})
+        block = NoDisplayNameBlock(runtime, scope_ids=scope_ids)
+        assert block.display_name_with_default() == "intro to python 101"
