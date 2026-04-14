@@ -1185,8 +1185,8 @@ class TestGetExplicitlySetFieldsByScope(unittest.TestCase):
     def test_no_explicitly_set_fields(self):
         """Fields not explicitly set should not appear in the result."""
         block = self._make_block()
-        assert block.get_explicitly_set_fields_by_scope(Scope.content) == {}
-        assert block.get_explicitly_set_fields_by_scope(Scope.settings) == {}
+        assert not block.get_explicitly_set_fields_by_scope(Scope.content)
+        assert not block.get_explicitly_set_fields_by_scope(Scope.settings)
 
     def test_explicitly_set_via_field_data(self):
         """Fields present in the field data store are considered explicitly set."""
@@ -1309,14 +1309,14 @@ class TestDisplayNameWithDefault(unittest.TestCase):
             'display_name': 'My Custom Name',
         })})
         block = self.BlockWithDisplayName(runtime, scope_ids=Mock(spec=ScopeIds))
-        assert block.display_name_with_default() == 'My Custom Name'
+        assert block.display_name_with_default == 'My Custom Name'
 
     def test_field_default_used_when_not_set(self):
         """When display_name is not explicitly set, the field default is used."""
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
         block = self.BlockWithDisplayName(runtime, scope_ids=Mock(spec=ScopeIds))
         # Field has default="Default Name", so that's returned
-        assert block.display_name_with_default() == "Default Name"
+        assert block.display_name_with_default == "Default Name"
 
     def test_empty_string_falls_back_to_usage_key(self):
         """When display_name is empty string (falsy), fall back to usage_key.block_id."""
@@ -1327,7 +1327,7 @@ class TestDisplayNameWithDefault(unittest.TestCase):
 
         runtime = TestRuntime(services={'field-data': DictFieldData({'display_name': ''})})
         block = self.BlockWithDisplayName(runtime, scope_ids=scope_ids)
-        assert block.display_name_with_default() == "my block id"
+        assert block.display_name_with_default == "my block id"
 
     def test_none_display_name_falls_back_to_usage_key(self):
         """When display_name is explicitly None (falsy), fall back to usage_key.block_id."""
@@ -1338,7 +1338,7 @@ class TestDisplayNameWithDefault(unittest.TestCase):
 
         runtime = TestRuntime(services={'field-data': DictFieldData({'display_name': None})})
         block = self.BlockWithDisplayName(runtime, scope_ids=scope_ids)
-        assert block.display_name_with_default() == "my block id"
+        assert block.display_name_with_default == "my block id"
 
     def test_no_display_name_field_falls_back_to_usage_key(self):
         """Block without display_name field at all should fall back to usage_key.block_id."""
@@ -1352,7 +1352,7 @@ class TestDisplayNameWithDefault(unittest.TestCase):
 
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
         block = NoDisplayNameBlock(runtime, scope_ids=scope_ids)
-        assert block.display_name_with_default() == "some block"
+        assert block.display_name_with_default == "some block"
 
     def test_underscores_replaced_with_spaces(self):
         """The fallback name should replace underscores with spaces."""
@@ -1366,4 +1366,4 @@ class TestDisplayNameWithDefault(unittest.TestCase):
 
         runtime = TestRuntime(services={'field-data': DictFieldData({})})
         block = NoDisplayNameBlock(runtime, scope_ids=scope_ids)
-        assert block.display_name_with_default() == "intro to python 101"
+        assert block.display_name_with_default == "intro to python 101"

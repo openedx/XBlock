@@ -970,6 +970,7 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         """
         return getattr(self, "icon_class", "other")
 
+    @property
     def display_name_with_default(self):
         """
         Return a display name for this block.
