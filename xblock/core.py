@@ -568,6 +568,32 @@ class Blocklike(metaclass=_AutoNamedFieldsMetaclass):
                 self._field_data_cache[field.name]
             )
 
+    def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
+        """
+        Get a dictionary of the fields for the given scope which are set
+        explicitly on this xblock. (Including any set to None.)
+
+        Arguments:
+            scope: The :class:`~xblock.fields.Scope` to filter by.
+                Defaults to ``Scope.content``.
+
+        Returns:
+            dict: A dictionary mapping field names to their JSON-serialized
+            values, for all fields of the given scope that have been
+            explicitly set on this block.
+        """
+        result = {}
+        for field in self.fields.values():
+            if field.scope == scope and field.is_set_on(self):
+                try:
+                    result[field.name] = field.read_json(self)
+                except TypeError as exception:
+                    exception_message = (
+                        f"{exception}, Block={self.usage_key}, Field-name={field.name}"
+                    )
+                    raise TypeError(exception_message) from exception
+        return result
+
     def add_xml_to_node(self, node):
         """
         For exporting, set data on `node` from ourselves.
@@ -937,6 +963,35 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
             True or False
         """
         return hasattr(view, "_supports") and functionality in view._supports  # pylint: disable=protected-access
+
+    def get_icon_class(self):
+        """
+        Return a css class identifying this XBlock in the context of an icon
+        """
+        return getattr(self, "icon_class", "other")
+
+    @property
+    def display_name_with_default(self):
+        """
+        Return a display name for this block.
+
+        Uses ``display_name`` if it is set and not None. Otherwise, falls back
+        to a name derived from the block's ``usage_key.block_id`` by replacing
+        underscores with spaces.
+
+        This method avoids direct attribute access and uses ``getattr`` to safely
+        handle cases where attributes like ``display_name`` or ``usage_key`` may
+        not be present.
+
+        Note:
+            This method does not perform any escaping. Callers are responsible
+            for ensuring the returned value is properly escaped where required.
+
+        Returns:
+            str: The resolved display name, or an empty string if no suitable
+            value is available.
+        """
+        return getattr(self, "display_name", None) or self.usage_key.block_id.replace("_", " ")
 
 
 class XBlockAside(Plugin, Blocklike):
