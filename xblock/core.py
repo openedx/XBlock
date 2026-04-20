@@ -978,11 +978,6 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
         Uses ``display_name`` if it is set and not None. Otherwise, falls back
         to a name derived from the block's ``usage_key.block_id`` by replacing
         underscores with spaces.
-
-        This method avoids direct attribute access and uses ``getattr`` to safely
-        handle cases where attributes like ``display_name`` or ``usage_key`` may
-        not be present.
-
         Note:
             This method does not perform any escaping. Callers are responsible
             for ensuring the returned value is properly escaped where required.
