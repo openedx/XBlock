@@ -12,12 +12,12 @@ coverage==7.13.5
     # via -r requirements/ci.in
 distlib==0.4.0
     # via virtualenv
-filelock==3.25.2
+filelock==3.28.0
     # via
     #   python-discovery
     #   tox
     #   virtualenv
-packaging==26.0
+packaging==26.1
     # via
     #   pyproject-api
     #   tox
@@ -36,7 +36,7 @@ python-discovery==1.2.2
     #   virtualenv
 tomli-w==1.2.0
     # via tox
-tox==4.52.1
+tox==4.53.0
     # via -r requirements/ci.in
-virtualenv==21.2.1
+virtualenv==21.2.4
     # via tox
