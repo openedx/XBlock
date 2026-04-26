@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-cachetools==7.0.5
+cachetools==7.0.6
     # via tox
 colorama==0.4.6
     # via tox
@@ -12,12 +12,12 @@ coverage==7.13.5
     # via -r requirements/ci.in
 distlib==0.4.0
     # via virtualenv
-filelock==3.28.0
+filelock==3.29.0
     # via
     #   python-discovery
     #   tox
     #   virtualenv
-packaging==26.1
+packaging==26.2
     # via
     #   pyproject-api
     #   tox

@@ -22,16 +22,16 @@ babel==2.18.0
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-boto3==1.42.91
+boto3==1.42.96
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.91
+botocore==1.42.96
     # via
     #   -r requirements/django.txt
     #   boto3
     #   s3transfer
-certifi==2026.2.25
+certifi==2026.4.22
     # via requests
 charset-normalizer==3.4.7
     # via requests
@@ -59,7 +59,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/django.txt
     #   openedx-django-pyfs
-idna==3.11
+idna==3.13
     # via requests
 imagesize==2.0.0
     # via sphinx
@@ -85,7 +85,7 @@ mock==5.2.0
     # via -r requirements/doc.in
 openedx-django-pyfs==4.0.0
     # via -r requirements/django.txt
-packaging==26.1
+packaging==26.2
     # via sphinx
 pydata-sphinx-theme==0.16.1
     # via sphinx-book-theme
@@ -94,7 +94,7 @@ pygments==2.20.0
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-pymongo==4.16.0
+pymongo==4.17.0
     # via
     #   -r requirements/django.txt
     #   edx-opaque-keys
@@ -110,11 +110,11 @@ requests==2.33.1
     # via sphinx
 roman-numerals==4.1.0
     # via sphinx
-s3transfer==0.16.0
+s3transfer==0.16.1
     # via
     #   -r requirements/django.txt
     #   boto3
-simplejson==4.0.1
+simplejson==4.1.1
     # via -r requirements/django.txt
 six==1.17.0
     # via

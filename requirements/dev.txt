@@ -17,20 +17,20 @@ astroid==4.0.4
     #   -r requirements/test.txt
     #   pylint
     #   pylint-celery
-boto3==1.42.91
+boto3==1.42.96
     # via
     #   -r requirements/test.txt
     #   fs-s3fs
-botocore==1.42.91
+botocore==1.42.96
     # via
     #   -r requirements/test.txt
     #   boto3
     #   s3transfer
-build==1.4.3
+build==1.4.4
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-cachetools==7.0.5
+cachetools==7.0.6
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -39,7 +39,7 @@ chardet==7.4.3
     # via
     #   -r requirements/test.txt
     #   diff-cover
-click==8.3.2
+click==8.3.3
     # via
     #   -r requirements/pip-tools.txt
     #   -r requirements/test.txt
@@ -91,7 +91,7 @@ edx-lint==6.0.0
     # via -r requirements/test.txt
 edx-opaque-keys==4.0.0
     # via -r requirements/test.txt
-filelock==3.28.0
+filelock==3.29.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/test.txt
@@ -107,7 +107,7 @@ fs-s3fs==1.1.1
     # via
     #   -r requirements/test.txt
     #   openedx-django-pyfs
-hypothesis==6.152.1
+hypothesis==6.152.2
     # via -r requirements/test.txt
 iniconfig==2.3.0
     # via
@@ -146,7 +146,7 @@ mock==5.2.0
     # via -r requirements/test.txt
 openedx-django-pyfs==4.0.0
     # via -r requirements/test.txt
-packaging==26.1
+packaging==26.2
     # via
     #   -r requirements/ci.txt
     #   -r requirements/pip-tools.txt
@@ -203,7 +203,7 @@ pylint-plugin-utils==0.9.0
     #   -r requirements/test.txt
     #   pylint-celery
     #   pylint-django
-pymongo==4.16.0
+pymongo==4.17.0
     # via
     #   -r requirements/test.txt
     #   edx-opaque-keys
@@ -246,11 +246,11 @@ pyyaml==6.0.3
     # via
     #   -r requirements/test.txt
     #   code-annotations
-s3transfer==0.16.0
+s3transfer==0.16.1
     # via
     #   -r requirements/test.txt
     #   boto3
-simplejson==4.0.1
+simplejson==4.1.1
     # via -r requirements/test.txt
 six==1.17.0
     # via
@@ -306,7 +306,7 @@ web-fragments==4.0.0
     # via -r requirements/test.txt
 webob==1.8.9
     # via -r requirements/test.txt
-wheel==0.46.3
+wheel==0.47.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
