@@ -10,9 +10,9 @@ appdirs==1.4.4
     #   fs
 asgiref==3.11.1
     # via django
-boto3==1.42.96
+boto3==1.43.2
     # via fs-s3fs
-botocore==1.42.96
+botocore==1.43.2
     # via
     #   boto3
     #   s3transfer
@@ -42,7 +42,7 @@ lazy==1.6
     # via -r requirements/django.in
 lxml==6.1.0
     # via -r requirements/base.txt
-mako==1.3.11
+mako==1.3.12
     # via -r requirements/base.txt
 markupsafe==3.0.3
     # via
@@ -62,7 +62,7 @@ pytz==2026.1.post1
     # via -r requirements/base.txt
 pyyaml==6.0.3
     # via -r requirements/base.txt
-s3transfer==0.16.1
+s3transfer==0.17.0
     # via boto3
 simplejson==4.1.1
     # via -r requirements/base.txt

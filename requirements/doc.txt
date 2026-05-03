@@ -22,11 +22,11 @@ babel==2.18.0
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-boto3==1.42.96
+boto3==1.43.2
     # via
     #   -r requirements/django.txt
     #   fs-s3fs
-botocore==1.42.96
+botocore==1.43.2
     # via
     #   -r requirements/django.txt
     #   boto3
@@ -74,7 +74,7 @@ lazy==1.6
     # via -r requirements/django.txt
 lxml==6.1.0
     # via -r requirements/django.txt
-mako==1.3.11
+mako==1.3.12
     # via -r requirements/django.txt
 markupsafe==3.0.3
     # via
@@ -110,7 +110,7 @@ requests==2.33.1
     # via sphinx
 roman-numerals==4.1.0
     # via sphinx
-s3transfer==0.16.1
+s3transfer==0.17.0
     # via
     #   -r requirements/django.txt
     #   boto3
