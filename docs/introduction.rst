@@ -1,3 +1,5 @@
+.. _Introduction to XBlocks:
+
 #######################
 Introduction to XBlocks
 #######################
