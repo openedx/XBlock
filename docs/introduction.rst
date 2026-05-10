@@ -1,4 +1,4 @@
-.. _Introduction to XBlocks:
+.. _XBlock Concepts:
 
 #######################
 Introduction to XBlocks
