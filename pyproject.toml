@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "XBlock"
+description = "XBlock Core Library"
+readme = "README.rst"
+license = "Apache-2.0"
+license-files = ["LICENSE.TXT"]
+authors = [
+    {name = "edX", email = "oscm@edx.org"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.12"
+dynamic = ["version"]
+dependencies = [
+    "edx-opaque-keys",
+    "fs",
+    "lxml",
+    "mako",
+    "markupsafe",
+    "python-dateutil",
+    "pytz",
+    "pyyaml",
+    "simplejson",
+    "web-fragments",
+    "webob>=1.6.0",
+]
+
+[project.optional-dependencies]
+django = [
+    "openedx-django-pyfs>=1.0.5",
+    "lazy",
+]
+
+[project.urls]
+Homepage = "https://github.com/openedx/XBlock"
+
+[tool.setuptools_scm]
+version_scheme = "only-version"
+local_scheme = "no-local-version"
+
+[tool.setuptools.packages.find]
+
+[tool.setuptools.package-data]
+"xblock.utils" = ["public/*", "templates/*", "templatetags/*"]
+"xblock.test.utils" = ["data/*"]
+
+[tool.pycodestyle]
+ignore = ["E501", "E402", "E722"]
+exclude = ["docs/*", ".tox/"]
