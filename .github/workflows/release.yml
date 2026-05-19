@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  run_tests:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    runs-on: ubuntu-latest
+    needs: run_tests
+    if: github.ref_name == 'master'
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+      version: ${{ steps.release.outputs.version }}
+
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        ref: ${{ github.ref_name }}
+        fetch-depth: 0
+
+    - run: git reset --hard ${{ github.sha }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Python Semantic Release
+      id: release
+      uses: python-semantic-release/python-semantic-release@v10.5.3
+      with:
+        git_committer_name: "github-actions"
+        git_committer_email: "github-actions@github.com"
+        changelog: "false"
+
+    - name: Upload dist artifacts
+      if: steps.release.outputs.released == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+
+  publish_to_pypi:
+    runs-on: ubuntu-latest
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    permissions:
+      id-token: write
+
+    steps:
+    - name: Download dist artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist/
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

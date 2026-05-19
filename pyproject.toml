@@ -132,3 +132,8 @@ constraint-dependencies = [
 ]
 [tool.edx_lint]
 uv_constraints = []
+
+[tool.semantic_release]
+build_command = "SETUPTOOLS_SCM_PRETEND_VERSION=$new_version uv build"
+tag_format = "{version}"
+
