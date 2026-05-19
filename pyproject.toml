@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=64", "setuptools-scm"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "XBlock"
@@ -17,7 +17,6 @@ classifiers = [
     "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -60,3 +59,76 @@ local_scheme = "no-local-version"
 [tool.pycodestyle]
 ignore = ["E501", "E402", "E722"]
 exclude = ["docs/*", ".tox/"]
+
+[dependency-groups]
+# Base test packages, no Django version pinned
+test-base = [
+    "astroid",
+    "coverage",
+    "ddt",
+    "diff-cover>=0.2.1",
+    "hypothesis",
+    "mock",
+    "path",
+    "pytest",
+    "pytest-cov",
+    "pytest-django",
+]
+# Default test group: current supported Django version + django extras
+# Update Django pin here when bumping the default; add a legacy group for older versions
+test = [
+    {include-group = "test-base"},
+    "Django>=5.2,<6.0",
+    "openedx-django-pyfs>=1.0.5",
+    "lazy",
+]
+# Legacy Django 4.2 support
+django42 = [
+    {include-group = "test-base"},
+    "Django>=4.2,<5.0",
+    "openedx-django-pyfs>=1.0.5",
+    "lazy",
+]
+quality = [
+    {include-group = "test"},
+    "edx-lint",
+    "pylint",
+    "pycodestyle",
+]
+doc = [
+    {include-group = "test"},
+    "mock",
+    "sphinx",
+    "sphinx-book-theme",
+]
+# Minimal CI group: just what's needed to invoke tox
+ci = [
+    "tox",
+    "tox-uv",
+]
+dev = [
+    {include-group = "quality"},
+    {include-group = "ci"},
+    {include-group = "doc"},
+]
+
+[tool.uv]
+package = true
+conflicts = [
+    [
+        {group = "test"},
+        {group = "django42"},
+    ],
+]
+
+#  DO NOT EDIT constraint-dependencies DIRECTLY.
+#  This list is managed by `edx_lint write_uv_constraints`
+#  and will be overwritten the next time `make upgrade` is run.
+#  - GLOBAL constraints: edit edx_lint/files/common_constraints.txt
+#  - REPO-SPECIFIC constraints: edit [tool.edx_lint].uv_constraints in this file
+constraint-dependencies = [
+    "Django<6.0",
+    "elasticsearch<7.14.0",
+]
+[tool.edx_lint]
+uv_constraints = []

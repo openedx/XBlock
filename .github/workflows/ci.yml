@@ -24,14 +24,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install pip
-      run: pip install -r requirements/pip.txt
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
 
-    - name: Install Dependencies
-      run: pip install -r requirements/ci.txt
+    - name: Install CI dependencies
+      run: uv sync --group ci
 
     - name: Run Tests
-      run: tox -e ${{ matrix.toxenv }}
+      run: uv run tox -e ${{ matrix.toxenv }}
 
     - name: Run Coverage
       if: matrix.python-version == '3.12' && matrix.toxenv == 'django42'
