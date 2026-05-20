@@ -50,6 +50,9 @@ Homepage = "https://github.com/openedx/XBlock"
 version_scheme = "only-version"
 local_scheme = "no-local-version"
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.packages.find]
 
 [tool.setuptools.package-data]
@@ -134,6 +137,6 @@ constraint-dependencies = [
 uv_constraints = []
 
 [tool.semantic_release]
-build_command = "SETUPTOOLS_SCM_PRETEND_VERSION=$new_version uv build"
+build_command = "SETUPTOOLS_SCM_PRETEND_VERSION=$NEW_VERSION uv build"
 tag_format = "{version}"
 
