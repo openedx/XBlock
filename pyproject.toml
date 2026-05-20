@@ -61,7 +61,7 @@ include-package-data = true
 
 [tool.pycodestyle]
 ignore = ["E501", "E402", "E722"]
-exclude = ["docs/*", ".tox/"]
+exclude = ["docs/*", ".tox/", ".venv/"]
 
 [dependency-groups]
 # Base test packages, no Django version pinned
