@@ -59,10 +59,6 @@ include-package-data = true
 "xblock.utils" = ["public/*", "templates/*", "templatetags/*"]
 "xblock.test.utils" = ["data/*"]
 
-[tool.pycodestyle]
-ignore = ["E501", "E402", "E722"]
-exclude = ["docs/*", ".tox/", ".venv/"]
-
 [dependency-groups]
 # Base test packages, no Django version pinned
 test-base = [
