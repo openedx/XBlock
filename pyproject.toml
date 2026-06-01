@@ -134,5 +134,7 @@ uv_constraints = []
 
 [tool.semantic_release]
 build_command = "SETUPTOOLS_SCM_PRETEND_VERSION=$NEW_VERSION uv build"
-tag_format = "{version}"
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat", "docs"]
 
