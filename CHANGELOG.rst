@@ -5,6 +5,12 @@ Change history for XBlock
 Unreleased
 ----------
 
+6.2.0 - 2026-06-09
+------------------
+
+* Migrated web_fragments into XBlock's project. You should remove web_fragments as a separate dependency if you
+  currently depend on it directly.
+
 5.3.0 - 2025-12-19
 ------------------
 
