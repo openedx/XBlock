@@ -1530,15 +1530,6 @@ wheels = [
 ]
 
 [[package]]
-name = "web-fragments"
-version = "4.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a5/1c/938b2e2a7908937361dcaaeb7afe17ca0f1ca9e68c335c72820b772c5b24/web_fragments-4.0.0.tar.gz", hash = "sha256:e82488beb4e8666b9e37a10a81258142f404f4e1964b31d3010154896832f90b", size = 15590, upload-time = "2026-03-10T14:30:43.685Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/f8/28aa823f4a618481908bc3bb815e5961cc6e79682e7ceb568bcc4d6f10f4/web_fragments-4.0.0-py2.py3-none-any.whl", hash = "sha256:0d5f59c63b2ac5ee95f76f5904c2f20d0e83d6a1425680fcc676485b13f85d32", size = 15580, upload-time = "2026-03-10T14:30:41.406Z" },
-]
-
-[[package]]
 name = "webob"
 version = "1.8.10"
 source = { registry = "https://pypi.org/simple" }
@@ -1563,7 +1554,6 @@ dependencies = [
     { name = "pytz" },
     { name = "pyyaml" },
     { name = "simplejson" },
-    { name = "web-fragments" },
     { name = "webob" },
 ]
 
@@ -1691,7 +1681,6 @@ requires-dist = [
     { name = "pytz" },
     { name = "pyyaml" },
     { name = "simplejson" },
-    { name = "web-fragments" },
     { name = "webob", specifier = ">=1.6.0" },
 ]
 provides-extras = ["django"]

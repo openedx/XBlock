@@ -27,13 +27,15 @@ class AttrAssertionMixin(TestCase):
     """
     A mixin to add attribute assertion methods to TestCases.
     """
-    def assertHasAttr(self, obj, attr):
+    def assertHasAttr(self, obj, name, msg=None):
         "Assert that `obj` has the attribute named `attr`."
-        self.assertTrue(hasattr(obj, attr), f"{obj!r} doesn't have attribute {attr!r}")
+        msg = msg or f"{obj!r} doesn't have attribute {name!r}"
+        self.assertTrue(hasattr(obj, name), msg)
 
-    def assertNotHasAttr(self, obj, attr):
+    def assertNotHasAttr(self, obj, name, msg=None):
         "Assert that `obj` doesn't have the attribute named `attr`."
-        self.assertFalse(hasattr(obj, attr), f"{obj!r} has attribute {attr!r}")
+        msg = msg or f"{obj!r} has attribute {name!r}"
+        self.assertFalse(hasattr(obj, name), msg)
 
 
 class TestScopedStorage(AttrAssertionMixin, TestCase):
