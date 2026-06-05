@@ -33,24 +33,8 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(BROWSER) docs/_build/html/index.html
 
 requirements: ## install development environment requirements
-	pip install -qr requirements/dev.txt --exists-action w
-	pip install -e .
+	uv sync --group dev
 
-upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
-upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
-	pip install -qr requirements/pip-tools.txt
-	pip install -qr requirements/pip.txt
-	# Make sure to compile files after any other files they include!
-	pip-compile -v --upgrade --rebuild --allow-unsafe -o requirements/pip.txt requirements/pip.in
-	pip-compile -v --upgrade --rebuild -o requirements/pip-tools.txt requirements/pip-tools.in
-	pip install -qr requirements/pip.txt
-	pip install -qr requirements/pip-tools.txt
-	pip-compile -v --upgrade --rebuild -o requirements/base.txt requirements/base.in
-	pip-compile -v --upgrade --rebuild -o requirements/django.txt requirements/django.in
-	pip-compile -v --upgrade --rebuild -o requirements/test.txt requirements/test.in
-	pip-compile -v --upgrade --rebuild -o requirements/doc.txt requirements/doc.in
-	pip-compile -v --upgrade --rebuild -o requirements/ci.txt requirements/ci.in
-	pip-compile -v --upgrade --rebuild -o requirements/dev.txt requirements/dev.in
-	# Let tox control the Django version for tests
-	sed '/^[dD]jango==/d' requirements/test.txt > requirements/test.tmp
-	mv requirements/test.tmp requirements/test.txt
+upgrade: ## update the uv.lock to use the latest releases satisfying our constraints
+	uv run --with edx-lint edx_lint write_uv_constraints pyproject.toml
+	uv lock --upgrade
