@@ -63,6 +63,22 @@ def test_runtime_service_shadows_plugin_service():
     assert block.runtime.service(block, 'ai_extensions') is sentinel
 
 
+@ServiceProvider.register_temp_plugin(
+    DummyAIService, identifier='ai_extensions', group='xblock.service.v1',
+)
+def test_runtime_none_service_disables_plugin_service():
+    wants_block = make_block(
+        WantsAIBlock, runtime=TestRuntime(services={'ai_extensions': None}),
+    )
+    assert wants_block.runtime.service(wants_block, 'ai_extensions') is None
+
+    needs_block = make_block(
+        NeedsAIBlock, runtime=TestRuntime(services={'ai_extensions': None}),
+    )
+    with pytest.raises(NoSuchServiceError):
+        needs_block.runtime.service(needs_block, 'ai_extensions')
+
+
 def test_missing_plugin_service_wanted_returns_none():
     block = make_block(WantsAIBlock)
     assert block.runtime.service(block, 'ai_extensions') is None

@@ -454,7 +454,9 @@ class ServiceProvider(Plugin):
 
     Services that the runtime itself provides (via the ``services`` constructor
     argument or a ``service()`` override) always take precedence; entry points
-    are only consulted when the runtime does not offer the requested service.
+    are only consulted when the runtime has no entry for the requested name.
+    A runtime entry explicitly set to None counts as provided (it means the
+    runtime deliberately disabled the service) and is never overridden.
 
     The provider class is instantiated per service request as
     ``provider_class(runtime=runtime, xblock=block)``, mirroring
@@ -1132,8 +1134,9 @@ class Runtime(metaclass=ABCMeta):
         declaration = block.service_declaration(service_name)
         if declaration is None:
             raise NoSuchServiceError(f"Service {service_name!r} was not requested.")
-        service = self._services.get(service_name)
-        if service is None:
+        if service_name in self._services:
+            service = self._services[service_name]
+        else:
             service = self._load_service_from_entry_point(block, service_name)
         if service is None and declaration == "need":
             raise NoSuchServiceError(f"Service {service_name!r} is not available.")

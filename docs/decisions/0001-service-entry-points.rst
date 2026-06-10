@@ -88,7 +88,12 @@ workbench, third-party runtimes that don't override ``service()``) for a
 single small change, and gives a hard guarantee: *runtime-provided services
 always shadow plugin-provided ones*.  A pip package cannot replace or
 intercept ``user``, ``field-data``, ``i18n``, or any other service the host
-application provides deliberately.  Runtimes that override ``service()``
+application provides deliberately.  "Provided" is decided by key presence in
+``_services``, not truthiness: runtimes use an explicit ``None`` to mean
+"this service exists but is disabled here" — the Open edX LMS maps
+``completion`` to ``None`` for anonymous users, and this library's own test
+suite passes ``services={'i18n': None}`` — and a plugin must not resurrect a
+service the runtime switched off.  Runtimes that override ``service()``
 entirely keep that freedom — the fallback only exists in the default path
 they opt into by calling ``super().service()``.
 
