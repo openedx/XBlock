@@ -33,7 +33,6 @@ dependencies = [
     "pytz",
     "pyyaml",
     "simplejson",
-    "web-fragments",
     "webob>=1.6.0",
 ]
 
@@ -54,10 +53,15 @@ local_scheme = "no-local-version"
 include-package-data = true
 
 [tool.setuptools.packages.find]
+include = [
+    "xblock*",
+    "web_fragments*",
+]
 
 [tool.setuptools.package-data]
 "xblock.utils" = ["public/*", "templates/*", "templatetags/*"]
 "xblock.test.utils" = ["data/*"]
+"web_fragments" = ["templates/*"]
 
 [dependency-groups]
 # Base test packages, no Django version pinned

@@ -21,5 +21,6 @@ in depth and guides developers through the process of creating an XBlock.
     runtime
     plugins
     exceptions
+    fragments
     xblock-tutorial/index
     xblock-utils/index

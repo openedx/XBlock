@@ -21,7 +21,7 @@ help: ## display this help message
 
 quality: ## check coding style with pycodestyle and pylint
 	pycodestyle
-	pylint xblock
+	pylint xblock web_fragments
 
 validate: test
 

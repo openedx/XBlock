@@ -99,12 +99,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Uncomment the next line to enable the admin:
     'django.contrib.admin',
 
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'web_fragments',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -138,6 +135,16 @@ LOGGING = {
         }
     }
 }
+
+ROOT_URLCONF = 'web_fragments.examples.urls'
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+    },
+]
 
 WORKBENCH = {
     'reset_state_on_restart': (
