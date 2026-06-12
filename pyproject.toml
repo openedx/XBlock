@@ -137,7 +137,7 @@ constraint-dependencies = [
 uv_constraints = []
 
 [tool.semantic_release]
-build_command = "SETUPTOOLS_SCM_PRETEND_VERSION=$NEW_VERSION uv build"
+build_command = "python -m pip install --upgrade build && SETUPTOOLS_SCM_PRETEND_VERSION=$NEW_VERSION python -m build"
 
 [tool.semantic_release.commit_parser_options]
 minor_tags = ["feat", "docs"]
