@@ -22,5 +22,6 @@ in depth and guides developers through the process of creating an XBlock.
     plugins
     exceptions
     fragments
+    decisions/0001-service-entry-points
     xblock-tutorial/index
     xblock-utils/index
