@@ -375,7 +375,10 @@ class Dynamic:
 
 class TestObjectAggregator:
     """
-    Test that the ObjectAggregator behaves correctly
+    Test that the ObjectAggregator behaves correctly.
+
+    ObjectAggregator is deprecated; all instantiations are wrapped to assert
+    the expected DeprecationWarning is raised.
     """
     # pylint: disable=attribute-defined-outside-init
     def setup_method(self):
@@ -385,7 +388,8 @@ class TestObjectAggregator:
         # Create some objects that only have single attributes
         self.first = Dynamic(first=1)
         self.second = Dynamic(second=2)
-        self.agg = ObjectAggregator(self.first, self.second)
+        with pytest.warns(DeprecationWarning, match="ObjectAggregator is deprecated"):
+            self.agg = ObjectAggregator(self.first, self.second)
     # pylint: enable=attribute-defined-outside-init
 
     def test_get(self):
