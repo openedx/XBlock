@@ -5,6 +5,13 @@ Change history for XBlock
 Unreleased
 ----------
 
+* Removed ``threading.RLock`` from ``Mixologist``'s class cache to make it safe
+  for ASGI/async deployments. ``dict.setdefault()`` atomicity (via CPython's GIL)
+  provides equivalent thread safety without blocking the event loop.
+  Relates to `openedx/openedx-platform#38680 <https://github.com/openedx/openedx-platform/issues/38680>`_.
+* Deprecated ``ObjectAggregator`` from ``xblock.runtime``; it had no production
+  callers and will be removed in a future major release.
+
 6.2.0 - 2026-06-09
 ------------------
 

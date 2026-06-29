@@ -11,7 +11,6 @@ import itertools
 import json
 import logging
 import re
-import threading
 import warnings
 
 from lxml import etree
@@ -1195,6 +1194,11 @@ class ObjectAggregator:
     """
 
     def __init__(self, *objects):
+        warnings.warn(
+            "ObjectAggregator is deprecated and will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.__dict__['_objects'] = objects
 
     def _object_with_attr(self, name):
@@ -1221,9 +1225,11 @@ class ObjectAggregator:
         delattr(self._object_with_attr(name), name)
 
 
-# Cache of Mixologist generated classes
+# Cache of Mixologist generated classes.
+# dict.setdefault() is atomic under CPython's GIL, so no lock is needed here.
+# This is also safe in asyncio contexts: mix() has no await points, so the
+# event loop cannot interleave two calls to it within the same thread.
 _CLASS_CACHE = {}
-_CLASS_CACHE_LOCK = threading.RLock()
 
 
 class Mixologist:
@@ -1277,18 +1283,16 @@ class Mixologist:
         mixin_key = (base_class, mixins)
 
         if mixin_key not in _CLASS_CACHE:
-            # Only lock if we're about to make a new class
-            with _CLASS_CACHE_LOCK:
-                # Use setdefault so that if someone else has already
-                # created a class before we got the lock, we don't
-                # overwrite it
-                return _CLASS_CACHE.setdefault(mixin_key, type(
-                    base_class.__name__ + 'WithMixins',  # type() requires native str
-                    (base_class,) + mixins,
-                    {'unmixed_class': base_class}
-                ))
-        else:
-            return _CLASS_CACHE[mixin_key]
+            new_class = type(
+                base_class.__name__ + 'WithMixins',  # type() requires native str
+                (base_class,) + mixins,
+                {'unmixed_class': base_class}
+            )
+            # setdefault is atomic under CPython's GIL: if two threads race
+            # here, one wins and the other's new_class is silently discarded.
+            _CLASS_CACHE.setdefault(mixin_key, new_class)
+
+        return _CLASS_CACHE[mixin_key]
 
 
 class RegexLexer:
