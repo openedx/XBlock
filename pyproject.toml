@@ -132,9 +132,12 @@ conflicts = [
 constraint-dependencies = [
     "Django<6.0",
     "elasticsearch<7.14.0",
+    "pytest-django<4.13.0",
 ]
 [tool.edx_lint]
-uv_constraints = []
+uv_constraints = [
+    "pytest-django<4.13.0",
+]
 
 [tool.semantic_release]
 build_command = "python -m pip install --upgrade build && SETUPTOOLS_SCM_PRETEND_VERSION=$NEW_VERSION python -m build"
