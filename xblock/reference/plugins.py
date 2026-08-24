@@ -70,6 +70,7 @@ class Service:
     necessarily a finished interface.
 
     Possible goals:
+
     * Right now, they derive from object. We'd like there to be a
       common superclass.
     * We'd like to be able to provide both language-level and

@@ -21,6 +21,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockAside, XML_NAMESPACES
 from xblock.fields import Field, BlockScope, Scope, ScopeIds, UserScope
 from xblock.field_data import FieldData
+from xblock.plugin import Plugin, PluginMissingError
 from xblock.exceptions import (
     NoSuchViewError,
     NoSuchHandlerError,
@@ -430,6 +431,43 @@ class MemoryIdManager(IdReader, IdGenerator):
     def get_aside_type_from_usage(self, aside_id):
         """Get an aside's type from its usage id."""
         return aside_id.aside_type
+
+
+class ServiceProvider(Plugin):
+    """
+    Entry-point loader for runtime services contributed by installed packages.
+
+    A package can offer an XBlock runtime service by registering a provider
+    class under the ``xblock.service.v1`` entry-point group::
+
+        # in the providing package's setup.py / pyproject.toml
+        entry_points={
+            "xblock.service.v1": [
+                "my_service = my_package.services:MyService",
+            ],
+        }
+
+    The entry-point name is the service name that XBlocks declare with
+    ``@XBlock.needs`` / ``@XBlock.wants`` and pass to
+    ``self.runtime.service(self, name)``.
+
+    Services that the runtime itself provides (via the ``services`` constructor
+    argument or a ``service()`` override) always take precedence; entry points
+    are only consulted when the runtime has no entry for the requested name.
+    A runtime entry explicitly set to None counts as provided (it means the
+    runtime deliberately disabled the service) and is never overridden.
+
+    The provider class is instantiated per service request as
+    ``provider_class(runtime=runtime, xblock=block)``, mirroring
+    :class:`xblock.reference.plugins.Service`. Providers with expensive set-up
+    should cache that state themselves (e.g. at module or class level).
+
+    If two installed packages register the same service name, lookup raises
+    :class:`xblock.plugin.AmbiguousPluginError` rather than silently picking
+    one. A deliberate replacement can be registered under the
+    ``xblock.service.v1.overrides`` group, which takes priority.
+    """
+    entry_point = 'xblock.service.v1'
 
 
 class Runtime(metaclass=ABCMeta):
@@ -1095,10 +1133,32 @@ class Runtime(metaclass=ABCMeta):
         declaration = block.service_declaration(service_name)
         if declaration is None:
             raise NoSuchServiceError(f"Service {service_name!r} was not requested.")
-        service = self._services.get(service_name)
+        if service_name in self._services:
+            service = self._services[service_name]
+        else:
+            service = self._load_service_from_entry_point(block, service_name)
         if service is None and declaration == "need":
             raise NoSuchServiceError(f"Service {service_name!r} is not available.")
         return service
+
+    def _load_service_from_entry_point(self, block, service_name):
+        """
+        Fall back to a service provider registered by an installed package
+        under the ``xblock.service.v1`` entry-point group.
+
+        Only reached when the runtime itself does not provide `service_name`,
+        so runtime-provided services always shadow plugin-provided ones.
+
+        Returns an instance of the provider class, or None if no installed
+        package provides `service_name`. Lookup results (including misses) are
+        cached by :meth:`xblock.plugin.Plugin.load_class`, so the steady-state
+        cost of a miss is a single dict lookup.
+        """
+        try:
+            service_class = ServiceProvider.load_class(service_name)
+        except PluginMissingError:
+            return None
+        return service_class(runtime=self, xblock=block)
 
     # Querying
 
