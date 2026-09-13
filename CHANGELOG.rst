@@ -5,6 +5,9 @@ Change history for XBlock
 Unreleased
 ----------
 
+* Fixed ``webob_to_django_response`` dropping all but the last ``Set-Cookie``
+  header; they are now loaded into the Django response's cookie jar so every
+  cookie is sent to the client.
 * Removed ``threading.RLock`` from ``Mixologist``'s class cache to make it safe
   for ASGI/async deployments. ``dict.setdefault()`` atomicity (via CPython's GIL)
   provides equivalent thread safety without blocking the event loop.
