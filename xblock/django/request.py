@@ -22,7 +22,12 @@ def webob_to_django_response(webob_response, streaming=False):
             status=webob_response.status_code,
         )
     for name, value in webob_response.headerlist:
-        django_response[name] = value
+        if name.lower() == 'set-cookie':
+            # Django headers can't hold multiple values with the same name,
+            # so Set-Cookie headers go through the response's cookie jar.
+            django_response.cookies.load(value)
+        else:
+            django_response[name] = value
     return django_response
 
 
