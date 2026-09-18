@@ -23,7 +23,7 @@
 .. _GitHub Help: https://help.github.com/articles/set-up-git
 .. _Git: https://help.github.com/articles/set-up-git
 
-.. _VirtualEnv: http://www.virtualenv.org/en/latest/
+.. _VirtualEnv: https://virtualenv.pypa.io/en/latest/
 
 .. _Virtual Environments: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
