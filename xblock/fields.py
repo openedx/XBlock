@@ -768,8 +768,8 @@ class Boolean(JSONField):
     MUTABLE = False
 
     # We're OK redefining built-in `help`
-    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None,
-                 **kwargs):  # pylint: disable=redefined-builtin
+    def __init__(self, help=None, default=UNSET, scope=Scope.content, display_name=None,  # pylint: disable=redefined-builtin
+                 **kwargs):
         super().__init__(help, default, scope, display_name,
                          values=({'display_name': "True", "value": True},
                                  {'display_name': "False", "value": False}), **kwargs)
