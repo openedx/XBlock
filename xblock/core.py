@@ -802,12 +802,12 @@ class XBlock(Plugin, Blocklike, metaclass=_HasChildrenMetaclass):
 
         return block
 
-    def __init__(
+    def __init__(  # pylint: disable=keyword-arg-before-vararg
         self,
         runtime,
         field_data=None,
         scope_ids=UNSET,
-        *args,  # pylint: disable=keyword-arg-before-vararg
+        *args,
         **kwargs
     ):
         """
