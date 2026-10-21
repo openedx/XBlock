@@ -138,11 +138,11 @@ wheels = [
 
 [[package]]
 name = "certifi"
-version = "2026.7.22"
+version = "2026.10.19"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a3/c2/24167ea9858356b47a87a50d39908bfdb72ceeefe0041586e704e5376b3a/certifi-2026.7.22.tar.gz", hash = "sha256:741e2c3b351ddf169a738da9f2c048608ff7f2c5cc02f1ebc6b118bb090d5d55", size = 138112, upload-time = "2026-07-22T03:35:12.644Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a6/bd/1436c50cc46699de0230fbaacc1d1de7bfec413176099949e9d5112e88f2/certifi-2026.10.19.tar.gz", hash = "sha256:035c1e85572b141bf1c3a3eff0e33a8eb74917522f2559075ff8d2fea780a1ae", size = 137598, upload-time = "2026-10-20T02:24:16.604Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl", hash = "sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775", size = 136983, upload-time = "2026-07-22T03:35:11.276Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/51/29046e48f693c54e5b7412216d447a1d8362c9653148d98c02cdf65fa733/certifi-2026.10.19-py3-none-any.whl", hash = "sha256:42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b", size = 136464, upload-time = "2026-10-20T02:24:15.072Z" },
 ]
 
 [[package]]
@@ -531,9 +531,9 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 dependencies = [
-    { name = "asgiref", marker = "extra == 'group-6-xblock-dev' or extra != 'group-6-xblock-django42' or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
-    { name = "sqlparse", marker = "extra == 'group-6-xblock-dev' or extra != 'group-6-xblock-django42' or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
-    { name = "tzdata", marker = "(sys_platform == 'win32' and extra == 'group-6-xblock-dev') or (sys_platform == 'win32' and extra != 'group-6-xblock-django42') or (extra == 'group-6-xblock-dev' and extra == 'group-6-xblock-django42') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
+    { name = "asgiref", marker = "extra == 'group-6-xblock-dev' or extra != 'group-6-xblock-django42' or extra == 'group-6-xblock-doc' or extra == 'group-6-xblock-quality' or extra == 'group-6-xblock-test'" },
+    { name = "sqlparse", marker = "extra == 'group-6-xblock-dev' or extra != 'group-6-xblock-django42' or extra == 'group-6-xblock-doc' or extra == 'group-6-xblock-quality' or extra == 'group-6-xblock-test'" },
+    { name = "tzdata", marker = "(sys_platform == 'win32' and extra != 'group-6-xblock-django42') or (extra == 'group-6-xblock-dev' and extra == 'group-6-xblock-django42') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/85/fe/79e692b430c7721bf4b812c328bfe687e73e3f28f56611a6a18a97e887cc/django-5.2.18.tar.gz", hash = "sha256:461c5dd06d2ea16bd5ca37d3f46e4def1d6b0fe7588c6f4e2119517bb0af8b2d", size = 10910238, upload-time = "2026-10-06T13:01:09.371Z" }
 wheels = [
@@ -1077,7 +1077,7 @@ version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django", version = "4.2.30", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-6-xblock-django42'" },
-    { name = "django", version = "5.2.18", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-6-xblock-dev' or extra != 'group-6-xblock-django42' or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
+    { name = "django", version = "5.2.18", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-6-xblock-dev' or extra != 'group-6-xblock-django42' or extra == 'group-6-xblock-doc' or extra == 'group-6-xblock-quality' or extra == 'group-6-xblock-test'" },
     { name = "fs" },
     { name = "fs-s3fs" },
 ]
@@ -1301,7 +1301,7 @@ name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'group-6-xblock-dev' and extra == 'group-6-xblock-django42') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
@@ -1754,7 +1754,7 @@ dependencies = [
     { name = "pyproject-api" },
     { name = "python-discovery" },
     { name = "tomli-w" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'group-6-xblock-dev' and extra == 'group-6-xblock-django42') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "virtualenv" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4a/79/ce1ce8c98a1ff8ff318191ed1b4f113a3a8626fccfcedc687f7a485b5d7f/tox-4.67.0.tar.gz", hash = "sha256:d3e48816bebbd7bad0f6942a36fa7bcd14fe4ccbf4b3a5d54040ca0294dafd1f", size = 346271, upload-time = "2026-10-17T19:15:47.791Z" }
@@ -1861,7 +1861,7 @@ name = "webob"
 version = "1.8.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "legacy-cgi", marker = "python_full_version >= '3.13' or (extra == 'group-6-xblock-dev' and extra == 'group-6-xblock-django42') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-doc') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-quality') or (extra == 'group-6-xblock-django42' and extra == 'group-6-xblock-test')" },
+    { name = "legacy-cgi", marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e6/92/9329872e36be90e25ba616ac6e9ee8c1be4326a1ea3fdffcdabd0eb48efb/webob-1.8.11.tar.gz", hash = "sha256:aa8c27231070b135c025e567a9cd7eda03f4df71352ffaac740cb6a75f0f81a5", size = 286047, upload-time = "2026-08-02T06:26:26.063Z" }
 wheels = [
