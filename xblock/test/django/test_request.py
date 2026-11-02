@@ -7,6 +7,7 @@ responses.
 from unittest import TestCase
 
 try:
+    from django.http import BadHeaderError
     from django.test.client import RequestFactory
     HAS_DJANGO = True
 except ImportError:
@@ -70,6 +71,23 @@ class TestDjangoWebobResponse(TestCase):
         self.assertIn('X-Foo', self._as_django(headerlist=[('X-Foo', 'bar')]))
         self.assertEqual(self._as_django(headerlist=[('X-Foo', 'bar')])['X-Foo'], 'bar')
 
+    def test_multiple_set_cookie_headers(self):
+        response = self._as_django(headerlist=[
+            ('Set-Cookie', 'yummy_cookie=choco; Path=/; HttpOnly'),
+            ('Set-Cookie', 'tasty_cookie=strawberry; SameSite=Lax'),
+        ])
+        self.assertEqual(response.cookies['yummy_cookie'].value, 'choco')
+        self.assertEqual(response.cookies['yummy_cookie']['path'], '/')
+        self.assertTrue(response.cookies['yummy_cookie']['httponly'])
+        self.assertEqual(response.cookies['tasty_cookie'].value, 'strawberry')
+        self.assertEqual(response.cookies['tasty_cookie']['samesite'], 'Lax')
+
+    def test_set_cookie_header_that_is_not_one_cookie(self):
+        # Each of these would change or drop a cookie if loaded into the response's cookie jar.
+        for value in ('a=1; Path=/; Priority=High; HttpOnly', 'pref=x; sessionid=evil; Path=/', 'a b=1'):
+            with self.subTest(value=value), self.assertRaises(BadHeaderError):
+                self._as_django(headerlist=[('Set-Cookie', value)])
+
     def test_content_types(self):
         # JSON content type (no charset should be returned)
         self.assertEqual(
@@ -104,6 +122,14 @@ class TestDjangoWebobResponseStreamed(TestCase):
     def test_headers(self):
         self.assertIn('X-Foo', self._as_django(headerlist=[('X-Foo', 'bar')]))
         self.assertEqual(self._as_django(headerlist=[('X-Foo', 'bar')])['X-Foo'], 'bar')
+
+    def test_multiple_set_cookie_headers(self):
+        response = self._as_django(headerlist=[
+            ('Set-Cookie', 'yummy_cookie=choco'),
+            ('Set-Cookie', 'tasty_cookie=strawberry'),
+        ])
+        self.assertEqual(response.cookies['yummy_cookie'].value, 'choco')
+        self.assertEqual(response.cookies['tasty_cookie'].value, 'strawberry')
 
     def test_content_types(self):
         # JSON content type (no charset should be returned)

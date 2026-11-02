@@ -1,9 +1,10 @@
 """Helpers for WebOb requests and responses."""
+from http.cookies import SimpleCookie
 from itertools import chain, repeat
 from lazy import lazy
 
 import webob
-from django.http import StreamingHttpResponse, HttpResponse
+from django.http import BadHeaderError, StreamingHttpResponse, HttpResponse
 from webob.multidict import MultiDict, NestedMultiDict, NoVars
 
 
@@ -22,7 +23,19 @@ def webob_to_django_response(webob_response, streaming=False):
             status=webob_response.status_code,
         )
     for name, value in webob_response.headerlist:
-        django_response[name] = value
+        if name.lower() == 'set-cookie':
+            # Django headers can't hold multiple values with the same name,
+            # so Set-Cookie headers go through the response's cookie jar.
+            # SimpleCookie parses with the request Cookie grammar, so a header
+            # that does not parse to exactly one cookie would be changed or
+            # dropped; fail loudly instead.
+            cookie = SimpleCookie()
+            cookie.load(value)
+            if len(cookie) != 1:
+                raise BadHeaderError("Set-Cookie header did not parse to exactly one cookie")
+            django_response.cookies.update(cookie)
+        else:
+            django_response[name] = value
     return django_response
 
 
