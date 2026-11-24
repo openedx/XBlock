@@ -37,6 +37,7 @@ class ResourceLoader:
         context['_i18n_service'] = i18n_service
         libraries = {
             'i18n': 'xblock.utils.templatetags.i18n',
+            'xblock_i18n': 'xblock.utils.templatetags.i18n',
         }
 
         installed_libraries = get_installed_libraries()

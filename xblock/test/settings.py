@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'web_fragments',
+    'xblock.django',
 )
 
 # A sample logging configuration. The only tangible logging
