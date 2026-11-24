@@ -1,15 +1,46 @@
 """
 Helper class (ResourceLoader) for loading resources used by an XBlock
 """
+import functools
 import os
 import sys
 import warnings
 
 import importlib.resources
+from django.core.signals import setting_changed
+from django.dispatch import receiver
 from django.template import Context, Engine, Template
 from django.template.backends.django import get_installed_libraries
 from mako.lookup import TemplateLookup as MakoTemplateLookup
 from mako.template import Template as MakoTemplate
+
+
+@functools.cache
+def _get_django_template_engine():
+    """
+    Return the template engine that ``ResourceLoader.render_django_template`` renders with.
+
+    It knows every installed template tag library, except that ``{% load i18n %}`` loads XBlock's
+    own ``trans`` and ``blocktrans`` tags, which translate through the block's i18n service.
+
+    The engine is built once per process. Finding the installed libraries means scanning the
+    ``templatetags`` package of every installed app, which is too slow to repeat on every render.
+    The engine is not changed by rendering, so sharing it between calls and threads is safe.
+    """
+    libraries = get_installed_libraries()
+    libraries['i18n'] = 'xblock.utils.templatetags.i18n'
+    return Engine(libraries=libraries)
+
+
+@receiver(setting_changed)
+def _reset_django_template_engine(*, setting, **kwargs):
+    """
+    Rebuild the engine when the set of installed apps, and so of tag libraries, changes.
+
+    Settings only change at runtime in tests, through ``override_settings``.
+    """
+    if setting == 'INSTALLED_APPS':
+        _get_django_template_engine.cache_clear()
 
 
 class ResourceLoader:
@@ -35,16 +66,9 @@ class ResourceLoader:
         """
         context = context or {}
         context['_i18n_service'] = i18n_service
-        libraries = {
-            'i18n': 'xblock.utils.templatetags.i18n',
-        }
-
-        installed_libraries = get_installed_libraries()
-        installed_libraries.update(libraries)
-        engine = Engine(libraries=installed_libraries)
 
         template_str = self.load_unicode(template_path)
-        template = Template(template_str, engine=engine)
+        template = Template(template_str, engine=_get_django_template_engine())
         rendered = template.render(Context(context))
 
         return rendered

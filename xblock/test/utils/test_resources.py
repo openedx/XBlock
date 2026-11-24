@@ -9,6 +9,7 @@ from unittest.mock import DEFAULT, patch
 
 import importlib.resources
 
+from xblock.utils import resources
 from xblock.utils.resources import ResourceLoader
 
 expected_string = """\
@@ -184,6 +185,35 @@ class TestResourceLoader(unittest.TestCase):
                                           context=example_context,
                                           i18n_service=MockI18nService())
         self.assertEqual(s, expected_localized_template)
+
+    def test_render_django_template_reuses_engine(self):
+        # Building the engine scans every installed app for template tag libraries, so it must
+        # happen once, not once per render.
+        resources._get_django_template_engine.cache_clear()  # pylint: disable=protected-access
+        loader = ResourceLoader(__name__)
+        with patch.object(
+            resources, "get_installed_libraries", wraps=resources.get_installed_libraries
+        ) as mock_get_installed_libraries:
+            for _ in range(3):
+                s = loader.render_django_template("data/simple_django_template.txt", dict(example_context))
+                self.assertEqual(s, expected_filled_template)
+            ResourceLoader("xblock.test.utils.data").render_django_template("simple_django_template.txt")
+        self.assertEqual(mock_get_installed_libraries.call_count, 1)
+
+    def test_django_template_engine_follows_installed_apps(self):
+        # The tag libraries come from the installed apps, so a changed INSTALLED_APPS needs a new engine.
+        # The receiver is called directly: override_settings(INSTALLED_APPS=...) would also reset
+        # Django's translations, which the translation tests in this class are sensitive to.
+        get_engine = resources._get_django_template_engine  # pylint: disable=protected-access
+        reset_engine = resources._reset_django_template_engine  # pylint: disable=protected-access
+        engine = get_engine()
+        self.assertIs(get_engine(), engine)
+
+        reset_engine(setting="DEBUG")
+        self.assertIs(get_engine(), engine)
+
+        reset_engine(setting="INSTALLED_APPS")
+        self.assertIsNot(get_engine(), engine)
 
     def test_render_mako_template(self):
         loader = ResourceLoader(__name__)

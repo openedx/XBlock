@@ -5,6 +5,9 @@ Change history for XBlock
 Unreleased
 ----------
 
+* ``ResourceLoader.render_django_template`` (and ``render_js_template``) now build their template
+  engine once per process instead of on every call. Each call used to scan every installed app for
+  template tag libraries, which took about 3 ms per render in openedx-platform.
 * Fixed ``webob_to_django_response`` dropping all but the last ``Set-Cookie``
   header; they are now loaded into the Django response's cookie jar so every
   cookie is sent to the client.
