@@ -177,6 +177,14 @@ class TestResourceLoader(unittest.TestCase):
         s = loader.render_django_template("data/trans_django_template.txt", example_context)
         self.assertEqual(s, expected_not_translated_template)
 
+    def test_render_django_template_with_xblock_i18n_load(self):
+        """``{% load xblock_i18n %}`` is accepted too, so templates can be shared with Django's own engine."""
+        loader = ResourceLoader(__name__)
+        s = loader.render_django_template("data/xblock_i18n_django_template.txt",
+                                          context=example_context,
+                                          i18n_service=MockI18nService())
+        self.assertEqual(s.strip(), "tRaNsLaTe !")
+
     def test_render_django_template_localized(self):
         # Test that default template tags like l10n are loaded
         loader = ResourceLoader(__name__)

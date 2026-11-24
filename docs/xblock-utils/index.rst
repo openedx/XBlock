@@ -173,6 +173,33 @@ See :ref:`theming-support` for details.
 
 To learn more, refer to the  page.
 
+Translating Django templates
+----------------------------
+
+``{% trans %}`` and ``{% blocktrans %}`` in a block's Django templates can translate through the
+block's ``i18n`` service, i.e. the block's own catalog, instead of the host's global catalog. Two ways
+to get that:
+
+* ``ResourceLoader.render_django_template(path, context, i18n_service=...)`` renders a template
+  that ships inside the block's package. Its engine has no template loaders, so ``{% include %}``
+  does not work there, and both ``{% load i18n %}`` and ``{% load xblock_i18n %}`` give the
+  block-aware tags.
+
+* Templates rendered by Django's own engine (``render_to_string``, ``{% include %}`` and template
+  caching all work) can ``{% load xblock_i18n %}`` when ``"xblock.django"`` is in the host's
+  ``INSTALLED_APPS``. Put the service in the context under ``_i18n_service``:
+
+  .. code:: python
+
+      from django.template.loader import render_to_string
+
+      html = render_to_string(
+          "my_block/student_view.html",
+          {**context, "_i18n_service": self.runtime.service(self, "i18n")},
+      )
+
+Strings missing from the block's catalog fall back to Django's translation for the active language.
+
 .. toctree::
     :caption: Contents:
 

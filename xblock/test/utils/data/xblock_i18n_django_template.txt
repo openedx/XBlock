@@ -1,0 +1,2 @@
+{% load xblock_i18n %}
+{% trans "Translate 1" %}

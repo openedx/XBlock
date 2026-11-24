@@ -5,6 +5,14 @@ Change history for XBlock
 Unreleased
 ----------
 
+* Added the ``xblock.django`` Django app. With it in ``INSTALLED_APPS``, templates rendered by
+  Django's own engine can ``{% load xblock_i18n %}`` to get ``trans``/``blocktrans`` tags that
+  translate through the XBlock ``i18n`` service in the template context (``_i18n_service``).
+  ``ResourceLoader.render_django_template`` accepts ``{% load xblock_i18n %}`` as well.
+* Fixed the XBlock ``trans``/``blocktrans`` tags modifying Django's shared translation object.
+  They now install a per-thread translation that consults the block's service first and leave the
+  shared one untouched, so a block's catalog no longer leaks into the host's translations after the
+  first render of a cached template. The service no longer needs a ``plural`` attribute.
 * Fixed ``webob_to_django_response`` dropping all but the last ``Set-Cookie``
   header; they are now loaded into the Django response's cookie jar so every
   cookie is sent to the client.
